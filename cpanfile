@@ -16,10 +16,11 @@ requires 'Carp';
 requires 'Exporter';
 requires 'File::Path';
 requires 'Mail::Send';
+requires 'Data::Printer';
+requires 'Parse::RecDescent';
 
 on 'develop' => sub {
     requires 'Data::Dumper';
-    requires 'Data::Printer';
     requires 'Perl::Critic';
     requires 'Perl::Tidy';
     requires 'Term::ReadKey';
