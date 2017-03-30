@@ -1,4 +1,4 @@
-use Modern::Perl '2015';
+use exact;
 use Config::App;
 use Test::Most;
 use Test::Moose;

@@ -8,35 +8,10 @@ default:
             production: info
             development: debug
         alert_email:
-            - gryphon@cbqz.org
-    # mojolicious:
-    #     cookie_name: cbqz
-    #     secrets:
-    #         - 1fb07ba01a3c9f04bf716c28fac3bf15
-    #     config:
-    #         hypnotoad:
-    #             proxy: 1
-    #             workers: 3
-    #             pid_file: runtime/hypnotoad.pid
-    #             listen:
-    #                 - http://*:3210
-    #     session_duration: 3600
-    #     access_log:
-    #         production: access.log
-    #         development: morbo.log
-    # template:
-    #     compile_ext: .ttc
-    #     compile_dir:
-    #         production: runtime/ttc
-    #         development: runtime/ttc
-    #     wrapper: wrapper.html.tt
-    #     include_path:
-    #         - templates/pages
-    #         - templates/components
+            - g@cbqz.org
+    data: data
     optional_include: runtime/config.yaml
 +|+|dev:
     logging:
         filter:
             - email
-    # mojolicious:
-    #     silent_restart: 1

@@ -1,13 +1,11 @@
 package CBQZ::Util::Format;
 
-use Modern::Perl '2015';
+use exact;
 
 require Exporter;
 
 our @ISA       = 'Exporter';
-our @EXPORT_OK = qw(
-    log_date html_to_text
-);
+our @EXPORT_OK = 'log_date';
 
 {
     my @abbr = qw( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );

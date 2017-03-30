@@ -1,4 +1,4 @@
-use Modern::Perl '2015';
+use exact;
 use Config::App;
 use Test::Most;
 
@@ -9,7 +9,7 @@ exit main();
 {
     package _TestThis;
     use CBQZ::Util::Format qw(
-        log_date html_to_text
+        log_date
     );
 }
 

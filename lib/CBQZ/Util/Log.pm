@@ -1,6 +1,6 @@
 package CBQZ::Util::Log;
 
-use Modern::Perl '2015';
+use exact;
 use Log::Dispatch;
 use Term::ANSIColor ();
 use Config::App;
@@ -53,7 +53,7 @@ sub new {
                 ),
             ],
             [
-                'Email::MailSend',
+                'Email::Mailer',
                 name      => 'email',
                 min_level => _highest_level( $log_level, 'alert' ),
                 to        => $conf->get( 'logging', 'alert_email' ),
@@ -63,7 +63,7 @@ sub new {
     );
 
     my $filter = $conf->get( 'logging', 'filter' );
-    $filter = ( ref $filter ) ? $filter : [$filter];
+    $filter = ( ref $filter ) ? $filter : ($filter) ? [$filter] : [];
     $filter = [ map { $_->{name} } $log_obj->outputs ] if ( grep { lc($_) eq 'all' } @$filter );
 
     $log_obj->remove($_) for (@$filter);

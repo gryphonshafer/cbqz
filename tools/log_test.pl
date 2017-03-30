@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
-use Modern::Perl '2015';
+use exact;
+use open qw( :std :utf8 );
 use Config::App;
 use CBQZ;
 

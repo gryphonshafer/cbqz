@@ -4,15 +4,14 @@ use Moose;
 use MooseX::ClassAttribute;
 use Config::App;
 use Try::Tiny;
+use Mojo::UserAgent;
 
 use CBQZ::Error;
 use CBQZ::Util::Log;
 
-class_has log => ( isa => 'Log::Dispatch', is => 'ro', lazy => 1, default => sub {
-    return CBQZ::Util::Log->new;
-} );
-
-class_has conf => ( isa => 'Config::App', is => 'ro', default => sub { Config::App->new } );
+class_has conf => ( isa => 'Config::App',     is => 'ro', lazy => 0, default => sub { Config::App->new } );
+class_has log  => ( isa => 'Log::Dispatch',   is => 'ro', lazy => 1, default => sub { CBQZ::Util::Log->new } );
+class_has ua   => ( isa => 'Mojo::UserAgent', is => 'ro', lazy => 1, default => sub { Mojo::UserAgent->new } );
 
 sub params_check {
     my $self = shift;

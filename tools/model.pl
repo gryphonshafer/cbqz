@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
-use Modern::Perl '2015';
+use exact;
+use open qw( :std :utf8 );
 use Config::App;
 use Util::CommandLine qw( podhelp pod2usage );
 use Parse::RecDescent;
@@ -51,6 +52,7 @@ sub execute {
             unless ($obj) {
                 $node = 'CBQZ::Model::' . join( '::', map { ucfirst($_) } split( '::', $node ) );
                 eval "require $node";
+                die $@ if ($@);
                 "$node"->import;
                 $obj = "$node"->new;
             }

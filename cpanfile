@@ -1,35 +1,27 @@
-requires 'Modern::Perl', '>= 1.20150127';
+requires 'exact';
 requires 'Config::App', '>= 1.04';
-requires 'Util::CommandLine', '>= 1.02';
-
-requires 'Mojolicious', '>= 7.10';
-
-requires 'Bible::OBML', '>= 1.06';
 
 requires 'Moose';
 requires 'MooseX::ClassAttribute';
+requires 'Mojolicious', '>= 7.10';
 
-requires 'Try::Tiny';
-requires 'Log::Dispatch';
-requires 'Term::ANSIColor';
 requires 'Carp';
+requires 'Email::Mailer';
 requires 'Exporter';
 requires 'File::Path';
-requires 'Mail::Send';
-requires 'Data::Printer';
-requires 'Parse::RecDescent';
+requires 'IO::All';
+requires 'Log::Dispatch';
+requires 'Log::Dispatch::Email::Mailer';
+requires 'Term::ANSIColor';
+requires 'Try::Tiny';
 
-on 'develop' => sub {
-    requires 'Data::Dumper';
-    requires 'Perl::Critic';
-    requires 'Perl::Tidy';
-    requires 'Term::ReadKey';
-    requires 'Term::ReadLine::Perl';
-    requires 'Benchmark';
-};
-
-feature 'test', 'Testing Tools' => sub {
+feature 'test', 'Testing' => sub {
     requires 'Test::Most';
     requires 'Test::Moose';
-    requires 'Devel::Cover';
+};
+
+feature 'tools', 'Tools' => sub {
+    requires 'Data::Printer';
+    requires 'Parse::RecDescent';
+    requires 'Util::CommandLine';
 };
