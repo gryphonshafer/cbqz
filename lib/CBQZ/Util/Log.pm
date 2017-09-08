@@ -1,11 +1,11 @@
 package CBQZ::Util::Log;
 
 use exact;
+use Config::App;
+use File::Path 'make_path';
 use Log::Dispatch;
 use Term::ANSIColor ();
-use Config::App;
 use CBQZ::Util::Format 'log_date';
-use File::Path 'make_path';
 
 sub new {
     my $conf = Config::App->new;

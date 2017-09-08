@@ -1,9 +1,9 @@
 package E {
     use Moose;
     use MooseX::ClassAttribute;
+    use Carp 'croak';
     use Try::Tiny;
     use CBQZ;
-    use Carp 'croak';
 
     extends 'Throwable::Error';
     class_has cbqz => ( isa => 'CBQZ', is => 'ro', default => sub { CBQZ->new } );

@@ -1,0 +1,12 @@
+<h1>CBQZ</h1>
+
+<form method="post" action="[% c.url_for.path('/login') %]"
+    <fieldset>
+        <legend>Login</legend>
+        <label>Name: <input name="name"></label>
+        <br>
+        <label>Password: <input type="password" name="passwd"></label>
+        <br>
+        <input type="submit" value="Login">
+    </fieldset>
+</form>

@@ -3,15 +3,55 @@ package CBQZ;
 use Moose;
 use MooseX::ClassAttribute;
 use Config::App;
-use Try::Tiny;
+use DBIx::Query;
+use JSON::XS;
 use Mojo::UserAgent;
-
+use Try::Tiny;
 use CBQZ::Error;
 use CBQZ::Util::Log;
 
 class_has conf => ( isa => 'Config::App',     is => 'ro', lazy => 0, default => sub { Config::App->new } );
 class_has log  => ( isa => 'Log::Dispatch',   is => 'ro', lazy => 1, default => sub { CBQZ::Util::Log->new } );
 class_has ua   => ( isa => 'Mojo::UserAgent', is => 'ro', lazy => 1, default => sub { Mojo::UserAgent->new } );
+class_has json => ( isa => 'JSON::XS',        is => 'ro', lazy => 1, default => sub { return JSON::XS->new->utf8 } );
+
+package __PACKAGE__::_YAML {
+    use exact;
+    use YAML::XS ();
+
+    sub new {
+        return bless( {}, __PACKAGE__ );
+    }
+
+    sub dump {
+        shift;
+        return YAML::XS::Dump(@_);
+    }
+
+    sub load {
+        shift;
+        return YAML::XS::Load(@_);
+    }
+
+    sub dump_file {
+        shift;
+        return YAML::XS::DumpFile(@_);
+    }
+
+    sub load_file {
+        shift;
+        return YAML::XS::LoadFile(@_);
+    }
+}
+
+class_has dq => ( isa => 'DBIx::Query::db', is => 'ro', lazy => 1, default => sub {
+    return (
+        DBIx::Query->connect(
+            join( '', @{ Config::App->new->get('database') }{ qw( dsn dbname ) } ),
+            @{ Config::App->new->get('database') }{ qw( username password settings ) },
+        ) or E::Db->throw( $DBI::errstr )
+    );
+} );
 
 sub params_check {
     my $self = shift;
