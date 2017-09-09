@@ -1,5 +1,10 @@
 #!/usr/bin/env perl
 use exact;
+
+BEGIN {
+    $ENV{CONFIGAPPENV} = $ENV{MOJO_MODE} || $ENV{PLACK_ENV} || 'development';
+}
+
 use Config::App;
 use Mojolicious::Commands;
 

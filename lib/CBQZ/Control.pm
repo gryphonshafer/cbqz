@@ -127,7 +127,8 @@ sub startup {
     my $r = $self->routes;
 
     $r->any('/')->to('main#index');
-    $r->any( '/' . $_ )->to( controller => 'main', action => $_ ) for ( 'login', 'logout' );
+    $r->any( '/' . $_ )->to( controller => 'main', action => $_ ) for ( qw( login logout create_user ) );
+    $r->any('/create-user')->to( controller => 'main', action => 'create_user' );
 
     my $auth = $r->under( sub {
         my ($self) = @_;

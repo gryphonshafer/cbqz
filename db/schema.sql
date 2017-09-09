@@ -1,7 +1,7 @@
 CREATE TABLE event (
     event_id int(10) unsigned NOT NULL,
     user_id int(10) unsigned NOT NULL,
-    type enum('login','login_fail','challenged','challenge_fail') DEFAULT NULL,
+    type enum('login','login_fail') NOT NULL,
     created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (event_id),
     KEY user (user_id),
@@ -11,7 +11,7 @@ CREATE TABLE event (
 CREATE TABLE role (
     role_id int(10) unsigned NOT NULL,
     user_id int(10) unsigned NOT NULL,
-    type enum('money','admin') DEFAULT NULL,
+    type enum('admin','director','quizmaster','scorekeeper','coach') NOT NULL,
     created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (role_id),
     UNIQUE KEY user_type (user_id,type),
@@ -21,8 +21,9 @@ CREATE TABLE role (
 
 CREATE TABLE user (
     user_id int(10) unsigned NOT NULL,
-    name varchar(32) NOT NULL,
-    passwd varchar(40) NOT NULL,
+    name varchar(64) DEFAULT NULL,
+    passwd varchar(64) DEFAULT NULL,
+    email varchar(64) DEFAULT NULL,
     last_login timestamp NULL DEFAULT NULL,
     last_modified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created timestamp NOT NULL DEFAULT '1970-01-01 08:00:00',

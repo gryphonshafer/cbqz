@@ -2,18 +2,15 @@ package CBQZ::Model::User::PreLogin;
 
 use Moose::Role;
 use Try::Tiny;
+use Digest::SHA 'sha256_hex';
 
 sub create {
     my ( $self, $params ) = @_;
 
     $self->params_check(
-        [ '"name" not defined in input',   sub { not defined $params->{name} }   ],
-        [ '"name" length < 6 in input',    sub { length $params->{name} < 6 }    ],
-        [ '"passwd" not defined in input', sub { not defined $params->{passwd} } ],
-        [ '"passwd" length < 8 in input',  sub { length $params->{passwd} < 8 }  ],
-        [ '"passwd" complexity not met',   sub {
-            not $self->password_quality( $params->{passwd} )
-        } ],
+        [ '"name" not defined in input', sub { not defined $params->{name} }                      ],
+        [ '"name" length < 2 in input',  sub { length $params->{name} < 2 }                       ],
+        [ '"passwd" complexity not met', sub { not $self->password_quality( $params->{passwd} ) } ],
     );
 
     $self->params_check(
@@ -21,13 +18,30 @@ sub create {
     ) unless ( delete $params->{_} );
 
     try {
+        my $passwd = delete $params->{passwd};
         $self->obj( $self->rs->create($params)->get_from_storage );
+        $self->obj->update({ passwd => $passwd });
     }
     catch {
         E->throw('Failed to create user that already exists')
             if ( index( $_, 'Duplicate entry' ) > -1 );
         E->throw($_);
     };
+
+    $self->event('create_user');
+
+    # if there are no user with the "admin" role, add the admin roll to this new user
+    $self->add_role('admin') unless (
+        $self->rs->search(
+            {
+                'me.active'  => 1,
+                'roles.type' => 'admin',
+            },
+            {
+                'join' => 'roles',
+            },
+        )->count
+    );
 
     return $self;
 }
@@ -41,6 +55,7 @@ sub login {
     );
 
     $params->{active} = 1;
+    $params->{passwd} = sha256_hex( $params->{passwd} );
 
     my $user = $self->rs->search($params)->first;
 

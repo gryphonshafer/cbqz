@@ -36,7 +36,7 @@ feature 'tools', 'Tools' => sub {
 };
 
 feature 'deploy', 'Deployment' => sub {
-    requires 'App::Dest';
+    requires 'App::Dest', '>= 1.17';
 };
 
 feature 'db', 'Deployment' => sub {

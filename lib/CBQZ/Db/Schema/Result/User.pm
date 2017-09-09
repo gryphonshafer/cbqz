@@ -36,14 +36,20 @@ __PACKAGE__->table("user");
 =head2 name
 
   data_type: 'varchar'
-  is_nullable: 0
-  size: 32
+  is_nullable: 1
+  size: 64
 
 =head2 passwd
 
   data_type: 'varchar'
-  is_nullable: 0
-  size: 40
+  is_nullable: 1
+  size: 64
+
+=head2 email
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 64
 
 =head2 last_login
 
@@ -82,9 +88,11 @@ __PACKAGE__->add_columns(
     is_nullable => 0,
   },
   "name",
-  { data_type => "varchar", is_nullable => 0, size => 32 },
+  { data_type => "varchar", is_nullable => 1, size => 64 },
   "passwd",
-  { data_type => "varchar", is_nullable => 0, size => 40 },
+  { data_type => "varchar", is_nullable => 1, size => 64 },
+  "email",
+  { data_type => "varchar", is_nullable => 1, size => 64 },
   "last_login",
   {
     data_type => "timestamp",
@@ -181,8 +189,8 @@ __PACKAGE__->has_many(
 with 'CBQZ::Db::Base::Result::User';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-07 17:14:28
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:QGdcqZJ8th8lYT6iWIaTUA
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-08 13:04:02
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:P/FjQnWiqoBZDLW4q9k5jg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

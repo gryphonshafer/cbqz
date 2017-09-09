@@ -9,6 +9,8 @@ default:
             development: debug
         alert_email:
             - g@cbqz.org
+        filter:
+            - email
     data: data
     optional_include: runtime/config.yaml
     mojolicious:
@@ -46,7 +48,12 @@ default:
             RaiseError: 1
             PrintError: 0
             mysql_enable_utf8: 1
-+|+|dev:
+        logging:
+            debug: 1
+            file: runtime/dbic_sql.sql
+            profile: console
++|+|production:
+    database:
+        logging: ~
     logging:
-        filter:
-            - email
+        filter: ~

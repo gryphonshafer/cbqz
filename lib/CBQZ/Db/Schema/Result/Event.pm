@@ -43,8 +43,8 @@ __PACKAGE__->table("event");
 =head2 type
 
   data_type: 'enum'
-  extra: {list => ["login","login_fail","challenged","challenge_fail"]}
-  is_nullable: 1
+  extra: {list => ["login","login_fail"]}
+  is_nullable: 0
 
 =head2 created
 
@@ -73,8 +73,8 @@ __PACKAGE__->add_columns(
   "type",
   {
     data_type => "enum",
-    extra => { list => ["login", "login_fail", "challenged", "challenge_fail"] },
-    is_nullable => 1,
+    extra => { list => ["login", "login_fail"] },
+    is_nullable => 0,
   },
   "created",
   {
@@ -115,8 +115,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-07 17:14:28
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:qLaGt5zXU1yVPzk4y1wroQ
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-08 11:54:00
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Jz9GSkXky3a+YO0NQmLxFQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

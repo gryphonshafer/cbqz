@@ -19,14 +19,7 @@ before [ qw( change_name change_passwd ) ] => sub {
 
 sub password_quality {
     my ( $self, $passwd ) = @_;
-    return (
-        $passwd and
-        length $passwd >= 8 and
-        $passwd =~ /[A-Z]/ and
-        $passwd =~ /[a-z]/ and
-        $passwd =~ /[0-9]/ and
-        $passwd =~ /[^A-Za-z0-9]/
-    ) ? 1 : 0;
+    return ( $passwd and length $passwd >= 6 ) ? 1 : 0;
 }
 
 sub change_name {
@@ -128,6 +121,7 @@ sub add_role {
         type    => $role,
     });
 
+    $self->event('role_change');
     return $self;
 }
 
@@ -139,6 +133,7 @@ sub remove_role {
         type    => $role,
     })->delete;
 
+    $self->event('role_change');
     return $self;
 }
 

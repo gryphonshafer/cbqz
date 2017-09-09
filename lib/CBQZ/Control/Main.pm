@@ -44,4 +44,25 @@ sub logout {
     return $self->redirect_to('/');
 }
 
+sub create_user {
+    my ($self) = @_;
+
+    my $user = CBQZ::Model::User->new;
+    my $e;
+    try {
+        $user = $user
+            ->create( { map { $_ => $self->param($_) } qw( name passwd email ) } )
+            ->login( { map { $_ => $self->param($_) } qw( name passwd ) } );
+
+        # TODO: cause the login controller actions to fire
+    }
+    catch {
+        $e = $self->clean_error($_);
+        $self->info( 'Create user failure (in controller): ' . $e );
+        $self->flash( message => "Create user failed. $e. Please try again." );
+    };
+
+    return $self->redirect_to('/');
+}
+
 1;

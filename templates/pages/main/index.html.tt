@@ -1,12 +1,25 @@
 <h1>CBQZ</h1>
 
-<form method="post" action="[% c.url_for.path('/login') %]"
-    <fieldset>
-        <legend>Login</legend>
-        <label>Name: <input name="name"></label>
-        <br>
-        <label>Password: <input type="password" name="passwd"></label>
-        <br>
-        <input type="submit" value="Login">
-    </fieldset>
-</form>
+[% UNLESS user %]
+    <form method="post" action="[% c.url_for.path('/login') %]"
+        <fieldset>
+            <legend>Login</legend>
+            <label>Name: <input name="name"></label><br>
+            <label>Password: <input type="password" name="passwd"></label><br>
+            <input type="submit" value="Login">
+        </fieldset>
+    </form>
+
+    <form method="post" action="[% c.url_for.path('/create-user') %]"
+        <fieldset>
+            <legend>Create User</legend>
+            <label>Name: <input name="name"></label><br>
+            <label>Password: <input type="password" name="passwd"></label><br>
+            <label>Email: <input name="email"></label><br>
+            <input type="submit" value="Create User">
+        </fieldset>
+    </form>
+[% ELSE %]
+    <p>Logged in as: [% user.obj.name %]</p>
+    <p><a href="[% c.url_for.path('/logout') %]">Logout</a></p>
+[% END %]

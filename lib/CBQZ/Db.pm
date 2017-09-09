@@ -40,6 +40,7 @@ extends 'DBIx::Class::Schema', 'CBQZ';
                     'See the database/logging/file setting'
                 ) );
                 binmode( $dbic_log_file, ':utf8' );
+                $dbic_log_file->autoflush;
                 $db->storage->debugfh($dbic_log_file);
             }
         }

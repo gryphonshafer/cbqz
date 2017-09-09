@@ -2,8 +2,9 @@
 
 CREATE TABLE user (
     user_id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-    name VARCHAR(32) NOT NULL,
-    passwd VARCHAR(40) NOT NULL,
+    name VARCHAR(64) NULL,
+    passwd VARCHAR(64) NULL,
+    email VARCHAR(64) NULL,
     last_login TIMESTAMP NULL,
     last_modified TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     created TIMESTAMP NOT NULL DEFAULT '1970-01-01 00:00:00',
@@ -17,7 +18,7 @@ CREATE TRIGGER user_before_insert BEFORE INSERT ON user FOR EACH ROW SET NEW.cre
 CREATE TABLE event (
     event_id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
     user_id INTEGER UNSIGNED NOT NULL,
-    type ENUM('login','login_fail','challenged','challenge_fail'),
+    type ENUM('create_user','login','login_fail','role_change') NOT NULL,
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY(event_id),
 INDEX user(user_id),
@@ -30,7 +31,7 @@ FOREIGN KEY(user_id)
 CREATE TABLE role (
     role_id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
     user_id INTEGER UNSIGNED NOT NULL,
-    type ENUM('money','admin'),
+    type ENUM('admin','director','quizmaster','scorekeeper','coach') NOT NULL,
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY(role_id),
 INDEX user(user_id),
