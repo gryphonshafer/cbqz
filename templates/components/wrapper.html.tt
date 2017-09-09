@@ -3,6 +3,7 @@
 
     DEFAULT
         page.title = '',
+        page.vue   = 0,
         page.js    = [],
     ;
 
@@ -19,14 +20,20 @@
         <link rel="shortcut icon" href="[% c.url_for.path('/favicon.ico') %]" type="image/x-icon" />
         <link rel="stylesheet" type="text/css" media="screen" href="[% c.url_for.path('/screen.css') %]" />
 
+        [% IF page.vue %]
+            <script type="text/javascript" src="[% c.url_for.path(
+                "/js/lib/" _ ( ( c.app.mode == 'development' ) ? 'vue.js' : 'vue.min.js' )
+            ) %]"></script>
+        [% END %]
+
         <title>[% ( page.title ) ? 'CBQZ: ' _ page.title : 'Christian Bible Quizzing' %]</title>
     </head>
     <body>
         [% PROCESS page_layout.html.tt %]
 
         [% IF page.js.size > 0 %]
-            [% FOREACH lib IN page.js %]
-                <script type="text/javascript" src="[% c.url_for.path("/js/${lib}.js") %]"></script>
+            [% FOREACH file IN page.js %]
+                <script type="text/javascript" src="[% c.url_for.path("/js/${file}") %]"></script>
             [% END %]
         [% END %]
     </body>

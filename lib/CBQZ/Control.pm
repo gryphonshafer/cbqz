@@ -93,7 +93,7 @@ sub startup {
     $self->renderer->default_handler('tt');
 
     # pre-load controllers
-    load_class( 'CBQZ::Control::' . $_ ) for qw( Main Account );
+    load_class( 'CBQZ::Control::' . $_ ) for qw( Main Editor );
 
     # before dispatch tasks
     $self->hook( 'before_dispatch' => sub {

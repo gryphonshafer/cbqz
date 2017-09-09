@@ -1,4 +1,43 @@
 body {
     font-family: sans-serif;
-    background-color: #f0f0ff;
+    background-color: aliceblue;
+    margin: 20px;
+    padding: 0px;
+}
+
+div#header {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    text-align: right;
+}
+
+[contenteditable="true"] {
+    border: 1px solid lightgray;
+    background-color: white;
+    margin-top: 20px;
+    padding: 10px;
+    width: 500px;
+    height: 200px;
+    overflow: auto;
+    overflow-x: hidden;
+}
+
+[contenteditable="true"]:hover {
+    border-color: gray;
+}
+
+.unique_word {
+    font-weight: bold;
+    color: blue;
+}
+
+.unique_phrase {
+    font-weight: bold;
+    color: green;
+}
+
+.unique_chapter {
+    font-weight: bold;
+    color: red;
 }

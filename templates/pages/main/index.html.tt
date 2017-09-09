@@ -1,7 +1,8 @@
 <h1>CBQZ</h1>
 
 [% UNLESS user %]
-    <form method="post" action="[% c.url_for.path('/login') %]"
+    <h2>Login</h2>
+    <form method="post" action="[% c.url_for.path('/login') %]" autocomplete="off">
         <fieldset>
             <legend>Login</legend>
             <label>Name: <input name="name"></label><br>
@@ -10,7 +11,8 @@
         </fieldset>
     </form>
 
-    <form method="post" action="[% c.url_for.path('/create-user') %]"
+    <h2>Create User</h2>
+    <form method="post" action="[% c.url_for.path('/create-user') %]" autocomplete="new-password">
         <fieldset>
             <legend>Create User</legend>
             <label>Name: <input name="name"></label><br>
@@ -20,6 +22,5 @@
         </fieldset>
     </form>
 [% ELSE %]
-    <p>Logged in as: [% user.obj.name %]</p>
-    <p><a href="[% c.url_for.path('/logout') %]">Logout</a></p>
+    <a href="[% c.url_for.path('/editor') %]">Editor</a>
 [% END %]
