@@ -16,65 +16,7 @@ Vue.config.keyCodes.c = 67;
 
 var vm = new Vue({
     el: "#app",
-    data: {
-        title: 'Questions Editor',
-        types: [ 'SQ', 'MA', 'CR', 'CVR', 'Q', 'FTV', 'FT', 'SIT' ],
-        books: [
-            'Matthew',
-            'Mark',
-            'Luke',
-            'John',
-            '1 Corinthians',
-            '2 Corinthians',
-            'Acts',
-        ],
-        question: {
-            type: 'FTV',
-            book: '1 Corinthians',
-            chapter: '5',
-            verse: '15',
-            question: '\
-                This is <span class="unique_phrase">some text</span>.\
-                This is <span class="unique_word">even</span> <span class="unique_phrase">more text</span>.\
-                And this is a <span class="unique_phrase"><span class="unique_chapter">special</span> word</span>.',
-            answer: '\
-                This is <span class="unique_phrase">some text</span>.\
-                This is <span class="unique_word">even</span> <span class="unique_phrase">more text</span>.\
-                And this is a <span class="unique_phrase"><span class="unique_chapter">special</span> word</span>.'
-        },
-        list: {
-            books: [
-                '1 Corinthians',
-                '2 Corinthians',
-            ],
-            book: '1 Corinthians',
-            chapters: [ 1, 2, 3, 4, 5 ],
-            chapter: 3,
-            questions: [
-                { id: 1138, label: '1 (CR 0)' },
-                { id: 1138, label: '1 (SQ 0)' },
-                { id: 1138, label: '1 (SQ 0)' },
-                { id: 1138, label: '1 (SQ 0)' },
-                { id: 1138, label: '1 (SQ 0)' },
-                { id: 1138, label: '2 (CVR 0)' },
-                { id: 1138, label: '2 (MA 0)' },
-                { id: 1138, label: '2 (SQ 0)' },
-                { id: 1138, label: '2 (SQ 0)' },
-                { id: 1138, label: '2 (SQ 0)' },
-                { id: 1138, label: '2 (SQ 0)' },
-                { id: 1138, label: '2 (SQ 0)' },
-                { id: 1138, label: '3 (CR 0)' },
-                { id: 1138, label: '3 (CR 0)' },
-                { id: 1138, label: '3 (CVR 0)' },
-                { id: 1138, label: '3 (SQ 0)' },
-                { id: 1138, label: '3 (SQ 0)' },
-                { id: 1138, label: '3 (SQ 0)' },
-                { id: 1138, label: '3 (SQ 0)' },
-                { id: 1138, label: '3 (SQ 0)' }
-            ],
-            question: ''
-        }
-    },
+    data: data,
     methods: {
 
         format: function (className) {
@@ -103,11 +45,10 @@ var vm = new Vue({
         },
 
         save: function () {
-            this.$http.get('/editor/save').then( function (response) {
-                this.question.answer = response.body.data.answer;
+            this.$http.post( cntlr + '/save', this.question ).then( function (response) {
+                this.question = response.body.question;
             } );
-        }
-
+        },
     }
 });
 

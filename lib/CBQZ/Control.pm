@@ -32,6 +32,14 @@ sub startup {
         my ($self) = @_;
         return { map { $_ => $self->req->param($_) } @{ $self->req->params->names } };
     } );
+    $self->helper( 'req_body_json' => sub {
+        my ($self) = @_;
+        my $data;
+        try {
+            $data = $cbqz->json->decode( $self->req->body );
+        };
+        return $data;
+    } );
 
     # logging
     $self->log->level('error'); # temporarily raise log level to skip AccessLog "warn" status
@@ -86,8 +94,7 @@ sub startup {
     $self->plugin('PODRenderer') if ( $self->mode eq 'development' );
 
     # JSON rendering
-    my $json = $cbqz->json;
-    $self->renderer->add_handler( 'json' => sub { ${ $_[2] } = eval { $json->encode( $_[3]{json} ) } } );
+    $self->renderer->add_handler( 'json' => sub { ${ $_[2] } = eval { $cbqz->json->encode( $_[3]{json} ) } } );
 
     # set default rendering handler
     $self->renderer->default_handler('tt');
@@ -98,6 +105,7 @@ sub startup {
     # before dispatch tasks
     $self->hook( 'before_dispatch' => sub {
         my ($self) = @_;
+        $self->stash( 'conf' => $cbqz->conf );
 
         # expire the session if the last request time was over an hour ago
         my $last_request_time = $self->session('last_request_time');

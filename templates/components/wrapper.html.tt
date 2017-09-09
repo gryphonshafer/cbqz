@@ -11,6 +11,7 @@
         PROCESS $template;
     END;
 -%]
+[%- UNLESS skip_wrapper -%]
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -22,8 +23,9 @@
 
         [% IF page.vue %]
             <script type="text/javascript" src="[% c.url_for.path(
-                "/js/lib/" _ ( ( c.app.mode == 'development' ) ? 'vue.js' : 'vue.min.js' )
+                '/js/lib/' _ ( ( c.app.mode == 'development' ) ? 'vue.js' : 'vue.min.js' )
             ) %]"></script>
+            <script type="text/javascript" src="[% c.url_for.path('/js/lib/vue-resource.js') %]"></script>
         [% END %]
 
         <title>[% ( page.title ) ? 'CBQZ: ' _ page.title : 'Christian Bible Quizzing' %]</title>
@@ -33,8 +35,11 @@
 
         [% IF page.js.size > 0 %]
             [% FOREACH file IN page.js %]
-                <script type="text/javascript" src="[% c.url_for.path("/js/${file}") %]"></script>
+                <script type="text/javascript" src="[% c.url_for.path(file) %]"></script>
             [% END %]
         [% END %]
     </body>
 </html>
+[%- ELSE -%]
+[%- content -%]
+[%- END -%]

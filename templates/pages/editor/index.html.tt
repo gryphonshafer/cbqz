@@ -1,6 +1,6 @@
 [%
     page.vue = 1;
-    page.js.push( 'lib/vue-resource.js', 'app/editor.js' );
+    page.js.push( '/editor/data.js', '/js/app/editor.js' );
 %]
 
 <div id="app"
