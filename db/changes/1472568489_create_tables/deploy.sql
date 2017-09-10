@@ -60,8 +60,9 @@ CREATE TABLE material (
     chapter TINYINT UNSIGNED NULL,
     verse TINYINT UNSIGNED NULL,
     text TEXT NULL,
-    is_key ENUM( 'solo', 'range' ) NULL,
+    key_class ENUM( 'solo', 'range' ) NULL,
     key_type TINYTEXT NULL,
+    is_new_para BOOL NOT NULL DEFAULT 0,
 PRIMARY KEY(material_id),
 UNIQUE INDEX reference( book, chapter, verse ),
 FOREIGN KEY(material_set_id)

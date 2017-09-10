@@ -63,7 +63,7 @@ __PACKAGE__->table("material");
   data_type: 'text'
   is_nullable: 1
 
-=head2 is_key
+=head2 key_class
 
   data_type: 'enum'
   extra: {list => ["solo","range"]}
@@ -73,6 +73,12 @@ __PACKAGE__->table("material");
 
   data_type: 'tinytext'
   is_nullable: 1
+
+=head2 is_new_para
+
+  data_type: 'tinyint'
+  default_value: 0
+  is_nullable: 0
 
 =cut
 
@@ -99,7 +105,7 @@ __PACKAGE__->add_columns(
   { data_type => "tinyint", extra => { unsigned => 1 }, is_nullable => 1 },
   "text",
   { data_type => "text", is_nullable => 1 },
-  "is_key",
+  "key_class",
   {
     data_type => "enum",
     extra => { list => ["solo", "range"] },
@@ -107,6 +113,8 @@ __PACKAGE__->add_columns(
   },
   "key_type",
   { data_type => "tinytext", is_nullable => 1 },
+  "is_new_para",
+  { data_type => "tinyint", default_value => 0, is_nullable => 0 },
 );
 
 =head1 PRIMARY KEY
@@ -157,8 +165,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-10 07:40:07
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:C7DC1Rl8ymN/Ne0poe5HQw
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-10 10:17:14
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:MmDkZDvPLwcXns22fXK/Sg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

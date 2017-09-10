@@ -23,7 +23,7 @@
         <button tabindex="4">Copy Verse (Alt+V) TODO</button>
     </div>
 
-    <div tabindex="5" contenteditable="true" ref="question" v-html="question.question"></div>
+    <div tabindex="5" class="textarea" contenteditable="true" ref="question" v-html="question.question"></div>
 
     <div>
         <button v-on:click="format">Reset Formatting (Alt+Q)</button>
@@ -32,7 +32,7 @@
         <button v-on:click="format('unique_phrase')">Unique Phrase (Alt+R, Ctrl+U)</button>
     </div>
 
-    <div tabindex="6" contenteditable="true" ref="answer" v-html="question.answer"></div>
+    <div tabindex="6" class="textarea" contenteditable="true" ref="answer" v-html="question.answer"></div>
 
     <div>
         <select tabindex="7" v-model="question.type">
