@@ -1,4 +1,4 @@
-package CBQZ::Model::Roles;
+package CBQZ::Model::User::Roles;
 
 use Moose::Role;
 use Try::Tiny;
