@@ -50,11 +50,8 @@ sub create_user {
     my $user = CBQZ::Model::User->new;
     my $e;
     try {
-        $user = $user
-            ->create( { map { $_ => $self->param($_) } qw( name passwd email ) } )
-            ->login( { map { $_ => $self->param($_) } qw( name passwd ) } );
-
-        # TODO: cause the login controller actions to fire
+        $user = $user->create( { map { $_ => $self->param($_) } qw( name passwd email ) } );
+        $self->login;
     }
     catch {
         $e = $self->clean_error($_);
