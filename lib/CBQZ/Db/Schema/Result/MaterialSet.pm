@@ -1,12 +1,12 @@
 use utf8;
-package CBQZ::Db::Schema::Result::User;
+package CBQZ::Db::Schema::Result::MaterialSet;
 
 # Created by DBIx::Class::Schema::Loader
 # DO NOT MODIFY THE FIRST PART OF THIS FILE
 
 =head1 NAME
 
-CBQZ::Db::Schema::Result::User
+CBQZ::Db::Schema::Result::MaterialSet
 
 =cut
 
@@ -18,15 +18,15 @@ use MooseX::NonMoose;
 use MooseX::MarkAsMethods autoclean => 1;
 extends 'DBIx::Class::Core';
 
-=head1 TABLE: C<user>
+=head1 TABLE: C<material_set>
 
 =cut
 
-__PACKAGE__->table("user");
+__PACKAGE__->table("material_set");
 
 =head1 ACCESSORS
 
-=head2 user_id
+=head2 material_set_id
 
   data_type: 'integer'
   extra: {unsigned => 1}
@@ -38,24 +38,6 @@ __PACKAGE__->table("user");
   data_type: 'varchar'
   is_nullable: 1
   size: 64
-
-=head2 passwd
-
-  data_type: 'varchar'
-  is_nullable: 1
-  size: 64
-
-=head2 email
-
-  data_type: 'varchar'
-  is_nullable: 1
-  size: 64
-
-=head2 last_login
-
-  data_type: 'timestamp'
-  datetime_undef_if_invalid: 1
-  is_nullable: 1
 
 =head2 last_modified
 
@@ -71,16 +53,10 @@ __PACKAGE__->table("user");
   default_value: '1970-01-01 00:00:00'
   is_nullable: 0
 
-=head2 active
-
-  data_type: 'tinyint'
-  default_value: 1
-  is_nullable: 0
-
 =cut
 
 __PACKAGE__->add_columns(
-  "user_id",
+  "material_set_id",
   {
     data_type => "integer",
     extra => { unsigned => 1 },
@@ -89,16 +65,6 @@ __PACKAGE__->add_columns(
   },
   "name",
   { data_type => "varchar", is_nullable => 1, size => 64 },
-  "passwd",
-  { data_type => "varchar", is_nullable => 1, size => 64 },
-  "email",
-  { data_type => "varchar", is_nullable => 1, size => 64 },
-  "last_login",
-  {
-    data_type => "timestamp",
-    datetime_undef_if_invalid => 1,
-    is_nullable => 1,
-  },
   "last_modified",
   {
     data_type => "timestamp",
@@ -113,21 +79,19 @@ __PACKAGE__->add_columns(
     default_value => "1970-01-01 00:00:00",
     is_nullable => 0,
   },
-  "active",
-  { data_type => "tinyint", default_value => 1, is_nullable => 0 },
 );
 
 =head1 PRIMARY KEY
 
 =over 4
 
-=item * L</user_id>
+=item * L</material_set_id>
 
 =back
 
 =cut
 
-__PACKAGE__->set_primary_key("user_id");
+__PACKAGE__->set_primary_key("material_set_id");
 
 =head1 UNIQUE CONSTRAINTS
 
@@ -145,67 +109,24 @@ __PACKAGE__->add_unique_constraint("name", ["name"]);
 
 =head1 RELATIONS
 
-=head2 events
+=head2 materials
 
 Type: has_many
 
-Related object: L<CBQZ::Db::Schema::Result::Event>
+Related object: L<CBQZ::Db::Schema::Result::Material>
 
 =cut
 
 __PACKAGE__->has_many(
-  "events",
-  "CBQZ::Db::Schema::Result::Event",
-  { "foreign.user_id" => "self.user_id" },
+  "materials",
+  "CBQZ::Db::Schema::Result::Material",
+  { "foreign.material_set_id" => "self.material_set_id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
-
-=head2 question_sets
-
-Type: has_many
-
-Related object: L<CBQZ::Db::Schema::Result::QuestionSet>
-
-=cut
-
-__PACKAGE__->has_many(
-  "question_sets",
-  "CBQZ::Db::Schema::Result::QuestionSet",
-  { "foreign.user_id" => "self.user_id" },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
-=head2 roles
-
-Type: has_many
-
-Related object: L<CBQZ::Db::Schema::Result::Role>
-
-=cut
-
-__PACKAGE__->has_many(
-  "roles",
-  "CBQZ::Db::Schema::Result::Role",
-  { "foreign.user_id" => "self.user_id" },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
-=head1 L<Moose> ROLES APPLIED
-
-=over 4
-
-=item * L<CBQZ::Db::Base::Result::User>
-
-=back
-
-=cut
-
-
-with 'CBQZ::Db::Base::Result::User';
 
 
 # Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-10 07:40:07
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:FLnnPKw/hrR3t28LGNwlug
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:k8rgqXQZ9dL7Xc3K2Nvo9g
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

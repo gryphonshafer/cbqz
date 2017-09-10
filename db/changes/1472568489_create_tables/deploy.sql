@@ -18,7 +18,7 @@ CREATE TRIGGER user_before_insert BEFORE INSERT ON user FOR EACH ROW SET NEW.cre
 CREATE TABLE event (
     event_id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
     user_id INTEGER UNSIGNED NOT NULL,
-    type ENUM('create_user','login','login_fail','role_change') NOT NULL,
+    type ENUM( 'create_user', 'login', 'login_fail', 'role_change' ) NOT NULL,
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY(event_id),
 INDEX user(user_id),
@@ -31,7 +31,7 @@ FOREIGN KEY(user_id)
 CREATE TABLE role (
     role_id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
     user_id INTEGER UNSIGNED NOT NULL,
-    type ENUM('admin','director','quizmaster','scorekeeper','coach') NOT NULL,
+    type ENUM( 'admin', 'director', 'quizmaster', 'scorekeeper', 'coach' ) NOT NULL,
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY(role_id),
 INDEX user(user_id),
@@ -41,3 +41,64 @@ FOREIGN KEY(user_id)
     ON DELETE CASCADE
     ON UPDATE CASCADE
 ) ENGINE=InnoDB;
+
+CREATE TABLE material_set (
+    material_set_id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+    name VARCHAR(64) NULL,
+    last_modified TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created TIMESTAMP NOT NULL DEFAULT '1970-01-01 00:00:00',
+PRIMARY KEY(material_set_id),
+UNIQUE INDEX name(name)
+) ENGINE=InnoDB CHARSET=utf8;
+
+CREATE TRIGGER material_set_before_insert BEFORE INSERT ON material_set FOR EACH ROW SET NEW.created = NOW();
+
+CREATE TABLE material (
+    material_id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+    material_set_id INTEGER UNSIGNED NOT NULL,
+    book VARCHAR(32) NULL,
+    chapter TINYINT UNSIGNED NULL,
+    verse TINYINT UNSIGNED NULL,
+    text TEXT NULL,
+    is_key ENUM( 'solo', 'range' ) NULL,
+    key_type TINYTEXT NULL,
+PRIMARY KEY(material_id),
+UNIQUE INDEX reference( book, chapter, verse ),
+FOREIGN KEY(material_set_id)
+    REFERENCES material_set(material_set_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE=InnoDB CHARSET=utf8;
+
+CREATE TABLE question_set (
+    question_set_id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+    user_id INTEGER UNSIGNED NOT NULL,
+    name VARCHAR(64) NULL,
+    last_modified TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created TIMESTAMP NOT NULL DEFAULT '1970-01-01 00:00:00',
+PRIMARY KEY(question_set_id),
+UNIQUE INDEX name(name),
+FOREIGN KEY(user_id)
+    REFERENCES user(user_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE=InnoDB CHARSET=utf8;
+
+CREATE TRIGGER question_set_before_insert BEFORE INSERT ON question_set FOR EACH ROW SET NEW.created = NOW();
+
+CREATE TABLE question (
+    question_id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+    question_set_id INTEGER UNSIGNED NOT NULL,
+    book VARCHAR(32) NULL,
+    chapter TINYINT UNSIGNED NULL,
+    verse TINYINT UNSIGNED NULL,
+    text TEXT NULL,
+    type TINYTEXT NULL,
+    used TINYINT UNSIGNED,
+PRIMARY KEY(question_id),
+UNIQUE INDEX reference( book, chapter, verse ),
+FOREIGN KEY(question_set_id)
+    REFERENCES question_set(question_set_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE=InnoDB CHARSET=utf8;

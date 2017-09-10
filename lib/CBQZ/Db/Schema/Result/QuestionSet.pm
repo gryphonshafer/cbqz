@@ -1,12 +1,12 @@
 use utf8;
-package CBQZ::Db::Schema::Result::Event;
+package CBQZ::Db::Schema::Result::QuestionSet;
 
 # Created by DBIx::Class::Schema::Loader
 # DO NOT MODIFY THE FIRST PART OF THIS FILE
 
 =head1 NAME
 
-CBQZ::Db::Schema::Result::Event
+CBQZ::Db::Schema::Result::QuestionSet
 
 =cut
 
@@ -18,15 +18,15 @@ use MooseX::NonMoose;
 use MooseX::MarkAsMethods autoclean => 1;
 extends 'DBIx::Class::Core';
 
-=head1 TABLE: C<event>
+=head1 TABLE: C<question_set>
 
 =cut
 
-__PACKAGE__->table("event");
+__PACKAGE__->table("question_set");
 
 =head1 ACCESSORS
 
-=head2 event_id
+=head2 question_set_id
 
   data_type: 'integer'
   extra: {unsigned => 1}
@@ -40,23 +40,30 @@ __PACKAGE__->table("event");
   is_foreign_key: 1
   is_nullable: 0
 
-=head2 type
+=head2 name
 
-  data_type: 'enum'
-  extra: {list => ["create_user","login","login_fail","role_change"]}
-  is_nullable: 0
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 64
 
-=head2 created
+=head2 last_modified
 
   data_type: 'timestamp'
   datetime_undef_if_invalid: 1
   default_value: current_timestamp
   is_nullable: 0
 
+=head2 created
+
+  data_type: 'timestamp'
+  datetime_undef_if_invalid: 1
+  default_value: '1970-01-01 00:00:00'
+  is_nullable: 0
+
 =cut
 
 __PACKAGE__->add_columns(
-  "event_id",
+  "question_set_id",
   {
     data_type => "integer",
     extra => { unsigned => 1 },
@@ -70,17 +77,20 @@ __PACKAGE__->add_columns(
     is_foreign_key => 1,
     is_nullable => 0,
   },
-  "type",
+  "name",
+  { data_type => "varchar", is_nullable => 1, size => 64 },
+  "last_modified",
   {
-    data_type => "enum",
-    extra => { list => ["create_user", "login", "login_fail", "role_change"] },
+    data_type => "timestamp",
+    datetime_undef_if_invalid => 1,
+    default_value => \"current_timestamp",
     is_nullable => 0,
   },
   "created",
   {
     data_type => "timestamp",
     datetime_undef_if_invalid => 1,
-    default_value => \"current_timestamp",
+    default_value => "1970-01-01 00:00:00",
     is_nullable => 0,
   },
 );
@@ -89,15 +99,44 @@ __PACKAGE__->add_columns(
 
 =over 4
 
-=item * L</event_id>
+=item * L</question_set_id>
 
 =back
 
 =cut
 
-__PACKAGE__->set_primary_key("event_id");
+__PACKAGE__->set_primary_key("question_set_id");
+
+=head1 UNIQUE CONSTRAINTS
+
+=head2 C<name>
+
+=over 4
+
+=item * L</name>
+
+=back
+
+=cut
+
+__PACKAGE__->add_unique_constraint("name", ["name"]);
 
 =head1 RELATIONS
+
+=head2 questions
+
+Type: has_many
+
+Related object: L<CBQZ::Db::Schema::Result::Question>
+
+=cut
+
+__PACKAGE__->has_many(
+  "questions",
+  "CBQZ::Db::Schema::Result::Question",
+  { "foreign.question_set_id" => "self.question_set_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
 
 =head2 user
 
@@ -116,7 +155,7 @@ __PACKAGE__->belongs_to(
 
 
 # Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-10 07:40:07
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:bWG+0mvCMh1CPLfi/d3OCQ
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Z/IS0vdzAjSBJ/6XCMNBtw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
