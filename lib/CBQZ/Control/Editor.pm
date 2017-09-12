@@ -23,12 +23,13 @@ sub data {
     } );
 
     return $self->render( json => {
-        types    => [ qw( INT MA CR CVR Q FTV FT SIT ) ],
+        types    => [ qw( INT MA CR CVR MACR MACVR QT QTN FTV FT2V FT FTN SIT ) ],
+        books    => [ keys %$material ],
         question => { map { $_ => undef } qw( type book chapter verse question answer ) },
-        books    => [
-            '1 Corinthians',
-            '2 Corinthians',
-        ],
+        material => {
+            ( map { $_ => undef } qw( books book chapters chapter verses ) ),
+            data => $material,
+        },
         list => {
             books => [
                 '1 Corinthians',
@@ -61,11 +62,6 @@ sub data {
             ],
             question => '',
         },
-        material => {
-            ( map { $_ => undef } qw( books book chapters chapter verses ) ),
-            data => $material,
-        }
-
     } );
 }
 
