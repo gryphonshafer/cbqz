@@ -3,7 +3,7 @@
     page.js.push( '/editor/path.js', '/js/app/editor.js' );
 %]
 
-<div id="app"
+<div id="editor" v-cloak
     v-on:keyup.alt.q="format"
     v-on:keyup.alt.w="format('unique_word')"
     v-on:keyup.alt.e="format('unique_chapter')"
@@ -69,6 +69,22 @@
         <select v-model="material.chapter">
             <option v-for="item in material.chapters">{{ item }}</option>
         </select>
-        <div class="htmlarea" v-for="verse in material.verses" v-html="verse.text"></div>
+        <select v-model="material.verse">
+            <option v-for="item in material.verses">{{ item.verse }}</option>
+        </select>
+        <div id="material_lookup_display">
+            <a class="htmlarea"
+                v-for="verse in material.verses"
+                v-bind:name="'material_lookup_display_' + verse.verse"
+            >
+                <b class="material_para_markers" v-if="verse.is_new_para">&para;</b>
+                <b>{{ verse.chapter + ':' + verse.verse }}</b>
+                <span class="material_key_markers" v-if="verse.key_class">
+                    {{ ( verse.key_class == 'range' ) ? '&Dagger;' : '&dagger;' }}
+                    {{ ( verse.key_type ) ? verse.key_type : '' }}
+                </span>
+                <span v-html="verse.text"></span>
+            </a>
+        </div>
     </div>
 </div>

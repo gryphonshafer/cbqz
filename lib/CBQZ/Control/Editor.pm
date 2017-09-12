@@ -27,7 +27,7 @@ sub data {
         books    => [ keys %$material ],
         question => { map { $_ => undef } qw( type book chapter verse question answer ) },
         material => {
-            ( map { $_ => undef } qw( books book chapters chapter verses ) ),
+            ( map { $_ => undef } map { $_, $_ . 's' } qw( book chapter verse ) ),
             data => $material,
         },
         list => {

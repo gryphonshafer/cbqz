@@ -12,34 +12,53 @@ div#header {
     text-align: right;
 }
 
-div.htmlarea {
+.htmlarea {
+    display: block;
     border: 1px solid lightgray;
     background-color: white;
     padding: 10px;
 }
 
-div.htmlarea:hover {
+.htmlarea:hover {
     border-color: gray;
 }
 
-div.htmlarea[contenteditable="true"] {
+.htmlarea[contenteditable="true"] {
     width: 500px;
     height: 200px;
     overflow: auto;
     overflow-x: hidden;
 }
 
-span.unique_word {
+.unique_word {
     font-weight: bold;
     color: blue;
 }
 
-span.unique_phrase {
+.unique_phrase {
     font-weight: bold;
     color: green;
 }
 
-span.unique_chapter {
+.unique_chapter {
     font-weight: bold;
     color: red;
+}
+
+.material_para_markers,
+.material_key_markers {
+    color: gray;
+}
+
+div#material_lookup_display {
+    border: 1px solid lightgray;
+    background-color: white;
+    width: 500px;
+    height: 400px;
+    overflow: auto;
+    overflow-x: hidden;
+}
+
+[v-cloak] {
+    display: none;
 }

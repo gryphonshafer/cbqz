@@ -15,8 +15,8 @@ Vue.config.keyCodes.x = 88;
 Vue.config.keyCodes.c = 67;
 
 Vue.http.get( cntlr + '/data' ).then( function (response) {
-    var vm = new Vue({
-        el: "#app",
+    new Vue({
+        el: "#editor",
         data: response.body,
         methods: {
             format: function (className) {
@@ -51,11 +51,21 @@ Vue.http.get( cntlr + '/data' ).then( function (response) {
         },
         watch: {
             'material.book': function () {
-                this.material.chapters = Object.keys( this.material.data[ this.material.book ] ).sort();
+                this.material.chapters = Object.keys( this.material.data[ this.material.book ] ).sort(
+                    function ( a, b ) {
+                        return a - b;
+                    }
+                );
                 this.material.chapter  = this.material.chapters[0];
             },
             'material.chapter': function () {
                 this.material.verses = this.material.data[ this.material.book ][ this.material.chapter ];
+                this.material.verse  = this.material.verses[0].verse;
+            },
+            'material.verse': function () {
+                this.$nextTick( function () {
+                    window.location.href = '#material_lookup_display_' + this.material.verse;
+                } );
             }
         },
         mounted: function () {
