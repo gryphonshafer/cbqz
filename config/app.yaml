@@ -11,7 +11,7 @@ default:
             - g@cbqz.org
         filter:
             - email
-    data: data
+    data: data # location for "data" directory
     optional_include: runtime/config.yaml
     mojolicious:
         cookie_name: cbqz
@@ -25,7 +25,7 @@ default:
                 pid_file: runtime/hypnotoad.pid
                 listen:
                     - http://*:3210
-        session_duration: 3600
+        session_duration: 14400 # 4 hours
         access_log:
             production: access.log
             development: morbo.log
