@@ -50,7 +50,8 @@ div#header {
     color: gray;
 }
 
-div#material_lookup_display {
+div#material_lookup_display,
+div#material_search_display {
     border: 1px solid lightgray;
     background-color: white;
     width: 500px;
@@ -61,4 +62,9 @@ div#material_lookup_display {
 
 [v-cloak] {
     display: none;
+}
+
+.clickable_reference:hover {
+    text-decoration: underline;
+    cursor: pointer;
 }

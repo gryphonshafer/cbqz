@@ -3,46 +3,46 @@
     page.js.push( '/editor/path.js', '/js/app/editor.js' );
 %]
 
-<div id="editor" v-cloak
-    v-on:keyup.alt.q="format"
-    v-on:keyup.alt.w="format('unique_word')"
-    v-on:keyup.alt.e="format('unique_chapter')"
-    v-on:keyup.alt.r="format('unique_phrase')"
-    v-on:keyup.ctrl.b="format('unique_word')"
-    v-on:keyup.ctrl.i="format('unique_chapter')"
-    v-on:keyup.ctrl.u="format('unique_phrase')"
->
+<div id="editor" v-cloak>
     <div>
-        <select tabindex="1" v-model="question.book">
-            <option v-for="item in books">{{ item }}</option>
-        </select>
+        <div>
+            <select tabindex="1" v-model="question.book">
+                <option v-for="item in question.books">{{ item }}</option>
+            </select>
 
-        <input tabindex="2" v-model="question.chapter">:<input tabindex="3" v-model="question.verse">
-        <button tabindex="4">Copy Verse (Alt+V) TODO</button>
-    </div>
+            <input tabindex="2" v-model="question.chapter">:<input tabindex="3" v-model="question.verse">
+            <button tabindex="4" id="copy_verse" v-on:click="copy_verse">Copy Verse (Alt+V)</button>
+        </div>
 
-    <div tabindex="5" class="htmlarea" contenteditable="true" ref="question" v-html="question.question"></div>
+        <div tabindex="5" class="htmlarea" contenteditable="true"
+            ref="question" v-html="question.question"></div>
 
-    <div>
-        <button v-on:click="format">Reset Formatting (Alt+Q)</button>
-        <button v-on:click="format('unique_word')">Global Unique (Alt+W, Ctrl+B)</button>
-        <button v-on:click="format('unique_chapter')">Chapter Unique (Alt+E, Ctrl+I)</button>
-        <button v-on:click="format('unique_phrase')">Unique Phrase (Alt+R, Ctrl+U)</button>
-    </div>
+        <div>
+            <button id="format_reset"
+                v-on:click="format">Reset Formatting (Alt+Q)</button>
+            <button id="format_unique_word"
+                v-on:click="format('unique_word')">Global Unique (Alt+W, Ctrl+B)</button>
+            <button id="format_unique_chapter"
+                v-on:click="format('unique_chapter')">Chapter Unique (Alt+E, Ctrl+I)</button>
+            <button id="format_unique_phrase"
+                v-on:click="format('unique_phrase')">Unique Phrase (Alt+R, Ctrl+U)</button>
+        </div>
 
-    <div tabindex="6" class="htmlarea" contenteditable="true" ref="answer" v-html="question.answer"></div>
+        <div tabindex="6" class="htmlarea" contenteditable="true"
+            ref="answer" v-html="question.answer"></div>
 
-    <div>
-        <select tabindex="7" v-model="question.type">
-            <option v-for="item in types">{{ item }}</option>
-        </select>
-    </div>
+        <div>
+            <select tabindex="7" v-model="question.type">
+                <option v-for="item in question.types">{{ item }}</option>
+            </select>
+        </div>
 
-    <div>
-        <button tabindex="8" v-on:click="save">Save As New (Alt+A) TODO</button>
-        <button tabindex="9">Save Changes (Alt+S) TODO</button>
-        <button tabindex="10">Delete (Alt+X) TODO</button>
-        <button tabindex="11">Clear (Alt+C) TODO</button>
+        <div>
+            <button tabindex="8" v-on:click="save">Save As New (Alt+A) TODO</button>
+            <button tabindex="9">Save Changes (Alt+S, F9) TODO</button>
+            <button tabindex="10">Delete (Alt+X) TODO</button>
+            <button tabindex="11">Clear (Alt+C) TODO</button>
+        </div>
     </div>
 
     <div>
@@ -72,13 +72,37 @@
         <select v-model="material.verse">
             <option v-for="item in material.verses">{{ item.verse }}</option>
         </select>
+        <button id="lookup" v-on:click="lookup">Lookup (Alt+G, F2)</button>
+
         <div id="material_lookup_display">
             <a class="htmlarea"
                 v-for="verse in material.verses"
                 v-bind:name="'material_lookup_display_' + verse.verse"
             >
                 <b class="material_para_markers" v-if="verse.is_new_para">&para;</b>
-                <b>{{ verse.chapter + ':' + verse.verse }}</b>
+                <b class="clickable_reference" v-on:click="copy_verse_from_lookup(verse)"
+                    >{{ verse.chapter + ':' + verse.verse }}</b>
+                <span class="material_key_markers" v-if="verse.key_class">
+                    {{ ( verse.key_class == 'range' ) ? '&Dagger;' : '&dagger;' }}
+                    {{ ( verse.key_type ) ? verse.key_type : '' }}
+                </span>
+                <span v-html="verse.text"></span>
+            </a>
+        </div>
+    </div>
+
+    <div>
+        <input v-model="material.search">
+        <button id="find" v-on:click="find">Find (Alt+F, F8)</button>
+
+        <div id="material_search_display">
+            <a class="htmlarea"
+                v-for="verse in material.matched_verses"
+                v-bind:name="'material_search_display_' + verse.verse"
+            >
+                <b class="material_para_markers" v-if="verse.is_new_para">&para;</b>
+                <b class="clickable_reference" v-on:click="lookup_from_search(verse)"
+                    >{{ verse.book + ' ' + verse.chapter + ':' + verse.verse }}</b>
                 <span class="material_key_markers" v-if="verse.key_class">
                     {{ ( verse.key_class == 'range' ) ? '&Dagger;' : '&dagger;' }}
                     {{ ( verse.key_type ) ? verse.key_type : '' }}

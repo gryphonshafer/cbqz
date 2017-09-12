@@ -13,22 +13,33 @@ sub data {
     my ($self) = @_;
 
     my $material;
-    push( @{ $material->{ $_->{book} }{ $_->{chapter} } }, $_ ) for ( @{
-        $self->dq->sql(q{
-            SELECT book, chapter, verse, text, key_class, key_type, is_new_para
-            FROM material
-            WHERE material_set_id = ?
-            ORDER BY book, chapter, verse
-        })->run(1)->all({})
-    } );
+    push( @{ $material->{ $_->{book} }{ $_->{chapter} } }, $_ ) for (
+        map {
+            ( $_->{search} = lc( $_->{text} ) ) =~ s/<[^>]+>//g;
+            $_->{search} =~ s/\W//g;
+            $_;
+        }
+        @{
+            $self->dq->sql(q{
+                SELECT book, chapter, verse, text, key_class, key_type, is_new_para
+                FROM material
+                WHERE material_set_id = ?
+                ORDER BY book, chapter, verse
+            })->run(1)->all({})
+        }
+    );
 
     return $self->render( json => {
-        types    => [ qw( INT MA CR CVR MACR MACVR QT QTN FTV FT2V FT FTN SIT ) ],
-        books    => [ keys %$material ],
-        question => { map { $_ => undef } qw( type book chapter verse question answer ) },
+        question => {
+            types => [ qw( INT MA CR CVR MACR MACVR QT QTN FTV FT2V FT FTN SIT ) ],
+            books => [ sort { $a cmp $b } keys %$material ],
+            ( map { $_ => undef } qw( type book chapter verse question answer ) ),
+        },
         material => {
+            data           => $material,
+            search         => undef,
+            matched_verses => undef,
             ( map { $_ => undef } map { $_, $_ . 's' } qw( book chapter verse ) ),
-            data => $material,
         },
         list => {
             books => [
