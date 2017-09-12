@@ -1,6 +1,6 @@
 [%
     page.vue = 1;
-    page.js.push( '/editor/data.js', '/js/app/editor.js' );
+    page.js.push( '/editor/path.js', '/js/app/editor.js' );
 %]
 
 <div id="app"
@@ -12,8 +12,6 @@
     v-on:keyup.ctrl.i="format('unique_chapter')"
     v-on:keyup.ctrl.u="format('unique_phrase')"
 >
-    <h1>{{ title }}</h1>
-
     <div>
         <select tabindex="1" v-model="question.book">
             <option v-for="item in books">{{ item }}</option>
@@ -23,7 +21,7 @@
         <button tabindex="4">Copy Verse (Alt+V) TODO</button>
     </div>
 
-    <div tabindex="5" class="textarea" contenteditable="true" ref="question" v-html="question.question"></div>
+    <div tabindex="5" class="htmlarea" contenteditable="true" ref="question" v-html="question.question"></div>
 
     <div>
         <button v-on:click="format">Reset Formatting (Alt+Q)</button>
@@ -32,7 +30,7 @@
         <button v-on:click="format('unique_phrase')">Unique Phrase (Alt+R, Ctrl+U)</button>
     </div>
 
-    <div tabindex="6" class="textarea" contenteditable="true" ref="answer" v-html="question.answer"></div>
+    <div tabindex="6" class="htmlarea" contenteditable="true" ref="answer" v-html="question.answer"></div>
 
     <div>
         <select tabindex="7" v-model="question.type">
@@ -62,5 +60,15 @@
                 <option v-for="item in list.questions">{{ item.label }}</option>
             </select>
         </div>
+    </div>
+
+    <div>
+        <select v-model="material.book">
+            <option v-for="item in material.books">{{ item }}</option>
+        </select>
+        <select v-model="material.chapter">
+            <option v-for="item in material.chapters">{{ item }}</option>
+        </select>
+        <div class="htmlarea" v-for="verse in material.verses" v-html="verse.text"></div>
     </div>
 </div>

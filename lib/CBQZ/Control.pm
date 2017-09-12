@@ -22,7 +22,7 @@ sub startup {
     $self->sessions->default_expiration(0);
 
     # setup general helpers
-    for my $command ( qw( clean_error ) ) {
+    for my $command ( qw( clean_error dq conf ) ) {
         $self->helper( $command => sub {
             my $self = shift;
             return $cbqz->$command(@_);
@@ -105,7 +105,6 @@ sub startup {
     # before dispatch tasks
     $self->hook( 'before_dispatch' => sub {
         my ($self) = @_;
-        $self->stash( 'conf' => $cbqz->conf );
 
         # expire the session if the last request time was over an hour ago
         my $last_request_time = $self->session('last_request_time');

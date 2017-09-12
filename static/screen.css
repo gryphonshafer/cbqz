@@ -12,19 +12,21 @@ div#header {
     text-align: right;
 }
 
-div.textarea[contenteditable="true"] {
+div.htmlarea {
     border: 1px solid lightgray;
     background-color: white;
-    margin-top: 20px;
     padding: 10px;
+}
+
+div.htmlarea:hover {
+    border-color: gray;
+}
+
+div.htmlarea[contenteditable="true"] {
     width: 500px;
     height: 200px;
     overflow: auto;
     overflow-x: hidden;
-}
-
-div.textarea[contenteditable="true"]:hover {
-    border-color: gray;
 }
 
 span.unique_word {

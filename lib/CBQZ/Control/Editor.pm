@@ -4,9 +4,69 @@ use exact;
 use Mojo::Base 'Mojolicious::Controller';
 use Try::Tiny;
 
+sub path {
+    my ($self) = @_;
+    return $self->render( text => 'var cntlr = "' . $self->url_for->path('/editor') . '";' );
+}
+
 sub data {
     my ($self) = @_;
-    $self->stash( 'skip_wrapper' => 1 );
+
+    my $material;
+    push( @{ $material->{ $_->{book} }{ $_->{chapter} } }, $_ ) for ( @{
+        $self->dq->sql(q{
+            SELECT book, chapter, verse, text, key_class, key_type, is_new_para
+            FROM material
+            WHERE material_set_id = ?
+            ORDER BY book, chapter, verse
+        })->run(1)->all({})
+    } );
+
+    return $self->render( json => {
+        types    => [ qw( INT MA CR CVR Q FTV FT SIT ) ],
+        question => { map { $_ => undef } qw( type book chapter verse question answer ) },
+        books    => [
+            '1 Corinthians',
+            '2 Corinthians',
+        ],
+        list => {
+            books => [
+                '1 Corinthians',
+                '2 Corinthians',
+            ],
+            book => '1 Corinthians',
+            chapters => [ 1, 2, 3, 4, 5 ],
+            chapter => 3,
+            questions => [
+                { id => 1138, label => '1 (CR 0)' },
+                { id => 1138, label => '1 (SQ 0)' },
+                { id => 1138, label => '1 (SQ 0)' },
+                { id => 1138, label => '1 (SQ 0)' },
+                { id => 1138, label => '1 (SQ 0)' },
+                { id => 1138, label => '2 (CVR 0)' },
+                { id => 1138, label => '2 (MA 0)' },
+                { id => 1138, label => '2 (SQ 0)' },
+                { id => 1138, label => '2 (SQ 0)' },
+                { id => 1138, label => '2 (SQ 0)' },
+                { id => 1138, label => '2 (SQ 0)' },
+                { id => 1138, label => '2 (SQ 0)' },
+                { id => 1138, label => '3 (CR 0)' },
+                { id => 1138, label => '3 (CR 0)' },
+                { id => 1138, label => '3 (CVR 0)' },
+                { id => 1138, label => '3 (SQ 0)' },
+                { id => 1138, label => '3 (SQ 0)' },
+                { id => 1138, label => '3 (SQ 0)' },
+                { id => 1138, label => '3 (SQ 0)' },
+                { id => 1138, label => '3 (SQ 0)' },
+            ],
+            question => '',
+        },
+        material => {
+            ( map { $_ => undef } qw( books book chapters chapter verses ) ),
+            data => $material,
+        }
+
+    } );
 }
 
 sub save {
