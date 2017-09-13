@@ -12,6 +12,7 @@
 
             <input tabindex="2" v-model="question.chapter">:<input tabindex="3" v-model="question.verse">
             <button tabindex="4" id="copy_verse" v-on:click="copy_verse">Copy Verse (Alt+V)</button>
+            <button id="lookup" v-on:click="lookup">Lookup (Alt+G, F2)</button>
         </div>
 
         <div tabindex="5" class="htmlarea" contenteditable="true"
@@ -72,12 +73,11 @@
         <select v-model="material.verse">
             <option v-for="item in material.verses">{{ item.verse }}</option>
         </select>
-        <button id="lookup" v-on:click="lookup">Lookup (Alt+G, F2)</button>
 
         <div id="material_lookup_display">
             <a class="htmlarea"
                 v-for="verse in material.verses"
-                v-bind:name="'material_lookup_display_' + verse.verse"
+                v-bind:name="'v' + verse.verse"
             >
                 <b class="material_para_markers" v-if="verse.is_new_para">&para;</b>
                 <b class="clickable_reference" v-on:click="copy_verse_from_lookup(verse)"

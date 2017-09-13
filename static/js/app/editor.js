@@ -70,9 +70,9 @@ Vue.http.get( cntlr + '/data' ).then( function (response) {
             },
             lookup: function () {
                 if (
-                    this.question.book.length > 0 &&
-                    this.question.chapter.length > 0 &&
-                    this.question.verse.length > 0
+                    !! this.question.book &&
+                    parseInt( this.question.chapter ) > 0 &&
+                    parseInt( this.question.verse ) > 0
                 ) {
                     this.material.book = this.question.book;
                     this.$nextTick( function () {
@@ -96,13 +96,19 @@ Vue.http.get( cntlr + '/data' ).then( function (response) {
             },
             copy_verse: function () {
                 if (
-                    this.question.book.length > 0 &&
-                    this.question.chapter.length > 0 &&
-                    this.question.verse.length > 0
+                    !! this.question.book &&
+                    parseInt( this.question.chapter ) > 0 &&
+                    parseInt( this.question.verse ) > 0
                 ) {
                     var verse = this.material.data[ this.question.book ][ this.question.chapter ][ this.question.verse ];
-                    this.question.question = verse.text;
-                    this.question.answer   = verse.text;
+
+                    this.question.question = '';
+                    this.question.answer   = '';
+
+                    this.$nextTick( function () {
+                        this.question.question = verse.text;
+                        this.question.answer   = verse.text;
+                    } );
                 }
             },
             copy_verse_from_lookup: function (verse) {
@@ -133,11 +139,11 @@ Vue.http.get( cntlr + '/data' ).then( function (response) {
             },
             'material.chapter': function () {
                 this.material.verses = this.material.data[ this.material.book ][ this.material.chapter ];
-                this.material.verse  = this.material.verses[0].verse;
+                this.material.verse  = this.material.verses[1].verse;
             },
             'material.verse': function () {
                 this.$nextTick( function () {
-                    window.location.href = '#material_lookup_display_' + this.material.verse;
+                    window.location.href = '#v' + this.material.verse;
                 } );
             },
             'material.search': function () {
@@ -156,10 +162,13 @@ Vue.http.get( cntlr + '/data' ).then( function (response) {
 
                         for ( var j = 0; j < chapters.length; j++ ) {
                             var verses = this.material.data[ books[i] ][ chapters[j] ];
+                            var verse_numbers = Object.keys(verses).sort();
 
-                            for ( var k = 0; k < verses.length; k++ ) {
-                                if ( verses[k].search.indexOf( search_term ) != -1 ) {
-                                    this.material.matched_verses.push( verses[k] );
+                            for ( var k = 0; k < verse_numbers.length; k++ ) {
+                                var verse_number = verse_numbers[k];
+
+                                if ( verses[verse_number].search.indexOf( search_term ) != -1 ) {
+                                    this.material.matched_verses.push( verses[verse_number] );
                                 }
                             }
                         }

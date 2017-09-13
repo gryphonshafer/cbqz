@@ -13,7 +13,7 @@ sub data {
     my ($self) = @_;
 
     my $material;
-    push( @{ $material->{ $_->{book} }{ $_->{chapter} } }, $_ ) for (
+    $material->{ $_->{book} }{ $_->{chapter} }{ $_->{verse} } = $_ for (
         map {
             ( $_->{search} = lc( $_->{text} ) ) =~ s/<[^>]+>//g;
             $_->{search} =~ s/\W//g;
