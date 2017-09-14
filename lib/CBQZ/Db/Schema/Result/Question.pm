@@ -58,7 +58,12 @@ __PACKAGE__->table("question");
   extra: {unsigned => 1}
   is_nullable: 1
 
-=head2 text
+=head2 question
+
+  data_type: 'text'
+  is_nullable: 1
+
+=head2 answer
 
   data_type: 'text'
   is_nullable: 1
@@ -71,8 +76,9 @@ __PACKAGE__->table("question");
 =head2 used
 
   data_type: 'tinyint'
+  default_value: 0
   extra: {unsigned => 1}
-  is_nullable: 1
+  is_nullable: 0
 
 =cut
 
@@ -97,12 +103,19 @@ __PACKAGE__->add_columns(
   { data_type => "tinyint", extra => { unsigned => 1 }, is_nullable => 1 },
   "verse",
   { data_type => "tinyint", extra => { unsigned => 1 }, is_nullable => 1 },
-  "text",
+  "question",
+  { data_type => "text", is_nullable => 1 },
+  "answer",
   { data_type => "text", is_nullable => 1 },
   "type",
   { data_type => "tinytext", is_nullable => 1 },
   "used",
-  { data_type => "tinyint", extra => { unsigned => 1 }, is_nullable => 1 },
+  {
+    data_type => "tinyint",
+    default_value => 0,
+    extra => { unsigned => 1 },
+    is_nullable => 0,
+  },
 );
 
 =head1 PRIMARY KEY
@@ -116,24 +129,6 @@ __PACKAGE__->add_columns(
 =cut
 
 __PACKAGE__->set_primary_key("question_id");
-
-=head1 UNIQUE CONSTRAINTS
-
-=head2 C<reference>
-
-=over 4
-
-=item * L</book>
-
-=item * L</chapter>
-
-=item * L</verse>
-
-=back
-
-=cut
-
-__PACKAGE__->add_unique_constraint("reference", ["book", "chapter", "verse"]);
 
 =head1 RELATIONS
 
@@ -153,8 +148,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-10 07:40:07
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:4mrUpq+vzD5GE8WSuy0LnQ
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-13 07:46:40
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:bMJyzARct2O6TLq32/3Wtw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

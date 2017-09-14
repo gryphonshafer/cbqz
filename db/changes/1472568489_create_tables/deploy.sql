@@ -93,11 +93,12 @@ CREATE TABLE question (
     book VARCHAR(32) NULL,
     chapter TINYINT UNSIGNED NULL,
     verse TINYINT UNSIGNED NULL,
-    text TEXT NULL,
+    question TEXT NULL,
+    answer TEXT NULL,
     type TINYTEXT NULL,
-    used TINYINT UNSIGNED,
+    used TINYINT UNSIGNED NOT NULL DEFAULT 0,
 PRIMARY KEY(question_id),
-UNIQUE INDEX reference( book, chapter, verse ),
+INDEX reference( book, chapter, verse ),
 FOREIGN KEY(question_set_id)
     REFERENCES question_set(question_set_id)
     ON DELETE CASCADE

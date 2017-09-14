@@ -6,11 +6,11 @@
 <div id="editor" v-cloak>
     <div>
         <div>
-            <select tabindex="1" v-model="question.book">
-                <option v-for="item in question.books">{{ item }}</option>
+            <select id="book" tabindex="1" v-model="question.book">
+                <option v-for="item in metadata.books">{{ item }}</option>
             </select>
 
-            <input tabindex="2" v-model="question.chapter">:<input tabindex="3" v-model="question.verse">
+            <input tabindex="2" v-model="question.chapter">:<input id="verse" tabindex="3" v-model="question.verse">
             <button tabindex="4" id="copy_verse" v-on:click="copy_verse">Copy Verse (Alt+V)</button>
             <button id="lookup" v-on:click="lookup">Lookup (Alt+G, F2)</button>
         </div>
@@ -34,32 +34,33 @@
 
         <div>
             <select tabindex="7" v-model="question.type">
-                <option v-for="item in question.types">{{ item }}</option>
+                <option v-for="item in metadata.types">{{ item }}</option>
             </select>
         </div>
 
         <div>
-            <button tabindex="8" v-on:click="save">Save As New (Alt+A) TODO</button>
-            <button tabindex="9">Save Changes (Alt+S, F9) TODO</button>
-            <button tabindex="10">Delete (Alt+X) TODO</button>
-            <button tabindex="11">Clear (Alt+C) TODO</button>
+            <button tabindex="8" id="save_new" v-on:click="save_new">Save As New (Alt+A)</button>
+            <button tabindex="9" id="save_changes" v-on:click="save_changes">Save Changes (Alt+S, F9)</button>
+            <button tabindex="10" id="delete_question" v-on:click="delete_question">Delete (Alt+X)</button>
+            <button tabindex="11" id="clear_form" v-on:click="clear_form">Clear (Alt+C)</button>
         </div>
     </div>
 
     <div>
         <div>
-            <select v-model="list.book">
-                <option v-for="item in list.books">{{ item }}</option>
+            <select v-model="questions.book">
+                <option v-for="item in questions.books">{{ item }}</option>
             </select>
-
-            <select v-model="list.chapter">
-                <option v-for="item in list.chapters">{{ item }}</option>
+            <select v-model="questions.chapter">
+                <option v-for="item in questions.chapters">{{ item }}</option>
             </select>
-        </div>
-        <div>
-            <select v-model="list.question" size="10">
-                <option v-for="item in list.questions">{{ item.label }}</option>
-            </select>
+            <div>
+                <select v-model="questions.question_id" size="10">
+                    <option v-for="item in questions.questions" v-bind:value="item.question_id">{{
+                        item.verse + ' (' + item.type + ' ' + item.used + ')'
+                    }}</option>
+                </select>
+            </div>
         </div>
     </div>
 

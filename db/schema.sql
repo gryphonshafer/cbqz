@@ -41,11 +41,12 @@ CREATE TABLE question (
     book varchar(32) DEFAULT NULL,
     chapter tinyint(3) unsigned DEFAULT NULL,
     verse tinyint(3) unsigned DEFAULT NULL,
-    text text,
+    question text,
+    answer text,
     type tinytext,
-    used tinyint(3) unsigned DEFAULT NULL,
+    used tinyint(3) unsigned NOT NULL DEFAULT '0',
     PRIMARY KEY (question_id),
-    UNIQUE KEY reference (book,chapter,verse),
+    KEY reference (book,chapter,verse),
     KEY question_set_id (question_set_id),
     CONSTRAINT question_ibfk_1 FOREIGN KEY (question_set_id) REFERENCES question_set (question_set_id) ON DELETE CASCADE ON UPDATE CASCADE
 );

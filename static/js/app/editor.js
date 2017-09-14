@@ -26,17 +26,22 @@ document.addEventListener( "keyup", function(event) {
 
     // for Alt+V: Copy Verse
     if ( event.altKey && event.keyCode == 86 ) document.getElementById("copy_verse").click();
+
+    // for Alt+A: Save As New
+    if ( event.altKey && event.keyCode == 65 ) document.getElementById("save_new").click();
+
+    // for Alt+S, F9: Save Changes
+    if ( ( event.altKey && event.keyCode == 83 ) || event.keyCode == 120 )
+        document.getElementById("save_changes").click();
+
+    // for Alt+X: Delete
+    if ( event.altKey && event.keyCode == 88 ) document.getElementById("delete_question").click();
+
+    // for Alt+C: Clear
+    if ( event.altKey && event.keyCode == 67 ) document.getElementById("clear_form").click();
 } );
 
-/*
-    a: 65,   // for Alt+A:  Save As New
-    s: 83,   // for Alt+S:  Save Changes
-    f9: 120, // for F9:     Save Changes
-    x: 88,   // for Alt+X:  Delete
-    c: 67,   // for Alt+C:  Clear
-*/
-
-Vue.http.get( cntlr + '/data' ).then( function (response) {
+Vue.http.get( cntlr + "/data" ).then( function (response) {
     new Vue({
         el: "#editor",
         data: response.body,
@@ -49,7 +54,7 @@ Vue.http.get( cntlr + '/data' ).then( function (response) {
                         var replacement = document.createTextNode( range.toString() );
 
                         if (className) {
-                            var span = document.createElement('span');
+                            var span = document.createElement("span");
                             span.className = className;
                             span.appendChild(replacement);
                             replacement = span;
@@ -63,10 +68,109 @@ Vue.http.get( cntlr + '/data' ).then( function (response) {
                     this.question.answer   = this.$refs.answer.innerHTML;
                 }
             },
-            save: function () {
-                this.$http.post( cntlr + '/save', this.question ).then( function (response) {
-                    this.question = response.body.question;
-                } );
+            save_new: function () {
+                if (
+                    !! this.question.book &&
+                    parseInt( this.question.chapter ) > 0 &&
+                    parseInt( this.question.verse ) > 0 &&
+                    this.question.question.length > 0 &&
+                    this.question.answer.length > 0 &&
+                    !! this.question.type
+                ) {
+                    this.question.question = this.$refs.question.innerHTML;
+                    this.question.answer   = this.$refs.answer.innerHTML;
+
+                    this.$http.post( cntlr + "/save", this.question ).then( function (response) {
+                        var question = response.body.question;
+
+                        if ( ! this.questions.data[ question.book ] )
+                            this.questions.data[ question.book ] = {};
+                        if ( ! this.questions.data[ question.book ][ question.chapter ] )
+                            this.questions.data[ question.book ][ question.chapter ] = {};
+
+                        this.questions.data
+                            [ question.book ][ question.chapter ][ question.question_id ] = question;
+
+                        this.questions.books = Object.keys( this.questions.data ).sort();
+                        this.questions.book = null;
+
+                        this.$nextTick( function () {
+                            this.questions.book = question.book;
+
+                            this.$nextTick( function () {
+                                this.questions.chapter = question.chapter;
+                            } );
+                        } );
+
+                        this.clear_form();
+
+                        this.$nextTick( function () {
+                            this.question.book    = question.book;
+                            this.question.chapter = question.chapter;
+                            this.question.verse   = question.verse;
+
+                            document.getElementById("verse").focus();
+                            this.$nextTick( function () {
+                                document.getElementById("verse").select();
+                            } );
+                        } );
+                    } );
+                }
+                else {
+                    alert('Not all required fields have data.');
+                }
+            },
+            save_changes: function () {
+                console.log("CALL save_changes"); // TODO
+
+
+
+
+            },
+            delete_question: function () {
+                console.log("CALL delete"); // TODO
+
+
+                if ( !! this.questions.question_id ) {
+                    this.$http.post(
+                        cntlr + "/delete",
+                        { question_id: this.questions.question_id }
+                    ).then( function (response) {
+
+
+
+
+                        delete this.questions.data[ this.questions.book ][ this.questions.chapter ][ this.questions.question_id ];
+
+                        this.questions.books = Object.keys( this.questions.data ).sort();
+                        if ( this.questions.books[0] )
+                            ( !! this.questions.data[ this.questions.book ][ this.questions.chapter ] )
+                                ? this.questions.chapter
+                                : this.questions.books[0];
+
+
+
+
+                    } );
+                }
+
+
+
+
+            },
+            clear_form: function () {
+                this.questions.question_id = null;
+
+                this.question.question_id = null;
+                this.question.used        = null;
+                this.question.book        = null;
+                this.question.chapter     = null;
+                this.question.verse       = null;
+                this.question.question    = null;
+                this.question.answer      = null;
+                this.question.type        = null;
+
+                document.getElementById("book").focus();
             },
             lookup: function () {
                 if (
@@ -86,7 +190,7 @@ Vue.http.get( cntlr + '/data' ).then( function (response) {
             find: function () {
                 var selection = document.getSelection();
                 if ( selection.rangeCount > 0 && selection.isCollapsed == 0 ) {
-                    var search_text = '';
+                    var search_text = "";
                     for ( var i = 0; i < selection.rangeCount; i++ ) {
                         search_text = search_text + selection.getRangeAt(i).toString();
                     }
@@ -100,23 +204,36 @@ Vue.http.get( cntlr + '/data' ).then( function (response) {
                     parseInt( this.question.chapter ) > 0 &&
                     parseInt( this.question.verse ) > 0
                 ) {
-                    var verse = this.material.data[ this.question.book ][ this.question.chapter ][ this.question.verse ];
+                    this.questions.question_id = null;
 
-                    this.question.question = '';
-                    this.question.answer   = '';
+                    var verse = this.material.data
+                        [ this.question.book ][ this.question.chapter ][ this.question.verse ];
+
+                    this.question.question = "";
+                    this.question.answer   = "";
 
                     this.$nextTick( function () {
                         this.question.question = verse.text;
                         this.question.answer   = verse.text;
                     } );
+
+                    this.question.question_id = null;
+                    this.question.used        = null;
+                    this.question.type        = null;
                 }
             },
             copy_verse_from_lookup: function (verse) {
+                this.questions.question_id = null;
+
                 this.question.book     = verse.book;
                 this.question.chapter  = verse.chapter;
                 this.question.verse    = verse.verse;
                 this.question.question = verse.text;
                 this.question.answer   = verse.text;
+
+                this.question.question_id = null;
+                this.question.used        = null;
+                this.question.type        = null;
             },
             lookup_from_search: function (verse) {
                 this.material.book = verse.book;
@@ -129,7 +246,7 @@ Vue.http.get( cntlr + '/data' ).then( function (response) {
             }
         },
         watch: {
-            'material.book': function () {
+            "material.book": function () {
                 this.material.chapters = Object.keys( this.material.data[ this.material.book ] ).sort(
                     function ( a, b ) {
                         return a - b;
@@ -137,20 +254,20 @@ Vue.http.get( cntlr + '/data' ).then( function (response) {
                 );
                 this.material.chapter  = this.material.chapters[0];
             },
-            'material.chapter': function () {
+            "material.chapter": function () {
                 this.material.verses = this.material.data[ this.material.book ][ this.material.chapter ];
                 this.material.verse  = this.material.verses[1].verse;
             },
-            'material.verse': function () {
+            "material.verse": function () {
                 this.$nextTick( function () {
-                    window.location.href = '#v' + this.material.verse;
+                    window.location.href = "#v" + this.material.verse;
                 } );
             },
-            'material.search': function () {
+            "material.search": function () {
                 this.material.matched_verses = [];
 
                 if ( this.material.search.length > 2 ) {
-                    var search_term = this.material.search.toLowerCase().replace( /\W+/g, '' );
+                    var search_term = this.material.search.toLowerCase().replace( /\W+/g, "" );
 
                     var books = Object.keys( this.material.data ).sort();
                     for ( var i = 0; i < books.length; i++ ) {
@@ -174,11 +291,53 @@ Vue.http.get( cntlr + '/data' ).then( function (response) {
                         }
                     }
                 }
-            }
+            },
+            "questions.book": function () {
+                if ( !! this.questions.book ) {
+                    this.questions.chapters = Object.keys( this.questions.data[ this.questions.book ] ).sort(
+                        function ( a, b ) {
+                            return a - b;
+                        }
+                    );
+                    this.questions.chapter = this.questions.chapters[0];
+                }
+            },
+            "questions.chapter": function () {
+                var questions_hash = this.questions.data[ this.questions.book ][ this.questions.chapter ];
+                var keys = Object.keys(questions_hash);
+
+                var questions_array = new Array();
+                for ( var i = 0; i < keys.length; i++ ) {
+                    questions_array.push( questions_hash[ keys[i] ] );
+                }
+
+                this.questions.questions = questions_array.sort( function ( a, b ) {
+                    if ( a.verse < b.verse ) return -1;
+                    if ( a.verse > b.verse ) return 1;
+                    if ( a.type < b.type ) return -1;
+                    if ( a.type > b.type ) return 1;
+                    if ( a.used > b.used ) return -1;
+                    if ( a.used < b.used ) return 1;
+                    return 0;
+                } );
+            },
+            "questions.question_id": function () {
+                if ( !! this.questions.question_id ) {
+                    var question = this.questions.data
+                        [ this.questions.book ][ this.questions.chapter ][ this.questions.question_id ];
+
+                    for ( var key in question ) {
+                        this.question[key] = question[key];
+                    }
+                }
+            },
         },
         mounted: function () {
             this.material.books = Object.keys( this.material.data );
             this.material.book  = this.material.books[0];
+
+            this.questions.books = Object.keys( this.questions.data ).sort();
+            if ( this.questions.books[0] ) this.questions.book = this.questions.books[0];
         }
     });
 } );
