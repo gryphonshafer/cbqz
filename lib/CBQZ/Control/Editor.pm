@@ -91,17 +91,29 @@ sub save {
     my ($self) = @_;
     my $question = $self->req_body_json;
 
-    $self->dq->sql(q{
-        INSERT INTO question (
-            question_set_id, book, chapter, verse, question, answer, type
-        ) VALUES ( ?, ?, ?, ?, ?, ?, ? )
-    })->run(
-        $self->session('question_set_id'),
-        @$question{ qw( book chapter verse question answer type ) }
-    );
+    unless ( $question->{question_id} ) {
+        $self->dq->sql(q{
+            INSERT INTO question (
+                question_set_id, book, chapter, verse, question, answer, type
+            ) VALUES ( ?, ?, ?, ?, ?, ?, ? )
+        })->run(
+            $self->session('question_set_id'),
+            @$question{ qw( book chapter verse question answer type ) },
+        );
 
-    $question->{question_id} = $self->dq->sql('SELECT last_insert_id()')->run->value;
-    $question->{used}        = 0;
+        $question->{question_id} = $self->dq->sql('SELECT last_insert_id()')->run->value;
+        $question->{used}        = 0;
+    }
+    else {
+        $self->dq->sql(q{
+            UPDATE question
+            SET book = ?, chapter = ?, verse = ?, question = ?, answer = ?, type = ?
+            WHERE question_id = ?
+        })->run(
+            @$question{ qw( book chapter verse question answer type ) },
+            $question->{question_id},
+        );
+    }
 
     return $self->render( json => { question => $question } );
 }
