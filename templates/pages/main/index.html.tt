@@ -1,4 +1,4 @@
-<h1>CBQZ</h1>
+<h1>CBQZ Bible Quizzing System</h1>
 
 [% UNLESS user %]
     <h2>Login</h2>
@@ -22,5 +22,10 @@
         </fieldset>
     </form>
 [% ELSE %]
-    <a href="[% c.url_for.path('/editor') %]">Editor</a>
+    <ul>
+        <li><a href="[% c.url_for.path('/') %]">Home</a></li>
+        <li><a href="[% c.url_for.path('/editor') %]">Editor</a></li>
+        <li><a href="[% c.url_for.path('/quizroom') %]">Quiz Room</a></li>
+        <li><a href="[% c.url_for.path('/logout') %]">Logout</a></li>
+    </ul>
 [% END %]

@@ -1,6 +1,9 @@
 <div id="header">
     [% IF user %]
         Logged in as: [% user.obj.name %]<br>
+        <a href="[% c.url_for.path('/') %]">Home</a>
+        <a href="[% c.url_for.path('/editor') %]">Editor</a>
+        <a href="[% c.url_for.path('/quizroom') %]">Quiz Room</a>
         <a href="[% c.url_for.path('/logout') %]">Logout</a>
     [% END %]
 </div>

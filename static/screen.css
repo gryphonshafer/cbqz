@@ -1,8 +1,14 @@
 body {
     font-family: sans-serif;
+    font-size: 10pt;
     background-color: aliceblue;
     margin: 20px;
     padding: 0px;
+}
+
+input, button, select {
+    font-family: sans-serif;
+    font-size: 10pt;
 }
 
 div#header {
@@ -24,8 +30,8 @@ div#header {
 }
 
 .htmlarea[contenteditable="true"] {
-    width: 500px;
-    height: 200px;
+    width: 400px;
+    height: 150px;
     overflow: auto;
     overflow-x: hidden;
 }
@@ -54,10 +60,18 @@ div#material_lookup_display,
 div#material_search_display {
     border: 1px solid lightgray;
     background-color: white;
-    width: 500px;
-    height: 400px;
     overflow: auto;
     overflow-x: hidden;
+}
+
+div#material_lookup_display {
+    width: 450px;
+    height: 400px;
+}
+
+div#material_search_display {
+    width: 1025px;
+    height: 250px;
 }
 
 [v-cloak] {
@@ -67,4 +81,26 @@ div#material_search_display {
 .clickable_reference:hover {
     text-decoration: underline;
     cursor: pointer;
+}
+
+div#editor div#question_form {
+    display: inline-block;
+    vertical-align: top;
+}
+
+div#editor div#questions_list {
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+div#editor div#material_lookup {
+    display: inline-block;
+    vertical-align: top;
+}
+
+div#editor div#material_search {
+    display: block;
+    vertical-align: top;
 }

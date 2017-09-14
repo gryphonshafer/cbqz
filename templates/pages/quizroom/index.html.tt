@@ -1,0 +1,9 @@
+[%
+    page.vue = 1;
+    page.js.push( '/editor/path.js', '/js/app/quizroom.js' );
+%]
+
+<h1>Quiz Room</h1>
+
+<div id="quizroom" v-cloak>
+</div>
