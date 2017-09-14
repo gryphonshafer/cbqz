@@ -20,7 +20,7 @@
             <button id="lookup" v-on:click="lookup">Lookup (Alt+G, F2)</button>
         </div>
 
-        <div tabindex="5" class="htmlarea" contenteditable="true"
+        <div tabindex="5" class="htmlarea question" contenteditable="true"
             ref="question" v-html="question.question"></div>
 
         <div>
@@ -35,7 +35,7 @@
                 v-on:click="format('unique_phrase')">Phrase (Alt+R, Ctrl+U)</button>
         </div>
 
-        <div tabindex="6" class="htmlarea" contenteditable="true"
+        <div tabindex="6" class="htmlarea question" contenteditable="true"
             ref="answer" v-html="question.answer"></div>
 
         <div>

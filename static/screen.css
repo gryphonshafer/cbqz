@@ -25,15 +25,18 @@ div#header {
     padding: 10px;
 }
 
-.htmlarea:hover {
+.htmlarea[contenteditable="true"] {
+    overflow: auto;
+    overflow-x: hidden;
+}
+
+.htmlarea[contenteditable="true"]:hover {
     border-color: gray;
 }
 
-.htmlarea[contenteditable="true"] {
+.question {
     width: 400px;
     height: 150px;
-    overflow: auto;
-    overflow-x: hidden;
 }
 
 .unique_word {
@@ -103,4 +106,47 @@ div#editor div#material_lookup {
 div#editor div#material_search {
     display: block;
     vertical-align: top;
+}
+
+span.field {
+    border: 1px solid lightgray;
+    background-color: white;
+    padding: 1px 4px 1px 4px;
+    display: inline-block;
+}
+
+div#quizroom div#question {
+    display: inline-block;
+    vertical-align: top;
+}
+
+div#quizroom div#manage {
+    display: inline-block;
+    vertical-align: top;
+}
+
+div#quizroom div#material_lookup {
+    display: inline-block;
+    vertical-align: top;
+}
+
+div#quizroom div#material_search {
+    display: block;
+    vertical-align: top;
+}
+
+div#manage {
+    width: 130px;
+}
+
+div#manage > div {
+    margin-bottom: 10px;
+}
+
+div#timer div.timer_display {
+    border: 1px solid lightgray;
+    background-color: white;
+    padding: 1px 10px 1px 10px;
+    font-size: 40pt;
+    float: left;
 }
