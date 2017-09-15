@@ -30,7 +30,7 @@ sub index {
 
 sub path {
     my ($self) = @_;
-    return $self->render( text => 'var cntlr = "' . $self->url_for->path('/editor') . '";' );
+    return $self->render( text => 'var cntlr = "' . $self->url_for->path('/quizroom') . '";' );
 }
 
 sub data {
@@ -190,7 +190,22 @@ sub data {
             matched_verses => undef,
             ( map { $_ => undef } map { $_, $_ . 's' } qw( book chapter verse ) ),
         },
-        questions => \@questions,
+        questions => [
+            map {
+                $_->{number} = undef;
+                $_->{as}     = undef;
+                $_;
+            } @questions
+        ],
+        question => {
+            map { $_ => undef } qw( number type as used book chapter verse question answer )
+        },
+        position => 0,
+        timer    => {
+            value => 30,
+            state => 'ready',
+            label => 'Start Timer',
+        },
     } );
 }
 
