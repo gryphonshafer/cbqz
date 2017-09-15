@@ -84,6 +84,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     this.question.question = this.$refs.question.innerHTML;
                     this.question.answer   = this.$refs.answer.innerHTML;
 
+                    this.question.question_id = null;
+
                     this.$http.post( cntlr + "/save", this.question ).then( function (response) {
                         var question = response.body.question;
 
@@ -445,7 +447,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 if ( !! this.questions.book ) {
                     this.questions.chapters = Object.keys( this.questions.data[ this.questions.book ] ).sort(
                         function ( a, b ) {
-                            return a - b;
+                            return b - a;
                         }
                     );
 
@@ -466,8 +468,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     }
 
                     this.questions.questions = questions_array.sort( function ( a, b ) {
-                        if ( a.verse < b.verse ) return -1;
-                        if ( a.verse > b.verse ) return 1;
+                        if ( a.verse > b.verse ) return -1;
+                        if ( a.verse < b.verse ) return 1;
                         if ( a.type < b.type ) return -1;
                         if ( a.type > b.type ) return 1;
                         if ( a.used > b.used ) return -1;

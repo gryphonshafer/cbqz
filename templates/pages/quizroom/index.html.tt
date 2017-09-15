@@ -13,7 +13,9 @@
         Used: <span class="field">{{ question.used }}</span>
         <br>
         Reference: <span class="field">{{
-            question.book + ' ' + question.chapter + ':' + question.verse
+            ( question.book && question.chapter && question.verse )
+                ? question.book + ' ' + question.chapter + ':' + question.verse
+                : ''
         }}</span>
 
         <button id="lookup" v-on:click="lookup">Lookup (Alt+G, F2)</button>

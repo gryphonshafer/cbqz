@@ -259,7 +259,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             this.material.books = Object.keys( this.material.data );
             this.material.book  = this.material.books[0];
 
-            this.setup_question();
+            if ( this.questions.length > 0 ) this.setup_question();
         }
     });
 });

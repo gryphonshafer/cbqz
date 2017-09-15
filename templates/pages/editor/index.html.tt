@@ -25,7 +25,7 @@
 
         <div>
             <button id="format_reset"
-                v-on:click="format">Reset (Alt+Q)</button>
+                v-on:click="format('')">Reset (Alt+Q)</button>
             <button id="format_unique_word"
                 v-on:click="format('unique_word')">Global (Alt+W, Ctrl+B)</button>
             <br>
