@@ -30,7 +30,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     } );
                 }
                 else {
-                    alert('Incomplete reference; lookup not possible.');
+                    alert("Incomplete reference; lookup not possible.");
                 }
             },
             find: function () {
@@ -44,7 +44,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     this.material.search = search_text;
                 }
                 else {
-                    alert('No text selected to conduct a find for.');
+                    alert("No text selected to conduct a find for.");
                 }
             },
             copy_verse: function () {
@@ -71,7 +71,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     this.question.type        = null;
                 }
                 else {
-                    alert('Incomplete reference; copy verse not possible.');
+                    alert("Incomplete reference; copy verse not possible.");
                 }
             },
             lookup_from_search: function (verse) {
@@ -86,7 +86,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             setup_question: function () {
                 this.question        = this.questions[ this.position ];
                 this.question.number = 1;
-                this.question.as     = 'Standard';
+                this.question.as     = "Standard";
             },
             move_question: function(direction) {
                 if ( this.position + direction > -1 && this.position + direction < this.questions.length ) {
@@ -99,26 +99,26 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 snd.play();
             },
             timer_click: function () {
-                if ( this.timer.state == 'ready' || this.timer.state == 'stopped' ) {
-                    this.timer.state = 'running';
-                    this.timer.label = 'Stop Timer';
+                if ( this.timer.state == "ready" || this.timer.state == "stopped" ) {
+                    this.timer.state = "running";
+                    this.timer.label = "Stop Timer";
                     this.timer_tick();
                 }
-                else if ( this.timer.state == 'running' ) {
-                    this.timer.state = 'stopped';
-                    this.timer.label = 'Continue';
+                else if ( this.timer.state == "running" ) {
+                    this.timer.state = "stopped";
+                    this.timer.label = "Continue";
                 }
-                else if ( this.timer.state == 'ended' ) {
-                    this.timer.state = 'ready';
+                else if ( this.timer.state == "ended" ) {
+                    this.timer.state = "ready";
                     this.timer.value = 30;
-                    this.timer.label = 'Start Timer';
+                    this.timer.label = "Start Timer";
                 }
             },
             timer_tick: function () {
                 var self = this;
 
                 setTimeout( function () {
-                    if ( self.timer.state == 'running' ) {
+                    if ( self.timer.state == "running" ) {
                         self.timer.value--;
 
                         if ( self.timer.value > 0 ) {
@@ -126,17 +126,59 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                         }
                         else {
                             self.make_beep();
-                            self.timer.state = 'ended';
-                            self.timer.label = 'Reset';
+                            self.timer.state = "ended";
+                            self.timer.label = "Reset";
                         }
                     }
                 }, 1000 );
             },
             set_timer: function (value) {
-                this.timer.state = 'ready';
-                this.timer.label = 'Start Timer';
+                this.timer.state = "ready";
+                this.timer.label = "Start Timer";
                 this.timer.value = value;
             },
+            result: function (result) {
+                this.$http.post( cntlr + "/used", { question_id: this.question.question_id } );
+                this.question.used++;
+
+                var as     = this.question.as;
+                var number = this.question.number;
+
+                this.move_question(1);
+
+                if ( result == "correct" ) {
+                    this.question.as     = "Standard";
+                    this.question.number = parseInt(number) + 1;
+                }
+                else if ( result == "error" ) {
+                    if ( as == "Standard" ) {
+                        this.question.as = "Toss-Up";
+                    }
+                    else if ( as == "Toss-Up" ) {
+                        this.question.as = "Bonus";
+                    }
+                    else if ( as == "Bonus" ) {
+                        this.question.as = "Standard";
+                    }
+
+                    if ( parseInt(number) < 16 ) {
+                        this.question.number = parseInt(number) + 1;
+                    }
+                    else if ( number == parseInt(number) ) {
+                        this.question.number = parseInt(number) + 'A';
+                    }
+                    else if ( number == parseInt(number) + 'A' ) {
+                        this.question.number = parseInt(number) + 'B';
+                    }
+                    else if ( number == parseInt(number) + 'B' ) {
+                        this.question.number = parseInt(number) + 1;
+                    }
+                }
+                else if ( result == "no_jump" ) {
+                    this.question.as     = "Standard";
+                    this.question.number = parseInt(number) + 1;
+                }
+            }
         },
         watch: {
             "material.book": function () {

@@ -66,9 +66,9 @@
 
         <b>Result</b>
         <div id="result">
-            <button>Correct</button>
-            <button>Error</button>
-            <button>No Jump</button>
+            <button v-on:click="result('correct')">Correct</button>
+            <button v-on:click="result('error')">Error</button>
+            <button v-on:click="result('no_jump')">No Jump</button>
         </div>
 
         <b>Replace</b>

@@ -209,4 +209,16 @@ sub data {
     } );
 }
 
+sub used {
+    my ($self) = @_;
+    my $json = $self->req_body_json;
+
+
+$self->warn( $json->{question_id} );
+
+
+    $self->dq->sql('UPDATE question SET used = used + 1 WHERE question_id = ?')->run( $json->{question_id} );
+    return $self->render( json => {} );
+}
+
 1;
