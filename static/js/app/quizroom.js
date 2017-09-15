@@ -178,6 +178,27 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     this.question.as     = "Standard";
                     this.question.number = parseInt(number) + 1;
                 }
+            },
+            replace: function (type) {
+                this.$http.post(
+                    cntlr + "/replace",
+                    {
+                        type: type,
+                        questions: this.questions
+                    }
+                ).then( function (response) {
+                    if ( response.body.error ) {
+                        alert('Unable to replace with that type. Try another.');
+                    }
+                    else {
+                        var question = response.body.question;
+
+                        question.as     = this.question.as;
+                        question.number = this.question.number;
+
+                        this.question = this.questions[ this.position ] = question;
+                    }
+                } );
             }
         },
         watch: {

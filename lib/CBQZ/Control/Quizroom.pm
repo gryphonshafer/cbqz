@@ -130,14 +130,14 @@ sub data {
         })->run->all({});
 
         unless (@$results) {
-            my $ids_sql = join( ', ', map { $_->{question_id} } @questions, @$results );
+            my $ids = join( ', ', map { $_->{question_id} } @questions, @$results );
 
             push( @$results, @{ $self->dq->sql(qq{
                 SELECT question_id, book, chapter, verse, question, answer, type, used
                 FROM question
                 WHERE
                     type IN ($types) AND
-                    question_id NOT IN ($ids_sql)
+                    question_id NOT IN ($ids)
                 ORDER BY used, RAND()
                 LIMIT 1
             })->run->all({}) } );
@@ -162,13 +162,13 @@ sub data {
         })->run->all({}) } );
 
         if ( @questions < $target_questions_count ) {
-            $limit      = $target_questions_count - @questions;
-            my $ids_sql = join( ', ', map { $_->{question_id} } @questions );
+            $limit  = $target_questions_count - @questions;
+            my $ids = join( ', ', map { $_->{question_id} } @questions );
 
             push( @questions, @{ $self->dq->sql(qq{
                 SELECT question_id, book, chapter, verse, question, answer, type, used
                 FROM question
-                WHERE question_id NOT IN ($ids_sql)
+                WHERE question_id NOT IN ($ids)
                 ORDER BY used, RAND()
                 LIMIT $limit
             })->run->all({}) } );
@@ -213,12 +213,48 @@ sub used {
     my ($self) = @_;
     my $json = $self->req_body_json;
 
-
-$self->warn( $json->{question_id} );
-
-
     $self->dq->sql('UPDATE question SET used = used + 1 WHERE question_id = ?')->run( $json->{question_id} );
     return $self->render( json => {} );
+}
+
+sub replace {
+    my ($self) = @_;
+    my $json = $self->req_body_json;
+
+    my $refs = join( ', ',
+        map { $self->dq->quote($_) }
+        'invalid reference',
+        ( map { $_->{book} . ' ' . $_->{chapter} . ':' . $_->{verse} } @{ $json->{questions} } )
+    );
+
+    my $results = $self->dq->sql(qq{
+        SELECT question_id, book, chapter, verse, question, answer, type, used
+        FROM question
+        WHERE
+            type = ? AND
+            CONCAT( book, ' ', chapter, ':', verse ) NOT IN ($refs)
+        ORDER BY used, RAND()
+        LIMIT 1
+    })->run( $json->{type} )->all({});
+
+    unless (@$results) {
+        my $ids = join( ', ', 0, map { $_->{question_id} } @{ $json->{questions} } );
+
+        $results = $self->dq->sql(qq{
+            SELECT question_id, book, chapter, verse, question, answer, type, used
+            FROM question
+            WHERE
+                type = ? AND
+                question_id NOT IN ($ids)
+            ORDER BY used, RAND()
+            LIMIT 1
+        })->run( $json->{type} )->all({});
+    }
+
+    return $self->render( json => {
+        question => (@$results) ? $results->[0] : undef,
+        error    => (@$results) ? undef : 'Failed to find question of that type.',
+    } );
 }
 
 1;

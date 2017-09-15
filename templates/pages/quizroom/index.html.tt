@@ -73,19 +73,19 @@
 
         <b>Replace</b>
         <div id="replace">
-            <button>INT</button>
-            <button>MA</button>
-            <button>CR</button>
-            <button>CVR</button>
-            <button>MACR</button>
-            <button>MACVR</button>
-            <button>QT</button>
-            <button>QTN</button>
-            <button>FTV</button>
-            <button>FT2V</button>
-            <button>FT</button>
-            <button>FTN</button>
-            <button>SIT</button>
+            <button v-on:click="replace('INT')">INT</button>
+            <button v-on:click="replace('MA')">MA</button>
+            <button v-on:click="replace('CR')">CR</button>
+            <button v-on:click="replace('CVR')">CVR</button>
+            <button v-on:click="replace('MACR')">MACR</button>
+            <button v-on:click="replace('MACVR')">MACVR</button>
+            <button v-on:click="replace('QT')">QT</button>
+            <button v-on:click="replace('QTN')">QTN</button>
+            <button v-on:click="replace('FTV')">FTV</button>
+            <button v-on:click="replace('FT2V')">FT2V</button>
+            <button v-on:click="replace('FT')">FT</button>
+            <button v-on:click="replace('FTN')">FTN</button>
+            <button v-on:click="replace('SIT')">SIT</button>
         </div>
     </div>
 
