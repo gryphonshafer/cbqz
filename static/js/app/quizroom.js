@@ -5,8 +5,8 @@ document.addEventListener( "keyup", function(event) {
     if ( ( event.altKey && event.keyCode == 71 ) || event.keyCode == 113 )
         document.getElementById("lookup").click();
 
-    // for Alt+F, F8: Find Text
-    if ( ( event.altKey && event.keyCode == 70 ) || event.keyCode == 119 )
+    // for Alt+F, F4: Find Text
+    if ( ( event.altKey && event.keyCode == 70 ) || event.keyCode == 115 )
         document.getElementById("find").click();
 } );
 

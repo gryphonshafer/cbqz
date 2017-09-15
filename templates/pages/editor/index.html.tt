@@ -45,7 +45,7 @@
         </div>
 
         <div>
-            <button tabindex="8" id="save_new" v-on:click="save_new">Save New (Alt+A)</button>
+            <button tabindex="8" id="save_new" v-on:click="save_new">Save New (Alt+A, F8)</button>
             <button tabindex="9" id="save_changes" v-on:click="save_changes">Save Changes (Alt+S, F9)</button>
             <br>
             <button tabindex="10" id="delete_question" v-on:click="delete_question">Delete (Alt+X)</button>
@@ -101,7 +101,7 @@
 
     <div id="material_search">
         <input v-model="material.search">
-        <button id="find" v-on:click="find">Find (Alt+F, F8)</button>
+        <button id="find" v-on:click="find">Find (Alt+F, F4)</button>
 
         <div id="material_search_display">
             <a class="htmlarea"

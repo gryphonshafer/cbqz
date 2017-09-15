@@ -91,7 +91,7 @@
 
     <div id="material_search">
         <input v-model="material.search">
-        <button id="find" v-on:click="find">Find (Alt+F, F8)</button>
+        <button id="find" v-on:click="find">Find (Alt+F, F4)</button>
 
         <div id="material_search_display">
             <a class="htmlarea"
