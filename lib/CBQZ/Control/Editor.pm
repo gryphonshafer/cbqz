@@ -2,7 +2,6 @@ package CBQZ::Control::Editor;
 
 use exact;
 use Mojo::Base 'Mojolicious::Controller';
-use Try::Tiny;
 
 sub index {
     my ($self) = @_;
