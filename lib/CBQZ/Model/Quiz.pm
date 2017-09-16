@@ -30,8 +30,8 @@ sub generate {
         [ ['INT'],                     [ 8, 12 ] ],
         [ [ qw( MA MACR MACVR ) ],     [ 2,  7 ] ],
         [ [ qw( CR CVR MACR MACVR ) ], [ 3,  5 ] ],
-        [ [ qw( QT QTN ) ],            [ 1,  2 ] ],
-        [ [ qw( FTV FT2V FT FTN ) ],   [ 1,  2 ] ],
+        [ [ qw( Q Q2V ) ],             [ 1,  2 ] ],
+        [ [ qw( FT FTN FTV F2V ) ],    [ 1,  2 ] ],
         [ ['SIT'],                     [ 0,  4 ] ],
     );
     my $target_questions_count = 50;

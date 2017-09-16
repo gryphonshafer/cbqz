@@ -65,7 +65,7 @@ sub data {
 
     return $self->render( json => {
         metadata => {
-            types => [ qw( INT MA CR CVR MACR MACVR QT QTN FTV FT2V FT FTN SIT ) ],
+            types => [ qw( INT MA CR CVR MACR MACVR Q Q2V FT FTN FTV F2V SIT ) ],
             books => [ sort { $a cmp $b } keys %$material ],
         },
         question => {

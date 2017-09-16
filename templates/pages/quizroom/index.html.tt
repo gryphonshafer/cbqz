@@ -81,12 +81,12 @@
             <button v-on:click="replace('CVR')">CVR</button>
             <button v-on:click="replace('MACR')">MACR</button>
             <button v-on:click="replace('MACVR')">MACVR</button>
-            <button v-on:click="replace('QT')">QT</button>
-            <button v-on:click="replace('QTN')">QTN</button>
-            <button v-on:click="replace('FTV')">FTV</button>
-            <button v-on:click="replace('FT2V')">FT2V</button>
+            <button v-on:click="replace('Q')">Q</button>
+            <button v-on:click="replace('Q2V')">Q2V</button>
             <button v-on:click="replace('FT')">FT</button>
             <button v-on:click="replace('FTN')">FTN</button>
+            <button v-on:click="replace('FTV')">FTV</button>
+            <button v-on:click="replace('F2V')">F2V</button>
             <button v-on:click="replace('SIT')">SIT</button>
         </div>
     </div>
