@@ -190,6 +190,21 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 user_programs
+
+Type: has_many
+
+Related object: L<CBQZ::Db::Schema::Result::UserProgram>
+
+=cut
+
+__PACKAGE__->has_many(
+  "user_programs",
+  "CBQZ::Db::Schema::Result::UserProgram",
+  { "foreign.user_id" => "self.user_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head1 L<Moose> ROLES APPLIED
 
 =over 4
@@ -204,8 +219,8 @@ __PACKAGE__->has_many(
 with 'CBQZ::Db::Base::Result::User';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-10 07:40:07
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:FLnnPKw/hrR3t28LGNwlug
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-19 09:42:09
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:T6vr94faFEoidaJNeA5kKg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

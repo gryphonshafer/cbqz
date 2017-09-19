@@ -18,9 +18,13 @@ sub create {
     ) unless ( delete $params->{_} );
 
     try {
-        my $passwd = delete $params->{passwd};
+        my $program_id = delete $params->{program};
+        my $passwd     = delete $params->{passwd};
+
         $self->obj( $self->rs->create($params)->get_from_storage );
         $self->obj->update({ passwd => $passwd });
+
+        $self->add_program($program_id) if ($program_id);
     }
     catch {
         E->throw('Failed to create user that already exists')

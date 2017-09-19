@@ -10,6 +10,9 @@ SELECT ( IF (
     ( SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = @db AND table_name = 'question' ) +
     ( SELECT COUNT(*) FROM information_schema.triggers WHERE trigger_schema = @db AND trigger_name = 'user_before_insert' ) +
     ( SELECT COUNT(*) FROM information_schema.triggers WHERE trigger_schema = @db AND trigger_name = 'material_set_before_insert' ) +
-    ( SELECT COUNT(*) FROM information_schema.triggers WHERE trigger_schema = @db AND trigger_name = 'question_set_before_insert' )
-    = 10, 1, 0
+    ( SELECT COUNT(*) FROM information_schema.triggers WHERE trigger_schema = @db AND trigger_name = 'question_set_before_insert' ) +
+    ( SELECT COUNT(*) FROM information_schema.triggers WHERE trigger_schema = @db AND trigger_name = 'question_after_insert' ) +
+    ( SELECT COUNT(*) FROM information_schema.triggers WHERE trigger_schema = @db AND trigger_name = 'question_after_update' ) +
+    ( SELECT COUNT(*) FROM information_schema.triggers WHERE trigger_schema = @db AND trigger_name = 'question_after_delete' )
+    = 13, 1, 0
 ) ) AS test;

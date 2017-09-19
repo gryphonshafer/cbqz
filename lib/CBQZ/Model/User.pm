@@ -67,6 +67,28 @@ sub event {
     return;
 }
 
+sub add_program {
+    my ( $self, $program_id, $user ) = @_;
+
+    $self->rs('UserProgram')->create({
+        user_id    => ( ($user) ? $user : $self )->obj->id,
+        program_id => $program_id,
+    });
+
+    return $self;
+}
+
+sub remove_program {
+    my ( $self, $program_id, $user ) = @_;
+
+    $self->rs('UserProgram')->search({
+        user_id    => ( ($user) ? $user : $self )->obj->id,
+        program_id => $program_id,
+    })->delete;
+
+    return $self;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;

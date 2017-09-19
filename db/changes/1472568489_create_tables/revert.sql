@@ -1,6 +1,11 @@
+# dest.prereq: db/changes/1505834625_program
+
 DROP TRIGGER IF EXISTS user_before_insert;
 DROP TRIGGER IF EXISTS material_set_before_insert;
 DROP TRIGGER IF EXISTS question_set_before_insert;
+DROP TRIGGER IF EXISTS question_after_insert;
+DROP TRIGGER IF EXISTS question_after_update;
+DROP TRIGGER IF EXISTS question_after_delete;
 
 DROP TABLE IF EXISTS question;
 DROP TABLE IF EXISTS question_set;

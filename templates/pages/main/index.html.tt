@@ -18,6 +18,20 @@
             <label>Name: <input name="name"></label><br>
             <label>Password: <input type="password" name="passwd"></label><br>
             <label>Email: <input name="email"></label><br>
+
+            [% IF programs.count > 0 %]
+                <label>
+                    Program:
+                    <select name="program">
+                        [% programs.reset %]
+                        [% WHILE ( program = programs.next ) %]
+                            <option value="[% program.program_id %]">[% program.name %]</option>
+                        [% END %]
+                    </select>
+                </label>
+                <br>
+            [% END %]
+
             <input type="submit" value="Create User">
         </fieldset>
     </form>

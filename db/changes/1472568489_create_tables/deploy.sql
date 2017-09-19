@@ -104,3 +104,15 @@ FOREIGN KEY(question_set_id)
     ON DELETE CASCADE
     ON UPDATE CASCADE
 ) ENGINE=InnoDB CHARSET=utf8;
+
+CREATE TRIGGER question_after_insert AFTER INSERT ON question
+FOR EACH ROW
+UPDATE question_set SET last_modified = NOW() WHERE question_set_id = NEW.question_set_id;
+
+CREATE TRIGGER question_after_update AFTER UPDATE ON question
+FOR EACH ROW
+UPDATE question_set SET last_modified = NOW() WHERE question_set_id IN ( NEW.question_set_id, OLD.question_set_id );
+
+CREATE TRIGGER question_after_delete AFTER DELETE ON question
+FOR EACH ROW
+UPDATE question_set SET last_modified = NOW() WHERE question_set_id = OLD.question_set_id;

@@ -4,6 +4,12 @@ use exact;
 use Mojo::Base 'Mojolicious::Controller';
 use Try::Tiny;
 use CBQZ::Model::User;
+use CBQZ::Model::Program;
+
+sub index {
+    my ($self) = @_;
+    $self->stash( programs => CBQZ::Model::Program->new->list );
+}
 
 sub login {
     my ($self) = @_;
@@ -50,7 +56,7 @@ sub create_user {
     my $user = CBQZ::Model::User->new;
     my $e;
     try {
-        $user = $user->create( { map { $_ => $self->param($_) } qw( name passwd email ) } );
+        $user = $user->create( $self->params );
         $self->login;
     }
     catch {
