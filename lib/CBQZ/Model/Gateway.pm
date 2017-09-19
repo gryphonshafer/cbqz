@@ -12,8 +12,8 @@ class_has _summary_dom => ( isa => 'Mojo::DOM', is => 'ro', lazy => 1, default =
     my ($self) = @_;
 
     my $file = filename(
-        $self->conf->get( qw( config_app root_dir ) ),
-        $self->conf->get('data'),
+        $self->config->get( qw( config_app root_dir ) ),
+        $self->config->get('data'),
         'gateway',
         'niv',
         'summary.html',
@@ -104,8 +104,8 @@ sub raw_chapter {
     # TODO: error if the book/chapter reference is invalid
 
     my $file = filename(
-        $self->conf->get( qw( config_app root_dir ) ),
-        $self->conf->get('data'),
+        $self->config->get( qw( config_app root_dir ) ),
+        $self->config->get('data'),
         'gateway',
         $translation,
         $+{book},

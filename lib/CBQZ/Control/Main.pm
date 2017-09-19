@@ -8,7 +8,11 @@ use CBQZ::Model::Program;
 
 sub index {
     my ($self) = @_;
-    $self->stash( programs => CBQZ::Model::Program->new->list );
+
+    $self->stash(
+        programs  => CBQZ::Model::Program->new->list,
+        recaptcha => $self->config->get( 'recaptcha', 'public_key' ),
+    );
 }
 
 sub login {

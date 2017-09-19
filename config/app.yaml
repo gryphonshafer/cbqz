@@ -53,8 +53,14 @@ default:
             debug: 1
             file: runtime/dbic_sql.sql
             profile: console
+    recaptcha:
+        public_key: 6LeGUjEUAAAAAHGfypaiPnD3r32I8sp7a8QeqYQg
+        private_key: 6LftUTEUAAAAAKk9ZR886rf0l-3CuFzV_hTkt8gq
 +|+|production:
     database:
         logging: ~
     logging:
         filter: ~
+    recaptcha:
+        public_key: 6LftUTEUAAAAALtbl98u4t4udXIAh9YpVnYRPdoP
+        private_key: 6LeGUjEUAAAAAFvCPhrKLU0q5k7hlPS9toYr_Kl3

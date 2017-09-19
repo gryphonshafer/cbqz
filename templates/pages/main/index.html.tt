@@ -1,3 +1,5 @@
+[% page.js.push('https://www.google.com/recaptcha/api.js') %]
+
 <h1>CBQZ Bible Quizzing System</h1>
 
 [% UNLESS user %]
@@ -32,14 +34,23 @@
                 <br>
             [% END %]
 
-            <input type="submit" value="Create User">
+            <div class="g-recaptcha" data-sitekey="[% recaptcha %]" data-callback="enableSubmit"></div>
+            <input id="createFormSubmit" type="submit" value="Create User" disabled="true">
         </fieldset>
     </form>
+
+    <script type="text/javascript">
+        function enableSubmit() {
+            document.getElementById('createFormSubmit').disabled = false;
+        }
+    </script>
 [% ELSE %]
     <ul>
         <li><a href="[% c.url_for.path('/') %]">Home</a></li>
-        <li><a href="[% c.url_for.path('/editor') %]">Editor</a></li>
-        <li><a href="[% c.url_for.path('/quizroom') %]">Quiz Room</a></li>
+        [% IF user.roles %]
+            <li><a href="[% c.url_for.path('/editor') %]">Editor</a></li>
+            <li><a href="[% c.url_for.path('/quizroom') %]">Quiz Room</a></li>
+        [% END %]
         <li><a href="[% c.url_for.path('/logout') %]">Logout</a></li>
     </ul>
 [% END %]

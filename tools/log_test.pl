@@ -9,7 +9,7 @@ my $cbqz = CBQZ->new;
 $cbqz->$_(qq{This is a message logged at the "$_" log level}) for (
     'debug',     # something logged at a pedantic level
     'info',      # complete an action within a subsystem
-    'notice',    # service start, stop, restart, reload conf, and similar
+    'notice',    # service start, stop, restart, reload config, etc.
     'warning',   # something to investigate when time allows
     'error',     # something went wrong but probably not serious
     'critical',  # non-repeating serious error

@@ -12,8 +12,8 @@ use CBQZ::Util::Format 'log_date';
 sub startup {
     my ( $self, $app ) = @_;
 
-    my $cbqz = CBQZ->new;
-    my $config = $cbqz->conf;
+    my $cbqz   = CBQZ->new;
+    my $config = $cbqz->config;
 
     $self->static->paths->[0] =~ s|/public$|/static|;
     $self->sessions->cookie_name( $config->get( 'mojolicious', 'cookie_name' ) );
@@ -22,7 +22,7 @@ sub startup {
     $self->sessions->default_expiration(0);
 
     # setup general helpers
-    for my $command ( qw( clean_error dq conf ) ) {
+    for my $command ( qw( clean_error dq config ) ) {
         $self->helper( $command => sub {
             my $self = shift;
             return $cbqz->$command(@_);
@@ -131,21 +131,22 @@ sub startup {
     });
 
     # routes setup section
-    my $r = $self->routes;
+    my $anyone = $self->routes;
 
-    $r->any('/')->to('main#index');
-    $r->any( '/' . $_ )->to( controller => 'main', action => $_ ) for ( qw( login logout create_user ) );
-    $r->any('/create-user')->to( controller => 'main', action => 'create_user' );
+    $anyone->any('/')->to('main#index');
+    $anyone->any( '/' . $_ )->to( controller => 'main', action => $_ ) for ( qw( login logout create_user ) );
+    $anyone->any('/create-user')->to( controller => 'main', action => 'create_user' );
 
-    my $auth = $r->under( sub {
+    my $authorized_user = $anyone->under( sub {
         my ($self) = @_;
-        return 1 if ( $self->stash('user') );
+        return 1 if ( $self->stash('user') and $self->stash('user')->roles > 0 );
+
         $self->info('Login required but not yet met');
         return $self->redirect_to('/');
     } );
 
-    $auth->any('/:controller')->to( action => 'index' );
-    $auth->any('/:controller/:action');
+    $authorized_user->any('/:controller')->to( action => 'index' );
+    $authorized_user->any('/:controller/:action');
 
     return;
 }

@@ -8,35 +8,35 @@ extends 'DBIx::Class::Schema', 'CBQZ';
 
 {
     my $db;
-    my $conf = Config::App->new->get('database');
+    my $config = Config::App->new->get('database');
 
     sub connect {
         my $self = shift;
         return $db if ($db);
 
         my ( $dsn, $dbname, $username, $password, $settings ) =
-            @{$conf}{ qw( dsn dbname username password settings ) };
+            @{$config}{ qw( dsn dbname username password settings ) };
 
         $db = $self->clone->connection( $dsn . $dbname, $username, $password, $settings );
 
         # if logging is active, we're going to setup a nice, pretty-looking
         # SQL log output based on configuration settings
-        if ( $conf->{'logging'} ) {
+        if ( $config->{'logging'} ) {
             require DBIx::Class::Storage::Debug::PrettyPrint;
 
-            $db->storage->debug( $conf->{'logging'}{'debug'} ) if ( defined $conf->{'logging'}{'debug'} );
+            $db->storage->debug( $config->{'logging'}{'debug'} ) if ( defined $config->{'logging'}{'debug'} );
 
             $db->storage->debugobj( DBIx::Class::Storage::Debug::PrettyPrint->new({
-                profile => $conf->{'logging'}{'profile'},
-            }) ) if ( defined $conf->{'logging'}{'profile'} );
+                profile => $config->{'logging'}{'profile'},
+            }) ) if ( defined $config->{'logging'}{'profile'} );
 
-            if ( defined $conf->{'logging'}{'file'} ) {
-                $conf->{'logging'}{'file'} =
-                    Config::App->new->get( 'config_app', 'root_dir' ) . '/' . $conf->{'logging'}{'file'}
-                    if ( substr( $conf->{'logging'}{'file'}, 0, 1 ) ne '/' );
+            if ( defined $config->{'logging'}{'file'} ) {
+                $config->{'logging'}{'file'} =
+                    Config::App->new->get( 'config_app', 'root_dir' ) . '/' . $config->{'logging'}{'file'}
+                    if ( substr( $config->{'logging'}{'file'}, 0, 1 ) ne '/' );
 
-                open( my $dbic_log_file, '>>', $conf->{'logging'}{'file'} ) or E::Db->throw( join( '',
-                    'Unable to append to "', $conf->{'logging'}{'file'}, '"; ',
+                open( my $dbic_log_file, '>>', $config->{'logging'}{'file'} ) or E::Db->throw( join( '',
+                    'Unable to append to "', $config->{'logging'}{'file'}, '"; ',
                     'See the database/logging/file setting'
                 ) );
                 binmode( $dbic_log_file, ':utf8' );

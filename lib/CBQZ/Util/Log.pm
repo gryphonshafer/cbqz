@@ -8,14 +8,14 @@ use Term::ANSIColor ();
 use CBQZ::Util::Format 'log_date';
 
 sub new {
-    my $conf = Config::App->new;
+    my $config = Config::App->new;
 
-    my $log_level_set = $conf->get( 'logging', 'log_level' );
+    my $log_level_set = $config->get( 'logging', 'log_level' );
     my $log_level     = _lowest_level( map { $log_level_set->{$_} } keys %$log_level_set );
 
     my $log_dir = join( '/',
-        $conf->get( qw( config_app root_dir ) ),
-        $conf->get( qw( logging log_dir ) ),
+        $config->get( qw( config_app root_dir ) ),
+        $config->get( qw( logging log_dir ) ),
     );
     make_path($log_dir) unless ( -d $log_dir );
 
@@ -47,22 +47,22 @@ sub new {
                 mode      => 'append',
                 autoflush => 1,
                 filename  => join( '/',
-                    $conf->get( qw( config_app root_dir ) ),
-                    $conf->get( qw( logging log_dir ) ),
-                    $conf->get( qw( logging log_file ) ),
+                    $config->get( qw( config_app root_dir ) ),
+                    $config->get( qw( logging log_dir ) ),
+                    $config->get( qw( logging log_file ) ),
                 ),
             ],
             [
                 'Email::Mailer',
                 name      => 'email',
                 min_level => _highest_level( $log_level, 'alert' ),
-                to        => $conf->get( 'logging', 'alert_email' ),
+                to        => $config->get( 'logging', 'alert_email' ),
                 subject   => 'CBQZ Alert Log Message',
             ],
         ],
     );
 
-    my $filter = $conf->get( 'logging', 'filter' );
+    my $filter = $config->get( 'logging', 'filter' );
     $filter = ( ref $filter ) ? $filter : ($filter) ? [$filter] : [];
     $filter = [ map { $_->{name} } $log_obj->outputs ] if ( grep { lc($_) eq 'all' } @$filter );
 
@@ -164,13 +164,13 @@ CBQZ::Util::Log
     my $log      = CBQZ::Util::Log->new;
     my $pedantic = CBQZ::Util::Log->new(0);
 
-    $log->info(      'complete an action within a subsystem'                  );
-    $log->notice(    'service start, stop, restart, reload conf, and similar' );
-    $log->warning(   'something to investigate when time allows'              );
-    $log->error(     'something went wrong but probably not serious'          );
-    $log->critical(  'non-repeating serious error'                            );
-    $log->alert(     'repeating serious error'                                );
-    $log->emergency( 'subsystem unresponsive or functionally broken'          );
+    $log->info(      'complete an action within a subsystem'             );
+    $log->notice(    'service start, stop, restart, reload config, etc.' );
+    $log->warning(   'something to investigate when time allows'         );
+    $log->error(     'something went wrong but probably not serious'     );
+    $log->critical(  'non-repeating serious error'                       );
+    $log->alert(     'repeating serious error'                           );
+    $log->emergency( 'subsystem unresponsive or functionally broken'     );
 
     $pedantic->debug('something logged at a pedantic level (normally disabled)');
 
@@ -207,7 +207,7 @@ The following are the log levels and their meanings:
 
     debug     = everything at a pedantic level (normally disabled)
     info      = completed actions within a subsystem
-    notice    = service start, stop, restart, reload conf, and similar
+    notice    = service start, stop, restart, reload config, etc.
     warning   = something to investigate when time allows
     error     = something went wrong but probably not serious
     critical  = non-repeating serious error

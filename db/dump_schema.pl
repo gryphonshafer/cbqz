@@ -2,8 +2,8 @@
 use exact;
 use Config::App;
 
-my $conf = Config::App->new;
-my ( $dbname, $username, $password ) = @{ $conf->get('database') }{ qw( dbname username password ) };
+my $config = Config::App->new;
+my ( $dbname, $username, $password ) = @{ $config->get('database') }{ qw( dbname username password ) };
 
 my $command = q{
     /usr/bin/env mysqldump --skip-opt --skip-disable-keys --skip-comments --skip-set-charset --no-data
@@ -16,7 +16,7 @@ my $command = q{
     | /bin/sed -e '/^$/d'
     | /bin/sed -e 's/;/;\n/'
     | /bin/sed -e 's/^  /    /'
-} . '> ' . $conf->get( qw( config_app root_dir ) ) . '/db/schema.sql';
+} . '> ' . $config->get( qw( config_app root_dir ) ) . '/db/schema.sql';
 
 $command =~ s/\s*\n\s*/ /g;
 system($command);

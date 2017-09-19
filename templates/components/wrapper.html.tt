@@ -34,7 +34,9 @@
 
         [% IF page.js.size > 0 %]
             [% FOREACH file IN page.js %]
-                <script type="text/javascript" src="[% c.url_for.path(file) %]"></script>
+                <script type="text/javascript" src="[%
+                    ( file.match('^\w+://') ) ? file : c.url_for.path(file)
+                %]"></script>
             [% END %]
         [% END %]
     </body>
