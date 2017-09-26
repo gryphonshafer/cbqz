@@ -1,32 +1,44 @@
 <div id="header">
-    [% IF user %]
-        Logged in as: [% user.obj.name %]<br>
-        <a href="[% c.url_for.path('/') %]">Home</a>
-        <a href="[% c.url_for.path('/editor') %]">Editor</a>
-        <a href="[% c.url_for.path('/quizroom') %]">Quiz Room</a>
-        <a href="[% c.url_for.path('/logout') %]">Logout</a>
-    [% END %]
+    <h1>[% page.title %]</h1>
+
+    <div id="header_login">
+        [% UNLESS user %]
+            <form method="post" action="[% c.url_for.path('/login') %]" autocomplete="off">
+                <input name="name" placeholder="Name" size="12">
+                <input type="password" name="passwd" placeholder="Password" size="12">
+                <input type="submit" value="Login">
+            </form>
+        [% ELSE %]
+            Logged in as: <b>[% user.obj.name %]</b>
+            (<a href="[% c.url_for.path('/logout') %]">Logout</a>)
+            <br>
+            <a [% IF page.menu == 'home' %]class="selected"[% END %]
+                href="[% c.url_for.path('/') %]">Home</a>
+            <a [% IF page.menu == 'editor' %]class="selected"[% END %]
+                href="[% c.url_for.path('/editor') %]">Editor</a>
+            <a [% IF page.menu == 'quizroom' %]class="selected"[% END %]
+                href="[% c.url_for.path('/quizroom') %]">Quiz Room</a>
+        [% END %]
+    </div>
 </div>
 
 <div id="content">
     [% IF message OR c.session.flash.message %]
         [% fv = (message) ? message : c.session.flash.message %]
         <div id="message" class="[% fv.type || 'error' %]">
-            <p>
-                [% UNLESS fv.ref %]
-                    [% fv %]
-                [% ELSIF fv.ref == 'HASH' %]
-                    [% IF fv.text %][% fv.text %][% END %]
-                    [% IF fv.errors %]
-                        There [% IF fv.errors.size > 1 %]were[% ELSE %]was[% END %]
-                        [% fv.errors.size %] form error[% IF fv.errors.size > 1 %]s[% END %].
-                    [% END %]
-
-                    [% FOREACH message IN fv.messages %]
-                        [% message.text %]
-                    [% END %]
+            [% UNLESS fv.ref %]
+                [% fv %]
+            [% ELSIF fv.ref == 'HASH' %]
+                [% IF fv.text %][% fv.text %][% END %]
+                [% IF fv.errors %]
+                    There [% IF fv.errors.size > 1 %]were[% ELSE %]was[% END %]
+                    [% fv.errors.size %] form error[% IF fv.errors.size > 1 %]s[% END %].
                 [% END %]
-            </p>
+
+                [% FOREACH message IN fv.messages %]
+                    [% message.text %]
+                [% END %]
+            [% END %]
         </div>
     [% END %]
 
@@ -34,5 +46,5 @@
 </div>
 
 <div id="footer">
-    v[% c.config.get('version') %]
+    <p>CBQZ v[% c.config.get('version') %]</p>
 </div>

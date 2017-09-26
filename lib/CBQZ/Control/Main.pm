@@ -26,7 +26,7 @@ sub login {
     catch {
         $e = $self->clean_error($_);
         $self->info( 'Login failure (in controller): ' . $e );
-        $self->flash( message => "Login failed. $e. Please try again." );
+        $self->flash( message => "Login failed. ($e) Please try again." );
     };
     return $self->redirect_to('/') if ($e);
 
@@ -60,13 +60,16 @@ sub create_user {
     my $user = CBQZ::Model::User->new;
     my $e;
     try {
-        $user = $user->create( $self->params );
+        my $params = $self->params;
+        delete $params->{'g-recaptcha-response'};
+
+        $user = $user->create($params);
         $self->login;
     }
     catch {
         $e = $self->clean_error($_);
         $self->info( 'Create user failure (in controller): ' . $e );
-        $self->flash( message => "Create user failed. $e. Please try again." );
+        $self->flash( message => "Create user failed. ($e) Please try again." );
     };
 
     return $self->redirect_to('/');

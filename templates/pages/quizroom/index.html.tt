@@ -1,9 +1,9 @@
 [%
     page.vue = 1;
     page.js.push( '/quizroom/path.js', '/js/app/quizroom.js' );
+    page.title = 'Quiz Room';
+    page.menu = 'quizroom';
 %]
-
-<h1>Quiz Room</h1>
 
 <div id="quizroom" v-cloak>
     <div id="question">

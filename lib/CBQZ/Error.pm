@@ -20,7 +20,7 @@ package E {
             $self->cbqz->log->log_to(
                 name    => 'log_file',
                 level   => 'error',
-                message => $_->as_string,
+                message => ( $self->cbqz->able( $_, 'as_string' ) ) ? $_->as_string : $_,
             );
 
             {

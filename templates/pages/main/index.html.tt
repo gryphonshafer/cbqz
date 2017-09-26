@@ -1,25 +1,37 @@
-[% page.js.push('https://www.google.com/recaptcha/api.js') %]
+[%
+    page.js.push('https://www.google.com/recaptcha/api.js');
+    page.title = 'CBQZ Bible Quizzing System';
+    page.menu = 'home';
+%]
 
-<h1>CBQZ Bible Quizzing System</h1>
+<h2>CBQZ: Christian Bible Quizzing</h2>
+
+<p>
+    Welcome to the Christian Bible Quizzing (CBQZ) system. This is a public
+    resource developed, operated, and maintained entirely by volunteers for the
+    purposes of supporting and encouraging Bible quizzing.
+</p>
+<p>
+    <b>
+        Please do not use CBQZ unless you have been invited and authorized to
+        do so.
+    </b>
+    However, if you're curious about learning more about CBQZ, please take a
+    look at the source code
+    <a href="https://github.com/gryphonshafer/cbqz">available publicly on GitHub</a>
+    and ask questions of the maintainers there.
+</p>
 
 [% UNLESS user %]
-    <h2>Login</h2>
-    <form method="post" action="[% c.url_for.path('/login') %]" autocomplete="off">
-        <fieldset>
-            <legend>Login</legend>
-            <label>Name: <input name="name"></label><br>
-            <label>Password: <input type="password" name="passwd"></label><br>
-            <input type="submit" value="Login">
-        </fieldset>
-    </form>
+    <h2>Create a CBQZ System User Account</h2>
+    <p>If you've been invited to, you can create a CBQZ system user account using the following form.</p>
 
-    <h2>Create User</h2>
     <form method="post" action="[% c.url_for.path('/create-user') %]" autocomplete="new-password">
         <fieldset>
-            <legend>Create User</legend>
-            <label>Name: <input name="name"></label><br>
-            <label>Password: <input type="password" name="passwd"></label><br>
-            <label>Email: <input name="email"></label><br>
+            <legend>Create User Account</legend>
+            <label>Name: <input name="name" size="12" placeholder="Name"></label><br>
+            <label>Password: <input type="password" name="passwd" size="12" placeholder="Password"></label><br>
+            <label>Email: <input name="email" size="12" placeholder="Email Address"></label><br>
 
             [% IF programs.count > 0 %]
                 <label>
@@ -44,13 +56,10 @@
             document.getElementById('createFormSubmit').disabled = false;
         }
     </script>
-[% ELSE %]
-    <ul>
-        <li><a href="[% c.url_for.path('/') %]">Home</a></li>
-        [% IF user.roles %]
-            <li><a href="[% c.url_for.path('/editor') %]">Editor</a></li>
-            <li><a href="[% c.url_for.path('/quizroom') %]">Quiz Room</a></li>
-        [% END %]
-        <li><a href="[% c.url_for.path('/logout') %]">Logout</a></li>
-    </ul>
+
+    <p>
+        <b>Note:</b> While your account will be created immediately, your account will not have access to
+        do anything until it has been explicitly authorized by CBQZ administrators or Bible quizzing program
+        directors. Please be patient for this authorization.
+    </p>
 [% END %]
