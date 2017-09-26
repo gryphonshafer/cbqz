@@ -26,7 +26,9 @@
     <h2>Create a CBQZ System User Account</h2>
     <p>If you've been invited to, you can create a CBQZ system user account using the following form.</p>
 
-    <form method="post" action="[% c.url_for.path('/create-user') %]" autocomplete="new-password">
+    <form id="create_form" method="post"
+        action="[% c.url_for.path('/create-user') %]" autocomplete="new-password"
+    >
         <fieldset>
             <legend>Create User Account</legend>
             <label>Name: <input name="name" size="12" placeholder="Name"></label><br>
@@ -46,14 +48,23 @@
                 <br>
             [% END %]
 
-            <div class="g-recaptcha" data-sitekey="[% recaptcha %]" data-callback="enableSubmit"></div>
-            <input id="createFormSubmit" type="submit" value="Create User" disabled="true">
+            <div class="g-recaptcha" data-sitekey="[% recaptcha %]" data-callback="enable_submit"></div>
+            <input id="create_form_submit" type="submit" value="Create User" disabled="true" onclick="
+                if (
+                    this.form.name.value.length == 0 ||
+                    this.form.passwd.value.length == 0 ||
+                    this.form.email.value.length == 0
+                ) {
+                    alert('Please fill out the form completely.');
+                    return false;
+                }
+            ">
         </fieldset>
     </form>
 
     <script type="text/javascript">
-        function enableSubmit() {
-            document.getElementById('createFormSubmit').disabled = false;
+        function enable_submit() {
+            document.getElementById('create_form_submit').disabled = false;
         }
     </script>
 

@@ -16,8 +16,10 @@
                 id="verse" tabindex="3" size="2" v-model="question.verse">
 
             <br>
-            <button tabindex="4" id="copy_verse" v-on:click="copy_verse">Copy Verse (Alt+V)</button>
-            <button id="lookup" v-on:click="lookup">Lookup (Alt+G, F2)</button>
+            <button tabindex="4" id="copy_verse"
+                v-on:click="copy_verse" v-bind:disabled="verse_incomplete">Copy Verse (Alt+V)</button>
+            <button id="lookup"
+                v-on:click="lookup" v-bind:disabled="verse_incomplete">Lookup (Alt+G, F2)</button>
         </div>
 
         <div tabindex="5" class="htmlarea question" contenteditable="true"
@@ -45,10 +47,14 @@
         </div>
 
         <div>
-            <button tabindex="8" id="save_new" v-on:click="save_new">Save New (Alt+A, F8)</button>
-            <button tabindex="9" id="save_changes" v-on:click="save_changes">Save Changes (Alt+S, F9)</button>
+            <button tabindex="8" id="save_new"
+                v-on:click="save_new" v-bind:disabled="new_question_incomplete">Save New (Alt+A, F8)</button>
+            <button tabindex="9" id="save_changes"
+                v-on:click="save_changes" v-bind:disabled="no_saved_question"
+            >Save Changes (Alt+S, F9)</button>
             <br>
-            <button tabindex="10" id="delete_question" v-on:click="delete_question">Delete (Alt+X)</button>
+            <button tabindex="10" id="delete_question"
+                v-on:click="delete_question" v-bind:disabled="no_saved_question">Delete (Alt+X)</button>
             <button tabindex="11" id="clear_form" v-on:click="clear_form">Clear (Alt+C)</button>
         </div>
     </div>

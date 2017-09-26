@@ -201,6 +201,15 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 } );
             }
         },
+        computed: {
+            verse_incomplete: function () {
+                return (
+                    !! this.question.book &&
+                    parseInt( this.question.chapter ) > 0 &&
+                    parseInt( this.question.verse ) > 0
+                ) ? false : true;
+            }
+        },
         watch: {
             "material.book": function () {
                 this.material.chapters = Object.keys( this.material.data[ this.material.book ] ).sort(

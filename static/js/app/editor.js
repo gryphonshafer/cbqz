@@ -77,8 +77,6 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     !! this.question.book &&
                     parseInt( this.question.chapter ) > 0 &&
                     parseInt( this.question.verse ) > 0 &&
-                    this.question.question.length > 0 &&
-                    this.question.answer.length > 0 &&
                     !! this.question.type
                 ) {
                     this.question.question = this.$refs.question.innerHTML;
@@ -306,6 +304,9 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.question.answer      = null;
                 this.question.type        = null;
 
+                this.$refs.question.innerHTML = '';
+                this.$refs.answer.innerHTML   = '';
+
                 document.getElementById("book").focus();
             },
             lookup: function () {
@@ -388,6 +389,26 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                         this.material.verse = verse.verse;
                     } );
                 } );
+            }
+        },
+        computed: {
+            verse_incomplete: function () {
+                return (
+                    !! this.question.book &&
+                    parseInt( this.question.chapter ) > 0 &&
+                    parseInt( this.question.verse ) > 0
+                ) ? false : true;
+            },
+            no_saved_question: function () {
+                return ! this.questions.question_id;
+            },
+            new_question_incomplete: function () {
+                return (
+                    !! this.question.book &&
+                    parseInt( this.question.chapter ) > 0 &&
+                    parseInt( this.question.verse ) > 0 &&
+                    !! this.question.type
+                ) ? false : true;
             }
         },
         watch: {
