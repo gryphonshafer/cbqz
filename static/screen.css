@@ -47,6 +47,7 @@ body {
     margin: 10px;
     padding: 0px;
     margin-top: 65px;
+    margin-bottom: 30px;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -142,9 +143,9 @@ form fieldset label {
 
 .htmlarea {
     display: block;
-    border: 1px solid lightgray;
     background-color: white;
     padding: 5px;
+    border: 1px solid lightgray;
 }
 
 .htmlarea[contenteditable="true"] {
@@ -157,8 +158,8 @@ form fieldset label {
 }
 
 .question {
-    width: 400px;
-    height: 150px;
+    width: 450px;
+    height: 125px;
 }
 
 .unique_word {
@@ -188,6 +189,21 @@ span.field {
     display: inline-block;
 }
 
+span.key_text {
+    font-size: 75%;
+    color: gray;
+}
+
+span.label {
+    font-size: 90%;
+    color: #333;
+}
+
+.margin_lift {
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+
 /* -------------------------------------------------------------------------- */
 
 div#material_lookup_display,
@@ -198,14 +214,18 @@ div#material_search_display {
     overflow-x: hidden;
 }
 
-div#material_lookup_display {
-    width: 450px;
-    height: 400px;
+div#material_lookup_display .htmlarea,
+div#material_search_display .htmlarea {
+    border-color: transparent;
 }
 
-div#material_search_display {
-    width: 1025px;
-    height: 250px;
+div#material_lookup_display .htmlarea + .htmlarea,
+div#material_search_display .htmlarea + .htmlarea {
+    border-top-color: lightgray;
+}
+
+div#material_lookup_display {
+    margin-top: 3px;
 }
 
 .clickable_reference:hover {
@@ -214,6 +234,10 @@ div#material_search_display {
 }
 
 /* -------------------------------------------------------------------------- */
+
+div#editor {
+    min-width: 625px;
+}
 
 div#editor div#question_form {
     display: inline-block;
@@ -230,6 +254,18 @@ div#editor div#questions_list {
 div#editor div#material_lookup {
     display: inline-block;
     vertical-align: top;
+    width: calc( 100vw - 655px );
+}
+
+@media ( max-width: 870px ) {
+    div#editor div#material_lookup {
+        width: auto;
+        margin-top: 3px;
+    }
+}
+
+div#editor div#material_lookup_display {
+    height: 375px;
 }
 
 div#editor div#material_search {
@@ -237,7 +273,21 @@ div#editor div#material_search {
     vertical-align: top;
 }
 
+div#editor div#material_search_display {
+    height: calc( 100vh - 535px );
+}
+
+@media ( max-height: 640px ) {
+    div#editor div#material_search_display {
+        height: 100px;
+    }
+}
+
 /* -------------------------------------------------------------------------- */
+
+div#quizroom {
+    min-width: 800px;
+}
 
 div#quizroom div#question {
     display: inline-block;
@@ -252,25 +302,65 @@ div#quizroom div#manage {
 div#quizroom div#material_lookup {
     display: inline-block;
     vertical-align: top;
+    width: calc( 100vw - 655px );
+    width: calc( 100vw - 625px );
+}
+
+@media ( max-width: 810px ) {
+    div#quizroom div#material_lookup {
+        width: 600px;
+        margin-top: 3px;
+    }
+}
+
+div#quizroom div#material_lookup_display {
+    height: 375px;
 }
 
 div#quizroom div#material_search {
     display: block;
     vertical-align: top;
+    margin-top: -25px;
+}
+
+div#quizroom div#material_search_display {
+    height: calc( 100vh - 505px );
+}
+
+@media ( max-height: 640px ) {
+    div#quizroom div#material_search_display {
+        height: 130px;
+    }
 }
 
 div#quizroom div#manage {
+    margin-left: 5px;
     width: 130px;
 }
 
-div#quizroom div#manage > div {
-    margin-bottom: 10px;
+div#quizroom div#manage div#timer button {
+    width: 35px;
 }
 
-div#quizroom div#timer div.timer_display {
+div#quizroom div#manage div#timer button#prime_timer_button {
+    width: 89px;
+    overflow: hidden;
+}
+
+div#quizroom div#manage div#timer,
+div#quizroom div#manage div#result,
+div#quizroom div#manage div#replace {
+    margin-top: 10px;
+}
+
+div#quizroom div#timer div#timer_display {
     border: 1px solid lightgray;
     background-color: white;
     padding: 1px 10px 1px 10px;
-    font-size: 40pt;
+    font-size: 400%;
+    width: 66px;
     float: left;
+    margin-right: 4px;
+    text-align: center;
+    overflow: hidden;
 }

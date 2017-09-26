@@ -10,6 +10,10 @@
     content = BLOCK;
         PROCESS $template;
     END;
+
+    page.title =
+        ( NOT page.title ) ? 'Christian Bible Quizzing' :
+        ( NOT page.title.match('^CBQZ\s') ) ? 'CBQZ: ' _ page.title : page.title;
 -%]
 <!DOCTYPE html>
 <html lang="en">
@@ -27,7 +31,7 @@
             <script type="text/javascript" src="[% c.url_for.path('/js/lib/vue-resource.js') %]"></script>
         [% END %]
 
-        <title>[% ( page.title ) ? 'CBQZ: ' _ page.title : 'Christian Bible Quizzing' %]</title>
+        <title>[% page.title %]</title>
     </head>
     <body>
         [% PROCESS page_layout.html.tt %]
