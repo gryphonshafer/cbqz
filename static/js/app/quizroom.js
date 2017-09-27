@@ -138,6 +138,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.timer.value = value;
             },
             result: function (result) {
+                this.set_timer(30);
+
                 this.$http.post( cntlr + "/used", { question_id: this.question.question_id } );
                 this.question.used++;
 

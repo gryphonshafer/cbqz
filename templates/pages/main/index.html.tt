@@ -73,14 +73,14 @@
         do anything until it has been explicitly authorized by CBQZ administrators or Bible quizzing program
         directors. Please be patient for this authorization.
     </p>
-[% END %]
-
-[% IF NOT user.roles.size OR NOT user.programs.size %]
-    <h2>Account Pending Approval</h2>
-    <p>
-        Your account has been created, but it's pending approval.  Your account
-        will not have access to do anything until it has been explicitly
-        authorized by CBQZ administrators or Bible quizzing program directors.
-        Please be patient for this authorization.
-    </p>
+[% ELSE %]
+    [% IF NOT user.roles.size OR NOT user.programs.size %]
+        <h2>Account Pending Approval</h2>
+        <p>
+            Your account has been created, but it's pending approval.  Your account
+            will not have access to do anything until it has been explicitly
+            authorized by CBQZ administrators or Bible quizzing program directors.
+            Please be patient for this authorization.
+        </p>
+    [% END %]
 [% END %]

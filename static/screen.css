@@ -302,8 +302,7 @@ div#quizroom div#manage {
 div#quizroom div#material_lookup {
     display: inline-block;
     vertical-align: top;
-    width: calc( 100vw - 655px );
-    width: calc( 100vw - 625px );
+    width: calc( 100vw - 635px );
 }
 
 @media ( max-width: 810px ) {
