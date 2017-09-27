@@ -67,6 +67,22 @@ sub event {
     return;
 }
 
+sub programs {
+    my ( $self, $user ) = @_;
+
+    if ($user) {
+        E->throw('Input provided is not a valid user object')
+            unless ( $self->able( $user, 'obj' ) and $user->obj and $user->obj->in_storage );
+    }
+    else {
+        E->throw('Failure because user object data not yet loaded')
+            unless ( $self->obj and $self->obj->in_storage );
+    }
+
+    my $programs = [ map { $_->program } ( ($user) ? $user : $self )->obj->user_programs->all ];
+    return (wantarray) ? @{$programs} : $programs;
+}
+
 sub add_program {
     my ( $self, $program_id, $user ) = @_;
 

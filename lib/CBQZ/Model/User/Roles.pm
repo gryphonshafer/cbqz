@@ -24,8 +24,6 @@ sub roles {
     if ($user) {
         E->throw('Input provided is not a valid user object')
             unless ( $self->able( $user, 'obj' ) and $user->obj and $user->obj->in_storage );
-        E->throw('Only users with admin roles can call this method on other users')
-            unless ( grep { $_->type eq 'admin' } $self->obj->roles->all );
     }
     else {
         E->throw('Failure because user object data not yet loaded')

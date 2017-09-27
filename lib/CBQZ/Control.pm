@@ -139,7 +139,11 @@ sub startup {
 
     my $authorized_user = $anyone->under( sub {
         my ($self) = @_;
-        return 1 if ( $self->stash('user') and $self->stash('user')->roles > 0 );
+        return 1 if (
+            $self->stash('user') and
+            $self->stash('user')->roles > 0 and
+            $self->stash('user')->programs > 0
+        );
 
         $self->info('Login required but not yet met');
         return $self->redirect_to('/');

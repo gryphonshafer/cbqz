@@ -20,12 +20,16 @@
             Logged in as: <b>[% user.obj.name %]</b>
             (<a href="[% c.url_for.path('/logout') %]">Logout</a>)
             <br>
+
             <a [% IF page.menu == 'home' %]class="selected"[% END %]
                 href="[% c.url_for.path('/') %]">Home</a>
-            <a [% IF page.menu == 'editor' %]class="selected"[% END %]
-                href="[% c.url_for.path('/editor') %]">Editor</a>
-            <a [% IF page.menu == 'quizroom' %]class="selected"[% END %]
-                href="[% c.url_for.path('/quizroom') %]">Quiz Room</a>
+
+            [% IF user.roles.size > 0 AND user.programs.size > 0 %]
+                <a [% IF page.menu == 'editor' %]class="selected"[% END %]
+                    href="[% c.url_for.path('/editor') %]">Editor</a>
+                <a [% IF page.menu == 'quizroom' %]class="selected"[% END %]
+                    href="[% c.url_for.path('/quizroom') %]">Quiz Room</a>
+            [% END %]
         [% END %]
     </div>
 </div>
