@@ -100,9 +100,6 @@ sub raw_chapter {
 
     $book_chapter =~ /^\s*(?<book>.+)\s+(?<chapter>\d+)\s*$/;
 
-    # TODO: canonicalize book/chapter reference
-    # TODO: error if the book/chapter reference is invalid
-
     my $file = filename(
         $self->config->get( qw( config_app root_dir ) ),
         $self->config->get('data'),

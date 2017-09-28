@@ -43,7 +43,7 @@ __PACKAGE__->table("program");
 
   data_type: 'timestamp'
   datetime_undef_if_invalid: 1
-  default_value: '1970-01-01 00:00:00'
+  default_value: current_timestamp
   is_nullable: 0
 
 =cut
@@ -62,7 +62,7 @@ __PACKAGE__->add_columns(
   {
     data_type => "timestamp",
     datetime_undef_if_invalid => 1,
-    default_value => "1970-01-01 00:00:00",
+    default_value => \"current_timestamp",
     is_nullable => 0,
   },
 );
@@ -111,8 +111,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-19 09:42:09
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:LqCTCqk3f7JkFV5HNxoeNQ
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-27 08:25:26
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:A0GAfAgJet+5j7i8ZBb8Pw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

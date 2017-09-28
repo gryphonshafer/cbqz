@@ -57,6 +57,9 @@
             <select tabindex="7" v-model="question.type">
                 <option v-for="item in metadata.types">{{ item }}</option>
             </select>
+
+            <span class="label">Marked:</span>
+            <span id="marked_comment" class="field">{{ question.marked }}</span>
         </div>
 
         <div>
@@ -87,9 +90,24 @@
         </div>
 
         <div class="margin_lift">
-            <select v-model="questions.question_id" size="21">
+            <select class="questions_list_list" v-model="questions.question_id" size="12">
                 <option v-for="item in questions.questions" v-bind:value="item.question_id">{{
-                    item.verse + ' (' + item.type + ' ' + item.used + ')'
+                    item.verse + ' ' +
+                    item.type + ' ' +
+                    '(' + item.used + ')' +
+                    ( ( item.marked ) ? ' *' : '' )
+                }}</option>
+            </select>
+        </div>
+
+        <span class="label">Marked Questions:</span>
+        <div>
+            <select class="questions_list_list" v-model="questions.marked_question_id" size="7">
+                <option v-for="item in this.questions.marked_questions" v-bind:value="item.question_id">{{
+                    item.book.replace( ' ', '' ).substr( 0, 2 ) + ' ' +
+                    item.chapter + ':' +
+                    item.verse + ' ' +
+                    item.type
                 }}</option>
             </select>
         </div>

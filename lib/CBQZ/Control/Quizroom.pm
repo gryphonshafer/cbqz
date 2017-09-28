@@ -58,11 +58,12 @@ sub data {
             map {
                 $_->{number} = undef;
                 $_->{as}     = undef;
+                $_->{marked} = undef;
                 $_;
             } @{ $quiz->{questions} }
         ],
         question => {
-            map { $_ => undef } qw( number type as used book chapter verse question answer )
+            map { $_ => undef } qw( number type as used book chapter verse question answer marked )
         },
         position => 0,
         timer    => {
@@ -78,6 +79,16 @@ sub used {
     my $json = $self->req_body_json;
 
     $self->dq->sql('UPDATE question SET used = used + 1 WHERE question_id = ?')->run( $json->{question_id} );
+    return $self->render( json => {} );
+}
+
+sub mark {
+    my ($self) = @_;
+    my $json = $self->req_body_json;
+
+    $self->dq->sql('UPDATE question SET marked = ? WHERE question_id = ?')
+        ->run( $json->{reason}, $json->{question_id} );
+
     return $self->render( json => {} );
 }
 

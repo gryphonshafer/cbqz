@@ -56,7 +56,7 @@ sub data {
     $questions->{ $_->{book} }{ $_->{chapter} }{ $_->{question_id} } = $_ for (
         @{
             $self->dq->sql(q{
-                SELECT question_id, book, chapter, verse, question, answer, type, used
+                SELECT question_id, book, chapter, verse, question, answer, type, used, marked
                 FROM question
                 WHERE question_set_id = ?
             })->run( $self->session('question_set_id') )->all({})
@@ -69,7 +69,7 @@ sub data {
             books => [ sort { $a cmp $b } keys %$material ],
         },
         question => {
-            ( map { $_ => undef } qw( question_id book chapter verse question answer type used ) ),
+            ( map { $_ => undef } qw( question_id book chapter verse question answer type used marked ) ),
         },
         material => {
             data           => $material,
@@ -78,9 +78,11 @@ sub data {
             ( map { $_ => undef } map { $_, $_ . 's' } qw( book chapter verse ) ),
         },
         questions => {
-            data        => $questions,
-            question_id => undef,
-            questions   => undef,
+            data               => $questions,
+            question_id        => undef,
+            marked_question_id => undef,
+            marked_questions   => [],
+            questions          => undef,
             ( map { $_ => undef } map { $_, $_ . 's' } qw( book chapter ) ),
         },
     } );
@@ -106,7 +108,7 @@ sub save {
     else {
         $self->dq->sql(q{
             UPDATE question
-            SET book = ?, chapter = ?, verse = ?, question = ?, answer = ?, type = ?
+            SET book = ?, chapter = ?, verse = ?, question = ?, answer = ?, type = ?, marked = NULL
             WHERE question_id = ?
         })->run(
             @$question{ qw( book chapter verse question answer type ) },

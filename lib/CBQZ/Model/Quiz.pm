@@ -52,7 +52,7 @@ sub generate {
             my $results = $self->dq->sql(qq{
                 SELECT question_id, book, chapter, verse, question, answer, type, used
                 FROM question
-                WHERE type IN ($types) $refs
+                WHERE type IN ($types) $refs AND marked IS NULL
                 ORDER BY used, RAND()
                 LIMIT $min
             })->run->all({});
@@ -68,7 +68,7 @@ sub generate {
                 push( @$results, @{ $self->dq->sql(qq{
                     SELECT question_id, book, chapter, verse, question, answer, type, used
                     FROM question
-                    WHERE type IN ($types) $ids
+                    WHERE type IN ($types) $ids AND marked IS NULL
                     ORDER BY used, RAND()
                     LIMIT $sub_min
                 })->run->all({}) } );
@@ -101,7 +101,8 @@ sub generate {
                 FROM question
                 WHERE
                     type IN ($types) AND
-                    CONCAT( book, ' ', chapter, ':', verse ) NOT IN ($refs)
+                    CONCAT( book, ' ', chapter, ':', verse ) NOT IN ($refs) AND
+                    marked IS NULL
                 ORDER BY used, RAND()
                 LIMIT 1
             })->run->all({});
@@ -114,7 +115,8 @@ sub generate {
                     FROM question
                     WHERE
                         type IN ($types) AND
-                        question_id NOT IN ($ids)
+                        question_id NOT IN ($ids) AND
+                        marked IS NULL
                     ORDER BY used, RAND()
                     LIMIT 1
                 })->run->all({}) } );
@@ -133,7 +135,7 @@ sub generate {
             push( @questions, @{ $self->dq->sql(qq{
                 SELECT question_id, book, chapter, verse, question, answer, type, used
                 FROM question
-                WHERE CONCAT( book, ' ', chapter, ':', verse ) NOT IN ($refs)
+                WHERE CONCAT( book, ' ', chapter, ':', verse ) NOT IN ($refs) AND marked IS NULL
                 ORDER BY used, RAND()
                 LIMIT $limit
             })->run->all({}) } );
@@ -145,7 +147,7 @@ sub generate {
                 push( @questions, @{ $self->dq->sql(qq{
                     SELECT question_id, book, chapter, verse, question, answer, type, used
                     FROM question
-                    WHERE question_id NOT IN ($ids)
+                    WHERE question_id NOT IN ($ids) AND marked IS NULL
                     ORDER BY used, RAND()
                     LIMIT $limit
                 })->run->all({}) } );

@@ -38,7 +38,7 @@ CREATE TRIGGER material_set_before_insert BEFORE INSERT ON material_set FOR EACH
 CREATE TABLE program (
     program_id int(10) unsigned NOT NULL,
     name varchar(64) DEFAULT NULL,
-    created timestamp NOT NULL DEFAULT '1970-01-01 08:00:00',
+    created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (program_id),
     UNIQUE KEY name (name)
 );
@@ -53,6 +53,7 @@ CREATE TABLE question (
     answer text,
     type tinytext,
     used tinyint(3) unsigned NOT NULL DEFAULT '0',
+    marked text,
     PRIMARY KEY (question_id),
     KEY reference (book,chapter,verse),
     KEY question_set_id (question_set_id),
@@ -114,7 +115,7 @@ CREATE TRIGGER user_before_insert BEFORE INSERT ON user FOR EACH ROW SET NEW.cre
 CREATE TABLE user_program (
     user_id int(10) unsigned NOT NULL,
     program_id int(10) unsigned NOT NULL,
-    created timestamp NOT NULL DEFAULT '1970-01-01 08:00:00',
+    created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id,program_id),
     KEY program_id (program_id),
     CONSTRAINT user_program_ibfk_1 FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE ON UPDATE CASCADE,

@@ -79,6 +79,10 @@
             <button v-on:click="result('no_jump')">No Jump</button>
         </div>
 
+        <div id="mark">
+            <button v-on:click="mark_for_edit" v-bind:disabled="question.marked">Mark for Edit</button>
+        </div>
+
         <div id="replace">
             <b>Replace</b><br>
             <button v-on:click="replace('INT')">INT</button>

@@ -46,6 +46,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
     new Vue({
         el: "#editor",
         data: response.body,
+
         methods: {
             format: function (className) {
                 var selection = document.getSelection();
@@ -72,6 +73,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     alert('No text selected to format.');
                 }
             },
+
             save_new: function () {
                 if (
                     !! this.question.book &&
@@ -124,10 +126,12 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     alert('Not all required fields have data.');
                 }
             },
+
             save_changes: function () {
                 if ( !! this.questions.question_id ) {
                     this.question.question = this.$refs.question.innerHTML;
                     this.question.answer   = this.$refs.answer.innerHTML;
+                    this.question.marked   = null;
 
                     this.$http.post( cntlr + "/save", this.question ).then( function (response) {
                         var question = response.body.question;
@@ -206,6 +210,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
                                 this.$nextTick( function () {
                                     this.questions.chapter = question.chapter;
+                                    this.questions.marked_questions = this.grep_marked_questions();
                                 } );
                             } );
 
@@ -229,6 +234,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     alert('No previously saved question selected.');
                 }
             },
+
             delete_question: function () {
                 if ( !! this.questions.question_id ) {
                     this.$http.post(
@@ -292,6 +298,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     alert('No question selected to delete.');
                 }
             },
+
             clear_form: function () {
                 this.questions.question_id = null;
 
@@ -309,6 +316,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
                 document.getElementById("book").focus();
             },
+
             lookup: function () {
                 if (
                     !! this.question.book &&
@@ -327,6 +335,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     alert('Incomplete reference; lookup not possible.');
                 }
             },
+
             find: function () {
                 var selection = document.getSelection();
                 if ( selection.rangeCount > 0 && selection.isCollapsed == 0 ) {
@@ -337,10 +346,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
                     this.material.search = search_text;
                 }
-                else {
-                    alert('No text selected to conduct a find for.');
-                }
             },
+
             copy_verse: function () {
                 if (
                     !! this.question.book &&
@@ -368,6 +375,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     alert('Incomplete reference; copy verse not possible.');
                 }
             },
+
             copy_verse_from_lookup: function (verse) {
                 this.questions.question_id = null;
 
@@ -381,6 +389,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.question.used        = null;
                 this.question.type        = null;
             },
+
             lookup_from_search: function (verse) {
                 this.material.book = verse.book;
                 this.$nextTick( function () {
@@ -389,8 +398,25 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                         this.material.verse = verse.verse;
                     } );
                 } );
-            }
+            },
+
+            grep_marked_questions: function () {
+                var marked_questions = [];
+
+                for ( var book in this.questions.data ) {
+                    for ( var chapter in this.questions.data[book] ) {
+                        for ( var id in this.questions.data[book][chapter] ) {
+                            if ( this.questions.data[book][chapter][id].marked ) {
+                                marked_questions.push( this.questions.data[book][chapter][id] );
+                            }
+                        }
+                    }
+                }
+
+                return marked_questions;
+            },
         },
+
         computed: {
             verse_incomplete: function () {
                 return (
@@ -399,9 +425,11 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     parseInt( this.question.verse ) > 0
                 ) ? false : true;
             },
+
             no_saved_question: function () {
                 return ! this.questions.question_id;
             },
+
             new_question_incomplete: function () {
                 return (
                     !! this.question.book &&
@@ -409,8 +437,9 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     parseInt( this.question.verse ) > 0 &&
                     !! this.question.type
                 ) ? false : true;
-            }
+            },
         },
+
         watch: {
             "material.book": function () {
                 this.material.chapters = Object.keys( this.material.data[ this.material.book ] ).sort(
@@ -424,17 +453,20 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     this.material.chapter = this.material.chapters[0];
                 } );
             },
+
             "material.chapter": function () {
                 if ( !! this.material.chapter ) {
                     this.material.verses = this.material.data[ this.material.book ][ this.material.chapter ];
                     this.material.verse  = this.material.verses[1].verse;
                 }
             },
+
             "material.verse": function () {
                 this.$nextTick( function () {
                     window.location.href = "#v" + this.material.verse;
                 } );
             },
+
             "material.search": function () {
                 this.material.matched_verses = [];
 
@@ -464,6 +496,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     }
                 }
             },
+
             "questions.book": function () {
                 if ( !! this.questions.book ) {
                     this.questions.chapters = Object.keys( this.questions.data[ this.questions.book ] ).sort(
@@ -478,6 +511,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     } );
                 }
             },
+
             "questions.chapter": function () {
                 if ( !! this.questions.chapter ) {
                     var questions_hash = this.questions.data[ this.questions.book ][ this.questions.chapter ];
@@ -499,6 +533,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     } );
                 }
             },
+
             "questions.question_id": function () {
                 if ( !! this.questions.question_id ) {
                     var question = this.questions.data
@@ -507,15 +542,54 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     for ( var key in question ) {
                         this.question[key] = question[key];
                     }
+
+                    var question_id = this.questions.question_id;
+                    if (
+                        this.questions.marked_questions.filter( function (question) {
+                            return question.question_id == question_id;
+                        } ).length > 0
+                    ) {
+                        this.questions.marked_question_id = this.questions.question_id;
+                    }
+                    else {
+                        this.questions.marked_question_id = null;
+                    }
+                }
+            },
+
+            "questions.marked_question_id": function () {
+                if (
+                    !! this.questions.marked_question_id &&
+                    (
+                        ! this.questions.question_id ||
+                        this.questions.marked_question_id != this.questions.question_id
+                    )
+                ) {
+                    var questions = this.questions;
+                    var marked_question = this.questions.marked_questions.filter( function (question) {
+                        return question.question_id == questions.marked_question_id;
+                    } ).shift();
+
+                    this.questions.book = marked_question.book;
+                    this.$nextTick( function () {
+                        this.questions.chapter = marked_question.chapter;
+
+                        this.$nextTick( function () {
+                            this.questions.question_id = this.questions.marked_question_id;
+                        } );
+                    } );
                 }
             },
         },
+
         mounted: function () {
             this.material.books = Object.keys( this.material.data );
             this.material.book  = this.material.books[0];
 
             this.questions.books = Object.keys( this.questions.data ).sort();
             if ( this.questions.books[0] ) this.questions.book = this.questions.books[0];
+
+            this.questions.marked_questions = this.grep_marked_questions();
         }
     });
 } );

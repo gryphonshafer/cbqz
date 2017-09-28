@@ -43,36 +43,6 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
                     this.material.search = search_text;
                 }
-                else {
-                    alert("No text selected to conduct a find for.");
-                }
-            },
-            copy_verse: function () {
-                if (
-                    !! this.question.book &&
-                    parseInt( this.question.chapter ) > 0 &&
-                    parseInt( this.question.verse ) > 0
-                ) {
-                    this.questions.question_id = null;
-
-                    var verse = this.material.data
-                        [ this.question.book ][ this.question.chapter ][ this.question.verse ];
-
-                    this.question.question = "";
-                    this.question.answer   = "";
-
-                    this.$nextTick( function () {
-                        this.question.question = verse.text;
-                        this.question.answer   = verse.text;
-                    } );
-
-                    this.question.question_id = null;
-                    this.question.used        = null;
-                    this.question.type        = null;
-                }
-                else {
-                    alert("Incomplete reference; copy verse not possible.");
-                }
             },
             lookup_from_search: function (verse) {
                 this.material.book = verse.book;
@@ -167,12 +137,12 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                         this.question.number = parseInt(number) + 1;
                     }
                     else if ( number == parseInt(number) ) {
-                        this.question.number = parseInt(number) + 'A';
+                        this.question.number = parseInt(number) + "A";
                     }
-                    else if ( number == parseInt(number) + 'A' ) {
-                        this.question.number = parseInt(number) + 'B';
+                    else if ( number == parseInt(number) + "A" ) {
+                        this.question.number = parseInt(number) + "B";
                     }
-                    else if ( number == parseInt(number) + 'B' ) {
+                    else if ( number == parseInt(number) + "B" ) {
                         this.question.number = parseInt(number) + 1;
                     }
                 }
@@ -181,16 +151,30 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     this.question.number = parseInt(number) + 1;
                 }
             },
+            mark_for_edit: function () {
+                var reason = prompt( "Enter comment about this question:", "Contains an error" );
+                if (reason) {
+                    this.$http.post(
+                        cntlr + "/mark",
+                        {
+                            question_id: this.question.question_id,
+                            reason:      reason
+                        }
+                    ).then( function (response) {
+                        this.question.marked = reason;
+                    } );
+                }
+            },
             replace: function (type) {
                 this.$http.post(
                     cntlr + "/replace",
                     {
-                        type: type,
+                        type:      type,
                         questions: this.questions
                     }
                 ).then( function (response) {
                     if ( response.body.error ) {
-                        alert('Unable to replace with that type. Try another.');
+                        alert("Unable to replace with that type. Try another.");
                     }
                     else {
                         var question = response.body.question;

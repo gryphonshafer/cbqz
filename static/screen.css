@@ -189,6 +189,11 @@ span.field {
     display: inline-block;
 }
 
+span.field:empty:before {
+    content: "-";
+    color: white;
+}
+
 span.key_text {
     font-size: 75%;
     color: gray;
@@ -249,12 +254,18 @@ div#editor div#questions_list {
     vertical-align: top;
     margin-left: 10px;
     margin-right: 10px;
+    width: 150px;
+    overflow: hidden;
+}
+
+div#editor div#questions_list select.questions_list_list {
+    width: 150px;
 }
 
 div#editor div#material_lookup {
     display: inline-block;
     vertical-align: top;
-    width: calc( 100vw - 655px );
+    width: calc( 100vw - 670px );
 }
 
 @media ( max-width: 870px ) {
@@ -281,6 +292,10 @@ div#editor div#material_search_display {
     div#editor div#material_search_display {
         height: 100px;
     }
+}
+
+span#marked_comment {
+    width: 300px;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -362,4 +377,15 @@ div#quizroom div#timer div#timer_display {
     margin-right: 4px;
     text-align: center;
     overflow: hidden;
+}
+
+div#quizroom div#manage div#result button,
+div#quizroom div#manage div#mark button,
+div#quizroom div#manage div#replace button {
+    margin: 1px -1px 1px -1px;
+    padding: 0px 2px 0px 2px;
+}
+
+div#quizroom div#manage div#mark {
+    margin-top: 12px;
 }
