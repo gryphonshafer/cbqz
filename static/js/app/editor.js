@@ -83,6 +83,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 ) {
                     this.question.question = this.$refs.question.innerHTML;
                     this.question.answer   = this.$refs.answer.innerHTML;
+                    this.question.marked   = null;
 
                     this.question.question_id = null;
 
@@ -105,6 +106,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
                             this.$nextTick( function () {
                                 this.questions.chapter = question.chapter;
+                                this.questions.marked_questions = this.grep_marked_questions();
                             } );
                         } );
 
@@ -292,6 +294,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                                 return 0;
                             } );
                         }
+
+                        this.questions.marked_questions = this.grep_marked_questions();
                     } );
                 }
                 else {
@@ -310,6 +314,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.question.question    = null;
                 this.question.answer      = null;
                 this.question.type        = null;
+                this.question.marked      = null;
 
                 this.$refs.question.innerHTML = '';
                 this.$refs.answer.innerHTML   = '';
@@ -369,7 +374,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
                     this.question.question_id = null;
                     this.question.used        = null;
-                    this.question.type        = null;
+                    this.question.marked      = null;
                 }
                 else {
                     alert('Incomplete reference; copy verse not possible.');
@@ -388,6 +393,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.question.question_id = null;
                 this.question.used        = null;
                 this.question.type        = null;
+                this.question.marked      = null;
             },
 
             lookup_from_search: function (verse) {

@@ -162,6 +162,11 @@ form fieldset label {
     height: 125px;
 }
 
+.clear {
+    font-weight: normal;
+    color: black;
+}
+
 .unique_word {
     font-weight: bold;
     color: blue;

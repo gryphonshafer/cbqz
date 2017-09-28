@@ -33,7 +33,7 @@
         </div>
 
         <div>
-            <button id="format_reset" v-on:click="format('')"
+            <button id="format_reset" v-on:click="format('clear')"
             >Reset <span class="key_text">Alt+Q</span></button>
 
             <button id="format_unique_word" v-on:click="format('unique_word')"
