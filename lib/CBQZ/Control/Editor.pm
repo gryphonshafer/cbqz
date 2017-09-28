@@ -83,6 +83,7 @@ sub data {
             marked_question_id => undef,
             marked_questions   => [],
             questions          => undef,
+            sort_by            => 'desc_ref',
             ( map { $_ => undef } map { $_, $_ . 's' } qw( book chapter ) ),
         },
     } );

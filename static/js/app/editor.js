@@ -70,7 +70,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     this.question.answer   = this.$refs.answer.innerHTML;
                 }
                 else {
-                    alert('No text selected to format.');
+                    alert("No text selected to format.");
                 }
             },
 
@@ -125,7 +125,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     } );
                 }
                 else {
-                    alert('Not all required fields have data.');
+                    alert("Not all required fields have data.");
                 }
             },
 
@@ -233,7 +233,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     } );
                 }
                 else {
-                    alert('No previously saved question selected.');
+                    alert("No previously saved question selected.");
                 }
             },
 
@@ -299,7 +299,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     } );
                 }
                 else {
-                    alert('No question selected to delete.');
+                    alert("No question selected to delete.");
                 }
             },
 
@@ -337,7 +337,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     } );
                 }
                 else {
-                    alert('Incomplete reference; lookup not possible.');
+                    alert("Incomplete reference; lookup not possible.");
                 }
             },
 
@@ -377,7 +377,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     this.question.marked      = null;
                 }
                 else {
-                    alert('Incomplete reference; copy verse not possible.');
+                    alert("Incomplete reference; copy verse not possible.");
                 }
             },
 
@@ -505,9 +505,10 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
             "questions.book": function () {
                 if ( !! this.questions.book ) {
+                    var sort_by = this.questions.sort_by;
                     this.questions.chapters = Object.keys( this.questions.data[ this.questions.book ] ).sort(
                         function ( a, b ) {
-                            return b - a;
+                            return ( sort_by == "desc_ref" ) ? b - a : a - b;
                         }
                     );
 
@@ -528,13 +529,41 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                         questions_array.push( questions_hash[ keys[i] ] );
                     }
 
+                    var sort_by = this.questions.sort_by;
                     this.questions.questions = questions_array.sort( function ( a, b ) {
-                        if ( a.verse > b.verse ) return -1;
-                        if ( a.verse < b.verse ) return 1;
-                        if ( a.type < b.type ) return -1;
-                        if ( a.type > b.type ) return 1;
-                        if ( a.used > b.used ) return -1;
-                        if ( a.used < b.used ) return 1;
+                        if ( sort_by == "desc_ref" ) {
+                            if ( a.verse > b.verse ) return -1;
+                            if ( a.verse < b.verse ) return 1;
+                            if ( a.type < b.type ) return -1;
+                            if ( a.type > b.type ) return 1;
+                            if ( a.used > b.used ) return -1;
+                            if ( a.used < b.used ) return 1;
+                        }
+                        else if ( sort_by == "ref" ) {
+                            if ( a.verse < b.verse ) return -1;
+                            if ( a.verse > b.verse ) return 1;
+                            if ( a.type < b.type ) return -1;
+                            if ( a.type > b.type ) return 1;
+                            if ( a.used > b.used ) return -1;
+                            if ( a.used < b.used ) return 1;
+                        }
+                        else if ( sort_by == "type" ) {
+                            if ( a.type < b.type ) return -1;
+                            if ( a.type > b.type ) return 1;
+                            if ( a.verse < b.verse ) return -1;
+                            if ( a.verse > b.verse ) return 1;
+                            if ( a.used > b.used ) return -1;
+                            if ( a.used < b.used ) return 1;
+                        }
+                        else if ( sort_by == "used" ) {
+                            if ( a.used > b.used ) return -1;
+                            if ( a.used < b.used ) return 1;
+                            if ( a.type < b.type ) return -1;
+                            if ( a.type > b.type ) return 1;
+                            if ( a.verse < b.verse ) return -1;
+                            if ( a.verse > b.verse ) return 1;
+                        }
+
                         return 0;
                     } );
                 }
@@ -586,6 +615,14 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     } );
                 }
             },
+
+            "questions.sort_by": function () {
+                this.questions.book = null;
+                this.$nextTick( function () {
+                    this.questions.books = Object.keys( this.questions.data ).sort();
+                    if ( this.questions.books[0] ) this.questions.book = this.questions.books[0];
+                } );
+            }
         },
 
         mounted: function () {

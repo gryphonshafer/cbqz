@@ -90,6 +90,16 @@
         </div>
 
         <div class="margin_lift">
+            <span class="label">Sort by:</span>
+            <select v-model="questions.sort_by">
+                <option value="desc_ref">Desc. Ref.</option>
+                <option value="ref">Reference</option>
+                <option value="type">Type</option>
+                <option value="used">Used Desc.</option>
+            </select>
+        </div>
+
+        <div class="margin_lift">
             <select class="questions_list_list" v-model="questions.question_id" size="12">
                 <option v-for="item in questions.questions" v-bind:value="item.question_id">{{
                     item.verse + ' ' +
@@ -102,7 +112,7 @@
 
         <span class="label">Marked Questions:</span>
         <div>
-            <select class="questions_list_list" v-model="questions.marked_question_id" size="7">
+            <select class="questions_list_list" v-model="questions.marked_question_id" size="6">
                 <option v-for="item in this.questions.marked_questions" v-bind:value="item.question_id">{{
                     item.book.replace( ' ', '' ).substr( 0, 2 ) + ' ' +
                     item.chapter + ':' +
