@@ -12,7 +12,7 @@ sub create_default {
     my $rs = $self->rs->result_source->resultset;
 
     $rs->set_cache([ $self->rs->create({
-        user_id => $user->id,
+        user_id => $user->obj->id,
         name    => 'Default ' . ucfirst( $user->obj->name ) . ' Set',
     })->get_from_storage ]);
 
