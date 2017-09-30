@@ -53,7 +53,7 @@ sub save {
                 question_set_id, book, chapter, verse, question, answer, type
             ) VALUES ( ?, ?, ?, ?, ?, ?, ? )
         })->run(
-            $self->session('question_set_id'),
+            $self->cookie('cbqz_sets_questions'),
             @$question{ qw( book chapter verse question answer type ) },
         );
 
