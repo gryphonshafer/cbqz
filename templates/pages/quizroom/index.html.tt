@@ -1,8 +1,8 @@
 [%
-    page.vue = 1;
-    page.js.push( '/quizroom/path.js', '/js/app/quizroom.js' );
     page.title = 'Quiz Room';
-    page.menu = 'quizroom';
+    page.menu  = 'quizroom';
+    page.vue   = 1;
+    page.js.push( '/quizroom/path.js', '/js/app/quizroom.js' );
 %]
 
 <div id="quizroom" v-cloak>
@@ -65,11 +65,14 @@
 
         <div id="timer">
             <div id="timer_display">{{ timer.value }}</div>
-            <button v-on:click="set_timer(5)">5</button><br>
-            <button v-on:click="set_timer(30)">30</button><br>
-            <button v-on:click="set_timer(60)">60</button><br>
+            [% BLOCK timer_button %]
+                <button v-on:click="set_timer([% value %])">[% value %]</button>
+            [% END %]
+            [% FOR i IN [ 0 .. 2 ] %]
+                [% PROCESS timer_button value = timer_values.$i %]<br>
+            [% END %]
             <button id="prime_timer_button" v-on:click="timer_click">{{ timer.label }}</button>
-            <button v-on:click="set_timer(90)">90</button>
+            [% PROCESS timer_button value = timer_values.last %]
         </div>
 
         <div id="result">
@@ -85,19 +88,9 @@
 
         <div id="replace">
             <b>Replace</b><br>
-            <button v-on:click="replace('INT')">INT</button>
-            <button v-on:click="replace('MA')">MA</button>
-            <button v-on:click="replace('CR')">CR</button>
-            <button v-on:click="replace('CVR')">CVR</button>
-            <button v-on:click="replace('MACR')">MACR</button>
-            <button v-on:click="replace('MACVR')">MACVR</button>
-            <button v-on:click="replace('Q')">Q</button>
-            <button v-on:click="replace('Q2V')">Q2V</button>
-            <button v-on:click="replace('FT')">FT</button>
-            <button v-on:click="replace('FTN')">FTN</button>
-            <button v-on:click="replace('FTV')">FTV</button>
-            <button v-on:click="replace('F2V')">F2V</button>
-            <button v-on:click="replace('SIT')">SIT</button>
+            [% FOR type IN question_types %]
+                <button v-on:click="replace('[% type %]')">[% type %]</button>
+            [% END %]
         </div>
     </div>
 

@@ -56,7 +56,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             setup_question: function () {
                 this.question        = this.questions[ this.position ];
                 this.question.number = 1;
-                this.question.as     = "Standard";
+                this.question.as     = this.metadata.as_default;
             },
             move_question: function(direction) {
                 if ( this.position + direction > -1 && this.position + direction < this.questions.length ) {
@@ -80,7 +80,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 }
                 else if ( this.timer.state == "ended" ) {
                     this.timer.state = "ready";
-                    this.timer.value = 30;
+                    this.timer.value = this.metadata.timer_default;
                     this.timer.label = "Start Timer";
                 }
             },
@@ -108,7 +108,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.timer.value = value;
             },
             result: function (result) {
-                this.set_timer(30);
+                this.set_timer( this.metadata.timer_default );
 
                 this.$http.post( cntlr + "/used", { question_id: this.question.question_id } );
                 this.question.used++;
@@ -118,38 +118,9 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
                 this.move_question(1);
 
-                if ( result == "correct" ) {
-                    this.question.as     = "Standard";
-                    this.question.number = parseInt(number) + 1;
-                }
-                else if ( result == "error" ) {
-                    if ( as == "Standard" ) {
-                        this.question.as = "Toss-Up";
-                    }
-                    else if ( as == "Toss-Up" ) {
-                        this.question.as = "Bonus";
-                    }
-                    else if ( as == "Bonus" ) {
-                        this.question.as = "Standard";
-                    }
-
-                    if ( parseInt(number) < 16 ) {
-                        this.question.number = parseInt(number) + 1;
-                    }
-                    else if ( number == parseInt(number) ) {
-                        this.question.number = parseInt(number) + "A";
-                    }
-                    else if ( number == parseInt(number) + "A" ) {
-                        this.question.number = parseInt(number) + "B";
-                    }
-                    else if ( number == parseInt(number) + "B" ) {
-                        this.question.number = parseInt(number) + 1;
-                    }
-                }
-                else if ( result == "no_jump" ) {
-                    this.question.as     = "Standard";
-                    this.question.number = parseInt(number) + 1;
-                }
+                var as_number        = result_operation( result, as, number );
+                this.question.as     = as_number.as;
+                this.question.number = as_number.number;
             },
             mark_for_edit: function () {
                 var reason = prompt( "Enter comment about this question:", "Contains an error" );

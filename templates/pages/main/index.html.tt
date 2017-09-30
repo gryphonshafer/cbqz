@@ -1,7 +1,7 @@
 [%
-    page.js.push('https://www.google.com/recaptcha/api.js');
     page.title = 'CBQZ Bible Quizzing System';
-    page.menu = 'home';
+    page.menu  = 'home';
+    page.js.push( '/js/utilities.js', '/js/pages/home_page.js' );
 %]
 
 <h2>CBQZ: Christian Bible Quizzing</h2>
@@ -26,14 +26,18 @@
     <h2>Create a CBQZ System User Account</h2>
     <p>If you've been invited to, you can create a CBQZ system user account using the following form.</p>
 
+    [% page.js.push('https://www.google.com/recaptcha/api.js') %]
+
     <form id="create_form" method="post"
         action="[% c.url_for.path('/create-user') %]" autocomplete="new-password"
     >
         <fieldset>
             <legend>Create User Account</legend>
-            <label>Name: <input name="name" size="12" placeholder="Name"></label><br>
-            <label>Password: <input type="password" name="passwd" size="12" placeholder="Password"></label><br>
-            <label>Email: <input name="email" size="12" placeholder="Email Address"></label><br>
+            <label>Name: <input name="name" size="20" placeholder="Name"></label>
+            <br>
+            <label>Password: <input type="password" name="passwd" size="20" placeholder="Password"></label>
+            <br>
+            <label>Email: <input name="email" size="20" placeholder="Email Address"></label><br>
 
             [% IF programs.count > 0 %]
                 <label>
@@ -49,31 +53,18 @@
             [% END %]
 
             <div class="g-recaptcha" data-sitekey="[% recaptcha %]" data-callback="enable_submit"></div>
-            <input id="create_form_submit" type="submit" value="Create User" disabled="true" onclick="
-                if (
-                    this.form.name.value.length == 0 ||
-                    this.form.passwd.value.length == 0 ||
-                    this.form.email.value.length == 0
-                ) {
-                    alert('Please fill out the form completely.');
-                    return false;
-                }
-            ">
+            <input id="create_form_submit" type="submit" value="Create User" disabled="true">
         </fieldset>
     </form>
-
-    <script type="text/javascript">
-        function enable_submit() {
-            document.getElementById('create_form_submit').disabled = false;
-        }
-    </script>
 
     <p>
         <b>Note:</b> While your account will be created immediately, your account will not have access to
         do anything until it has been explicitly authorized by CBQZ administrators or Bible quizzing program
         directors. Please be patient for this authorization.
     </p>
+
 [% ELSE %]
+
     [% IF NOT user.roles.size OR NOT user.programs.size %]
         <h2>Account Pending Approval</h2>
         <p>
@@ -82,5 +73,40 @@
             authorized by CBQZ administrators or Bible quizzing program directors.
             Please be patient for this authorization.
         </p>
+    [% ELSE %]
+        <h2>Select Sets</h2>
+        <p>Using the options below, select the sets you want to work with.</p>
+
+        <form id="select_sets" method="post" action="[% c.url_for.path('/') %]">
+            <fieldset>
+                <legend>Quiz Program</legend>
+                [% FOR program IN user.programs %]
+                    <label><input type="radio" name="program"
+                        [% IF loop.first %]checked[% END %]
+                        value="[% program.id %]">[% program.name %]</label>
+                    [% UNLESS loop.last %]<br>[% END %]
+                [% END %]
+            </fieldset>
+
+            <fieldset>
+                <legend>Material Set</legend>
+                [% FOR material IN materials %]
+                    <label><input type="radio" name="material"
+                        [% IF loop.first %]checked[% END %]
+                        value="[% material.id %]">[% material.name %]</label>
+                    [% UNLESS loop.last %]<br>[% END %]
+                [% END %]
+            </fieldset>
+
+            <fieldset>
+                <legend>Questions Set</legend>
+                [% FOR set IN user.question_sets %]
+                    <label><input type="radio" name="questions"
+                        [% IF loop.first %]checked[% END %]
+                        value="[% set.id %]">[% set.name %]</label>
+                    [% UNLESS loop.last %]<br>[% END %]
+                [% END %]
+            </fieldset>
+        </form>
     [% END %]
 [% END %]

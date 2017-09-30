@@ -3,41 +3,50 @@ package CBQZ::Control::Quizroom;
 use exact;
 use Mojo::Base 'Mojolicious::Controller';
 use CBQZ::Model::Quiz;
+use CBQZ::Model::Program;
 
 sub index {
     my ($self) = @_;
 
-    my $question_set_id = $self->dq->sql(q{
-        SELECT question_set_id
-        FROM question_set
-        WHERE user_id = ?
-        ORDER BY last_modified DESC, created DESC
-        LIMIT 1
-    })->run( $self->session('user_id') )->value;
+    my $program = CBQZ::Model::Program->new->load( $self->cookie('cbqz_sets_program') );
 
-    unless ($question_set_id) {
-        $self->dq->sql(q{
-            INSERT INTO question_set ( user_id, name ) VALUES ( ?, ? )
-        })->run(
-            $self->session('user_id'),
-            $self->stash('user')->obj->name . ' auto-created',
-        );
-        $question_set_id = $self->dq->sql('SELECT last_insert_id()')->run->value;
-    }
+    $self->stash(
+        question_types => $program->types_list,
+        timer_values   => $program->timer_values,
+    );
 
-    $self->session( 'question_set_id' => $question_set_id );
     return;
 }
 
 sub path {
     my ($self) = @_;
-    return $self->render( text => 'var cntlr = "' . $self->url_for->path('/quizroom') . '";' );
+
+    my $path             = $self->url_for->path('/quizroom');
+    my $result_operation = CBQZ::Model::Program->new->load(
+        $self->cookie('cbqz_sets_program')
+    )->obj->result_operation;
+
+    return $self->render(
+        text => qq/
+            var cntlr = "$path";
+            function result_operation( result, as, number ) {
+                $result_operation
+                return { result: result, as: as, number: number };
+            }
+        /,
+    );
 }
 
 sub data {
     my ($self) = @_;
 
-    my $quiz = CBQZ::Model::Quiz->new->generate;
+    my $quiz = CBQZ::Model::Quiz->new->generate(
+        $self->cookie('cbqz_sets_program'),
+        $self->cookie('cbqz_sets_material'),
+        $self->cookie('cbqz_sets_questions'),
+    );
+
+    my $program = CBQZ::Model::Program->new->load( $self->cookie('cbqz_sets_program') );
 
     if ( $quiz->{error} ) {
         $self->notice( $quiz->{error} );
@@ -46,7 +55,9 @@ sub data {
 
     return $self->render( json => {
         metadata => {
-            types => [ qw( INT MA CR CVR MACR MACVR Q Q2V FT FTN FTV F2V SIT ) ],
+            types         => CBQZ::Model::Program->new->load( $self->cookie('cbqz_sets_program') )->types_list,
+            timer_default => $program->obj->timer_default,
+            as_default    => $program->obj->as_default,
         },
         material => {
             data           => $quiz->{material},

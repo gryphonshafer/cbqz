@@ -2,11 +2,12 @@ package CBQZ::Model::Quiz;
 
 use Moose;
 use Try::Tiny;
+use CBQZ::Model::Program;
 
 extends 'CBQZ';
 
 sub generate {
-    my ($self) = @_;
+    my ( $self, $program_id, $material_set_id, $question_set_id ) = @_;
 
     my $material = {};
     try {
@@ -21,20 +22,14 @@ sub generate {
                     SELECT book, chapter, verse, text, key_class, key_type, is_new_para
                     FROM material
                     WHERE material_set_id = ?
-                })->run(1)->all({})
+                })->run($material_set_id)->all({})
             }
         );
     };
 
-    my @question_types = (
-        [ ['INT'],                     [ 8, 12 ] ],
-        [ [ qw( MA MACR MACVR ) ],     [ 2,  7 ] ],
-        [ [ qw( CR CVR MACR MACVR ) ], [ 3,  5 ] ],
-        [ [ qw( Q Q2V ) ],             [ 1,  2 ] ],
-        [ [ qw( FT FTN FTV F2V ) ],    [ 1,  2 ] ],
-        [ ['SIT'],                     [ 0,  4 ] ],
-    );
-    my $target_questions_count = 50;
+    my $program                = CBQZ::Model::Program->new->load($program_id);
+    my @question_types         = @{ $self->json->decode( $program->obj->question_types ) };
+    my $target_questions_count = $program->obj->target_questions;
 
     my ( @questions, $error );
     try {

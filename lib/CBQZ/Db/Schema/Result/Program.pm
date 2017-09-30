@@ -39,6 +39,39 @@ __PACKAGE__->table("program");
   is_nullable: 1
   size: 64
 
+=head2 question_types
+
+  data_type: 'tinytext'
+  is_nullable: 1
+
+=head2 target_questions
+
+  data_type: 'tinyint'
+  default_value: 50
+  extra: {unsigned => 1}
+  is_nullable: 0
+
+=head2 result_operation
+
+  data_type: 'text'
+  is_nullable: 1
+
+=head2 timer_values
+
+  data_type: 'tinytext'
+  is_nullable: 1
+
+=head2 timer_default
+
+  data_type: 'tinyint'
+  default_value: 30
+  is_nullable: 0
+
+=head2 as_default
+
+  data_type: 'tinytext'
+  is_nullable: 1
+
 =head2 created
 
   data_type: 'timestamp'
@@ -58,6 +91,23 @@ __PACKAGE__->add_columns(
   },
   "name",
   { data_type => "varchar", is_nullable => 1, size => 64 },
+  "question_types",
+  { data_type => "tinytext", is_nullable => 1 },
+  "target_questions",
+  {
+    data_type => "tinyint",
+    default_value => 50,
+    extra => { unsigned => 1 },
+    is_nullable => 0,
+  },
+  "result_operation",
+  { data_type => "text", is_nullable => 1 },
+  "timer_values",
+  { data_type => "tinytext", is_nullable => 1 },
+  "timer_default",
+  { data_type => "tinyint", default_value => 30, is_nullable => 0 },
+  "as_default",
+  { data_type => "tinytext", is_nullable => 1 },
   "created",
   {
     data_type => "timestamp",
@@ -111,8 +161,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-27 08:25:26
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:A0GAfAgJet+5j7i8ZBb8Pw
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-30 07:46:31
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:gBK2YDjIrOvSJeU3Q0Kyuw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

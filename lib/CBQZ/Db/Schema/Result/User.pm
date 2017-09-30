@@ -219,8 +219,8 @@ __PACKAGE__->has_many(
 with 'CBQZ::Db::Base::Result::User';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-19 09:42:09
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:T6vr94faFEoidaJNeA5kKg
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-30 07:33:16
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:XkHgb8zVqB8CgaBefFa49w
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

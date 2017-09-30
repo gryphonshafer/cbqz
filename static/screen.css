@@ -126,9 +126,14 @@ form fieldset legend {
     background-color: whitesmoke;
 }
 
-form fieldset label {
+form#select_sets fieldset {
     display: inline-block;
-    width: 200px;
+    vertical-align: top;
+}
+
+form#create_form fieldset label {
+    display: inline-block;
+    width: 250px;
     text-align: right;
     margin-bottom: 3px;
 }

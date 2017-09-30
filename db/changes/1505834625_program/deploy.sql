@@ -3,6 +3,12 @@
 CREATE TABLE program (
     program_id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
     name VARCHAR(64) NULL,
+    question_types TINYTEXT NULL,
+    target_questions TINYINT UNSIGNED NOT NULL DEFAULT 50,
+    result_operation TEXT NULL,
+    timer_values TINYTEXT NULL,
+    timer_default TINYINT NOT NULL DEFAULT 30,
+    as_default TINYTEXT NULL,
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY(program_id),
 UNIQUE INDEX name(name)

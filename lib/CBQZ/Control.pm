@@ -16,7 +16,7 @@ sub startup {
     my $config = $cbqz->config;
 
     $self->static->paths->[0] =~ s|/public$|/static|;
-    $self->sessions->cookie_name( $config->get( 'mojolicious', 'cookie_name' ) );
+    $self->sessions->cookie_name( $config->get( 'mojolicious', 'session_cookie_name' ) );
     $self->secrets( $config->get( 'mojolicious', 'secrets' ) );
     $self->config( $config->get( 'mojolicious', 'config' ) );
     $self->sessions->default_expiration(0);

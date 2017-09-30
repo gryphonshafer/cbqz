@@ -38,6 +38,12 @@ CREATE TRIGGER material_set_before_insert BEFORE INSERT ON material_set FOR EACH
 CREATE TABLE program (
     program_id int(10) unsigned NOT NULL,
     name varchar(64) DEFAULT NULL,
+    question_types tinytext,
+    target_questions tinyint(3) unsigned NOT NULL DEFAULT '50',
+    result_operation text,
+    timer_values tinytext,
+    timer_default tinyint(4) NOT NULL DEFAULT '30',
+    as_default tinytext,
     created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (program_id),
     UNIQUE KEY name (name)

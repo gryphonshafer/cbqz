@@ -5,7 +5,7 @@
         page.title = '',
         page.vue   = 0,
         page.js    = [],
-    ;
+     ;
 
     content = BLOCK;
         PROCESS $template;
@@ -38,9 +38,12 @@
 
         [% IF page.js.size > 0 %]
             [% FOREACH file IN page.js %]
-                <script type="text/javascript" src="[%
-                    ( file.match('^\w+://') ) ? file : c.url_for.path(file)
-                %]"></script>
+                [% UNLESS js_seen.$file %]
+                    <script type="text/javascript" src="[%
+                        ( file.match('^\w+://') ) ? file : c.url_for.path(file)
+                    %]"></script>
+                    [% js_seen.$file = js_seen.$file + 1 %]
+                [% END %]
             [% END %]
         [% END %]
     </body>

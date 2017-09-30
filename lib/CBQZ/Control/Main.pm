@@ -5,14 +5,24 @@ use Mojo::Base 'Mojolicious::Controller';
 use Try::Tiny;
 use CBQZ::Model::User;
 use CBQZ::Model::Program;
+use CBQZ::Model::MaterialSet;
+use CBQZ::Model::QuestionSet;
 
 sub index {
     my ($self) = @_;
 
-    $self->stash(
-        programs  => CBQZ::Model::Program->new->list,
-        recaptcha => $self->config->get( 'recaptcha', 'public_key' ),
-    );
+    unless ( $self->session('user_id') ) {
+        $self->stash(
+            programs  => CBQZ::Model::Program->new->list,
+            recaptcha => $self->config->get( 'recaptcha', 'public_key' ),
+        );
+    }
+    else {
+        CBQZ::Model::QuestionSet->new->create_default( $self->stash('user') )
+            unless ( $self->stash('user')->question_sets->count );
+
+        $self->stash( materials => CBQZ::Model::MaterialSet->new->list );
+    }
 }
 
 sub login {

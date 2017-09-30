@@ -1,8 +1,8 @@
 [%
-    page.vue = 1;
-    page.js.push( '/editor/path.js', '/js/app/editor.js' );
     page.title = 'Questions Editor';
-    page.menu = 'editor';
+    page.menu  = 'editor';
+    page.vue   = 1;
+    page.js.push( '/editor/path.js', '/js/app/editor.js' );
 %]
 
 <div id="editor" v-cloak>

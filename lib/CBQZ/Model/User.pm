@@ -105,6 +105,15 @@ sub remove_program {
     return $self;
 }
 
+sub question_sets {
+    my ($self) = @_;
+
+    E->throw('Failure because user object data not yet loaded')
+        unless ( $self->obj and $self->obj->in_storage );
+
+    return $self->obj->question_sets;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
