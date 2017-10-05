@@ -78,7 +78,7 @@ model.pl - Execute model calls using simplified grammar
 
 =head1 SYNOPSIS
 
-model.pl INSTRUCTIONS | model.pl --help | model.pl --man
+    model.pl INSTRUCTIONS | model.pl --help | model.pl --man
 
 =head1 DESCRIPTION
 
