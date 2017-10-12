@@ -41,7 +41,7 @@ root password and allow for access while not being system root, you can try this
     service mysql stop
     echo "
         UPDATE mysql.user SET
-            authentication_string = PASSWORD('new_root_password'),
+            Password = PASSWORD('new_root_password'),
             password_expired = 'N', plugin = ''
         WHERE User = 'root' AND Host = 'localhost';
         FLUSH PRIVILEGES;
