@@ -47,11 +47,7 @@ sub data {
     );
 
     my $program = CBQZ::Model::Program->new->load( $self->cookie('cbqz_sets_program') );
-
-    if ( $quiz->{error} ) {
-        $self->notice( $quiz->{error} );
-        $self->flash( message => $quiz->{error} );
-    }
+    $self->notice( $quiz->{error} ) if ( $quiz->{error} );
 
     return $self->render( json => {
         metadata => {
@@ -82,6 +78,7 @@ sub data {
             state => 'ready',
             label => 'Start Timer',
         },
+        error => ( $quiz->{error} ) ? $quiz->{error} : undef,
     } );
 }
 

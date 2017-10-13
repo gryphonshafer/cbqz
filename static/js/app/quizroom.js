@@ -226,6 +226,11 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             this.material.book  = this.material.books[0];
 
             if ( this.questions.length > 0 ) this.setup_question();
+
+            if ( this.error ) {
+                this.question.question = '<span class="unique_chapter">' + this.error + '.</span>';
+                this.question.answer   = '<span class="unique_chapter">' + this.error + '.</span>';
+            }
         }
     });
 });
