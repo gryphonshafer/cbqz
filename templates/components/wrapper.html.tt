@@ -42,7 +42,7 @@
                     <script type="text/javascript" src="[%
                         ( file.match('^\w+://') ) ? file : c.url_for.path(file)
                     %]"></script>
-                    [% js_seen.$file = js_seen.$file + 1 %]
+                    [% js_seen.$file = ( js_seen.$file || 0 ) + 1 %]
                 [% END %]
             [% END %]
         [% END %]

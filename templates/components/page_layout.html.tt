@@ -18,7 +18,10 @@
             <a [% IF page.menu == 'home' %]class="selected"[% END %]
                 href="[% c.url_for.path('/') %]">Home</a>
 
-            [% IF user.roles.size > 0 AND user.programs.size > 0 %]
+            [% IF
+                user.roles.size > 0 AND user.programs.size > 0 AND
+                NOT ( page.menu == 'home' AND NOT materials )
+            %]
                 <a [% IF page.menu == 'editor' %]class="selected"[% END %]
                     href="[% c.url_for.path('/editor') %]">Editor</a>
                 <a [% IF page.menu == 'quizroom' %]class="selected"[% END %]
