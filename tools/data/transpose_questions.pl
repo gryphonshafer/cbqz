@@ -40,6 +40,13 @@ while (<$in>) {
     $line->{question} = "According to $line->{book}, chapter $line->{chapter}, verse $line->{verse}, $line->{question}"
         if ( $line->{type} eq 'MACVR' or $line->{type} eq 'CVR' );
 
+    $line->{question} = "Quote $line->{book}, chapter $line->{chapter}, verse $line->{verse}."
+        if ( $line->{type} eq 'Q' );
+
+    if ( $line->{type} eq 'Q2V' and $line->{question} =~ /(\d+)-(\d+)/ ) {
+        $line->{question} = "Quote $line->{book}, chapter $line->{chapter}, verses $1 and $2.";
+    }
+
     push( @$data, [ @$line{ qw( type book chapter verse question answer ) } ] );
 }
 
