@@ -1,4 +1,4 @@
 .dest
 .prove
-data
-runtime
+/data
+/runtime
