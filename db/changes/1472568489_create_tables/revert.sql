@@ -1,4 +1,5 @@
 # dest.prereq: db/changes/1505834625_program
+# dest.prereq: db/changes/1506524323_mark_for_edit
 
 DROP TRIGGER IF EXISTS user_before_insert;
 DROP TRIGGER IF EXISTS material_set_before_insert;
