@@ -99,3 +99,14 @@ To start a development instance of the CBQZ web service:
 
 Note that at this point, while the service may be running, it by default binds
 to `localhost:3000`. So you may need to tunnel that to gain access.
+
+## Materials Loading
+
+Although the application system will be technically operational in the previous
+step, you can't really do anything useful like work in the questions editor or
+operate the quiz room page without adding reference materials.
+
+To do that, use the `material_load.pl` program located in the `tools/data`
+directory.
+
+    ./tools/data/material_load.pl -n '2017 Corinthians' -k etc/2017_kvl.csv -m etc/2017_materials.csv
