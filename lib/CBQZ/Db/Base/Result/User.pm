@@ -10,8 +10,6 @@ around set_column => sub {
 };
 
 1;
-__END__
-=pod
 
 =head1 NAME
 
@@ -54,5 +52,3 @@ This module has the following dependencies:
 =item * L<Digest::SHA>
 
 =back
-
-=cut

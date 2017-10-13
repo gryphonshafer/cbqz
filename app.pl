@@ -10,9 +10,6 @@ use Mojolicious::Commands;
 
 Mojolicious::Commands->start_app('CBQZ::Control');
 
-__END__
-=pod
-
 =head1 NAME
 
 app.pl - CBQZ Application
@@ -38,5 +35,3 @@ automatic restart of the application.
 
 For production, it is likely you will want to run the application under
 "hypnotoad" behind nginx or similar.
-
-=cut

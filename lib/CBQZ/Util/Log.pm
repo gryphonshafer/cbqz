@@ -150,8 +150,6 @@ sub _log_cb_label {
 }
 
 1;
-__END__
-=pod
 
 =head1 NAME
 
@@ -250,5 +248,3 @@ This module has the following dependencies:
 =item * L<CBQZ::Util::Format>
 
 =back
-
-=cut

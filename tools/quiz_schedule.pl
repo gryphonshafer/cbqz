@@ -105,9 +105,6 @@ for my $set (@$meet) {
     print "\n";
 }
 
-__END__
-=pod
-
 =head1 NAME
 
 quiz_schedule.pl - Generate a quiz meet schedule based on simple inputs
@@ -124,5 +121,3 @@ quiz_schedule.pl - Generate a quiz meet schedule based on simple inputs
 =head1 DESCRIPTION
 
 This program will generate a quiz meet schedule based on simple inputs.
-
-=cut

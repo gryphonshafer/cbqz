@@ -27,9 +27,6 @@ make_schema_at(
     [ $dsn . $dbname, $username, $password ],
 );
 
-__END__
-=pod
-
 =head1 NAME
 
 schema_loader.pl - Automatically Build DBIx::Class Schema Files
@@ -52,5 +49,3 @@ for the same reason.
 It ought to be completely safe to run this file at any time. It must be run
 after any database schema change to keep the DBIx::Class schema files in sync
 with the database.
-
-=cut

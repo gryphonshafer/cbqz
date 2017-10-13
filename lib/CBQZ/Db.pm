@@ -77,8 +77,6 @@ sub enum {
 __PACKAGE__->meta->make_immutable;
 
 1;
-__END__
-=pod
 
 =head1 NAME
 
@@ -171,5 +169,3 @@ This module has the following dependencies:
 =item * L<DBIx::Class::Storage::Debug::PrettyPrint>
 
 =back
-
-=cut

@@ -69,9 +69,6 @@ sub execute {
     return $obj;
 }
 
-__END__
-=pod
-
 =head1 NAME
 
 model.pl - Execute model calls using simplified grammar
@@ -95,5 +92,3 @@ when providing values to methods.
 
 You can chain multiple calls with semicolons. The resulting output of each call
 will be printed to STDOUT.
-
-=cut

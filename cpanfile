@@ -29,10 +29,11 @@ feature 'test', 'Testing' => sub {
     requires 'Test::Moose';
 };
 
-feature 'tools', 'Tools' => sub {
+feature 'tools', 'Tools and Etc.' => sub {
     requires 'Data::Printer';
     requires 'Parse::RecDescent';
     requires 'Util::CommandLine';
+    requires 'Text::CSV_XS';
 };
 
 feature 'deploy', 'Deployment' => sub {
