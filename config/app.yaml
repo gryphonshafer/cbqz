@@ -21,19 +21,17 @@ default:
         config:
             hypnotoad:
                 proxy: 1
-                workers: 3
+                workers: 10
                 pid_file: runtime/hypnotoad.pid
                 listen:
-                    - http://*:3210
+                    - http://*:3000
         session_duration: 14400 # 4 hours
         access_log:
             production: access.log
             development: morbo.log
     template:
         compile_ext: .ttc
-        compile_dir:
-            production: runtime/ttc
-            development: runtime/ttc
+        compile_dir: runtime/ttc
         wrapper: wrapper.html.tt
         include_path:
             - templates/pages

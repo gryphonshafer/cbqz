@@ -5,6 +5,7 @@ use Mojo::Base 'Mojolicious';
 use Mojo::Loader 'load_class';
 use MojoX::Log::Dispatch::Simple;
 use Try::Tiny;
+use File::Path 'remove_tree';
 use CBQZ;
 use CBQZ::Model::User;
 use CBQZ::Util::Format 'log_date';
@@ -61,14 +62,16 @@ sub startup {
     );
 
     # template processing
+    my $tt_conf = $config->get('template');
+    remove_tree( $tt_conf->{'compile_dir'} ) if ( $tt_conf->{'compile_dir'} );
     $self->plugin(
         'ToolkitRenderer',
         {
             config => {
-                INCLUDE_PATH => $config->get( 'template', 'include_path' ),
-                COMPILE_EXT  => $config->get( 'template', 'compile_ext' ),
-                COMPILE_DIR  => $config->get( 'template', 'compile_dir', $self->mode ),
-                WRAPPER      => $config->get( 'template', 'wrapper' ),
+                INCLUDE_PATH => $tt_conf->{'include_path'},
+                COMPILE_EXT  => $tt_conf->{'compile_ext'},
+                COMPILE_DIR  => $tt_conf->{'compile_dir'},
+                WRAPPER      => $tt_conf->{'wrapper'},
                 CONSTANTS    => {
                     version => $config->get('version'),
                 },
