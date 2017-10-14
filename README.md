@@ -110,3 +110,14 @@ To do that, use the `material_load.pl` program located in the `tools/data`
 directory.
 
     ./tools/data/material_load.pl -n '2017 Corinthians' -k etc/2017_kvl.csv -m etc/2017_materials.csv
+
+## Upgrading and Staying Current
+
+After pulling CBQZ code updates, you may need to update other aspects of your
+enviornment. Generally speaking, you can do that with from the project's root
+directory with:
+
+    cpanm -n -f --with-develop --with-all-features --installdeps .
+    dest update
+
+Also check changes on this file for clues as to any other dependencies needed.
