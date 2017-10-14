@@ -18,10 +18,14 @@ sub index {
         );
     }
     else {
-        CBQZ::Model::QuestionSet->new->create_default( $self->stash('user') )
-            unless ( $self->stash('user')->question_sets->count );
+        my $question_sets = $self->stash('user')->question_sets;
+        $question_sets = [ CBQZ::Model::QuestionSet->new->create_default( $self->stash('user') ) ]
+            unless (@$question_sets);
 
-        $self->stash( materials => CBQZ::Model::MaterialSet->new->list );
+        $self->stash(
+            materials     => CBQZ::Model::MaterialSet->new->list,
+            question_sets => $question_sets,
+        );
     }
 }
 

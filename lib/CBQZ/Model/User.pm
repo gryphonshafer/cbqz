@@ -111,7 +111,11 @@ sub question_sets {
     E->throw('Failure because user object data not yet loaded')
         unless ( $self->obj and $self->obj->in_storage );
 
-    return $self->obj->question_sets;
+    return [ map {
+        my $set = CBQZ::Model::QuestionSet->new;
+        $set->obj($_);
+        $set;
+    } $self->obj->question_sets->all ];
 }
 
 __PACKAGE__->meta->make_immutable;

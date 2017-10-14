@@ -16,7 +16,8 @@ sub create_default {
         name    => 'Default ' . ucfirst( $user->obj->name ) . ' Set',
     })->get_from_storage ]);
 
-    return $rs;
+    $self->obj($rs);
+    return $self;
 }
 
 sub get_questions {

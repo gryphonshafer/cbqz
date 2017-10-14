@@ -102,10 +102,10 @@
 
             <fieldset>
                 <legend>Questions Set</legend>
-                [% FOR set IN user.question_sets %]
+                [% FOR set IN question_sets %]
                     <label><input type="radio" name="questions"
                         [% IF loop.first %]checked[% END %]
-                        value="[% set.id %]">[% set.name %]</label>
+                        value="[% set.obj.id %]">[% set.obj.name %]</label>
                     [% UNLESS loop.last %]<br>[% END %]
                 [% END %]
             </fieldset>
