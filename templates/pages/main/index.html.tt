@@ -74,6 +74,15 @@
             Please be patient for this authorization.
         </p>
     [% ELSE %]
+        [% UNLESS materials %]
+            <h2>No Material Sets Available</h2>
+            <p>
+                There don't appear to be any material sets available.
+                Unfortunately, you can't use CBQZ's questions editor or quiz
+                room pages until there's at least 1 materials set to select.
+            </p>
+        [% END %]
+
         <h2>Select Sets</h2>
         <p>Using the options below, select the sets you want to work with.</p>
 
@@ -111,13 +120,37 @@
             </fieldset>
         </form>
 
-        [% UNLESS materials %]
-            <h2>No Material Sets Available</h2>
-            <p>
-                There don't appear to be any material sets available.
-                Unfortunately, you can't use CBQZ's questions editor or quiz
-                room pages until there's at least 1 materials set to select.
-            </p>
+        [% FOR set IN question_sets %]
+            <h3>[% set.obj.name %]</h3>
+            [% stats = set.statistics %]
+            [% IF stats.size > 0 %]
+                <table>
+                    [% FOR chapter IN stats %]
+                        [% IF loop.first %]
+                            <tr>
+                                <th>Chapter</th>
+                                <th>Verses</th>
+                                <th>Questions</th>
+                                <th>Qs/V</th>
+                                [% FOR type IN chapter.types %]
+                                    <th>[% type.0 %]</th>
+                                [% END %]
+                            </tr>
+                        [% END %]
+                        <tr>
+                            <td>[% chapter.book %] [% chapter.chapter %]</td>
+                            <td>[% chapter.questions %]</td>
+                            <td>[% chapter.verses %]</td>
+                            <td>[% chapter.questions / chapter.verses | format('%0.2f') %]</td>
+                            [% FOR type IN chapter.types %]
+                                <td>[% type.1 || 0 %]</td>
+                            [% END %]
+                        </tr>
+                    [% END %]
+                </table>
+            [% ELSE %]
+                <p>There are no questions yet written for this question set.</p>
+            [% END %]
         [% END %]
     [% END %]
 [% END %]
