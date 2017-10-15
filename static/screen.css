@@ -50,6 +50,41 @@ body {
     margin-bottom: 30px;
 }
 
+table.tabular,
+table.tabular th,
+table.tabular td {
+    border: 1px solid silver;
+    padding: 0px;
+    border-spacing: 0px;
+    border-collapse: collapse;
+}
+
+table.tabular th {
+    background-color: lightgray;
+    color: black;
+    padding: 2px 5px 2px 5px;
+    font-size: 10pt;
+    text-align: left;
+}
+
+table.tabular td {
+    background-color: white;
+    color: black;
+    padding: 1px 3px 1px 3px;
+}
+
+table.numeric td {
+    text-align: right;
+}
+
+table td.left {
+    text-align: left;
+}
+
+table td.right {
+    text-align: right;
+}
+
 /* -------------------------------------------------------------------------- */
 
 div#header {
@@ -120,13 +155,13 @@ div#footer p {
 /* -------------------------------------------------------------------------- */
 
 form fieldset {
-    border: 1px solid gray;
+    border: 1px solid silver;
     display: inline-block;
 }
 
 form fieldset legend {
-    border: 1px solid gray;
-    background-color: whitesmoke;
+    border: 1px solid silver;
+    background-color: white;
 }
 
 form#select_sets fieldset {

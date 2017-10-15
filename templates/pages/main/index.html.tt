@@ -124,21 +124,23 @@
             <h3>[% set.obj.name %]</h3>
             [% stats = set.statistics %]
             [% IF stats.size > 0 %]
-                <table>
+                <table class="tabular numeric">
                     [% FOR chapter IN stats %]
                         [% IF loop.first %]
                             <tr>
-                                <th>Chapter</th>
-                                <th>Verses</th>
-                                <th>Questions</th>
-                                <th>Qs/V</th>
+                                <th>Book</th>
+                                <th>Ch.</th>
+                                <th>Vrs.</th>
+                                <th>Qs.</th>
+                                <th>Qs./V.</th>
                                 [% FOR type IN chapter.types %]
                                     <th>[% type.0 %]</th>
                                 [% END %]
                             </tr>
                         [% END %]
                         <tr>
-                            <td>[% chapter.book %] [% chapter.chapter %]</td>
+                            <td class="left">[% chapter.book %]</td>
+                            <td>[% chapter.chapter %]</td>
                             <td>[% chapter.questions %]</td>
                             <td>[% chapter.verses %]</td>
                             <td>[% chapter.questions / chapter.verses | format('%0.2f') %]</td>
