@@ -118,14 +118,27 @@
                     [% UNLESS loop.last %]<br>[% END %]
                 [% END %]
             </fieldset>
+
+            [% FOR question_set IN question_sets %]
+                [% statistics = question_set.statistics %]
+                [% IF statistics.size > 0 %]
+                    <select multiple size="10">
+                        [% FOR chapter IN statistics %]
+                            <option>[% chapter.book %] [% chapter.chapter %]</option>
+                        [% END %]
+                    </select>
+                [% ELSE %]
+                    <span>No Data</span>
+                [% END %]
+            [% END %]
         </form>
 
-        [% FOR set IN question_sets %]
-            <h3>[% set.obj.name %]</h3>
-            [% stats = set.statistics %]
-            [% IF stats.size > 0 %]
+        [% FOR question_set IN question_sets %]
+            <h3>[% question_set.obj.name %]</h3>
+            [% statistics = question_set.statistics %]
+            [% IF statistics.size > 0 %]
                 <table class="tabular numeric">
-                    [% FOR chapter IN stats %]
+                    [% FOR chapter IN statistics %]
                         [% IF loop.first %]
                             <tr>
                                 <th>Book</th>

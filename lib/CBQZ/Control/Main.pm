@@ -6,7 +6,6 @@ use Try::Tiny;
 use CBQZ::Model::User;
 use CBQZ::Model::Program;
 use CBQZ::Model::MaterialSet;
-use CBQZ::Model::QuestionSet;
 
 sub index {
     my ($self) = @_;
@@ -18,15 +17,16 @@ sub index {
         );
     }
     else {
-        my $question_sets = $self->stash('user')->question_sets;
-        $question_sets = [ CBQZ::Model::QuestionSet->new->create_default( $self->stash('user') ) ]
-            unless (@$question_sets);
-
         $self->stash(
             materials     => CBQZ::Model::MaterialSet->new->list,
-            question_sets => $question_sets,
+            question_sets => $self->stash('user')->question_sets,
         );
     }
+}
+
+sub question_sets_statistics {
+    my ($self) = @_;
+    return $self->render( json => [ map { $_->to_data } @{ $self->stash('user')->question_sets } ] );
 }
 
 sub login {

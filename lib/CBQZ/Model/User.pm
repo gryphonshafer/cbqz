@@ -4,6 +4,7 @@ use Moose;
 use MooseX::ClassAttribute;
 use Digest::SHA 'sha256_hex';
 use Try::Tiny;
+use CBQZ::Model::QuestionSet;
 
 extends 'CBQZ::Model';
 
@@ -111,11 +112,16 @@ sub question_sets {
     E->throw('Failure because user object data not yet loaded')
         unless ( $self->obj and $self->obj->in_storage );
 
-    return [ map {
+    my $question_sets = [ map {
         my $set = CBQZ::Model::QuestionSet->new;
         $set->obj($_);
         $set;
     } $self->obj->question_sets->all ];
+
+    $question_sets = [ CBQZ::Model::QuestionSet->new->create_default( $self->stash('user') ) ]
+        unless (@$question_sets);
+
+    return $question_sets;
 }
 
 __PACKAGE__->meta->make_immutable;
