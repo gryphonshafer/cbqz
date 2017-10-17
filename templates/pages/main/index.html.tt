@@ -1,7 +1,6 @@
 [%
     page.title = 'CBQZ Bible Quizzing System';
-    page.menu  = 'home';
-    page.js.push( '/js/utilities.js', '/js/pages/home_page.js' );
+    page.menu  = 'main';
 %]
 
 <h2>CBQZ: Christian Bible Quizzing</h2>
@@ -26,7 +25,11 @@
     <h2>Create a CBQZ System User Account</h2>
     <p>If you've been invited to, you can create a CBQZ system user account using the following form.</p>
 
-    [% page.js.push('https://www.google.com/recaptcha/api.js') %]
+    [% page.js.push(
+        'https://www.google.com/recaptcha/api.js'
+        '/js/utilities.js',
+        '/js/pages/create_form.js',
+    ) %]
 
     <form id="create_form" method="post"
         action="[% c.url_for.path('/create-user') %]" autocomplete="new-password"
@@ -34,22 +37,18 @@
         <fieldset>
             <legend>Create User Account</legend>
             <label>Name: <input name="name" size="20" placeholder="Name"></label>
-            <br>
             <label>Password: <input type="password" name="passwd" size="20" placeholder="Password"></label>
-            <br>
-            <label>Email: <input name="email" size="20" placeholder="Email Address"></label><br>
+            <label>Email: <input name="email" size="20" placeholder="Email Address"></label>
 
-            [% IF programs.count > 0 %]
+            [% IF programs.size > 0 %]
                 <label>
                     Program:
                     <select name="program">
-                        [% programs.reset %]
-                        [% WHILE ( program = programs.next ) %]
+                        [% FOR program IN programs %]
                             <option value="[% program.program_id %]">[% program.name %]</option>
                         [% END %]
                     </select>
                 </label>
-                <br>
             [% END %]
 
             <div class="g-recaptcha" data-sitekey="[% recaptcha %]" data-callback="enable_submit"></div>
@@ -65,7 +64,7 @@
 
 [% ELSE %]
 
-    [% IF NOT user.roles.size OR NOT user.programs.size %]
+    [% IF NOT user.roles_count OR NOT user.programs_count %]
         <h2>Account Pending Approval</h2>
         <p>
             Your account has been created, but it's pending approval.  Your account
@@ -73,99 +72,70 @@
             authorized by CBQZ administrators or Bible quizzing program directors.
             Please be patient for this authorization.
         </p>
+    [% ELSIF NOT material_sets_count %]
+        <h2>No Material Sets Available</h2>
+        <p>
+            There don't appear to be any material sets available.
+            Unfortunately, you can't use CBQZ's questions editor or quiz
+            room pages until there's at least 1 materials set to select.
+        </p>
     [% ELSE %]
-        [% UNLESS materials %]
-            <h2>No Material Sets Available</h2>
-            <p>
-                There don't appear to be any material sets available.
-                Unfortunately, you can't use CBQZ's questions editor or quiz
-                room pages until there's at least 1 materials set to select.
-            </p>
-        [% END %]
+        [%
+            page.vue = 1;
+            page.js.push( '/main/path.js', '/js/app/main.js' );
+        %]
 
-        <h2>Select Sets</h2>
-        <p>Using the options below, select the sets you want to work with.</p>
+        <div id="main" v-cloak>
+            <h2>Select Sets</h2>
+            <p>Using the options below, select the sets you want to work with.</p>
 
-        <form id="select_sets" method="post" action="[% c.url_for.path('/') %]">
-            <fieldset>
-                <legend>Quiz Program</legend>
-                [% FOR program IN user.programs %]
-                    <label><input type="radio" name="program"
-                        [% IF loop.first %]checked[% END %]
-                        value="[% program.id %]">[% program.name %]</label>
-                    [% UNLESS loop.last %]<br>[% END %]
-                [% END %]
-            </fieldset>
+            <form id="select_sets" method="post" action="[% c.url_for.path('/') %]">
+                <fieldset>
+                    <legend>Quiz Program</legend>
+                    <label v-for="program in programs"><input type="radio" name="program"
+                        v-bind:value="program.program_id">{{ program.name }}</label>
+                </fieldset>
 
-            [% IF materials %]
                 <fieldset>
                     <legend>Material Set</legend>
-                    [% FOR material IN materials %]
-                        <label><input type="radio" name="material"
-                            [% IF loop.first %]checked[% END %]
-                            value="[% material.id %]">[% material.name %]</label>
-                        [% UNLESS loop.last %]<br>[% END %]
-                    [% END %]
+                    <label v-for="set in material_sets"><input type="radio" name="material"
+                        v-bind:value="set.material_set_id">{{ set.name }}</label>
                 </fieldset>
-            [% END %]
 
-            <fieldset>
-                <legend>Questions Set</legend>
-                [% FOR set IN question_sets %]
-                    <label><input type="radio" name="questions"
-                        [% IF loop.first %]checked[% END %]
-                        value="[% set.obj.id %]">[% set.obj.name %]</label>
-                    [% UNLESS loop.last %]<br>[% END %]
-                [% END %]
-            </fieldset>
+                <fieldset>
+                    <legend>Questions Set</legend>
+                    <label v-for="set in question_sets"><input type="radio" name="questions"
+                        v-bind:value="set.question_set_id" v-model="question_set_id">{{ set.name }}</label>
+                </fieldset>
+            </form>
 
-            [% FOR question_set IN question_sets %]
-                [% statistics = question_set.statistics %]
-                [% IF statistics.size > 0 %]
-                    <select multiple size="10">
-                        [% FOR chapter IN statistics %]
-                            <option>[% chapter.book %] [% chapter.chapter %]</option>
-                        [% END %]
-                    </select>
-                [% ELSE %]
-                    <span>No Data</span>
-                [% END %]
-            [% END %]
-        </form>
+            <div v-if="question_set">
+                <h3>Questions Set: {{ question_set.name }}</h3>
 
-        [% FOR question_set IN question_sets %]
-            <h3>[% question_set.obj.name %]</h3>
-            [% statistics = question_set.statistics %]
-            [% IF statistics.size > 0 %]
-                <table class="tabular numeric">
-                    [% FOR chapter IN statistics %]
-                        [% IF loop.first %]
-                            <tr>
-                                <th>Book</th>
-                                <th>Ch.</th>
-                                <th>Vrs.</th>
-                                <th>Qs.</th>
-                                <th>Qs./V.</th>
-                                [% FOR type IN chapter.types %]
-                                    <th>[% type.0 %]</th>
-                                [% END %]
-                            </tr>
-                        [% END %]
-                        <tr>
-                            <td class="left">[% chapter.book %]</td>
-                            <td>[% chapter.chapter %]</td>
-                            <td>[% chapter.questions %]</td>
-                            <td>[% chapter.verses %]</td>
-                            <td>[% chapter.questions / chapter.verses | format('%0.2f') %]</td>
-                            [% FOR type IN chapter.types %]
-                                <td>[% type.1 || 0 %]</td>
-                            [% END %]
-                        </tr>
-                    [% END %]
+                <table class="tabular numeric" v-if="question_set.statistics.length > 0">
+                    <tr>
+                        <th>Book</th>
+                        <th>Ch.</th>
+                        <th>Vrs.</th>
+                        <th>Qs.</th>
+                        <th>Qs./V.</th>
+                        <th v-for="type in question_set.statistics[0].types">{{ type[0] }}</th>
+                    </tr>
+
+                    <tr v-for="chapter in question_set.statistics">
+                        <td class="left">{{ chapter.book }}</td>
+                        <td>{{ chapter.chapter }}</td>
+                        <td>{{ chapter.questions }}</td>
+                        <td>{{ chapter.verses }}</td>
+                        <td>{{ ( chapter.questions / chapter.verses ).toFixed(2) }}</td>
+                        <td v-for="type in chapter.types">{{ type[1] || 0 }}</td>
+                    </tr>
                 </table>
-            [% ELSE %]
-                <p>There are no questions yet written for this question set.</p>
-            [% END %]
-        [% END %]
+
+                <p v-if="question_set.statistics.length == 0">
+                    There are no questions yet written for this question set.
+                </p>
+            </div>
+        </div>
     [% END %]
 [% END %]

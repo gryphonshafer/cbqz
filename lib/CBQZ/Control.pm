@@ -144,8 +144,8 @@ sub startup {
         my ($self) = @_;
         return 1 if (
             $self->stash('user') and
-            $self->stash('user')->roles > 0 and
-            $self->stash('user')->programs > 0
+            $self->stash('user')->roles_count > 0 and
+            $self->stash('user')->programs_count > 0
         );
 
         $self->info('Login required but not yet met');

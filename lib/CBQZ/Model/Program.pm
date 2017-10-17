@@ -7,9 +7,9 @@ extends 'CBQZ::Model';
 
 class_has 'schema_name' => ( isa => 'Str', is => 'ro', default => 'Program' );
 
-sub list {
+sub rs {
     my ($self) = @_;
-    my $programs = $self->rs->search;
+    my $programs = $self->SUPER::rs;
     return ( $programs->count ) ? $programs : $self->create_default;
 }
 

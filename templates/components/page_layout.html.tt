@@ -15,12 +15,12 @@
             (<a href="[% c.url_for.path('/logout') %]">Logout</a>)
             <br>
 
-            <a [% IF page.menu == 'home' %]class="selected"[% END %]
-                href="[% c.url_for.path('/') %]">Home</a>
+            <a [% IF page.menu == 'main' %]class="selected"[% END %]
+                href="[% c.url_for.path('/') %]">Main</a>
 
             [% IF
-                user.roles.size > 0 AND user.programs.size > 0 AND
-                NOT ( page.menu == 'home' AND NOT materials )
+                user.roles_count > 0 AND user.programs_count > 0
+                AND NOT ( page.menu == 'main' AND material_sets_count == 0 )
             %]
                 <a [% IF page.menu == 'editor' %]class="selected"[% END %]
                     href="[% c.url_for.path('/editor') %]">Editor</a>

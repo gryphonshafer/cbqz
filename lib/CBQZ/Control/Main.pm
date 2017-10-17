@@ -12,21 +12,13 @@ sub index {
 
     unless ( $self->session('user_id') ) {
         $self->stash(
-            programs  => CBQZ::Model::Program->new->list,
+            programs  => [ CBQZ::Model::Program->new->every_data ],
             recaptcha => $self->config->get( 'recaptcha', 'public_key' ),
         );
     }
     else {
-        $self->stash(
-            materials     => CBQZ::Model::MaterialSet->new->list,
-            question_sets => $self->stash('user')->question_sets,
-        );
+        $self->stash( material_sets_count => CBQZ::Model::MaterialSet->new->rs->count );
     }
-}
-
-sub question_sets_statistics {
-    my ($self) = @_;
-    return $self->render( json => [ map { $_->to_data } @{ $self->stash('user')->question_sets } ] );
 }
 
 sub login {
@@ -87,6 +79,21 @@ sub create_user {
     };
 
     return $self->redirect_to('/');
+}
+
+sub path {
+    my ($self) = @_;
+    return $self->render( text => 'var cntlr = "' . $self->url_for->path('/main') . '";' );
+}
+
+sub data {
+    my ($self) = @_;
+    return $self->render( json => {
+        programs      => [ map { $_->data } $self->stash('user')->programs ],
+        question_sets => [ map { $_->data } $self->stash('user')->question_sets ],
+        material_sets => [ CBQZ::Model::MaterialSet->new->every_data ],
+        ( map { $_ => undef, $_ . '_id' => undef } qw( program question_set material_set ) ),
+    } );
 }
 
 1;

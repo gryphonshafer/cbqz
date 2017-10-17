@@ -78,10 +78,9 @@ sub generate_statistics {
     ];
 }
 
-sub to_data {
+sub data {
     my ($self) = @_;
-
-    my $data = ( $self->obj ) ? { $self->obj->get_inflated_columns } : {};
+    my $data = $self->SUPER::data;
     $data->{statistics} = $self->statistics;
     return $data;
 }
