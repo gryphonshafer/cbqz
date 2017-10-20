@@ -12,14 +12,15 @@ sub path {
 }
 
 sub data {
-    my ($self) = @_;
+    my ($self)     = @_;
+    my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
 
-    my $material  = CBQZ::Model::MaterialSet->new->load( $self->cookie('cbqz_sets_material') )->get_material;
-    my $questions = CBQZ::Model::QuestionSet->new->load( $self->cookie('cbqz_sets_questions') )->get_questions;
+    my $material  = CBQZ::Model::MaterialSet->new->load( $cbqz_prefs->{material_set_id} )->get_material;
+    my $questions = CBQZ::Model::QuestionSet->new->load( $cbqz_prefs->{question_set_id} )->get_questions;
 
     return $self->render( json => {
         metadata => {
-            types => CBQZ::Model::Program->new->load( $self->cookie('cbqz_sets_program') )->types_list,
+            types => CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} )->types_list,
             books => [ sort { $a cmp $b } keys %$material ],
         },
         question => {
@@ -44,8 +45,9 @@ sub data {
 }
 
 sub save {
-    my ($self) = @_;
-    my $question = $self->req_body_json;
+    my ($self)     = @_;
+    my $question   = $self->req_body_json;
+    my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
 
     unless ( $question->{question_id} ) {
         $self->dq->sql(q{
@@ -53,7 +55,7 @@ sub save {
                 question_set_id, book, chapter, verse, question, answer, type
             ) VALUES ( ?, ?, ?, ?, ?, ?, ? )
         })->run(
-            $self->cookie('cbqz_sets_questions'),
+            $cbqz_prefs->{question_set_id},
             @$question{ qw( book chapter verse question answer type ) },
         );
 

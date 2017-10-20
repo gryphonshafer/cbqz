@@ -74,11 +74,7 @@ table.tabular td {
 }
 
 tr.selected td {
-    background-color: palegreen;
-}
-
-tr.weighted td {
-    background-color: wheat;
+    background-color: #ccffcc;
 }
 
 table.numeric td {

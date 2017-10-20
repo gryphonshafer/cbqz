@@ -3,6 +3,7 @@ package CBQZ::Control;
 use exact;
 use Mojo::Base 'Mojolicious';
 use Mojo::Loader 'load_class';
+use Mojo::Util 'b64_decode';
 use MojoX::Log::Dispatch::Simple;
 use Try::Tiny;
 use File::Path 'remove_tree';
@@ -38,6 +39,15 @@ sub startup {
         my $data;
         try {
             $data = $cbqz->json->decode( $self->req->body );
+        };
+        return $data;
+    } );
+    $self->helper( 'cbqz' => sub { $cbqz } );
+    $self->helper( 'decode_cookie' => sub {
+        my ( $self, $name ) = @_;
+        my $data = {};
+        try {
+            $data = $cbqz->json->decode( b64_decode( $self->cookie($name) ) );
         };
         return $data;
     } );

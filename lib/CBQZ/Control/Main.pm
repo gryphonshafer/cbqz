@@ -88,17 +88,37 @@ sub path {
 
 sub data {
     my ($self) = @_;
+    my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
+
+    my @selected_chapters = map {
+        $_->{book} . '|' . $_->{chapter}
+    } @{ $cbqz_prefs->{selected_chapters} };
+
     return $self->render( json => {
         programs        => [ map { $_->data } $self->stash('user')->programs ],
         material_sets   => [ CBQZ::Model::MaterialSet->new->every_data ],
-        weight_chapters => 0,
-        weight_percent  => 50,
+        weight_chapters => $cbqz_prefs->{weight_chapters} // 0,
+        weight_percent  => $cbqz_prefs->{weight_percent} // 50,
+        program_id      => $cbqz_prefs->{program_id} || undef,
+        question_set_id => $cbqz_prefs->{question_set_id} || undef,
+        material_set_id => $cbqz_prefs->{material_set_id} || undef,
+        question_set    => undef,
         question_sets   => [ map {
             my $set = $_->data;
-            $_->{selected} = undef for ( @{ $set->{statistics} } );
+            for ( @{ $set->{statistics} } ) {
+                unless (
+                    $cbqz_prefs->{question_set_id} and
+                    $cbqz_prefs->{question_set_id} == $set->{question_set_id}
+                ) {
+                    $_->{selected} = 0;
+                }
+                else {
+                    my $id = $_->{book} . '|' . $_->{chapter};
+                    $_->{selected} = ( grep { $id eq $_ } @selected_chapters ) ? 1 : 0;
+                }
+            }
             $set;
         } $self->stash('user')->question_sets ],
-        ( map { $_ => undef } qw( question_set program_id question_set_id material_set_id ) ),
     } );
 }
 

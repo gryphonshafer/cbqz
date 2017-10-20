@@ -6,9 +6,9 @@ use CBQZ::Model::Quiz;
 use CBQZ::Model::Program;
 
 sub index {
-    my ($self) = @_;
-
-    my $program = CBQZ::Model::Program->new->load( $self->cookie('cbqz_sets_program') );
+    my ($self)     = @_;
+    my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
+    my $program    = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
 
     $self->stash(
         question_types => $program->types_list,
@@ -19,12 +19,10 @@ sub index {
 }
 
 sub path {
-    my ($self) = @_;
-
+    my ($self)           = @_;
+    my $cbqz_prefs       = $self->decode_cookie('cbqz_prefs');
     my $path             = $self->url_for->path('/quizroom');
-    my $result_operation = CBQZ::Model::Program->new->load(
-        $self->cookie('cbqz_sets_program')
-    )->obj->result_operation;
+    my $result_operation = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} )->obj->result_operation;
 
     return $self->render(
         text => qq/
@@ -38,20 +36,17 @@ sub path {
 }
 
 sub data {
-    my ($self) = @_;
+    my ($self)     = @_;
+    my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
 
-    my $quiz = CBQZ::Model::Quiz->new->generate(
-        $self->cookie('cbqz_sets_program'),
-        $self->cookie('cbqz_sets_material'),
-        $self->cookie('cbqz_sets_questions'),
-    );
+    my $quiz = CBQZ::Model::Quiz->new->generate($cbqz_prefs);
 
-    my $program = CBQZ::Model::Program->new->load( $self->cookie('cbqz_sets_program') );
+    my $program = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
     $self->notice( $quiz->{error} ) if ( $quiz->{error} );
 
     return $self->render( json => {
         metadata => {
-            types         => CBQZ::Model::Program->new->load( $self->cookie('cbqz_sets_program') )->types_list,
+            types         => CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} )->types_list,
             timer_default => $program->obj->timer_default,
             as_default    => $program->obj->as_default,
         },
