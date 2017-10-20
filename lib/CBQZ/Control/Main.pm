@@ -89,10 +89,16 @@ sub path {
 sub data {
     my ($self) = @_;
     return $self->render( json => {
-        programs      => [ map { $_->data } $self->stash('user')->programs ],
-        question_sets => [ map { $_->data } $self->stash('user')->question_sets ],
-        material_sets => [ CBQZ::Model::MaterialSet->new->every_data ],
-        ( map { $_ => undef, $_ . '_id' => undef } qw( program question_set material_set ) ),
+        programs        => [ map { $_->data } $self->stash('user')->programs ],
+        material_sets   => [ CBQZ::Model::MaterialSet->new->every_data ],
+        weight_chapters => 0,
+        weight_percent  => 50,
+        question_sets   => [ map {
+            my $set = $_->data;
+            $_->{selected} = undef for ( @{ $set->{statistics} } );
+            $set;
+        } $self->stash('user')->question_sets ],
+        ( map { $_ => undef } qw( question_set program_id question_set_id material_set_id ) ),
     } );
 }
 

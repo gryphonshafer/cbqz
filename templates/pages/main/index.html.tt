@@ -82,7 +82,7 @@
     [% ELSE %]
         [%
             page.vue = 1;
-            page.js.push( '/main/path.js', '/js/app/main.js' );
+            page.js.push( '/main/path.js', '/js/app/main.js', '/js/utilities.js' );
         %]
 
         <div id="main" v-cloak>
@@ -93,13 +93,13 @@
                 <fieldset>
                     <legend>Quiz Program</legend>
                     <label v-for="program in programs"><input type="radio" name="program"
-                        v-bind:value="program.program_id">{{ program.name }}</label>
+                        v-bind:value="program.program_id" v-model="program_id">{{ program.name }}</label>
                 </fieldset>
 
                 <fieldset>
                     <legend>Material Set</legend>
                     <label v-for="set in material_sets"><input type="radio" name="material"
-                        v-bind:value="set.material_set_id">{{ set.name }}</label>
+                        v-bind:value="set.material_set_id" v-model="material_set_id">{{ set.name }}</label>
                 </fieldset>
 
                 <fieldset>
@@ -107,13 +107,31 @@
                     <label v-for="set in question_sets"><input type="radio" name="questions"
                         v-bind:value="set.question_set_id" v-model="question_set_id">{{ set.name }}</label>
                 </fieldset>
+
+                <fieldset v-if="question_set && selected_chapters_count">
+                    <legend>Chapter Weighting</legend>
+                    Weight last
+                    <select v-model="weight_chapters">
+                        <option>0</option>
+                        <option v-for="chapters in selected_chapters_count">{{ chapters }}</option>
+                    </select>
+                    chapters at
+                    <input size="1" v-model="weight_percent">%
+                </fieldset>
             </form>
 
             <div v-if="question_set">
                 <h3>Questions Set: {{ question_set.name }}</h3>
 
+                <p>
+                    Auto-Select Chapters:
+                    <button v-on:click="select_chapters('all')">All</button>
+                    <button v-on:click="select_chapters('none')">None</button>
+                </p>
+
                 <table class="tabular numeric" v-if="question_set.statistics.length > 0">
                     <tr>
+                        <th></th>
                         <th>Book</th>
                         <th>Ch.</th>
                         <th>Vrs.</th>
@@ -122,7 +140,18 @@
                         <th v-for="type in question_set.statistics[0].types">{{ type[0] }}</th>
                     </tr>
 
-                    <tr v-for="chapter in question_set.statistics">
+                    <tr
+                        v-for="chapter in question_set.statistics"
+                        v-on:click="chapter_clicked(chapter)"
+                        v-bind:class="{ selected: chapter.selected }"
+                    >
+                        <td class="center">
+                            <input type="checkbox"
+                                name="selected_chapters"
+                                v-bind:value="chapter.book + '|' + chapter.chapter"
+                                v-model="chapter.selected"
+                            >
+                        </td>
                         <td class="left">{{ chapter.book }}</td>
                         <td>{{ chapter.chapter }}</td>
                         <td>{{ chapter.questions }}</td>

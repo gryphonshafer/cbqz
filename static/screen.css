@@ -73,12 +73,24 @@ table.tabular td {
     padding: 1px 3px 1px 3px;
 }
 
+tr.selected td {
+    background-color: palegreen;
+}
+
+tr.weighted td {
+    background-color: wheat;
+}
+
 table.numeric td {
     text-align: right;
 }
 
 table td.left {
     text-align: left;
+}
+
+table td.center {
+    text-align: center;
 }
 
 table td.right {
