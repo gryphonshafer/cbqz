@@ -7,11 +7,6 @@ extends 'CBQZ::Model';
 
 class_has 'schema_name' => ( isa => 'Str', is => 'ro', default => 'MaterialSet' );
 
-sub list {
-    my ($self) = @_;
-    return $self->rs->search;
-}
-
 sub get_material {
     my ($self) = @_;
 

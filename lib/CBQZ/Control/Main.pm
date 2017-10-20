@@ -6,26 +6,18 @@ use Try::Tiny;
 use CBQZ::Model::User;
 use CBQZ::Model::Program;
 use CBQZ::Model::MaterialSet;
-use CBQZ::Model::QuestionSet;
 
 sub index {
     my ($self) = @_;
 
     unless ( $self->session('user_id') ) {
         $self->stash(
-            programs  => CBQZ::Model::Program->new->list,
+            programs  => [ CBQZ::Model::Program->new->every_data ],
             recaptcha => $self->config->get( 'recaptcha', 'public_key' ),
         );
     }
     else {
-        my $question_sets = $self->stash('user')->question_sets;
-        $question_sets = [ CBQZ::Model::QuestionSet->new->create_default( $self->stash('user') ) ]
-            unless (@$question_sets);
-
-        $self->stash(
-            materials     => CBQZ::Model::MaterialSet->new->list,
-            question_sets => $question_sets,
-        );
+        $self->stash( material_sets_count => CBQZ::Model::MaterialSet->new->rs->count );
     }
 }
 
@@ -87,6 +79,47 @@ sub create_user {
     };
 
     return $self->redirect_to('/');
+}
+
+sub path {
+    my ($self) = @_;
+    return $self->render( text => 'var cntlr = "' . $self->url_for->path('/main') . '";' );
+}
+
+sub data {
+    my ($self) = @_;
+    my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
+
+    my @selected_chapters = map {
+        $_->{book} . '|' . $_->{chapter}
+    } @{ $cbqz_prefs->{selected_chapters} };
+
+    return $self->render( json => {
+        programs        => [ map { $_->data } $self->stash('user')->programs ],
+        material_sets   => [ CBQZ::Model::MaterialSet->new->every_data ],
+        weight_chapters => $cbqz_prefs->{weight_chapters} // 0,
+        weight_percent  => $cbqz_prefs->{weight_percent} // 50,
+        program_id      => $cbqz_prefs->{program_id} || undef,
+        question_set_id => $cbqz_prefs->{question_set_id} || undef,
+        material_set_id => $cbqz_prefs->{material_set_id} || undef,
+        question_set    => undef,
+        question_sets   => [ map {
+            my $set = $_->data;
+            for ( @{ $set->{statistics} } ) {
+                unless (
+                    $cbqz_prefs->{question_set_id} and
+                    $cbqz_prefs->{question_set_id} == $set->{question_set_id}
+                ) {
+                    $_->{selected} = 0;
+                }
+                else {
+                    my $id = $_->{book} . '|' . $_->{chapter};
+                    $_->{selected} = ( grep { $id eq $_ } @selected_chapters ) ? 1 : 0;
+                }
+            }
+            $set;
+        } $self->stash('user')->question_sets ],
+    } );
 }
 
 1;

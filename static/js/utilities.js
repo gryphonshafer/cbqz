@@ -3,7 +3,7 @@ function set_cookie( name, value, days ) {
     if (days) {
         var date = new Date();
         date.setTime( date.getTime() + ( days * 24 * 60 * 60 * 1000 ) );
-        var expires = "; expires=" + date.toGMTString();
+        expires = "; expires=" + date.toGMTString();
     }
     document.cookie = name + "=" + value + expires + "; path=/";
     return value;
@@ -25,11 +25,11 @@ function erase_cookie(name) {
 }
 
 function set_json_cookie( name, value, days ) {
-    return set_cookie( name, JSON.stringify(value), days );
+    return set_cookie( name, btoa( JSON.stringify(value) ), days );
 }
 
 function get_json_cookie(name) {
-    return JSON.parse( get_cookie(name) );
+    return JSON.parse( atoa( get_cookie(name) ) );
 }
 
 // -----------------------------------------------------------------------------

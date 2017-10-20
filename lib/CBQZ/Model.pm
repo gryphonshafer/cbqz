@@ -33,7 +33,39 @@ sub load {
 
 sub rs {
     my $self = shift;
-    return $self->db->resultset( shift || $self->schema_name );
+    my $rs = $self->db->resultset( shift || $self->schema_name );
+    return (@_) ? $rs->search(@_) : $rs;
+}
+
+sub data {
+    my ($self) = @_;
+    return ( $self->obj ) ? { $self->obj->get_inflated_columns } : {};
+}
+
+sub model {
+    my $self = shift;
+
+    my $models = [
+        map {
+            my $new_model_object = $self->new;
+            $new_model_object->obj($_);
+            $new_model_object;
+        }
+        map { ( ref $_ eq 'ARRAY' ) ? @$_ : $_ } @_
+    ];
+    return (wantarray) ? @$models : $models;
+}
+
+sub every {
+    my $self = shift;
+    my $every = $self->model( $self->rs(@_)->all );
+    return (wantarray) ? @$every : $every;
+}
+
+sub every_data {
+    my $self = shift;
+    my $data = [ map { $_->data } @{ $self->every(@_) } ];
+    return (wantarray) ? @$data : $data;
 }
 
 __PACKAGE__->meta->make_immutable;

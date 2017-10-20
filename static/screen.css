@@ -73,12 +73,20 @@ table.tabular td {
     padding: 1px 3px 1px 3px;
 }
 
+tr.selected td {
+    background-color: #ccffcc;
+}
+
 table.numeric td {
     text-align: right;
 }
 
 table td.left {
     text-align: left;
+}
+
+table td.center {
+    text-align: center;
 }
 
 table td.right {
@@ -164,13 +172,16 @@ form fieldset legend {
     background-color: white;
 }
 
+form fieldset label {
+    display: block;
+}
+
 form#select_sets fieldset {
     display: inline-block;
     vertical-align: top;
 }
 
 form#create_form fieldset label {
-    display: inline-block;
     width: 250px;
     text-align: right;
     margin-bottom: 3px;

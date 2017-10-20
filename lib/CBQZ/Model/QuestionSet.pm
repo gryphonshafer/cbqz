@@ -7,6 +7,10 @@ extends 'CBQZ::Model';
 
 class_has 'schema_name' => ( isa => 'Str', is => 'ro', default => 'QuestionSet' );
 
+has 'statistics' => ( isa => 'ArrayRef[HashRef]', is => 'rw', lazy => 1, default => sub {
+    return shift->generate_statistics;
+} );
+
 sub create_default {
     my ( $self, $user ) = @_;
     my $rs = $self->rs->result_source->resultset;
@@ -37,7 +41,7 @@ sub get_questions {
     return $questions;
 }
 
-sub statistics {
+sub generate_statistics {
     my ($self) = @_;
 
     my %types;
@@ -72,6 +76,13 @@ sub statistics {
             ORDER BY book, chapter
         })->run( $self->obj->id )->all({}) }
     ];
+}
+
+sub data {
+    my ($self) = @_;
+    my $data = $self->SUPER::data;
+    $data->{statistics} = $self->statistics;
+    return $data;
 }
 
 __PACKAGE__->meta->make_immutable;

@@ -4,11 +4,13 @@ use Moose;
 use MooseX::ClassAttribute;
 use Digest::SHA 'sha256_hex';
 use Try::Tiny;
+use CBQZ::Model::QuestionSet;
 
 extends 'CBQZ::Model';
 
 with 'CBQZ::Model::User::PreLogin';
-with 'CBQZ::Model::User::Roles';
+with 'CBQZ::Model::User::Role';
+with 'CBQZ::Model::User::Program';
 
 class_has 'schema_name' => ( isa => 'Str', is => 'ro', default => 'User' );
 
@@ -67,55 +69,17 @@ sub event {
     return;
 }
 
-sub programs {
-    my ( $self, $user ) = @_;
-
-    if ($user) {
-        E->throw('Input provided is not a valid user object')
-            unless ( $self->able( $user, 'obj' ) and $user->obj and $user->obj->in_storage );
-    }
-    else {
-        E->throw('Failure because user object data not yet loaded')
-            unless ( $self->obj and $self->obj->in_storage );
-    }
-
-    my $programs = [ map { $_->program } ( ($user) ? $user : $self )->obj->user_programs->all ];
-    return (wantarray) ? @{$programs} : $programs;
-}
-
-sub add_program {
-    my ( $self, $program_id, $user ) = @_;
-
-    $self->rs('UserProgram')->create({
-        user_id    => ( ($user) ? $user : $self )->obj->id,
-        program_id => $program_id,
-    });
-
-    return $self;
-}
-
-sub remove_program {
-    my ( $self, $program_id, $user ) = @_;
-
-    $self->rs('UserProgram')->search({
-        user_id    => ( ($user) ? $user : $self )->obj->id,
-        program_id => $program_id,
-    })->delete;
-
-    return $self;
-}
-
 sub question_sets {
     my ($self) = @_;
 
     E->throw('Failure because user object data not yet loaded')
         unless ( $self->obj and $self->obj->in_storage );
 
-    return [ map {
-        my $set = CBQZ::Model::QuestionSet->new;
-        $set->obj($_);
-        $set;
-    } $self->obj->question_sets->all ];
+    my $question_sets = CBQZ::Model::QuestionSet->new->model( $self->obj->question_sets->all );
+    $question_sets = [ CBQZ::Model::QuestionSet->new->create_default( $self->stash('user') ) ]
+        unless (@$question_sets);
+
+    return (wantarray) ? @$question_sets : $question_sets;
 }
 
 __PACKAGE__->meta->make_immutable;
