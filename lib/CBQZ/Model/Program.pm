@@ -15,9 +15,9 @@ sub rs {
 
 sub create_default {
     my ($self) = @_;
-    my $rs = $self->rs->result_source->resultset;
+    my $rs = $self->db->resultset( $self->schema_name )->result_source->resultset;
 
-    $rs->set_cache([ $self->rs->create({
+    $rs->set_cache([ $rs->create({
         name           => 'Default Quiz Program',
         question_types => $self->json->encode(
             [
