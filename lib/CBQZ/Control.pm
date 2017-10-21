@@ -6,7 +6,6 @@ use Mojo::Loader 'load_class';
 use Mojo::Util 'b64_decode';
 use MojoX::Log::Dispatch::Simple;
 use Try::Tiny;
-use File::Path 'remove_tree';
 use CBQZ;
 use CBQZ::Model::User;
 use CBQZ::Util::Format 'log_date';
@@ -73,7 +72,7 @@ sub startup {
 
     # template processing
     my $tt_conf = $config->get('template');
-    remove_tree( $tt_conf->{'compile_dir'} ) if ( $tt_conf->{'compile_dir'} );
+    push( @INC, $config->get( 'config_app', 'root_dir' ) );
     $self->plugin(
         'ToolkitRenderer',
         {
