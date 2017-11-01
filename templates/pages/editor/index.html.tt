@@ -137,26 +137,28 @@
         </select>
 
         <div id="material_lookup_display">
-            <a class="htmlarea"
+            <span class="htmlarea"
                 v-for="verse in material.verses"
                 v-bind:name="'v' + verse.verse"
             >
-                <b class="material_para_markers" v-if="verse.is_new_para">&para;</b>
-                <b class="clickable_reference" v-on:click="copy_verse_from_lookup(verse)"
-                    >{{ verse.chapter + ':' + verse.verse }}</b>
+                <span class="outdent">
+                    <b class="material_para_markers" v-if="verse.is_new_para">&para;</b>
+                    <b class="clickable_reference" v-on:click="copy_verse_from_lookup(verse)"
+                        >{{ verse.chapter + ':' + verse.verse }}</b>
 
-                <span class="material_key_markers">
-                    <template v-if="verse.key_class">
-                        {{ ( verse.key_class == 'range' ) ? '&Dagger;' : '&dagger;' }}
-                        {{ ( verse.key_type ) ? verse.key_type : '' }}
-                    </template>
-                    <template v-else>
-                        -
-                    </template>
+                    <span class="material_key_markers">
+                        <template v-if="verse.key_class">
+                            {{ ( verse.key_class == 'range' ) ? '&Dagger;' : '&dagger;' }}
+                            {{ ( verse.key_type ) ? verse.key_type : '' }}
+                        </template>
+                        <template v-else>
+                            -
+                        </template>
+                    </span>
+
+                    <span v-html="verse.text"></span>
                 </span>
-
-                <span v-html="verse.text"></span>
-            </a>
+            </span>
         </div>
     </div>
 
@@ -167,26 +169,28 @@
         </div>
 
         <div id="material_search_display">
-            <a class="htmlarea"
+            <span class="htmlarea"
                 v-for="verse in material.matched_verses"
                 v-bind:name="'material_search_display_' + verse.verse"
             >
-                <b class="material_para_markers" v-if="verse.is_new_para">&para;</b>
-                <b class="clickable_reference" v-on:click="lookup_from_search(verse)"
-                    >{{ verse.book + ' ' + verse.chapter + ':' + verse.verse }}</b>
+                <span class="outdent">
+                    <b class="material_para_markers" v-if="verse.is_new_para">&para;</b>
+                    <b class="clickable_reference" v-on:click="lookup_from_search(verse)"
+                        >{{ verse.book + ' ' + verse.chapter + ':' + verse.verse }}</b>
 
-                <span class="material_key_markers">
-                    <template v-if="verse.key_class">
-                        {{ ( verse.key_class == 'range' ) ? '&Dagger;' : '&dagger;' }}
-                        {{ ( verse.key_type ) ? verse.key_type : '' }}
-                    </template>
-                    <template v-else>
-                        -
-                    </template>
+                    <span class="material_key_markers">
+                        <template v-if="verse.key_class">
+                            {{ ( verse.key_class == 'range' ) ? '&Dagger;' : '&dagger;' }}
+                            {{ ( verse.key_type ) ? verse.key_type : '' }}
+                        </template>
+                        <template v-else>
+                            -
+                        </template>
+                    </span>
+
+                    <span v-html="verse.text"></span>
                 </span>
-
-                <span v-html="verse.text"></span>
-            </a>
+            </span>
         </div>
     </div>
 </div>

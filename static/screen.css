@@ -63,6 +63,8 @@ body {
     margin-bottom: 30px;
 }
 
+/* -------------------------------------------------------------------------- */
+
 table.tabular,
 table.tabular th,
 table.tabular td {
@@ -290,6 +292,21 @@ div#material_search_display .htmlarea + .htmlarea {
 
 div#material_lookup_display {
     margin-top: 3px;
+}
+
+div#material_lookup_display span.outdent,
+div#material_search_display span.outdent {
+    display: block;
+}
+
+div#material_lookup_display span.outdent {
+    text-indent: -10px;
+    margin-left: 10px;
+}
+
+div#material_search_display span.outdent {
+    text-indent: -15px;
+    margin-left: 15px;
 }
 
 .clickable_reference:hover {
