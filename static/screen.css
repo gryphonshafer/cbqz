@@ -447,12 +447,13 @@ div#quizroom div#timer div#timer_display {
     border: 1px solid lightgray;
     background-color: white;
     padding: 1px 10px 1px 10px;
-    font-size: 400%;
-    width: 66px;
+    width: 67px;
     float: left;
     margin-right: 4px;
     text-align: center;
     overflow: hidden;
+    font-size: 400%;
+    font-family: medium;
 }
 
 div#quizroom div#manage div#result button,
