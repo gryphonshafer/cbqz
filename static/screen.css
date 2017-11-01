@@ -1,38 +1,51 @@
 @font-face {
-  font-family: 'Droid Serif';
-  font-style: normal;
-  font-weight: 400;
-  src: url(fonts/Droid_Serif/DroidSerif-Regular.ttf) format('truetype');
+    font-family: normal;
+    src: url(fonts/Roboto/Roboto-Regular.ttf) format('truetype');
 }
 
 @font-face {
-  font-family: 'Droid Serif';
-  font-style: normal;
-  font-weight: 700;
-  src: url(fonts/Droid_Serif/DroidSerif-Bold.ttf) format('truetype');
+    font-family: medium;
+    src: url(fonts/Roboto/Roboto-Medium.ttf) format('truetype');
 }
 
 @font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 400;
-  src: url(fonts/Roboto/Roboto-Regular.ttf) format('truetype');
+    font-family: bold;
+    src: url(fonts/Roboto/Roboto-Bold.ttf) format('truetype');
 }
 
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 700;
-  src: url(fonts/Roboto/Roboto-Bold.ttf) format('truetype');
+h1, h2, h3, h4, h5, h6, b {
+    font-family: bold;
+    font-weight: normal;
 }
 
 body, input, button, select {
-    font-family: 'Roboto', sans-serif;
-    font-size: 10pt;
+    font-family: normal, sans-serif;
+    font-size: 13px;
 }
 
 .htmlarea {
-    font-family: 'Droid Serif', serif;
+    font-size: 14px;
+    line-height: 18px;
+}
+
+.clear {
+    font-family: normal;
+    color: black;
+}
+
+.unique_word {
+    font-family: medium;
+    color: blue;
+}
+
+.unique_phrase {
+    font-family: medium;
+    color: green;
+}
+
+.unique_chapter {
+    font-family: medium;
+    color: red;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -63,8 +76,10 @@ table.tabular th {
     background-color: lightgray;
     color: black;
     padding: 2px 5px 2px 5px;
-    font-size: 10pt;
+    font-size: 13px;
     text-align: left;
+    font-family: bold;
+    font-weight: normal;
 }
 
 table.tabular td {
@@ -121,7 +136,7 @@ div#header div#header_login form {
 }
 
 div#header a.selected {
-    font-weight: bold;
+    font-family: bold;
 }
 
 div#content div#message {
@@ -131,7 +146,7 @@ div#content div#message {
     border: 2px solid black;
     padding: 5px;
     background-color: white;
-    font-weight: bold;
+    font-family: bold;
 }
 
 div#content div#message.error {
@@ -198,7 +213,7 @@ form#create_form fieldset label {
 .htmlarea {
     display: block;
     background-color: white;
-    padding: 5px;
+    padding: 1px 2px 1px 2px;
     border: 1px solid lightgray;
 }
 
@@ -211,29 +226,14 @@ form#create_form fieldset label {
     border-color: gray;
 }
 
-.question {
+.question_box {
     width: 450px;
-    height: 125px;
+    height: 100px;
 }
 
-.clear {
-    font-weight: normal;
-    color: black;
-}
-
-.unique_word {
-    font-weight: bold;
-    color: blue;
-}
-
-.unique_phrase {
-    font-weight: bold;
-    color: green;
-}
-
-.unique_chapter {
-    font-weight: bold;
-    color: red;
+.answer_box {
+    width: 450px;
+    height: 150px;
 }
 
 .material_para_markers,

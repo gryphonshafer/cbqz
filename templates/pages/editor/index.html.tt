@@ -28,7 +28,7 @@
 
         <div>
             <span class="label">Question:</span>
-            <div tabindex="5" class="htmlarea question" contenteditable="true"
+            <div tabindex="5" class="htmlarea question_box" contenteditable="true"
                 ref="question" v-html="question.question"></div>
         </div>
 
@@ -48,7 +48,7 @@
 
         <div>
             <span class="label">Answer:</span>
-            <div tabindex="6" class="htmlarea question" contenteditable="true"
+            <div tabindex="6" class="htmlarea answer_box" contenteditable="true"
                 ref="answer" v-html="question.answer"></div>
         </div>
 
@@ -144,10 +144,17 @@
                 <b class="material_para_markers" v-if="verse.is_new_para">&para;</b>
                 <b class="clickable_reference" v-on:click="copy_verse_from_lookup(verse)"
                     >{{ verse.chapter + ':' + verse.verse }}</b>
-                <span class="material_key_markers" v-if="verse.key_class">
-                    {{ ( verse.key_class == 'range' ) ? '&Dagger;' : '&dagger;' }}
-                    {{ ( verse.key_type ) ? verse.key_type : '' }}
+
+                <span class="material_key_markers">
+                    <template v-if="verse.key_class">
+                        {{ ( verse.key_class == 'range' ) ? '&Dagger;' : '&dagger;' }}
+                        {{ ( verse.key_type ) ? verse.key_type : '' }}
+                    </template>
+                    <template v-else>
+                        -
+                    </template>
                 </span>
+
                 <span v-html="verse.text"></span>
             </a>
         </div>
@@ -167,10 +174,17 @@
                 <b class="material_para_markers" v-if="verse.is_new_para">&para;</b>
                 <b class="clickable_reference" v-on:click="lookup_from_search(verse)"
                     >{{ verse.book + ' ' + verse.chapter + ':' + verse.verse }}</b>
-                <span class="material_key_markers" v-if="verse.key_class">
-                    {{ ( verse.key_class == 'range' ) ? '&Dagger;' : '&dagger;' }}
-                    {{ ( verse.key_type ) ? verse.key_type : '' }}
+
+                <span class="material_key_markers">
+                    <template v-if="verse.key_class">
+                        {{ ( verse.key_class == 'range' ) ? '&Dagger;' : '&dagger;' }}
+                        {{ ( verse.key_type ) ? verse.key_type : '' }}
+                    </template>
+                    <template v-else>
+                        -
+                    </template>
                 </span>
+
                 <span v-html="verse.text"></span>
             </a>
         </div>
