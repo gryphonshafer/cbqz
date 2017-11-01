@@ -210,6 +210,10 @@ form#create_form fieldset label {
     display: none;
 }
 
+.hidden {
+    display: none;
+}
+
 /* -------------------------------------------------------------------------- */
 
 .htmlarea {
@@ -421,6 +425,19 @@ div#quizroom div#material_search_display {
     div#quizroom div#material_search_display {
         height: 130px;
     }
+}
+
+div#quizroom div#quiz_view {
+    position: absolute;
+    margin: auto;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    background-color: white;
+    border: 1px solid lightgray;
+    width: 300px;
+    height: 400px;
 }
 
 div#quizroom div#manage {

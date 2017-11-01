@@ -66,10 +66,16 @@
         </div>
     </div>
 
+    <div id="quiz_view" v-bind:class="{ hidden: quiz_view_hidden }">
+        <h2>Quiz View</h2>
+        <a href="#" v-on:click="toggle_quiz_view">Close</a>
+    </div>
+
     <div id="manage">
         <div>
             <button v-on:click="move_question(-1)">&larr;</button>
             <button v-on:click="move_question(1)">&rarr;</button>
+            <button v-on:click="toggle_quiz_view">View</button>
         </div>
 
         <div id="timer">

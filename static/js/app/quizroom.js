@@ -60,11 +60,14 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.question.number = 1;
                 this.question.as     = this.metadata.as_default;
             },
-            move_question: function(direction) {
+            move_question: function (direction) {
                 if ( this.position + direction > -1 && this.position + direction < this.questions.length ) {
                     this.position += direction;
                     this.question = this.questions[ this.position ];
                 }
+            },
+            toggle_quiz_view: function () {
+                this.quiz_view_hidden = ! this.quiz_view_hidden;
             },
             make_beep: function () {
                 beep.play();

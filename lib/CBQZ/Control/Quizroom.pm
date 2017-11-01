@@ -67,8 +67,9 @@ sub data {
         question => {
             map { $_ => undef } qw( number type as used book chapter verse question answer marked )
         },
-        position => 0,
-        timer    => {
+        quiz_view_hidden => 1,
+        position         => 0,
+        timer            => {
             value => 30,
             state => 'ready',
             label => 'Start Timer',
