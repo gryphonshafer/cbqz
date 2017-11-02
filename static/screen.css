@@ -445,6 +445,15 @@ div#quizroom div#quiz_view {
     z-index: 30;
 }
 
+div#quizroom div#quiz_view h2 {
+    margin: 0px 0px 5px 0px;
+    padding: 0;
+}
+
+div#quizroom div#quiz_view a#quiz_view_close {
+    float: right;
+}
+
 div#quizroom div#quiz_view table {
     margin-bottom: 10px;
 }

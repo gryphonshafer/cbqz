@@ -60,10 +60,26 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.question.number = 1;
                 this.question.as     = this.metadata.as_default;
             },
-            move_question: function (direction) {
-                if ( this.position + direction > -1 && this.position + direction < this.questions.length ) {
-                    this.position += direction;
-                    this.question = this.questions[ this.position ];
+            move_question: function (target) {
+                if ( target == parseInt(target) ) {
+                    target--;
+                    if ( target >= 0 && target < this.questions.length ) {
+                        this.position = target;
+                        this.question = this.questions[ this.position ];
+                    }
+                }
+                else {
+                    var direction = 0;
+                    if ( target.substr( 0, 1 ).toLowerCase() == "b" ) {
+                        direction = -1;
+                    }
+                    else {
+                        direction = 1;
+                    }
+                    if ( this.position + direction > -1 && this.position + direction < this.questions.length ) {
+                        this.position += direction;
+                        this.question = this.questions[ this.position ];
+                    }
                 }
             },
             toggle_quiz_view: function () {
@@ -120,7 +136,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 var as     = this.question.as;
                 var number = this.question.number;
 
-                this.move_question(1);
+                this.move_question("forward");
 
                 var as_number        = result_operation( result, as, number );
                 this.question.as     = as_number.as;

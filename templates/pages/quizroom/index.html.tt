@@ -67,7 +67,8 @@
     </div>
 
     <div id="quiz_view" v-bind:class="{ hidden: quiz_view_hidden }">
-        <a href="#" v-on:click="toggle_quiz_view">Close</a>
+        <a href="#" id="quiz_view_close" v-on:click="toggle_quiz_view">Close</a>
+        <h2>Quiz Questions View</h2>
 
         <table class="tabular">
             <tr>
@@ -78,21 +79,23 @@
                 <th>As</th>
                 <th>Used</th>
             </tr>
-            <tr v-for="( question, index ) in questions">
-                <td class="right">{{ index + 1 }}</td>
-                <td class="right">{{ question.number }}</td>
-                <td>{{ question.book + " " + question.chapter + ":" + question.verse }}</td>
-                <td>{{ question.type }}</td>
-                <td>{{ question.as }}</td>
-                <td class="right">{{ question.used }}</td>
+            <tr v-for="( this_question, index ) in questions"
+                v-bind:class="{ selected: this_question.question_id == question.question_id }"
+            >
+                <td class="right"><a href="#" v-on:click="move_question( index + 1 )">{{ index + 1 }}</a></td>
+                <td class="right">{{ this_question.number }}</td>
+                <td>{{ this_question.book + " " + this_question.chapter + ":" + this_question.verse }}</td>
+                <td>{{ this_question.type }}</td>
+                <td>{{ this_question.as }}</td>
+                <td class="right">{{ this_question.used }}</td>
             </tr>
         </table>
     </div>
 
     <div id="manage">
         <div>
-            <button v-on:click="move_question(-1)">&larr;</button>
-            <button v-on:click="move_question(1)">&rarr;</button>
+            <button v-on:click="move_question('back')">&larr;</button>
+            <button v-on:click="move_question('forward')">&rarr;</button>
             <button v-on:click="toggle_quiz_view">View</button>
         </div>
 
