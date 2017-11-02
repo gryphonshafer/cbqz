@@ -121,6 +121,7 @@ div#header {
     padding: 10px;
     background-color: lightgray;
     border-bottom: 1px solid gray;
+    z-index: 10;
 }
 
 div#header h1 {
@@ -175,6 +176,7 @@ div#footer p {
     margin: 1px 3px 1px 3px;
     padding: 0px;
     display: inline-block;
+    z-index: 20;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -429,15 +431,22 @@ div#quizroom div#material_search_display {
 
 div#quizroom div#quiz_view {
     position: absolute;
-    margin: auto;
-    top: 0px;
-    right: 0px;
-    bottom: 0px;
+    margin: 0 auto 0 auto;
+    top: 10px;
     left: 0px;
-    background-color: white;
-    border: 1px solid lightgray;
-    width: 300px;
-    height: 400px;
+    right: 0px;
+    width: 500px;
+    max-height: calc( 100vh - 25px );
+    overflow: auto;
+    overflow-x: hidden;
+    padding: 5px 10px 0px 10px;
+    background-color: ghostwhite;
+    border: 1px solid gray;
+    z-index: 30;
+}
+
+div#quizroom div#quiz_view table {
+    margin-bottom: 10px;
 }
 
 div#quizroom div#manage {

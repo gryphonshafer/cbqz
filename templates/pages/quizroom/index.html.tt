@@ -42,7 +42,7 @@
         </select>
 
         <div id="material_lookup_display">
-            <span class="htmlarea"
+            <a class="htmlarea"
                 v-for="verse in material.verses"
                 v-bind:name="'v' + verse.verse"
             >
@@ -62,13 +62,31 @@
 
                     <span v-html="verse.text"></span>
                 </span>
-            </span>
+            </a>
         </div>
     </div>
 
     <div id="quiz_view" v-bind:class="{ hidden: quiz_view_hidden }">
-        <h2>Quiz View</h2>
         <a href="#" v-on:click="toggle_quiz_view">Close</a>
+
+        <table class="tabular">
+            <tr>
+                <th>Index</th>
+                <th>Question</th>
+                <th>Reference</th>
+                <th>Type</th>
+                <th>As</th>
+                <th>Used</th>
+            </tr>
+            <tr v-for="( question, index ) in questions">
+                <td class="right">{{ index + 1 }}</td>
+                <td class="right">{{ question.number }}</td>
+                <td>{{ question.book + " " + question.chapter + ":" + question.verse }}</td>
+                <td>{{ question.type }}</td>
+                <td>{{ question.as }}</td>
+                <td class="right">{{ question.used }}</td>
+            </tr>
+        </table>
     </div>
 
     <div id="manage">
@@ -116,7 +134,7 @@
         </div>
 
         <div id="material_search_display">
-            <span class="htmlarea"
+            <a class="htmlarea"
                 v-for="verse in material.matched_verses"
                 v-bind:name="'material_search_display_' + verse.verse"
             >
@@ -137,7 +155,7 @@
 
                     <span v-html="verse.text"></span>
                 </span>
-            </span>
+            </a>
         </div>
     </div>
 </div>
