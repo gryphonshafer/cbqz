@@ -68,26 +68,35 @@
 
     <div id="quiz_view" v-bind:class="{ hidden: quiz_view_hidden }">
         <a href="#" id="quiz_view_close" v-on:click="toggle_quiz_view">Close</a>
-        <h2>Quiz Questions View</h2>
+        <h2>Quiz Questions Pool View</h2>
 
-        <table class="tabular">
+        <table class="tabular numeric">
             <tr>
                 <th>Index</th>
-                <th>Question</th>
+                <th>Q#</th>
                 <th>Reference</th>
                 <th>Type</th>
                 <th>As</th>
                 <th>Used</th>
+                <th v-for="type in metadata.type_ranges">{{ type[2] }}#</th>
             </tr>
             <tr v-for="( this_question, index ) in questions"
                 v-bind:class="{ selected: this_question.question_id == question.question_id }"
+                v-on:click="move_question( index + 1 )"
             >
-                <td class="right"><a href="#" v-on:click="move_question( index + 1 )">{{ index + 1 }}</a></td>
-                <td class="right">{{ this_question.number }}</td>
-                <td>{{ this_question.book + " " + this_question.chapter + ":" + this_question.verse }}</td>
-                <td>{{ this_question.type }}</td>
-                <td>{{ this_question.as }}</td>
-                <td class="right">{{ this_question.used }}</td>
+                <td><a href="#" v-on:click="move_question( index + 1 )">{{ index + 1 }}</a></td>
+                <td>{{ this_question.number }}</td>
+                <td class="left">{{ this_question.book + " " + this_question.chapter + ":" + this_question.verse }}</td>
+                <td class="left">{{ this_question.type }}</td>
+                <td class="left">{{ this_question.as }}</td>
+                <td>{{ this_question.used }}</td>
+                <td v-for="type in metadata.type_ranges"
+                    v-bind:class="{
+                       below_min : type[3][index] < type[1][0],
+                       in_range  : type[3][index] >= type[1][0] && type[3][index] <= type[1][1],
+                       above_max : type[3][index] > type[1][1]
+                    }"
+                >{{ type[3][index] }}</td>
             </tr>
         </table>
     </div>

@@ -435,7 +435,7 @@ div#quizroom div#quiz_view {
     top: 10px;
     left: 0px;
     right: 0px;
-    width: 500px;
+    width: calc( 100vw - 350px );
     max-height: calc( 100vh - 25px );
     overflow: auto;
     overflow-x: hidden;
@@ -456,6 +456,19 @@ div#quizroom div#quiz_view a#quiz_view_close {
 
 div#quizroom div#quiz_view table {
     margin-bottom: 10px;
+    width: 100%;
+}
+
+div#quizroom div#quiz_view table td.below_min {
+    background-color: #ffffcc;
+}
+
+div#quizroom div#quiz_view table td.in_range {
+    background-color: #ccffcc;
+}
+
+div#quizroom div#quiz_view table td.above_max {
+    background-color: #ffccf0;
 }
 
 div#quizroom div#manage {

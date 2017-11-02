@@ -174,8 +174,27 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                         question.number = this.question.number;
 
                         this.question = this.questions[ this.position ] = question;
+                        this.set_type_counts();
                     }
                 } );
+            },
+            set_type_counts: function () {
+                var ranges    = this.metadata.type_ranges;
+                var questions = this.questions;
+
+                for ( var i = 0; i < ranges.length; i++ ) {
+                    ranges[i][3] = [];
+                    ranges[i][4] = 0;
+                }
+                for ( var i = 0; i < questions.length; i++ ) {
+                    for ( var j = 0; j < ranges.length; j++ ) {
+                        var match = ranges[j][0].find( function (element) {
+                            return element == questions[i].type;
+                        } );
+                        if ( !! match ) ranges[j][4]++;
+                        ranges[j][3][i] = ranges[j][4];
+                    }
+                }
             }
         },
         computed: {
@@ -240,6 +259,9 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     }
                 }
             }
+        },
+        created: function () {
+            this.set_type_counts();
         },
         mounted: function () {
             this.material.books = Object.keys( this.material.data );

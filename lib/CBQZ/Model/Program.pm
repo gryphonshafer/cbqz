@@ -21,15 +21,15 @@ sub create_default {
         name           => 'Default Quiz Program',
         question_types => $self->json->encode(
             [
-                [ ['INT'],                     [ 8, 12 ] ],
-                [ [ qw( MA MACR MACVR ) ],     [ 2,  7 ] ],
-                [ [ qw( CR CVR MACR MACVR ) ], [ 3,  5 ] ],
-                [ [ qw( Q Q2V ) ],             [ 1,  2 ] ],
-                [ [ qw( FT FTN FTV F2V ) ],    [ 1,  2 ] ],
-                [ ['SIT'],                     [ 0,  4 ] ],
+                [ ['INT'],                     [ 8, 12 ], 'INT' ],
+                [ [ qw( MA MACR MACVR ) ],     [ 2,  7 ], 'MA'  ],
+                [ [ qw( CR CVR MACR MACVR ) ], [ 3,  5 ], 'Ref' ],
+                [ [ qw( Q Q2V ) ],             [ 1,  2 ], 'Q'   ],
+                [ [ qw( FT FTN FTV F2V ) ],    [ 1,  2 ], 'F'   ],
+                [ ['SIT'],                     [ 0,  4 ], 'SIT' ],
             ],
         ),
-        target_questions => 50,
+        target_questions => 40,
         result_operation => q/
             if ( result == "correct" ) {
                 as     = "Standard";
