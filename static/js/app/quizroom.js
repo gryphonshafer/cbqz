@@ -258,6 +258,9 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                         }
                     }
                 }
+            },
+            "question.question_id": function () {
+                this.lookup();
             }
         },
         created: function () {
