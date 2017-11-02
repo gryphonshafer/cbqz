@@ -137,9 +137,13 @@
         </select>
 
         <div id="material_lookup_display">
-            <a class="htmlarea"
+            <a
                 v-for="verse in material.verses"
                 v-bind:name="'v' + verse.verse"
+                v-bind:class="{
+                    htmlarea: true,
+                    selected: material.verse == verse.verse
+                }"
             >
                 <span class="outdent">
                     <b class="material_para_markers" v-if="verse.is_new_para">&para;</b>
