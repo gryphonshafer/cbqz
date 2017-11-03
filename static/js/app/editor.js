@@ -510,7 +510,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                                     var text = verses[verse_number].text.replace(
                                         RegExp( search_regex, 'i' ),
                                         function (match) {
-                                            return '<span class="match">' + match + '</span>';
+                                            return '<span class="match">[</span>' + match + '<span class="match">]</span>';
                                         }
                                     );
 

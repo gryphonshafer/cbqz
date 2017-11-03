@@ -306,7 +306,8 @@ div#material_search_display a.selected {
 }
 
 div#material_search_display span.match {
-    background-color: #f0f0f0;
+    color: black;
+    font-family: bold;
 }
 
 div#material_lookup_display {
