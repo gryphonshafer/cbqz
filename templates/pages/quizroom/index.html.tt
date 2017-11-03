@@ -24,10 +24,10 @@
 
         <br>
         <span class="label">Question:</span>
-        <div class="htmlarea question" v-html="question.question"></div>
+        <div class="htmlarea question_box" v-html="question.question"></div>
 
         <span class="label">Answer:</span>
-        <div class="htmlarea question" v-html="question.answer"></div>
+        <div class="htmlarea answer_box" v-html="question.answer"></div>
     </div>
 
     <div id="material_lookup">
@@ -42,25 +42,74 @@
         </select>
 
         <div id="material_lookup_display">
-            <a class="htmlarea"
+            <a
                 v-for="verse in material.verses"
                 v-bind:name="'v' + verse.verse"
+                v-bind:class="{
+                    htmlarea: true,
+                    selected: material.verse == verse.verse
+                }"
             >
-                <b class="material_para_markers" v-if="verse.is_new_para">&para;</b>
-                <b>{{ verse.chapter + ':' + verse.verse }}</b>
-                <span class="material_key_markers" v-if="verse.key_class">
-                    {{ ( verse.key_class == 'range' ) ? '&Dagger;' : '&dagger;' }}
-                    {{ ( verse.key_type ) ? verse.key_type : '' }}
+                <span class="outdent">
+                    <b class="material_para_markers" v-if="verse.is_new_para">&para;</b>
+                    <b>{{ verse.chapter + ':' + verse.verse }}</b>
+
+                    <span class="material_key_markers">
+                        <template v-if="verse.key_class">
+                            {{ ( verse.key_class == 'range' ) ? '&Dagger;' : '&dagger;' }}
+                            {{ ( verse.key_type ) ? verse.key_type : '' }}
+                        </template>
+                        <template v-else>
+                            -
+                        </template>
+                    </span>
+
+                    <span v-html="verse.text"></span>
                 </span>
-                <span v-html="verse.text"></span>
             </a>
         </div>
     </div>
 
+    <div id="quiz_view" v-bind:class="{ hidden: quiz_view_hidden }">
+        <a href="#" id="quiz_view_close" v-on:click="toggle_quiz_view">Close</a>
+        <h2>Quiz Questions Pool View</h2>
+
+        <table class="tabular numeric">
+            <tr>
+                <th>Index</th>
+                <th>Q#</th>
+                <th>Reference</th>
+                <th>Type</th>
+                <th>As</th>
+                <th>Used</th>
+                <th v-for="type in metadata.type_ranges">{{ type[2] }}#</th>
+            </tr>
+            <tr v-for="( this_question, index ) in questions"
+                v-bind:class="{ selected: this_question.question_id == question.question_id }"
+                v-on:click="move_question( index + 1 )"
+            >
+                <td><a href="#" v-on:click="move_question( index + 1 )">{{ index + 1 }}</a></td>
+                <td>{{ this_question.number }}</td>
+                <td class="left">{{ this_question.book + " " + this_question.chapter + ":" + this_question.verse }}</td>
+                <td class="left">{{ this_question.type }}</td>
+                <td class="left">{{ this_question.as }}</td>
+                <td>{{ this_question.used }}</td>
+                <td v-for="type in metadata.type_ranges"
+                    v-bind:class="{
+                       below_min : type[3][index] < type[1][0],
+                       in_range  : type[3][index] >= type[1][0] && type[3][index] <= type[1][1],
+                       above_max : type[3][index] > type[1][1]
+                    }"
+                >{{ type[3][index] }}</td>
+            </tr>
+        </table>
+    </div>
+
     <div id="manage">
         <div>
-            <button v-on:click="move_question(-1)">&larr;</button>
-            <button v-on:click="move_question(1)">&rarr;</button>
+            <button v-on:click="move_question('back')">&larr;</button>
+            <button v-on:click="move_question('forward')">&rarr;</button>
+            <button v-on:click="toggle_quiz_view">View</button>
         </div>
 
         <div id="timer">
@@ -101,18 +150,31 @@
         </div>
 
         <div id="material_search_display">
-            <a class="htmlarea"
+            <a
                 v-for="verse in material.matched_verses"
                 v-bind:name="'material_search_display_' + verse.verse"
+                v-bind:class="{
+                    htmlarea: true,
+                    selected: material.book == verse.book && material.chapter == verse.chapter && material.verse == verse.verse
+                }"
             >
-                <b class="material_para_markers" v-if="verse.is_new_para">&para;</b>
-                <b class="clickable_reference" v-on:click="lookup_from_search(verse)"
-                    >{{ verse.book + ' ' + verse.chapter + ':' + verse.verse }}</b>
-                <span class="material_key_markers" v-if="verse.key_class">
-                    {{ ( verse.key_class == 'range' ) ? '&Dagger;' : '&dagger;' }}
-                    {{ ( verse.key_type ) ? verse.key_type : '' }}
+                <span class="outdent">
+                    <b class="material_para_markers" v-if="verse.is_new_para">&para;</b>
+                    <b class="clickable_reference" v-on:click="lookup_from_search(verse)"
+                        >{{ verse.book + ' ' + verse.chapter + ':' + verse.verse }}</b>
+
+                    <span class="material_key_markers">
+                        <template v-if="verse.key_class">
+                            {{ ( verse.key_class == 'range' ) ? '&Dagger;' : '&dagger;' }}
+                            {{ ( verse.key_type ) ? verse.key_type : '' }}
+                        </template>
+                        <template v-else>
+                            -
+                        </template>
+                    </span>
+
+                    <span v-html="verse.text"></span>
                 </span>
-                <span v-html="verse.text"></span>
             </a>
         </div>
     </div>

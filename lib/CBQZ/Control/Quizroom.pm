@@ -46,9 +46,10 @@ sub data {
 
     return $self->render( json => {
         metadata => {
-            types         => CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} )->types_list,
+            types         => $program->types_list,
             timer_default => $program->obj->timer_default,
             as_default    => $program->obj->as_default,
+            type_ranges   => $self->cbqz->json->decode( $program->obj->question_types ),
         },
         material => {
             data           => $quiz->{material},
@@ -67,8 +68,9 @@ sub data {
         question => {
             map { $_ => undef } qw( number type as used book chapter verse question answer marked )
         },
-        position => 0,
-        timer    => {
+        quiz_view_hidden => 1,
+        position         => 0,
+        timer            => {
             value => 30,
             state => 'ready',
             label => 'Start Timer',

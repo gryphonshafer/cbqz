@@ -12,11 +12,6 @@ sub get_material {
 
     my $material = {};
     $material->{ $_->{book} }{ $_->{chapter} }{ $_->{verse} } = $_ for (
-        map {
-            ( $_->{search} = lc( $_->{text} ) ) =~ s/<[^>]+>//g;
-            $_->{search} =~ s/\W//g;
-            $_;
-        }
         @{
             $self->dq->sql(q{
                 SELECT book, chapter, verse, text, key_class, key_type, is_new_para
