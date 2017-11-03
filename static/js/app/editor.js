@@ -472,7 +472,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             "material.search": function () {
                 this.material.matched_verses = [];
 
-                if ( this.material.search.length > 2 ) {
+                if ( this.material.search.length > 1 ) {
                     var search_regex = this.material.search
                         .toLowerCase()
                         .replace( /\s+/g, " " )
@@ -484,7 +484,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                             return match + "(<[^>]+>)*['-]*(<[^>]+>)*";
                         } )
                         .replace( /\\ /g, " " )
-                        .replace( /(^\s|\s$)/g, "" )
+                        .replace( /(^\s+|\s+$)/g, "\\s" )
                         .replace( /\s/g, "(<[^>]+>|\\W)+" );
 
                     var books = Object.keys( this.material.data ).sort();
@@ -502,7 +502,10 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                             for ( var k = 0; k < verse_numbers.length; k++ ) {
                                 var verse_number = verse_numbers[k];
 
-                                if ( verses[verse_number].text.search( RegExp( search_regex, 'i' ) ) != -1 ) {
+                                if (
+                                    verses[verse_number].text.search( RegExp( search_regex, 'i' ) ) != -1 &&
+                                    verses[verse_number].text.search( RegExp( search_regex + '[^<]*>', 'i' ) ) == -1
+                                ) {
                                     var text = verses[verse_number].text.replace(
                                         RegExp( search_regex, 'i' ),
                                         function (match) {
