@@ -213,11 +213,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                         return a - b;
                     }
                 );
-
-                this.material.chapter = null;
-                this.$nextTick( function () {
-                    this.material.chapter = this.material.chapters[0];
-                } );
+                this.material.chapter = this.material.chapters[0];
             },
             "material.chapter": function () {
                 if ( !! this.material.chapter ) {
