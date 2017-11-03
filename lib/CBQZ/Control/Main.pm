@@ -6,6 +6,7 @@ use Try::Tiny;
 use CBQZ::Model::User;
 use CBQZ::Model::Program;
 use CBQZ::Model::MaterialSet;
+use CBQZ::Model::QuestionSet;
 
 sub index {
     my ($self) = @_;
@@ -120,6 +121,34 @@ sub data {
             $set;
         } $self->stash('user')->question_sets ],
     } );
+}
+
+sub question_set_create {
+    my ($self) = @_;
+    my $data   = $self->req_body_json;
+
+    my $set = CBQZ::Model::QuestionSet->new->obj->create({
+        name    => $data->{name},
+        user_id => $self->stash('user')->obj->id,
+    });
+
+    return $self->render( json => { question_set_id => $set->id } );
+}
+
+sub question_set_delete {
+    my ($self) = @_;
+    my $data   = $self->req_body_json;
+
+    CBQZ::Model::QuestionSet->new->load( $data->{question_set_id} )->obj->delete;
+    return $self->render( json => {} );
+}
+
+sub question_set_rename {
+    my ($self) = @_;
+    my $data   = $self->req_body_json;
+
+    CBQZ::Model::QuestionSet->new->load( $data->{question_set_id} )->obj->name( $data->{name} )->save;
+    return $self->render( json => {} );
 }
 
 1;

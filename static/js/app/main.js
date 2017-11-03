@@ -51,6 +51,45 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 } );
 
                 this.question_set = question_set;
+            },
+            question_set_create: function () {
+                var name = prompt("Please enter a question set name:");
+                if ( !! name ) {
+                    this.$http.post(
+                        cntlr + "/question_set_create",
+                        { name: name }
+                    ).then( function (response) {
+                        // TODO;
+                    } );
+                }
+            },
+            question_set_delete: function () {
+                var check1 = confirm("Are you sure you want to delete this question set?");
+                if (check1) {
+                    var check2 = confirm("STOP! Are you really, really sure? (There's no undo.)");
+                    if (check2) {
+                        this.$http.post(
+                            cntlr + "/question_set_delete",
+                            { question_set_id: this.question_set_id }
+                        ).then( function (response) {
+                            // TODO;
+                        } );
+                    }
+                }
+            },
+            question_set_rename: function () {
+                var name = prompt("Please enter a question set name:");
+                if ( !! name ) {
+                    this.$http.post(
+                        cntlr + "/question_set_rename",
+                        {
+                            name            : name,
+                            question_set_id : this.question_set_id,
+                        }
+                    ).then( function (response) {
+                        // TODO;
+                    } );
+                }
             }
         },
 

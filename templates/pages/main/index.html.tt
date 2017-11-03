@@ -89,7 +89,7 @@
             <h2>Select Sets</h2>
             <p>Using the options below, select the sets you want to work with.</p>
 
-            <form id="select_sets" method="post" action="[% c.url_for.path('/') %]">
+            <form id="select_sets">
                 <fieldset>
                     <legend>Quiz Program</legend>
                     <label v-for="program in programs"><input type="radio" name="program"
@@ -106,6 +106,12 @@
                     <legend>Questions Set</legend>
                     <label v-for="set in question_sets"><input type="radio" name="questions"
                         v-bind:value="set.question_set_id" v-model="question_set_id">{{ set.name }}</label>
+
+                    <button type="button" v-on:click="question_set_create">Create</button>
+                    <button type="button" v-on:click="question_set_delete"
+                        v-bind:disabled="question_sets.length == 0">Delete</button>
+                    <button type="button" v-on:click="question_set_rename"
+                        v-bind:disabled="question_sets.length == 0">Rename</button>
                 </fieldset>
 
                 <fieldset v-if="question_set && selected_chapters_count">
