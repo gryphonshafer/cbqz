@@ -150,9 +150,13 @@
         </div>
 
         <div id="material_search_display">
-            <a class="htmlarea"
+            <a
                 v-for="verse in material.matched_verses"
                 v-bind:name="'material_search_display_' + verse.verse"
+                v-bind:class="{
+                    htmlarea: true,
+                    selected: material.book == verse.book && material.chapter == verse.chapter && material.verse == verse.verse
+                }"
             >
                 <span class="outdent">
                     <b class="material_para_markers" v-if="verse.is_new_para">&para;</b>

@@ -234,7 +234,19 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.material.matched_verses = [];
 
                 if ( this.material.search.length > 2 ) {
-                    var search_term = this.material.search.toLowerCase().replace( /\W+/g, "" );
+                    var search_regex = this.material.search
+                        .toLowerCase()
+                        .replace( /\s+/g, " " )
+                        .replace( /['-]/g, "" )
+                        .replace( /\W/g, function (match) {
+                            return "\\" + match;
+                        } )
+                        .replace( /\w/g, function (match) {
+                            return match + "(<[^>]+>)*['-]*(<[^>]+>)*";
+                        } )
+                        .replace( /\\ /g, " " )
+                        .replace( /(^\s|\s$)/g, "" )
+                        .replace( /\s/g, "(<[^>]+>|\\W)+" );
 
                     var books = Object.keys( this.material.data ).sort();
                     for ( var i = 0; i < books.length; i++ ) {
@@ -251,8 +263,23 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                             for ( var k = 0; k < verse_numbers.length; k++ ) {
                                 var verse_number = verse_numbers[k];
 
-                                if ( verses[verse_number].search.indexOf( search_term ) != -1 ) {
-                                    this.material.matched_verses.push( verses[verse_number] );
+                                if ( verses[verse_number].text.search( RegExp( search_regex, 'i' ) ) != -1 ) {
+                                    var text = verses[verse_number].text.replace(
+                                        RegExp( search_regex, 'i' ),
+                                        function (match) {
+                                            return '<span class="match">' + match + '</span>';
+                                        }
+                                    );
+
+                                    this.material.matched_verses.push({
+                                        book        : verses[verse_number].book,
+                                        chapter     : verses[verse_number].chapter,
+                                        verse       : verses[verse_number].verse,
+                                        is_new_para : verses[verse_number].is_new_para,
+                                        key_class   : verses[verse_number].key_class,
+                                        key_type    : verses[verse_number].key_type,
+                                        text        : text
+                                    });
                                 }
                             }
                         }

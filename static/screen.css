@@ -298,7 +298,11 @@ div#material_search_display .htmlarea + .htmlarea {
 
 div#material_lookup_display a.selected,
 div#material_search_display a.selected {
-    background-color: #fffff0;
+    background-color: #ffffe0;
+}
+
+div#material_search_display span.match {
+    background-color: #f0f0f0;
 }
 
 div#material_lookup_display {
