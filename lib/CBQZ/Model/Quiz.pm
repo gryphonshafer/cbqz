@@ -24,26 +24,7 @@ sub chapter_set {
 sub generate {
     my ( $self, $cbqz_prefs ) = @_;
 
-    my $chapter_set = $self->chapter_set($cbqz_prefs);
-    my $material    = {};
-
-    try {
-        $material->{ $_->{book} }{ $_->{chapter} }{ $_->{verse} } = $_ for (
-            map {
-                ( $_->{search} = lc( $_->{text} ) ) =~ s/<[^>]+>//g;
-                $_->{search} =~ s/\W//g;
-                $_;
-            }
-            @{
-                $self->dq->sql(q{
-                    SELECT book, chapter, verse, text, key_class, key_type, is_new_para
-                    FROM material
-                    WHERE material_set_id = ?
-                })->run( $cbqz_prefs->{material_set_id} )->all({})
-            }
-        );
-    };
-
+    my $chapter_set            = $self->chapter_set($cbqz_prefs);
     my $program                = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
     my @question_types         = @{ $self->json->decode( $program->obj->question_types ) };
     my $target_questions_count = $program->obj->target_questions;
@@ -64,7 +45,7 @@ sub generate {
             for my $selection ( qw( prime weight ) ) {
                 my $selection_set = $chapter_set->{$selection};
 
-                my $refs  = (@questions)
+                my $refs = (@questions)
                     ? 'AND CONCAT( book, " ", chapter, ":", verse ) NOT IN (' . join( ', ',
                         map { $self->dq->quote($_) }
                         'invalid reference',
@@ -90,7 +71,6 @@ sub generate {
                         ) . ')'
                         : '';
 
-
                     push( @$results, @{ $self->dq->sql(qq{
                         SELECT question_id, book, chapter, verse, question, answer, type, used
                         FROM question
@@ -111,11 +91,21 @@ sub generate {
 
         @questions = map { $_->[0] } sort { $a->[1] <=> $b->[1] } map { [ $_, rand ] } @questions;
 
-        @question_types =
-            map { $_->[0] }
-            sort { $a->[1] <=> $b->[1] }
-            map { [ $_, rand() ] }
-            map { ($_) x ( $_->[1][1] - $_->[1][0] ) } @question_types;
+        @question_types = (
+            (
+                map { $_->[0] }
+                sort { $a->[1] <=> $b->[1] }
+                map { [ $_, rand() ] }
+                grep { $_->[1][1] - $_->[1][0] > 0 } @question_types
+            ),
+            (
+                map { $_->[0] }
+                sort { $a->[1] <=> $b->[1] }
+                map { [ $_, rand() ] }
+                map { ($_) x ( $_->[1][1] - $_->[1][0] - 1 ) }
+                grep { $_->[1][1] - $_->[1][0] > 1 } @question_types
+            ),
+        );
 
         while ( @questions < $target_questions_count and @question_types ) {
             my $question_type = shift @question_types;
@@ -127,7 +117,7 @@ sub generate {
                 'invalid reference', ( map { $_->{book} . ' ' . $_->{chapter} . ':' . $_->{verse} } @questions )
             );
             my $selection_set = $chapter_set->{
-                ( $cbqz_prefs->{weight_percent} / 100 > rand() ) ? 'weight' : 'prime'
+                ( $cbqz_prefs->{weight_percent} >= rand() * 100 ) ? 'weight' : 'prime'
             };
 
             my $results = $self->dq->sql(qq{
@@ -163,17 +153,16 @@ sub generate {
             push( @questions, @$results );
         }
 
-        if ( @questions < $target_questions_count ) {
-            my $limit = $target_questions_count - @questions;
-            my $refs  = join( ', ',
+        while ( @questions < $target_questions_count ) {
+            my $selection_set = $chapter_set->{
+                ( $cbqz_prefs->{weight_percent} >= rand() * 100 ) ? 'weight' : 'prime'
+            };
+            my $refs = join( ', ',
                 map { $self->dq->quote($_) }
                 'invalid reference', ( map { $_->{book} . ' ' . $_->{chapter} . ':' . $_->{verse} } @questions )
             );
-            my $selection_set = $chapter_set->{
-                ( $cbqz_prefs->{weight_percent} / 100 > rand() ) ? 'weight' : 'prime'
-            };
 
-            push( @questions, @{ $self->dq->sql(qq{
+            my ($question) = @{ $self->dq->sql(qq{
                 SELECT question_id, book, chapter, verse, question, answer, type, used
                 FROM question
                 WHERE
@@ -182,23 +171,31 @@ sub generate {
                     question_set_id = ? AND
                     CONCAT( book, " ", chapter ) IN ($selection_set)
                 ORDER BY used, RAND()
-                LIMIT $limit
-            })->run( $cbqz_prefs->{question_set_id} )->all({}) } );
+                LIMIT 1
+            })->run( $cbqz_prefs->{question_set_id} )->all({}) };
 
-            if ( @questions < $target_questions_count ) {
-                $limit  = $target_questions_count - @questions;
-                my $ids = join( ', ', map { $_->{question_id} } @questions );
+            last unless ($question);
+            push( @questions, $question );
+        }
 
-                push( @questions, @{ $self->dq->sql(qq{
-                    SELECT question_id, book, chapter, verse, question, answer, type, used
-                    FROM question
-                    WHERE
-                        question_id NOT IN ($ids) AND marked IS NULL AND question_set_id = ? AND
-                        CONCAT( book, " ", chapter ) IN ($selection_set)
-                    ORDER BY used, RAND()
-                    LIMIT $limit
-                })->run( $cbqz_prefs->{question_set_id} )->all({}) } );
-            }
+        while ( @questions < $target_questions_count ) {
+            my $selection_set = $chapter_set->{
+                ( $cbqz_prefs->{weight_percent} >= rand() * 100 ) ? 'weight' : 'prime'
+            };
+            my $ids = join( ', ', map { $_->{question_id} } @questions );
+
+            my ($question) = @{ $self->dq->sql(qq{
+                SELECT question_id, book, chapter, verse, question, answer, type, used
+                FROM question
+                WHERE
+                    question_id NOT IN ($ids) AND marked IS NULL AND question_set_id = ? AND
+                    CONCAT( book, " ", chapter ) IN ($selection_set)
+                ORDER BY used, RAND()
+                LIMIT 1
+            })->run( $cbqz_prefs->{question_set_id} )->all({}) };
+
+            last unless ($question);
+            push( @questions, $question );
         }
 
         die 'Failed to create a question set to target size' if ( @questions < $target_questions_count );
@@ -208,7 +205,6 @@ sub generate {
     };
 
     return {
-        material  => $material,
         questions => \@questions,
         error     => $error,
     };

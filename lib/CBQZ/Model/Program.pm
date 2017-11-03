@@ -25,7 +25,7 @@ sub create_default {
                 [ [ qw( MA MACR MACVR ) ],     [ 2,  7 ], 'MA'  ],
                 [ [ qw( CR CVR MACR MACVR ) ], [ 3,  5 ], 'Ref' ],
                 [ [ qw( Q Q2V ) ],             [ 1,  2 ], 'Q'   ],
-                [ [ qw( FT FTN FTV F2V ) ],    [ 1,  2 ], 'F'   ],
+                [ [ qw( FT FTN FTV F2V ) ],    [ 2,  3 ], 'F'   ],
                 [ ['SIT'],                     [ 0,  4 ], 'SIT' ],
             ],
         ),

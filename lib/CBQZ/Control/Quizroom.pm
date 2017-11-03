@@ -4,6 +4,7 @@ use exact;
 use Mojo::Base 'Mojolicious::Controller';
 use CBQZ::Model::Quiz;
 use CBQZ::Model::Program;
+use CBQZ::Model::MaterialSet;
 
 sub index {
     my ($self)     = @_;
@@ -38,10 +39,9 @@ sub path {
 sub data {
     my ($self)     = @_;
     my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
+    my $quiz       = CBQZ::Model::Quiz->new->generate($cbqz_prefs);
+    my $program    = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
 
-    my $quiz = CBQZ::Model::Quiz->new->generate($cbqz_prefs);
-
-    my $program = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
     $self->notice( $quiz->{error} ) if ( $quiz->{error} );
 
     return $self->render( json => {
@@ -52,7 +52,7 @@ sub data {
             type_ranges   => $self->cbqz->json->decode( $program->obj->question_types ),
         },
         material => {
-            data           => $quiz->{material},
+            data           => CBQZ::Model::MaterialSet->new->load( $cbqz_prefs->{material_set_id} )->get_material,
             search         => undef,
             matched_verses => undef,
             ( map { $_ => undef } map { $_, $_ . 's' } qw( book chapter verse ) ),
@@ -81,7 +81,7 @@ sub data {
 
 sub used {
     my ($self) = @_;
-    my $json = $self->req_body_json;
+    my $json   = $self->req_body_json;
 
     $self->dq->sql('UPDATE question SET used = used + 1 WHERE question_id = ?')->run( $json->{question_id} );
     return $self->render( json => {} );
@@ -89,7 +89,7 @@ sub used {
 
 sub mark {
     my ($self) = @_;
-    my $json = $self->req_body_json;
+    my $json   = $self->req_body_json;
 
     $self->dq->sql('UPDATE question SET marked = ? WHERE question_id = ?')
         ->run( $json->{reason}, $json->{question_id} );
