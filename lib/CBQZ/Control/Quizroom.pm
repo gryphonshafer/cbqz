@@ -99,37 +99,11 @@ sub mark {
 
 sub replace {
     my ($self) = @_;
-    my $json = $self->req_body_json;
 
-    my $refs = join( ', ',
-        map { $self->dq->quote($_) }
-        'invalid reference',
-        ( map { $_->{book} . ' ' . $_->{chapter} . ':' . $_->{verse} } @{ $json->{questions} } )
+    my $results = CBQZ::Model::Quiz->new->replace(
+        $self->req_body_json,
+        $self->decode_cookie('cbqz_prefs'),
     );
-
-    my $results = $self->dq->sql(qq{
-        SELECT question_id, book, chapter, verse, question, answer, type, used
-        FROM question
-        WHERE
-            type = ? AND
-            CONCAT( book, ' ', chapter, ':', verse ) NOT IN ($refs)
-        ORDER BY used, RAND()
-        LIMIT 1
-    })->run( $json->{type} )->all({});
-
-    unless (@$results) {
-        my $ids = join( ', ', 0, map { $_->{question_id} } @{ $json->{questions} } );
-
-        $results = $self->dq->sql(qq{
-            SELECT question_id, book, chapter, verse, question, answer, type, used
-            FROM question
-            WHERE
-                type = ? AND
-                question_id NOT IN ($ids)
-            ORDER BY used, RAND()
-            LIMIT 1
-        })->run( $json->{type} )->all({});
-    }
 
     return $self->render( json => {
         question => (@$results) ? $results->[0] : undef,

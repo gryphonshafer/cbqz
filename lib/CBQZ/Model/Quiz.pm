@@ -6,7 +6,8 @@ use CBQZ::Model::Program;
 
 extends 'CBQZ';
 
-sub generate {
+
+sub chapter_set {
     my ( $self, $cbqz_prefs ) = @_;
 
     my @chapter_set_prime = map { $_->{book} . ' ' . $_->{chapter} } @{ $cbqz_prefs->{selected_chapters} };
@@ -14,12 +15,18 @@ sub generate {
     push( @chapter_set_weight, pop @chapter_set_prime )
         while ( @chapter_set_weight < $cbqz_prefs->{weight_chapters} );
 
-    my $chapter_set = {
+    return {
         prime  => join( ', ', map { $self->dq->quote($_) } @chapter_set_prime ),
         weight => join( ', ', map { $self->dq->quote($_) } @chapter_set_weight ),
     };
+}
 
-    my $material = {};
+sub generate {
+    my ( $self, $cbqz_prefs ) = @_;
+
+    my $chapter_set = $self->chapter_set($cbqz_prefs);
+    my $material    = {};
+
     try {
         $material->{ $_->{book} }{ $_->{chapter} }{ $_->{verse} } = $_ for (
             map {
@@ -205,6 +212,49 @@ sub generate {
         questions => \@questions,
         error     => $error,
     };
+}
+
+sub replace {
+    my ( $self, $request, $cbqz_prefs ) = @_;
+
+    my $chapter_set   = $self->chapter_set($cbqz_prefs);
+    my $selection_set = $chapter_set->{
+        ( $cbqz_prefs->{weight_percent} >= rand() * 100 ) ? 'weight' : 'prime'
+    };
+
+    my $refs = join( ', ',
+        map { $self->dq->quote($_) }
+        'invalid reference',
+        ( map { $_->{book} . ' ' . $_->{chapter} . ':' . $_->{verse} } @{ $request->{questions} } )
+    );
+
+    my $results = $self->dq->sql(qq{
+        SELECT question_id, book, chapter, verse, question, answer, type, used
+        FROM question
+        WHERE
+            type = ? AND marked IS NULL AND
+            CONCAT( book, " ", chapter ) IN ($selection_set) AND
+            CONCAT( book, ' ', chapter, ':', verse ) NOT IN ($refs)
+        ORDER BY used, RAND()
+        LIMIT 1
+    })->run( $request->{type} )->all({});
+
+    unless (@$results) {
+        my $ids = join( ', ', 0, map { $_->{question_id} } @{ $request->{questions} } );
+
+        $results = $self->dq->sql(qq{
+            SELECT question_id, book, chapter, verse, question, answer, type, used
+            FROM question
+            WHERE
+                type = ? AND marked IS NULL AND
+                CONCAT( book, " ", chapter ) IN ($selection_set) AND
+                question_id NOT IN ($ids)
+            ORDER BY used, RAND()
+            LIMIT 1
+        })->run( $request->{type} )->all({});
+    }
+
+    return $results;
 }
 
 __PACKAGE__->meta->make_immutable;
