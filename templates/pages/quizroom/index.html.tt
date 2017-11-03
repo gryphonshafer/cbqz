@@ -133,6 +133,7 @@
 
         <div id="mark">
             <button v-on:click="mark_for_edit" v-bind:disabled="question.marked">Mark for Edit</button>
+            <button v-on:click="make_beep">Beep</button>
         </div>
 
         <div id="replace">
