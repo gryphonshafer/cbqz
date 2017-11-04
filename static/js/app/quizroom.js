@@ -151,8 +151,13 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                             question_id: this.question.question_id,
                             reason:      reason
                         }
-                    ).then( function () {
-                        this.question.marked = reason;
+                    ).then( function (response) {
+                        if ( response.body.success ) {
+                            this.question.marked = reason;
+                        }
+                        else {
+                            alert("There was an error marking the question for edit.");
+                        }
                     } );
                 }
             },
