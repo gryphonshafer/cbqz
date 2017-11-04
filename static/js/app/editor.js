@@ -243,59 +243,65 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                         cntlr + "/delete",
                         { question_id: this.questions.question_id }
                     ).then( function (response) {
+                        if ( response.body.success ) {
+                            delete this.questions.data
+                                [ this.questions.book ][ this.questions.chapter ][ this.questions.question_id ];
 
-                        delete this.questions.data
-                            [ this.questions.book ][ this.questions.chapter ][ this.questions.question_id ];
+                            if ( ! Object.keys(
+                                this.questions.data[ this.questions.book ][ this.questions.chapter ]
+                            ).length )
+                                delete this.questions.data[ this.questions.book ][ this.questions.chapter ];
 
-                        if ( ! Object.keys(
-                            this.questions.data[ this.questions.book ][ this.questions.chapter ]
-                        ).length )
-                            delete this.questions.data[ this.questions.book ][ this.questions.chapter ];
+                            if ( ! Object.keys(
+                                this.questions.data[ this.questions.book ]
+                            ).length )
+                                delete this.questions.data[ this.questions.book ];
 
-                        if ( ! Object.keys(
-                            this.questions.data[ this.questions.book ]
-                        ).length )
-                            delete this.questions.data[ this.questions.book ];
-
-                        if ( ! this.questions.data[ this.questions.book ] ) {
-                            this.questions.books = Object.keys( this.questions.data ).sort();
-                            if ( this.questions.books[0] ) {
-                                this.questions.book = this.questions.books[0];
+                            if ( ! this.questions.data[ this.questions.book ] ) {
+                                this.questions.books = Object.keys( this.questions.data ).sort();
+                                if ( this.questions.books[0] ) {
+                                    this.questions.book = this.questions.books[0];
+                                }
+                                else {
+                                    this.questions.chapters = null;
+                                    this.questions.questions = null;
+                                }
+                            }
+                            else if ( ! this.questions.data[ this.questions.book ][ this.questions.chapter ] ) {
+                                this.questions.chapters = Object.keys(
+                                    this.questions.data[ this.questions.book ]
+                                ).sort(
+                                    function ( a, b ) {
+                                        return a - b;
+                                    }
+                                );
+                                this.questions.chapter = this.questions.chapters[0];
                             }
                             else {
-                                this.questions.chapters = null;
-                                this.questions.questions = null;
-                            }
-                        }
-                        else if ( ! this.questions.data[ this.questions.book ][ this.questions.chapter ] ) {
-                            this.questions.chapters = Object.keys( this.questions.data[ this.questions.book ] ).sort(
-                                function ( a, b ) {
-                                    return a - b;
+                                var questions_hash = this.questions.data[ this.questions.book ][ this.questions.chapter ];
+                                var keys = Object.keys(questions_hash);
+
+                                var questions_array = new Array();
+                                for ( var i = 0; i < keys.length; i++ ) {
+                                    questions_array.push( questions_hash[ keys[i] ] );
                                 }
-                            );
-                            this.questions.chapter = this.questions.chapters[0];
+
+                                this.questions.questions = questions_array.sort( function ( a, b ) {
+                                    if ( a.verse < b.verse ) return -1;
+                                    if ( a.verse > b.verse ) return 1;
+                                    if ( a.type < b.type ) return -1;
+                                    if ( a.type > b.type ) return 1;
+                                    if ( a.used > b.used ) return -1;
+                                    if ( a.used < b.used ) return 1;
+                                    return 0;
+                                } );
+                            }
+
+                            this.questions.marked_questions = this.grep_marked_questions();
                         }
                         else {
-                            var questions_hash = this.questions.data[ this.questions.book ][ this.questions.chapter ];
-                            var keys = Object.keys(questions_hash);
-
-                            var questions_array = new Array();
-                            for ( var i = 0; i < keys.length; i++ ) {
-                                questions_array.push( questions_hash[ keys[i] ] );
-                            }
-
-                            this.questions.questions = questions_array.sort( function ( a, b ) {
-                                if ( a.verse < b.verse ) return -1;
-                                if ( a.verse > b.verse ) return 1;
-                                if ( a.type < b.type ) return -1;
-                                if ( a.type > b.type ) return 1;
-                                if ( a.used > b.used ) return -1;
-                                if ( a.used < b.used ) return 1;
-                                return 0;
-                            } );
+                            alert("There was an error deleting the question.");
                         }
-
-                        this.questions.marked_questions = this.grep_marked_questions();
                     } );
                 }
                 else {

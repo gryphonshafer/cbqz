@@ -81,7 +81,7 @@ sub delete {
     my $json = $self->req_body_json;
 
     $self->dq->sql('DELETE FROM question WHERE question_id = ?')->run( $json->{question_id} );
-    return $self->render( json => {} );
+    return $self->render( json => { success => 1 } );
 }
 
 1;

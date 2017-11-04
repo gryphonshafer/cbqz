@@ -6,7 +6,6 @@ use CBQZ::Model::Program;
 
 extends 'CBQZ';
 
-
 sub chapter_set {
     my ( $self, $cbqz_prefs ) = @_;
 

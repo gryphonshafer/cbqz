@@ -76,7 +76,7 @@ sub question_sets {
         unless ( $self->obj and $self->obj->in_storage );
 
     my $question_sets = CBQZ::Model::QuestionSet->new->model( $self->obj->question_sets->all );
-    $question_sets = [ CBQZ::Model::QuestionSet->new->create_default( $self->stash('user') ) ]
+    $question_sets = [ CBQZ::Model::QuestionSet->new->create($self) ]
         unless (@$question_sets);
 
     return (wantarray) ? @$question_sets : $question_sets;

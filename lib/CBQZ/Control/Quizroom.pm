@@ -94,7 +94,7 @@ sub mark {
     $self->dq->sql('UPDATE question SET marked = ? WHERE question_id = ?')
         ->run( $json->{reason}, $json->{question_id} );
 
-    return $self->render( json => {} );
+    return $self->render( json => { success => 1 } );
 }
 
 sub replace {

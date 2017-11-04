@@ -152,7 +152,12 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                             reason:      reason
                         }
                     ).then( function (response) {
-                        this.question.marked = reason;
+                        if ( response.body.success ) {
+                            this.question.marked = reason;
+                        }
+                        else {
+                            alert("There was an error marking the question for edit.");
+                        }
                     } );
                 }
             },

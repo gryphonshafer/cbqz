@@ -6,6 +6,7 @@ use Try::Tiny;
 use CBQZ::Model::User;
 use CBQZ::Model::Program;
 use CBQZ::Model::MaterialSet;
+use CBQZ::Model::QuestionSet;
 
 sub index {
     my ($self) = @_;
@@ -98,8 +99,8 @@ sub data {
         programs        => [ map { $_->data } $self->stash('user')->programs ],
         material_sets   => [ CBQZ::Model::MaterialSet->new->every_data ],
         weight_chapters => $cbqz_prefs->{weight_chapters} // 0,
-        weight_percent  => $cbqz_prefs->{weight_percent} // 50,
-        program_id      => $cbqz_prefs->{program_id} || undef,
+        weight_percent  => $cbqz_prefs->{weight_percent}  // 50,
+        program_id      => $cbqz_prefs->{program_id}      || undef,
         question_set_id => $cbqz_prefs->{question_set_id} || undef,
         material_set_id => $cbqz_prefs->{material_set_id} || undef,
         question_set    => undef,
@@ -120,6 +121,37 @@ sub data {
             $set;
         } $self->stash('user')->question_sets ],
     } );
+}
+
+sub question_set_create {
+    my ($self) = @_;
+    my $data   = $self->req_body_json;
+
+    return $self->render( json => {
+        question_set => CBQZ::Model::QuestionSet->new->create(
+            $self->stash('user'),
+            $data->{name},
+        )->data
+    } );
+}
+
+sub question_set_delete {
+    my ($self) = @_;
+    my $data   = $self->req_body_json;
+
+    CBQZ::Model::QuestionSet->new->load( $data->{question_set_id} )->obj->delete;
+    return $self->render( json => { success => 1 } );
+}
+
+sub question_set_rename {
+    my ($self) = @_;
+    my $data   = $self->req_body_json;
+
+    my $set = CBQZ::Model::QuestionSet->new->load( $data->{question_set_id} )->obj;
+    $set->name( $data->{name} );
+    $set->update;
+
+    return $self->render( json => { success => 1 } );
 }
 
 1;
