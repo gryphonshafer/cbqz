@@ -46,7 +46,7 @@ sub startup {
         my ( $self, $name ) = @_;
         my $data = {};
         try {
-            $data = $cbqz->json->decode( b64_decode( $self->cookie($name) ) );
+            $data = $cbqz->json->decode( b64_decode( $self->cookie($name) // '' ) );
         };
         return $data;
     } );
@@ -138,7 +138,12 @@ sub startup {
                 $self->notice( 'Failed user load based on session "user_id" value: "' . $user_id . '"' );
             };
 
-            $self->stash( 'user' => $user ) if ($user);
+            if ($user) {
+                $self->stash( 'user' => $user );
+            }
+            else {
+                $self->session->{'user_id'};
+            }
         }
     });
 

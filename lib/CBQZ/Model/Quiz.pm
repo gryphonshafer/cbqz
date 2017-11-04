@@ -30,12 +30,15 @@ sub generate {
 
     my ( @questions, $error );
     try {
+        die "No chapters selected from which to build a quiz; select chapters and retry"
+            unless ( length $chapter_set->{prime} or length $chapter_set->{weight} );
+
         for my $question_type (@question_types) {
             my $types = join( ', ', map { $self->dq->quote($_) } @{ $question_type->[0] } );
             my $min   = $question_type->[1][0];
 
             my %min;
-            $min{prime} = ( $cbqz_prefs->{weight_percent} )
+            $min{prime} = ( $cbqz_prefs->{weight_percent} and $cbqz_prefs->{weight_chapters} )
                 ? int( $min * ( 1 - $cbqz_prefs->{weight_percent} / 100 ) )
                 : $min;
             $min{weight} = $min - $min{prime};
@@ -43,6 +46,7 @@ sub generate {
             my @pending_questions;
             for my $selection ( qw( prime weight ) ) {
                 my $selection_set = $chapter_set->{$selection};
+                next unless ($selection_set);
 
                 my $refs = (@questions)
                     ? 'AND CONCAT( book, " ", chapter, ":", verse ) NOT IN (' . join( ', ',
@@ -118,6 +122,7 @@ sub generate {
             my $selection_set = $chapter_set->{
                 ( $cbqz_prefs->{weight_percent} >= rand() * 100 ) ? 'weight' : 'prime'
             };
+            next unless ($selection_set);
 
             my $results = $self->dq->sql(qq{
                 SELECT question_id, book, chapter, verse, question, answer, type, used
@@ -156,6 +161,8 @@ sub generate {
             my $selection_set = $chapter_set->{
                 ( $cbqz_prefs->{weight_percent} >= rand() * 100 ) ? 'weight' : 'prime'
             };
+            next unless ($selection_set);
+
             my $refs = join( ', ',
                 map { $self->dq->quote($_) }
                 'invalid reference', ( map { $_->{book} . ' ' . $_->{chapter} . ':' . $_->{verse} } @questions )
@@ -181,6 +188,8 @@ sub generate {
             my $selection_set = $chapter_set->{
                 ( $cbqz_prefs->{weight_percent} >= rand() * 100 ) ? 'weight' : 'prime'
             };
+            next unless ($selection_set);
+
             my $ids = join( ', ', map { $_->{question_id} } @questions );
 
             my ($question) = @{ $self->dq->sql(qq{
@@ -212,10 +221,16 @@ sub generate {
 sub replace {
     my ( $self, $request, $cbqz_prefs ) = @_;
 
-    my $chapter_set   = $self->chapter_set($cbqz_prefs);
-    my $selection_set = $chapter_set->{
-        ( $cbqz_prefs->{weight_percent} >= rand() * 100 ) ? 'weight' : 'prime'
-    };
+    my $chapter_set = $self->chapter_set($cbqz_prefs);
+
+    unless ( length $chapter_set->{prime} or length $chapter_set->{weight} ) {
+        $self->warn("Replace quesiton: No chapters selected from which to build a quiz");
+        return [];
+    }
+
+    my $selection     = ( $cbqz_prefs->{weight_percent} >= rand() * 100 ) ? 'weight' : 'prime';
+    my $selection_set = $chapter_set->{$selection};
+    $selection_set    = $chapter_set->{ ( $selection eq 'prime' ) ? 'weight' : 'prime' } unless ($selection_set);
 
     my $refs = join( ', ',
         map { $self->dq->quote($_) }

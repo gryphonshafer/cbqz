@@ -40,7 +40,7 @@
             <label>Password: <input type="password" name="passwd" size="20" placeholder="Password"></label>
             <label>Email: <input name="email" size="20" placeholder="Email Address"></label>
 
-            [% IF programs.size > 0 %]
+            [% IF programs AND programs.size > 0 %]
                 <label>
                     Program:
                     <select name="program">

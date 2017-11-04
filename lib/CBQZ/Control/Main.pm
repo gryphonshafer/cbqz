@@ -11,7 +11,7 @@ use CBQZ::Model::QuestionSet;
 sub index {
     my ($self) = @_;
 
-    unless ( $self->session('user_id') ) {
+    unless ( $self->stash('user') ) {
         $self->stash(
             programs  => [ CBQZ::Model::Program->new->every_data ],
             recaptcha => $self->config->get( 'recaptcha', 'public_key' ),
