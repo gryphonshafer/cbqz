@@ -11,16 +11,17 @@ has 'statistics' => ( isa => 'ArrayRef[HashRef]', is => 'rw', lazy => 1, default
     return shift->generate_statistics;
 } );
 
-sub create_default {
-    my ( $self, $user ) = @_;
-    my $rs = $self->rs->result_source->resultset;
+sub create {
+    my ( $self, $user, $name ) = @_;
+    $name //= 'Default ' . ucfirst( $user->obj->name ) . ' Set';
 
-    $rs->set_cache([ $self->rs->create({
-        user_id => $user->obj->id,
-        name    => 'Default ' . ucfirst( $user->obj->name ) . ' Set',
-    })->get_from_storage ]);
+    $self->obj(
+        $self->rs->create({
+            user_id => $user->obj->id,
+            name    => $name,
+        })->get_from_storage
+    );
 
-    $self->obj($rs);
     return $self;
 }
 

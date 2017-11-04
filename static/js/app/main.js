@@ -59,20 +59,38 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                         cntlr + "/question_set_create",
                         { name: name }
                     ).then( function (response) {
-                        // TODO;
+                        if ( response.body.question_set ) {
+                            this.question_sets.push( response.body.question_set );
+                        }
+                        else {
+                            alert("There was an error creating the question set.");
+                        }
                     } );
                 }
             },
             question_set_delete: function () {
-                var check1 = confirm("Are you sure you want to delete this question set?");
-                if (check1) {
-                    var check2 = confirm("STOP! Are you really, really sure? (There's no undo.)");
-                    if (check2) {
+                if ( confirm(
+                    "Are you sure you want to delete the \"" + this.question_set.name + "\" question set?"
+                ) ) {
+                    if ( confirm("STOP! Are you really, really sure? (There's no undo.)") ) {
                         this.$http.post(
                             cntlr + "/question_set_delete",
                             { question_set_id: this.question_set_id }
                         ).then( function (response) {
-                            // TODO;
+                            if ( response.body.success ) {
+                                for ( var i = 0; i < this.question_sets.length; i++ ) {
+                                    if ( this.question_sets[i].question_set_id == this.question_set_id ) {
+                                        this.question_sets.splice( i, 1 );
+                                        break;
+                                    }
+                                }
+                                this.question_set_id = ( this.question_sets.length > 0 )
+                                    ? this.question_sets[0].question_set_id
+                                    : null;
+                            }
+                            else {
+                                alert("There was an error deleting the question set.");
+                            }
                         } );
                     }
                 }
@@ -87,7 +105,12 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                             question_set_id : this.question_set_id,
                         }
                     ).then( function (response) {
-                        // TODO;
+                        if ( response.body.success ) {
+                            this.question_set.name = name;
+                        }
+                        else {
+                            alert("There was an error renaming the question set.");
+                        }
                     } );
                 }
             }

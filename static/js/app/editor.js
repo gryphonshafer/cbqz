@@ -242,7 +242,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     this.$http.post(
                         cntlr + "/delete",
                         { question_id: this.questions.question_id }
-                    ).then( function (response) {
+                    ).then( function () {
 
                         delete this.questions.data
                             [ this.questions.book ][ this.questions.chapter ][ this.questions.question_id ];

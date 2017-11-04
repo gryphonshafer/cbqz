@@ -151,7 +151,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                             question_id: this.question.question_id,
                             reason:      reason
                         }
-                    ).then( function (response) {
+                    ).then( function () {
                         this.question.marked = reason;
                     } );
                 }
