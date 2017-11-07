@@ -169,6 +169,7 @@
     <div id="material_search">
         <div class="margin_lift">
             <input v-model="material.search" placeholder="Search Text">
+            <button v-on:click="search">Go</button>
             <button id="find" v-on:click="find">Find <span class="key_text">Alt+F, F4</span></button>
         </div>
 

@@ -200,6 +200,67 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                         ranges[j][3][i] = ranges[j][4];
                     }
                 }
+            },
+
+            search: function () {
+                this.material.matched_verses = [];
+
+                var search_regex = this.material.search
+                    .toLowerCase()
+                    .replace( /\s+/g, " " )
+                    .replace( /['-]/g, "" )
+                    .replace( /\W/g, function (match) {
+                        return "\\" + match;
+                    } )
+                    .replace( /\w/g, function (match) {
+                        return match + "(<[^>]+>)*['-]*(<[^>]+>)*";
+                    } )
+                    .replace( /\\ /g, " " )
+                    .replace( /(^\s+|\s+$)/g, "\\s" )
+                    .replace( /\s/g, "(<[^>]+>|\\W)+" );
+
+                search_regex += '(?![^<]*>)';
+
+                var books = Object.keys( this.material.data ).sort();
+                for ( var i = 0; i < books.length; i++ ) {
+                    var chapters = Object.keys( this.material.data[ books[i] ] ).sort(
+                        function ( a, b ) {
+                            return a - b;
+                        }
+                    );
+
+                    for ( var j = 0; j < chapters.length; j++ ) {
+                        var verses = this.material.data[ books[i] ][ chapters[j] ];
+                        var verse_numbers = Object.keys(verses).sort(
+                            function ( a, b ) {
+                                return a - b;
+                            }
+                        );
+
+                        for ( var k = 0; k < verse_numbers.length; k++ ) {
+                            var verse_number = verse_numbers[k];
+
+                            if ( verses[verse_number].text.search( RegExp( search_regex, 'i' ) ) != -1 ) {
+                                var text = verses[verse_number].text.replace(
+                                    RegExp( search_regex, 'ig' ),
+                                    function (match) {
+                                        return '<span class="match">[</span>' + match + '<span class="match">]</span>';
+                                    }
+                                );
+
+                                this.material.matched_verses.push({
+                                    book        : verses[verse_number].book,
+                                    chapter     : verses[verse_number].chapter,
+                                    verse       : verses[verse_number].verse,
+                                    is_new_para : verses[verse_number].is_new_para,
+                                    key_class   : verses[verse_number].key_class,
+                                    key_type    : verses[verse_number].key_type,
+                                    text        : text
+                                });
+                            }
+                        }
+                    }
+                }
             }
         },
         computed: {
@@ -233,62 +294,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             },
             "material.search": function () {
                 this.material.matched_verses = [];
-
-                if ( this.material.search.length > 1 ) {
-                    var search_regex = this.material.search
-                        .toLowerCase()
-                        .replace( /\s+/g, " " )
-                        .replace( /['-]/g, "" )
-                        .replace( /\W/g, function (match) {
-                            return "\\" + match;
-                        } )
-                        .replace( /\w/g, function (match) {
-                            return match + "(<[^>]+>)*['-]*(<[^>]+>)*";
-                        } )
-                        .replace( /\\ /g, " " )
-                        .replace( /(^\s+|\s+$)/g, "\\s" )
-                        .replace( /\s/g, "(<[^>]+>|\\W)+" );
-
-                    var books = Object.keys( this.material.data ).sort();
-                    for ( var i = 0; i < books.length; i++ ) {
-                        var chapters = Object.keys( this.material.data[ books[i] ] ).sort(
-                            function ( a, b ) {
-                                return a - b;
-                            }
-                        );
-
-                        for ( var j = 0; j < chapters.length; j++ ) {
-                            var verses = this.material.data[ books[i] ][ chapters[j] ];
-                            var verse_numbers = Object.keys(verses).sort();
-
-                            for ( var k = 0; k < verse_numbers.length; k++ ) {
-                                var verse_number = verse_numbers[k];
-
-                                if (
-                                    verses[verse_number].text.search( RegExp( search_regex, 'i' ) ) != -1 &&
-                                    verses[verse_number].text.search( RegExp( search_regex + '[^<]*>', 'i' ) ) == -1
-                                ) {
-                                    var text = verses[verse_number].text.replace(
-                                        RegExp( search_regex, 'i' ),
-                                        function (match) {
-                                            return '<span class="match">[</span>' + match + '<span class="match">]</span>';
-                                        }
-                                    );
-
-                                    this.material.matched_verses.push({
-                                        book        : verses[verse_number].book,
-                                        chapter     : verses[verse_number].chapter,
-                                        verse       : verses[verse_number].verse,
-                                        is_new_para : verses[verse_number].is_new_para,
-                                        key_class   : verses[verse_number].key_class,
-                                        key_type    : verses[verse_number].key_type,
-                                        text        : text
-                                    });
-                                }
-                            }
-                        }
-                    }
-                }
+                if ( this.material.search.length > 3 ) this.search();
             },
             "question.question_id": function () {
                 this.lookup();
