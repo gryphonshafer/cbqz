@@ -23,16 +23,16 @@ my $material = $dq->sql('SELECT book, chapter, verse, text FROM material WHERE m
 
 my $questions = $dq->get('question')->where( question_set_id => $q_set_id )->run;
 while ( my $question = $questions->next ) {
-    my $data = type_fork( $question->data );
+    my $data = type_fork( { %{ $question->data } } );
 
     next if ( not $data and not $settings->{mark} );
+
     if ( not $data and $settings->{mark} ) {
         $question->cell( marked => 'Auto color markup failed' );
     }
-    else {
+    elsif ($data) {
         $question->cell( $_ => $data->{$_} ) for ( qw( question answer ) );
     }
-
     $question->save('question_id');
 }
 
@@ -46,7 +46,7 @@ sub error ( $text, $data ) {
 
 sub type_fork ($data) {
     if ( $data->{type} eq 'INT' or $data->{type} eq 'MA' ) {
-        $data = process_question( $data, 0, 5 );
+        $data = process_question( $data, 0, 5, 0 );
         return unless ($data);
         $data->{question} .= '?' unless ( $data->{question} =~ /\?$/ );
     }
@@ -55,7 +55,7 @@ sub type_fork ($data) {
         $data->{type} eq 'MACR' or $data->{type} eq 'MACVR'
     ) {
         $data->{question} =~ s/ac\w*\sto\s+(\d\s+)?\w+[,\s]+c\w*\s*\d+(?:[,\s]+v\w*\s*\d+)?[\s:,]*//i;
-        $data = process_question( $data, 1, ( $data->{type} eq 'CVR' or $data->{type} eq 'MACVR' ) ? 0 : 5 );
+        $data = process_question( $data, 1, ( ( $data->{type} eq 'CVR' or $data->{type} eq 'MACVR' ) ? 0 : 5 ), 0 );
         return unless ($data);
         $data->{question} =
             'According to ' . $data->{book} . ', chapter ' . $data->{chapter} .
@@ -80,7 +80,7 @@ sub type_fork ($data) {
     elsif ( $data->{type} eq 'FTV' or $data->{type} eq 'F2V' ) {
         my @verses = get_2_verses($data);
         ( $data->{question}, $data->{answer} ) = first_5( $verses[0]->{text} );
-        $data = process_question( $data, 1, 0 );
+        $data = process_question( $data, 1, 0, 1 );
         return unless ($data);
 
         $data->{question} .= '...' unless ( $data->{question} =~ /\.{3}$/ );
@@ -91,7 +91,7 @@ sub type_fork ($data) {
     elsif ( $data->{type} eq 'FT' or $data->{type} eq 'FTN' ) {
         my @verses = get_2_verses($data);
         ( $data->{question}, $data->{answer} ) = first_5( $data->{question} . ' ' . $data->{answer} );
-        $data = process_question( $data, 1, 0 );
+        $data = process_question( $data, 1, 0, 1 );
         return unless ($data);
 
         $data->{question} .= '...' unless ( $data->{question} =~ /\.{3}$/ );
@@ -104,6 +104,7 @@ sub type_fork ($data) {
         return;
     }
 
+    $data->{answer} .= '.' unless ( $data->{answer} =~ /[.!?]$/ );
     return $data;
 }
 
@@ -113,7 +114,7 @@ sub regex ($text) {
     $text =~ s/(\w)/$1(?:<[^>]+>)*['-]*(?:<[^>]+>)*/g;
     $text =~ s/(?:^\s+|\s+$)//g;
     $text =~ s/\s/(?:<[^>]+>|\\W)+/g;
-    return '(?:<[^>]+>)*' . $text;
+    return '(?:<[^>]+>)*\b' . $text . '\b';
 }
 
 sub fix ($text) {
@@ -149,18 +150,20 @@ sub case ($text) {
     return $text;
 }
 
-sub process_question ( $data, $skip_casing, $range ) {
+sub process_question ( $data, $skip_casing, $range, $skip_interogative ) {
     $range //= 5;
 
     my $int;
-    if ( $data->{question} =~ s/(\W*(?:who|what|when|where|why|how|whom|whose)\W*)$//i ) {
-        $int->{phrase} = lc $1;
-        $int->{pos}    = 'aft';
-    }
-    elsif ( $data->{question} =~ s/^(\W*(?:who|what|when|where|why|how|whose)\W*)//i ) {
-        $int->{phrase} = lc $1;
-        $int->{phrase} = ucfirst $1 unless ($skip_casing);
-        $int->{pos}    = 'fore';
+    unless ($skip_interogative) {
+        if ( $data->{question} =~ s/(\W*\b(?:who|what|when|where|why|how|whom|whose)\b\W*)$//i ) {
+            $int->{phrase} = lc $1;
+            $int->{pos}    = 'aft';
+        }
+        elsif ( $data->{question} =~ s/^(\W*\b(?:who|what|when|where|why|how|whose)\b\W*)//i ) {
+            $int->{phrase} = lc $1;
+            $int->{phrase} = ucfirst $1 unless ($skip_casing);
+            $int->{pos}    = 'fore';
+        }
     }
     my @matches = search( @$data{ qw( question book chapter verse ) }, $range );
     if ( @matches > 1 ) {
@@ -190,7 +193,6 @@ sub process_question ( $data, $skip_casing, $range ) {
     }
 
     $match = $matches[0]->{match};
-    $match .= '.' unless ( $match =~ /[.!?]$/ );
     $match = case($match) unless ($skip_casing);
     $data->{answer} = $match;
 
