@@ -34,6 +34,11 @@ sub rs ( $self, $schema_name = undef, @params ) {
     return (@params) ? $rs->search(@params) : $rs;
 }
 
+sub create ( $self, $params ) {
+    $self->obj( $self->rs->create($params)->get_from_storage );
+    return $self;
+}
+
 sub data ($self) {
     return ( $self->obj ) ? { $self->obj->get_inflated_columns } : {};
 }

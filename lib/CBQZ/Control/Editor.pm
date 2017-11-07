@@ -4,6 +4,7 @@ use Mojo::Base 'Mojolicious::Controller';
 use exact;
 use CBQZ::Model::MaterialSet;
 use CBQZ::Model::QuestionSet;
+use CBQZ::Model::Question;
 use CBQZ::Model::Program;
 
 sub path ($self) {
@@ -47,34 +48,20 @@ sub save ($self) {
     my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
 
     unless ( $question->{question_id} ) {
-        $self->dq->sql(q{
-            INSERT INTO question (
-                question_set_id, book, chapter, verse, question, answer, type
-            ) VALUES ( ?, ?, ?, ?, ?, ?, ? )
-        })->run(
-            $cbqz_prefs->{question_set_id},
-            @$question{ qw( book chapter verse question answer type ) },
-        );
+        $question->{used}            = 0;
+        $question->{question_set_id} = $cbqz_prefs->{question_set_id};
 
-        $question->{question_id} = $self->dq->sql('SELECT last_insert_id()')->run->value;
-        $question->{used}        = 0;
+        $question = CBQZ::Model::Question->new->create($question)->data;
     }
     else {
-        $self->dq->sql(q{
-            UPDATE question
-            SET book = ?, chapter = ?, verse = ?, question = ?, answer = ?, type = ?, marked = NULL
-            WHERE question_id = ?
-        })->run(
-            @$question{ qw( book chapter verse question answer type ) },
-            $question->{question_id},
-        );
+        CBQZ::Model::Question->new->load( $question->{question_id} )->obj->update($question);
     }
 
     return $self->render( json => { question => $question } );
 }
 
 sub delete ($self) {
-    $self->dq->sql('DELETE FROM question WHERE question_id = ?')->run( $self->req_body_json->{question_id} );
+    CBQZ::Model::Question->new->load( $self->req_body_json->{question_id} )->obj->delete;
     return $self->render( json => { success => 1 } );
 }
 
