@@ -35,6 +35,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     alert("Incomplete reference; lookup not possible.");
                 }
             },
+
             find: function () {
                 var selection = document.getSelection();
                 if ( selection.rangeCount > 0 && selection.isCollapsed == 0 ) {
@@ -46,6 +47,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     this.material.search = search_text;
                 }
             },
+
             lookup_from_search: function (verse) {
                 this.material.book = verse.book;
                 this.$nextTick( function () {
@@ -55,11 +57,13 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     } );
                 } );
             },
+
             setup_question: function () {
                 this.question        = this.questions[ this.position ];
                 this.question.number = 1;
                 this.question.as     = this.metadata.as_default;
             },
+
             move_question: function (target) {
                 if ( target == parseInt(target) ) {
                     target--;
@@ -82,12 +86,15 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     }
                 }
             },
+
             toggle_quiz_view: function () {
                 this.quiz_view_hidden = ! this.quiz_view_hidden;
             },
+
             make_beep: function () {
                 beep.play();
             },
+
             timer_click: function () {
                 if ( this.timer.state == "ready" || this.timer.state == "stopped" ) {
                     this.timer.state = "running";
@@ -104,6 +111,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     this.timer.label = "Start Timer";
                 }
             },
+
             timer_tick: function () {
                 var self = this;
 
@@ -122,15 +130,23 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     }
                 }, 1000 );
             },
+
             set_timer: function (value) {
                 this.timer.state = "ready";
                 this.timer.label = "Start Timer";
                 this.timer.value = value;
             },
+
             result: function (result) {
                 this.set_timer( this.metadata.timer_default );
 
-                this.$http.post( cntlr + "/used", { question_id: this.question.question_id } );
+                this.$http.post( cntlr + "/used", { question_id: this.question.question_id } )
+                    .then( function (response) {
+                        if ( ! response.body.success ) {
+                            alert("There was an error updating the used count for the question.");
+                        }
+                    } );
+
                 this.question.used++;
 
                 var as     = this.question.as;
@@ -142,6 +158,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.question.as     = as_number.as;
                 this.question.number = as_number.number;
             },
+
             mark_for_edit: function () {
                 var reason = prompt( "Enter comment about this question:", "Contains an error" );
                 if (reason) {
@@ -161,6 +178,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     } );
                 }
             },
+
             replace: function (type) {
                 this.$http.post(
                     cntlr + "/replace",
@@ -183,6 +201,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     }
                 } );
             },
+
             set_type_counts: function () {
                 var ranges    = this.metadata.type_ranges;
                 var questions = this.questions;

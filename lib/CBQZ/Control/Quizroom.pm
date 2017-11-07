@@ -5,6 +5,7 @@ use exact;
 use CBQZ::Model::Quiz;
 use CBQZ::Model::Program;
 use CBQZ::Model::MaterialSet;
+use CBQZ::Model::Question;
 
 sub index ($self) {
     my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
@@ -77,16 +78,19 @@ sub data ($self) {
 }
 
 sub used ($self) {
-    $self->dq->sql('UPDATE question SET used = used + 1 WHERE question_id = ?')
-        ->run( $self->req_body_json->{question_id} );
-    return $self->render( json => {} );
+    CBQZ::Model::Question->new->load(
+        $self->req_body_json->{question_id}
+    )->obj->update({ used => \'used' + 1 });
+
+    return $self->render( json => { success => 1 } );
 }
 
 sub mark ($self) {
     my $json = $self->req_body_json;
 
-    $self->dq->sql('UPDATE question SET marked = ? WHERE question_id = ?')
-        ->run( $json->{reason}, $json->{question_id} );
+    CBQZ::Model::Question->new->load(
+        $self->req_body_json->{question_id}
+    )->obj->update({ marked => $json->{reason} });
 
     return $self->render( json => { success => 1 } );
 }
