@@ -2,15 +2,14 @@ package CBQZ::Model::Gateway;
 
 use Moose;
 use MooseX::ClassAttribute;
+use exact;
 use Mojo::URL;
 use Mojo::DOM;
 use CBQZ::Util::File qw( filename spurt slurp );
 
 extends 'CBQZ::Model';
 
-class_has _summary_dom => ( isa => 'Mojo::DOM', is => 'ro', lazy => 1, default => sub {
-    my ($self) = @_;
-
+class_has _summary_dom => ( isa => 'Mojo::DOM', is => 'ro', lazy => 1, default => sub ($self) {
     my $file = filename(
         $self->config->get( qw( config_app root_dir ) ),
         $self->config->get('data'),
@@ -31,9 +30,7 @@ class_has _summary_dom => ( isa => 'Mojo::DOM', is => 'ro', lazy => 1, default =
     return Mojo::DOM->new($html);
 } );
 
-class_has translations => ( isa => 'ArrayRef', is => 'ro', lazy => 1, default => sub {
-    my ($self) = @_;
-
+class_has translations => ( isa => 'ArrayRef', is => 'ro', lazy => 1, default => sub ($self) {
     my ( $language, $translations );
     for my $element (
         $self->_summary_dom->find(q{
@@ -71,9 +68,7 @@ class_has translations => ( isa => 'ArrayRef', is => 'ro', lazy => 1, default =>
     return $translations;
 } );
 
-class_has books => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
-    my ($self) = @_;
-
+class_has books => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub ($self) {
     return {
         map {
             $_->at('td.book-name')->text => $_->at('td.chapters a:last-child')->text
@@ -81,8 +76,7 @@ class_has books => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
     };
 } );
 
-sub translations_for_language {
-    my ( $self, $language ) = @_;
+sub translations_for_language ( $self, $language ) {
     $language = lc($language);
 
     return [ grep {
@@ -91,8 +85,7 @@ sub translations_for_language {
     } @{ $self->translations } ];
 }
 
-sub raw_chapter {
-    my ( $self, $book_chapter, $translation ) = @_;
+sub raw_chapter ( $self, $book_chapter, $translation ) {
     $translation //= 'NIV';
 
     E->throw('Book/chapter provided does not look legitimate')
@@ -122,8 +115,7 @@ sub raw_chapter {
     return $html;
 }
 
-sub chapter_as_obml {
-    my ( $self, $book_chapter, $translation ) = @_;
+sub chapter_as_obml ( $self, $book_chapter, $translation ) {
     $translation //= 'NIV';
 
     my $passage = Mojo::DOM
@@ -163,8 +155,7 @@ sub chapter_as_obml {
     return 42;
 }
 
-sub verses_from_books {
-    my ( $self, $books, $translation ) = @_;
+sub verses_from_books ( $self, $books, $translation ) {
     $translation //= 'NIV';
 
     E->throw('First parameter must be an arrayref containing books')
@@ -206,8 +197,7 @@ sub verses_from_books {
     }
 }
 
-sub verses {
-    my ( $self, $book_chapter, $translation ) = @_;
+sub verses ( $self, $book_chapter, $translation ) {
     $translation //= 'NIV';
 
     my $dom = Mojo::DOM

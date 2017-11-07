@@ -2,6 +2,7 @@ package CBQZ::Model::User;
 
 use Moose;
 use MooseX::ClassAttribute;
+use exact;
 use Digest::SHA 'sha256_hex';
 use Try::Tiny;
 use CBQZ::Model::QuestionSet;
@@ -14,20 +15,16 @@ with 'CBQZ::Model::User::Program';
 
 class_has 'schema_name' => ( isa => 'Str', is => 'ro', default => 'User' );
 
-before [ qw( change_name change_passwd ) ] => sub {
-    my ($self) = @_;
+before [ qw( change_name change_passwd ) ] => sub ($self) {
     E->throw('Failure because user object data not yet loaded')
         unless ( $self->obj and $self->obj->in_storage );
 };
 
-sub password_quality {
-    my ( $self, $passwd ) = @_;
+sub password_quality ( $self, $passwd ) {
     return ( $passwd and length $passwd >= 6 ) ? 1 : 0;
 }
 
-sub change_name {
-    my ( $self, $name, $underscore_ok ) = @_;
-
+sub change_name ( $self, $name, $underscore_ok = 0 ) {
     E->throw('"name" not defined in input') unless ($name);
     E->throw('"name" length < 6 in input') if ( length $name < 6 );
 
@@ -48,19 +45,15 @@ sub change_name {
     return $self->obj;
 }
 
-sub change_passwd {
-    my ( $self, $passwd, $old_passwd ) = @_;
+sub change_passwd ( $self, $passwd, $old_passwd ) {
     E->throw('Password complexity not met') unless ( $passwd and $self->password_quality($passwd) );
-
     E->throw('Password provided does not match stored password')
         if ( defined $old_passwd and $self->obj->passwd ne sha256_hex($old_passwd) );
 
     return $self->obj->update({ passwd => $passwd });
 }
 
-sub event {
-    my ( $self, $type, $user_id ) = @_;
-
+sub event ( $self, $type, $user_id = undef ) {
     $self->rs('Event')->create({
         user_id  => $user_id || $self->obj->id,
         type     => $type,
@@ -69,9 +62,7 @@ sub event {
     return;
 }
 
-sub question_sets {
-    my ($self) = @_;
-
+sub question_sets ($self) {
     E->throw('Failure because user object data not yet loaded')
         unless ( $self->obj and $self->obj->in_storage );
 

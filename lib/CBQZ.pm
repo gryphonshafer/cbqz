@@ -2,6 +2,7 @@ package CBQZ;
 
 use Moose;
 use MooseX::ClassAttribute;
+use exact;
 use Config::App;
 use DBIx::Query;
 use JSON::XS;
@@ -53,17 +54,13 @@ class_has dq => ( isa => 'DBIx::Query::db', is => 'ro', lazy => 1, default => su
     );
 } );
 
-sub params_check {
-    my $self = shift;
-
-    for (@_) {
+sub params_check ( $self, @params ) {
+    for (@params) {
         E->throw( $_->[0] ) if ( $_->[1]->() );
     }
 }
 
-sub able {
-    my ( $self, $obj, $method ) = @_;
-
+sub able ( $self, $obj, $method ) {
     my $rv;
     try {
         $rv = $obj->can($method);
@@ -75,8 +72,7 @@ sub able {
     return $rv;
 }
 
-sub clean_error {
-    my ( $self, $error_with_context ) = @_;
+sub clean_error ( $self, $error_with_context ) {
     ( my $error_without_context = $error_with_context ) =~ s/\s+at\s+(?:(?!\s+at\s+).)*[\r\n]*$//;
     return $error_without_context;
 }

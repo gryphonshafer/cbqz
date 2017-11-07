@@ -1,12 +1,11 @@
 package CBQZ::Model::User::PreLogin;
 
 use Moose::Role;
+use exact;
 use Try::Tiny;
 use Digest::SHA 'sha256_hex';
 
-sub create {
-    my ( $self, $params ) = @_;
-
+sub create ( $self, $params ) {
     $self->params_check(
         [ '"name" not defined in input', sub { not defined $params->{name} }                      ],
         [ '"name" length < 2 in input',  sub { length $params->{name} < 2 }                       ],
@@ -50,9 +49,7 @@ sub create {
     return $self;
 }
 
-sub login {
-    my ( $self, $params ) = @_;
-
+sub login ( $self, $params ) {
     $self->params_check(
         [ 'Valid "name" not in input',   sub { not $params->{name} }   ],
         [ 'Valid "passwd" not in input', sub { not $params->{passwd} } ],

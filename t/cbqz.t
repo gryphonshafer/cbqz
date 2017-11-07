@@ -1,7 +1,7 @@
-use exact;
 use Config::App;
 use Test::Most;
 use Test::Moose;
+use exact;
 
 use constant PACKAGE => 'CBQZ';
 
@@ -27,9 +27,7 @@ sub main {
     return 0;
 };
 
-sub params_check {
-    my ($obj) = @_;
-
+sub params_check ($obj) {
     throws_ok(
         sub { $obj->params_check( [ 'pass', sub { 0 } ] ) },
         qr/^$/,
@@ -45,9 +43,7 @@ sub params_check {
     return;
 }
 
-sub clean_error {
-    my ($obj) = @_;
-
+sub clean_error ($obj) {
     my $count = 0;
     is( $obj->clean_error( $_->[0] ), $_->[1], '$obj->error test ' . ++$count ) for (
         [ 'Error occured at SomeClass::method line 42', 'Error occured' ],

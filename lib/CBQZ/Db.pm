@@ -3,6 +3,7 @@ package CBQZ::Db;
 use Config::App;
 use Moose;
 use MooseX::MarkAsMethods autoclean => 1;
+use exact;
 
 extends 'DBIx::Class::Schema', 'CBQZ';
 
@@ -10,8 +11,7 @@ extends 'DBIx::Class::Schema', 'CBQZ';
     my $db;
     my $config = Config::App->new->get('database');
 
-    sub connect {
-        my $self = shift;
+    sub connect ($self) {
         return $db if ($db);
 
         my ( $dsn, $dbname, $username, $password, $settings ) =
@@ -49,9 +49,7 @@ extends 'DBIx::Class::Schema', 'CBQZ';
     }
 }
 
-sub enum {
-    my ( $self, $sources, $columns ) = @_;
-
+sub enum ( $self, $sources, $columns ) {
     $sources ||= [ $self->sources ];
     $sources = [$sources] if ( defined $sources and not ref $sources );
     $columns = [$columns] if ( defined $columns and not ref $columns );

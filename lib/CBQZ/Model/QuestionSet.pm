@@ -2,6 +2,7 @@ package CBQZ::Model::QuestionSet;
 
 use Moose;
 use MooseX::ClassAttribute;
+use exact;
 
 extends 'CBQZ::Model';
 
@@ -11,8 +12,7 @@ has 'statistics' => ( isa => 'ArrayRef[HashRef]', is => 'rw', lazy => 1, default
     return shift->generate_statistics;
 } );
 
-sub create {
-    my ( $self, $user, $name ) = @_;
+sub create ( $self, $user, $name = undef ){
     $name //= 'Default ' . ucfirst( $user->obj->name ) . ' Set';
 
     $self->obj(
@@ -25,9 +25,7 @@ sub create {
     return $self;
 }
 
-sub get_questions {
-    my ($self) = @_;
-
+sub get_questions ($self) {
     my $questions = {};
     $questions->{ $_->{book} }{ $_->{chapter} }{ $_->{question_id} } = $_ for (
         @{
@@ -42,9 +40,7 @@ sub get_questions {
     return $questions;
 }
 
-sub generate_statistics {
-    my ($self) = @_;
-
+sub generate_statistics ($self) {
     my %types;
     my $type_data;
     for (
@@ -79,8 +75,7 @@ sub generate_statistics {
     ];
 }
 
-sub data {
-    my ($self) = @_;
+sub data ($self) {
     my $data = $self->SUPER::data;
     $data->{statistics} = $self->statistics;
     return $data;

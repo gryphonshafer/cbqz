@@ -89,32 +89,30 @@ sub new {
         crit => 4,
     };
 
-    sub _lowest_level {
+    sub _lowest_level (@input) {
         return (
             map { $_->[1] }
             sort { $a->[0] <=> $b->[0] }
             map { [ $log_levels->{$_}, $_ ] }
-            @_
+            @input
         )[0];
     }
 
-    sub _highest_level {
+    sub _highest_level (@input) {
         return (
             map { $_->[1] }
             sort { $b->[0] <=> $a->[0] }
             map { [ $log_levels->{$_}, $_ ] }
-            @_
+            @input
         )[0];
     }
 }
 
-sub _log_cb_time {
-    my %msg = @_;
+sub _log_cb_time (%msg) {
     return log_date() . ' ' . $msg{message};
 }
 
-sub _log_cb_label {
-    my %msg = @_;
+sub _log_cb_label (%msg) {
     return '[' . uc( $msg{level} ) . '] ' . $msg{message};
 }
 
@@ -141,8 +139,7 @@ sub _log_cb_label {
         } ( ( ref $color{$_} ) ? @{ $color{$_} } : $color{$_} ) );
     }
 
-    sub _log_cb_color {
-        my %msg = @_;
+    sub _log_cb_color (%msg) {
         return ( $color{ $msg{level} } )
             ? $color{ $msg{level} } . $msg{message} . $color{reset}
             : $msg{message};

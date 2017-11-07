@@ -1,7 +1,7 @@
 package CBQZ::Control;
 
-use exact;
 use Mojo::Base 'Mojolicious';
+use exact;
 use Mojo::Loader 'load_class';
 use Mojo::Util 'b64_decode';
 use MojoX::Log::Dispatch::Simple;
@@ -10,9 +10,7 @@ use CBQZ;
 use CBQZ::Model::User;
 use CBQZ::Util::Format 'log_date';
 
-sub startup {
-    my ( $self, $app ) = @_;
-
+sub startup ( $self, $app = undef ) {
     my $cbqz   = CBQZ->new;
     my $config = $cbqz->config;
 
@@ -24,17 +22,14 @@ sub startup {
 
     # setup general helpers
     for my $command ( qw( clean_error dq config ) ) {
-        $self->helper( $command => sub {
-            my $self = shift;
-            return $cbqz->$command(@_);
+        $self->helper( $command => sub ( $self, @commands ) {
+            return $cbqz->$command(@commands);
         } );
     }
-    $self->helper( 'params' => sub {
-        my ($self) = @_;
+    $self->helper( 'params' => sub ($self) {
         return { map { $_ => $self->req->param($_) } @{ $self->req->params->names } };
     } );
-    $self->helper( 'req_body_json' => sub {
-        my ($self) = @_;
+    $self->helper( 'req_body_json' => sub ($self) {
         my $data;
         try {
             $data = $cbqz->json->decode( $self->req->body );
@@ -42,8 +37,7 @@ sub startup {
         return $data;
     } );
     $self->helper( 'cbqz' => sub { $cbqz } );
-    $self->helper( 'decode_cookie' => sub {
-        my ( $self, $name ) = @_;
+    $self->helper( 'decode_cookie' => sub ( $self, $name ) {
         my $data = {};
         try {
             $data = $cbqz->json->decode( b64_decode( $self->cookie($name) // '' ) );
@@ -115,9 +109,7 @@ sub startup {
     load_class( 'CBQZ::Control::' . $_ ) for qw( Main Editor );
 
     # before dispatch tasks
-    $self->hook( 'before_dispatch' => sub {
-        my ($self) = @_;
-
+    $self->hook( 'before_dispatch' => sub ($self) {
         # expire the session if the last request time was over an hour ago
         my $last_request_time = $self->session('last_request_time');
         if (
@@ -154,8 +146,7 @@ sub startup {
     $anyone->any( '/' . $_ )->to( controller => 'main', action => $_ ) for ( qw( login logout create_user ) );
     $anyone->any('/create-user')->to( controller => 'main', action => 'create_user' );
 
-    my $authorized_user = $anyone->under( sub {
-        my ($self) = @_;
+    my $authorized_user = $anyone->under( sub ($self) {
         return 1 if (
             $self->stash('user') and
             $self->stash('user')->roles_count > 0 and

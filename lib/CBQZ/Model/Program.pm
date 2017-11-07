@@ -2,19 +2,18 @@ package CBQZ::Model::Program;
 
 use Moose;
 use MooseX::ClassAttribute;
+use exact;
 
 extends 'CBQZ::Model';
 
 class_has 'schema_name' => ( isa => 'Str', is => 'ro', default => 'Program' );
 
-sub rs {
-    my ($self) = @_;
+sub rs ($self) {
     my $programs = $self->SUPER::rs;
     return ( $programs->count ) ? $programs : $self->create_default;
 }
 
-sub create_default {
-    my ($self) = @_;
+sub create_default ($self) {
     my $rs = $self->db->resultset( $self->schema_name )->result_source->resultset;
 
     $rs->set_cache([ $rs->create({
@@ -72,8 +71,7 @@ sub create_default {
     return $rs;
 }
 
-sub types_list {
-    my ($self) = @_;
+sub types_list ($self) {
     my %seen;
 
     return [
@@ -93,9 +91,7 @@ sub types_list {
     ];
 }
 
-sub timer_values {
-    my ($self) = @_;
-
+sub timer_values ($self) {
     return $self->json->decode(
         scalar(
             $self->dq->sql(q{

@@ -1,14 +1,13 @@
 package CBQZ::Model::Quiz;
 
 use Moose;
+use exact;
 use Try::Tiny;
 use CBQZ::Model::Program;
 
 extends 'CBQZ';
 
-sub chapter_set {
-    my ( $self, $cbqz_prefs ) = @_;
-
+sub chapter_set ( $self, $cbqz_prefs ) {
     my @chapter_set_prime = map { $_->{book} . ' ' . $_->{chapter} } @{ $cbqz_prefs->{selected_chapters} };
     my @chapter_set_weight;
     push( @chapter_set_weight, pop @chapter_set_prime )
@@ -20,9 +19,7 @@ sub chapter_set {
     };
 }
 
-sub generate {
-    my ( $self, $cbqz_prefs ) = @_;
-
+sub generate ( $self, $cbqz_prefs ) {
     my $chapter_set            = $self->chapter_set($cbqz_prefs);
     my $program                = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
     my @question_types         = @{ $self->json->decode( $program->obj->question_types ) };
@@ -218,9 +215,7 @@ sub generate {
     };
 }
 
-sub replace {
-    my ( $self, $request, $cbqz_prefs ) = @_;
-
+sub replace ( $self, $request, $cbqz_prefs ) {
     my $chapter_set = $self->chapter_set($cbqz_prefs);
 
     unless ( length $chapter_set->{prime} or length $chapter_set->{weight} ) {

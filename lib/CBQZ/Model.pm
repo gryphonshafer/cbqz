@@ -2,6 +2,7 @@ package CBQZ::Model;
 
 use Moose;
 use MooseX::ClassAttribute;
+use exact;
 use Try::Tiny;
 
 use CBQZ::Db::Schema;
@@ -17,10 +18,7 @@ class_has db => (
 
 has obj => ( isa => 'DBIx::Class::Row', is => 'rw' );
 
-sub load {
-    my $self = shift;
-    my @params = @_;
-
+sub load ( $self, @params ) {
     try {
         $self->obj( $self->db->resultset( $self->schema_name )->find(@params) );
     }
@@ -31,40 +29,34 @@ sub load {
     return $self;
 }
 
-sub rs {
-    my $self = shift;
-    my $rs = $self->db->resultset( shift || $self->schema_name );
-    return (@_) ? $rs->search(@_) : $rs;
+sub rs ( $self, $schema_name = undef, @params ) {
+    my $rs = $self->db->resultset( $schema_name || $self->schema_name );
+    return (@params) ? $rs->search(@params) : $rs;
 }
 
-sub data {
-    my ($self) = @_;
+sub data ($self) {
     return ( $self->obj ) ? { $self->obj->get_inflated_columns } : {};
 }
 
-sub model {
-    my $self = shift;
-
+sub model ( $self, @names ) {
     my $models = [
         map {
             my $new_model_object = $self->new;
             $new_model_object->obj($_);
             $new_model_object;
         }
-        map { ( ref $_ eq 'ARRAY' ) ? @$_ : $_ } @_
+        map { ( ref $_ eq 'ARRAY' ) ? @$_ : $_ } @names
     ];
     return (wantarray) ? @$models : $models;
 }
 
-sub every {
-    my $self = shift;
-    my $every = $self->model( $self->rs(@_)->all );
+sub every ( $self, @sets ) {
+    my $every = $self->model( $self->rs(@sets)->all );
     return (wantarray) ? @$every : $every;
 }
 
-sub every_data {
-    my $self = shift;
-    my $data = [ map { $_->data } @{ $self->every(@_) } ];
+sub every_data ( $self, @sets ) {
+    my $data = [ map { $_->data } @{ $self->every(@sets) } ];
     return (wantarray) ? @$data : $data;
 }
 

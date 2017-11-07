@@ -1,16 +1,14 @@
 package CBQZ::Control::Main;
 
-use exact;
 use Mojo::Base 'Mojolicious::Controller';
+use exact;
 use Try::Tiny;
 use CBQZ::Model::User;
 use CBQZ::Model::Program;
 use CBQZ::Model::MaterialSet;
 use CBQZ::Model::QuestionSet;
 
-sub index {
-    my ($self) = @_;
-
+sub index ($self) {
     unless ( $self->stash('user') ) {
         $self->stash(
             programs  => [ CBQZ::Model::Program->new->every_data ],
@@ -22,9 +20,7 @@ sub index {
     }
 }
 
-sub login {
-    my ($self) = @_;
-
+sub login ($self) {
     my $user = CBQZ::Model::User->new;
     my $e;
     try {
@@ -46,9 +42,7 @@ sub login {
     return $self->redirect_to('/');
 }
 
-sub logout {
-    my ($self) = @_;
-
+sub logout ($self) {
     $self->info(
         'Logout requested from: ' .
         ( ( $self->stash('user') ) ? $self->stash('user')->obj->name : '(Unlogged-in user)' )
@@ -61,9 +55,7 @@ sub logout {
     return $self->redirect_to('/');
 }
 
-sub create_user {
-    my ($self) = @_;
-
+sub create_user ($self) {
     my $user = CBQZ::Model::User->new;
     my $e;
     try {
@@ -82,13 +74,11 @@ sub create_user {
     return $self->redirect_to('/');
 }
 
-sub path {
-    my ($self) = @_;
+sub path ($self) {
     return $self->render( text => 'var cntlr = "' . $self->url_for->path('/main') . '";' );
 }
 
-sub data {
-    my ($self) = @_;
+sub data ($self) {
     my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
 
     my @selected_chapters = map {
@@ -123,29 +113,22 @@ sub data {
     } );
 }
 
-sub question_set_create {
-    my ($self) = @_;
-    my $data   = $self->req_body_json;
-
+sub question_set_create ($self) {
     return $self->render( json => {
         question_set => CBQZ::Model::QuestionSet->new->create(
             $self->stash('user'),
-            $data->{name},
+            $self->req_body_json->{name},
         )->data
     } );
 }
 
-sub question_set_delete {
-    my ($self) = @_;
-    my $data   = $self->req_body_json;
-
-    CBQZ::Model::QuestionSet->new->load( $data->{question_set_id} )->obj->delete;
+sub question_set_delete ($self) {
+    CBQZ::Model::QuestionSet->new->load( $self->req_body_json->{question_set_id} )->obj->delete;
     return $self->render( json => { success => 1 } );
 }
 
-sub question_set_rename {
-    my ($self) = @_;
-    my $data   = $self->req_body_json;
+sub question_set_rename ($self) {
+    my $data = $self->req_body_json;
 
     my $set = CBQZ::Model::QuestionSet->new->load( $data->{question_set_id} )->obj;
     $set->name( $data->{name} );

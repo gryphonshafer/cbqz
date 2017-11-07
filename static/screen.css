@@ -154,6 +154,7 @@ div#content div#message {
     padding: 5px;
     background-color: white;
     font-family: bold;
+    z-index: 100;
 }
 
 div#content div#message.error {

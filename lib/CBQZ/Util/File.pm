@@ -9,18 +9,16 @@ require Exporter;
 our @ISA       = 'Exporter';
 our @EXPORT_OK = qw( filename slurp spurt );
 
-sub filename {
+sub filename (@filenames) {
     return join( '/', map {
         my $node = $_ || '';
         $node =~ s/\s+/_/g;
         $node =~ s/["':;+=|{}\[\]\\]+//g;
         lc($node);
-    } @_ );
+    } @filenames );
 }
 
-sub slurp {
-    my ($file) = @_;
-
+sub slurp ($file) {
     my $path =
         ( ref $file eq 'ARRAY'      ) ? path( filename(@$file) ) :
         ( ref $file eq 'Mojo::File' ) ? $file                    : path($file);
@@ -28,9 +26,7 @@ sub slurp {
     return scalar( io($path)->slurp );
 }
 
-sub spurt {
-    my ( $file, $data ) = @_;
-
+sub spurt ( $file, $data ) {
     my $path =
         ( ref $file eq 'ARRAY'      ) ? path( filename(@$file) ) :
         ( ref $file eq 'Mojo::File' ) ? $file                    : path($file);

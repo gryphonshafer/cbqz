@@ -1,18 +1,16 @@
 package CBQZ::Control::Editor;
 
-use exact;
 use Mojo::Base 'Mojolicious::Controller';
+use exact;
 use CBQZ::Model::MaterialSet;
 use CBQZ::Model::QuestionSet;
 use CBQZ::Model::Program;
 
-sub path {
-    my ($self) = @_;
+sub path ($self) {
     return $self->render( text => 'var cntlr = "' . $self->url_for->path('/editor') . '";' );
 }
 
-sub data {
-    my ($self)     = @_;
+sub data ($self) {
     my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
 
     my $material  = CBQZ::Model::MaterialSet->new->load( $cbqz_prefs->{material_set_id} )->get_material;
@@ -44,8 +42,7 @@ sub data {
     } );
 }
 
-sub save {
-    my ($self)     = @_;
+sub save ($self) {
     my $question   = $self->req_body_json;
     my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
 
@@ -76,11 +73,8 @@ sub save {
     return $self->render( json => { question => $question } );
 }
 
-sub delete {
-    my ($self) = @_;
-    my $json = $self->req_body_json;
-
-    $self->dq->sql('DELETE FROM question WHERE question_id = ?')->run( $json->{question_id} );
+sub delete ($self) {
+    $self->dq->sql('DELETE FROM question WHERE question_id = ?')->run( $self->req_body_json->{question_id} );
     return $self->render( json => { success => 1 } );
 }
 

@@ -1,6 +1,7 @@
 package E {
     use Moose;
     use MooseX::ClassAttribute;
+    use exact;
     use Carp 'croak';
     use Try::Tiny;
     use CBQZ;
@@ -8,11 +9,7 @@ package E {
     extends 'Throwable::Error';
     class_has cbqz => ( isa => 'CBQZ', is => 'ro', default => sub { CBQZ->new } );
 
-    around 'throw' => sub {
-        my $orig   = shift;
-        my $self   = shift;
-        my @params = @_;
-
+    around 'throw' => sub ( $orig, $self, @params ) {
         try {
             $self->$orig(@params);
         }

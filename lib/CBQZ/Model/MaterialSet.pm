@@ -2,14 +2,13 @@ package CBQZ::Model::MaterialSet;
 
 use Moose;
 use MooseX::ClassAttribute;
+use exact;
 
 extends 'CBQZ::Model';
 
 class_has 'schema_name' => ( isa => 'Str', is => 'ro', default => 'MaterialSet' );
 
-sub get_material {
-    my ($self) = @_;
-
+sub get_material ($self) {
     my $material = {};
     $material->{ $_->{book} }{ $_->{chapter} }{ $_->{verse} } = $_ for (
         @{

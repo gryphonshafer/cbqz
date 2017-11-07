@@ -1,13 +1,12 @@
 package CBQZ::Control::Quizroom;
 
-use exact;
 use Mojo::Base 'Mojolicious::Controller';
+use exact;
 use CBQZ::Model::Quiz;
 use CBQZ::Model::Program;
 use CBQZ::Model::MaterialSet;
 
-sub index {
-    my ($self)     = @_;
+sub index ($self) {
     my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
     my $program    = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
 
@@ -19,8 +18,7 @@ sub index {
     return;
 }
 
-sub path {
-    my ($self)           = @_;
+sub path ($self) {
     my $cbqz_prefs       = $self->decode_cookie('cbqz_prefs');
     my $path             = $self->url_for->path('/quizroom');
     my $result_operation = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} )->obj->result_operation;
@@ -36,8 +34,7 @@ sub path {
     );
 }
 
-sub data {
-    my ($self)     = @_;
+sub data ($self) {
     my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
     my $quiz       = CBQZ::Model::Quiz->new->generate($cbqz_prefs);
     my $program    = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
@@ -79,17 +76,14 @@ sub data {
     } );
 }
 
-sub used {
-    my ($self) = @_;
-    my $json   = $self->req_body_json;
-
-    $self->dq->sql('UPDATE question SET used = used + 1 WHERE question_id = ?')->run( $json->{question_id} );
+sub used ($self) {
+    $self->dq->sql('UPDATE question SET used = used + 1 WHERE question_id = ?')
+        ->run( $self->req_body_json->{question_id} );
     return $self->render( json => {} );
 }
 
-sub mark {
-    my ($self) = @_;
-    my $json   = $self->req_body_json;
+sub mark ($self) {
+    my $json = $self->req_body_json;
 
     $self->dq->sql('UPDATE question SET marked = ? WHERE question_id = ?')
         ->run( $json->{reason}, $json->{question_id} );
@@ -97,9 +91,7 @@ sub mark {
     return $self->render( json => { success => 1 } );
 }
 
-sub replace {
-    my ($self) = @_;
-
+sub replace ($self) {
     my $results = CBQZ::Model::Quiz->new->replace(
         $self->req_body_json,
         $self->decode_cookie('cbqz_prefs'),
