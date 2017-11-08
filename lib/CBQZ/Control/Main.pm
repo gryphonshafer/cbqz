@@ -123,18 +123,20 @@ sub question_set_create ($self) {
 }
 
 sub question_set_delete ($self) {
-    CBQZ::Model::QuestionSet->new->load( $self->req_body_json->{question_set_id} )->obj->delete;
-    return $self->render( json => { success => 1 } );
+    my $set = CBQZ::Model::QuestionSet->new->load( $self->req_body_json->{question_set_id} );
+    if ( $set and $set->is_owned_by( $self->stash('user') ) ) {
+        $set->obj->delete;
+        return $self->render( json => { success => 1 } );
+    }
 }
 
 sub question_set_rename ($self) {
     my $data = $self->req_body_json;
-
-    my $set = CBQZ::Model::QuestionSet->new->load( $data->{question_set_id} )->obj;
-    $set->name( $data->{name} );
-    $set->update;
-
-    return $self->render( json => { success => 1 } );
+    my $set  = CBQZ::Model::QuestionSet->new->load( $data->{question_set_id} );
+    if ( $set and $set->is_owned_by( $self->stash('user') ) ) {
+        $set->obj->update({ name => $data->{name} });
+        return $self->render( json => { success => 1 } );
+    }
 }
 
 1;
