@@ -37,6 +37,7 @@ sub path ($self) {
 
 sub data ($self) {
     my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
+    # TODO: prevent if question_set_id in prefs is not owned by the user
     my $quiz       = CBQZ::Model::Quiz->new->generate($cbqz_prefs);
     my $program    = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
 
@@ -78,6 +79,7 @@ sub data ($self) {
 }
 
 sub used ($self) {
+    # TODO: prevent if question is not in a set owned by the user
     CBQZ::Model::Question->new->load(
         $self->req_body_json->{question_id}
     )->obj->update({ used => \'used' + 1 });
@@ -88,6 +90,7 @@ sub used ($self) {
 sub mark ($self) {
     my $json = $self->req_body_json;
 
+    # TODO: prevent if question is not in a set owned by the user
     CBQZ::Model::Question->new->load(
         $self->req_body_json->{question_id}
     )->obj->update({ marked => $json->{reason} });
@@ -96,6 +99,7 @@ sub mark ($self) {
 }
 
 sub replace ($self) {
+    # TODO: prevent if question_set_id in prefs is not owned by the user
     my $results = CBQZ::Model::Quiz->new->replace(
         $self->req_body_json,
         $self->decode_cookie('cbqz_prefs'),

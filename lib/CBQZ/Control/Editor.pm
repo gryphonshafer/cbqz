@@ -15,6 +15,7 @@ sub data ($self) {
     my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
 
     my $material  = CBQZ::Model::MaterialSet->new->load( $cbqz_prefs->{material_set_id} )->get_material;
+    # TODO: prevent get_questions if user doesn't own the set
     my $questions = CBQZ::Model::QuestionSet->new->load( $cbqz_prefs->{question_set_id} )->get_questions;
 
     return $self->render( json => {
@@ -51,9 +52,11 @@ sub save ($self) {
         $question->{used}            = 0;
         $question->{question_set_id} = $cbqz_prefs->{question_set_id};
 
+        # TODO: prevent save to a question_set_id not owned by the user
         $question = CBQZ::Model::Question->new->create($question)->data;
     }
     else {
+        # TODO: prevent if question_set_id not owned by the user
         CBQZ::Model::Question->new->load( $question->{question_id} )->obj->update($question);
     }
 
@@ -61,6 +64,7 @@ sub save ($self) {
 }
 
 sub delete ($self) {
+    # TODO: prevent if question_set_id not owned by the user
     CBQZ::Model::Question->new->load( $self->req_body_json->{question_id} )->obj->delete;
     return $self->render( json => { success => 1 } );
 }

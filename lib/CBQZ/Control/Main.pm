@@ -123,6 +123,7 @@ sub question_set_create ($self) {
 }
 
 sub question_set_delete ($self) {
+    # TODO: prevent delete if user doesn't own the set
     CBQZ::Model::QuestionSet->new->load( $self->req_body_json->{question_set_id} )->obj->delete;
     return $self->render( json => { success => 1 } );
 }
@@ -130,6 +131,7 @@ sub question_set_delete ($self) {
 sub question_set_rename ($self) {
     my $data = $self->req_body_json;
 
+    # TODO: prevent rename if user doesn't own the set
     my $set = CBQZ::Model::QuestionSet->new->load( $data->{question_set_id} )->obj;
     $set->name( $data->{name} );
     $set->update;
