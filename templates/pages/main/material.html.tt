@@ -1,0 +1,17 @@
+[%
+    page.title = 'Bible Reference Material';
+    page.menu  = 'material';
+    page.vue   = 1;
+
+    page.js.push( '/main/path.js' );
+    page.links.push( '/js/components/material_lookup.html' );
+    page.links.push( '/js/app/material.js' );
+%]
+
+<h2>Materials... eventually...</h2>
+
+<div id="app" v-cloak>
+    <p>Local Data: <b>{{ message }}</b></p>
+    <p>Local Component: <b><local-component></local-component></b></p>
+    <p>Vue Component: <b><hello-world></hello-world></b></p>
+</div>

@@ -5,6 +5,7 @@
         page.title = '',
         page.vue   = 0,
         page.js    = [],
+        page.links = [],
      ;
 
     content = BLOCK;
@@ -24,11 +25,16 @@
         <link rel="shortcut icon" href="[% c.url_for.path('/favicon.ico') %]" type="image/x-icon" />
         <link rel="stylesheet" type="text/css" media="screen" href="[% c.url_for.path('/screen.css') %]" />
 
-        [% IF page.vue %]
-            <script type="text/javascript" src="[% c.url_for.path(
-                '/js/lib/' _ ( ( c.app.mode == 'development' ) ? 'vue.js' : 'vue.min.js' )
-            ) %]"></script>
-            <script type="text/javascript" src="[% c.url_for.path('/js/lib/vue-resource.js') %]"></script>
+        [% FOREACH file IN page.links %]
+            [% UNLESS link_seen.$file %]
+                <link rel="import" href="[%
+                    ( file.match('^\w+://') ) ? file : c.url_for.path(file)
+                %]">
+                [% link_seen.$file = ( link_seen.$file || 0 ) + 1 %]
+            [% END %]
+            [% IF loop.first %]
+                [% page.js.push('/js/import_links.js') %]
+            [% END %]
         [% END %]
 
         <title>[% page.title %]</title>
@@ -36,14 +42,18 @@
     <body>
         [% PROCESS page_layout.html.tt %]
 
-        [% IF page.js.size > 0 %]
-            [% FOREACH file IN page.js %]
-                [% UNLESS js_seen.$file %]
-                    <script type="text/javascript" src="[%
-                        ( file.match('^\w+://') ) ? file : c.url_for.path(file)
-                    %]"></script>
-                    [% js_seen.$file = ( js_seen.$file || 0 ) + 1 %]
-                [% END %]
+        [% IF page.vue %]
+            <script type="text/javascript" src="[% c.url_for.path(
+                '/js/lib/' _ ( ( c.app.mode == 'development' ) ? 'vue.js' : 'vue.min.js' )
+            ) %]"></script>
+            <script type="text/javascript" src="[% c.url_for.path('/js/lib/vue-resource.js') %]"></script>
+        [% END %]
+        [% FOREACH file IN page.js %]
+            [% UNLESS js_seen.$file %]
+                <script type="text/javascript" src="[%
+                    ( file.match('^\w+://') ) ? file : c.url_for.path(file)
+                %]"></script>
+                [% js_seen.$file = ( js_seen.$file || 0 ) + 1 %]
             [% END %]
         [% END %]
     </body>
