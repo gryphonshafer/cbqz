@@ -1,0 +1,27 @@
+<script type="text/x-template" id="message-template">
+    <div>
+        <input v-model="reply">
+        <button v-on:click="message_click">
+            Message: {{ message }}
+        </button>
+    </div>
+</script>
+
+<script type="text/javascript">
+    Vue.component( "message", {
+        template : "#message-template",
+        data : function () {
+            return {
+                reply: "Default Reply"
+            };
+        },
+        props    : {
+            message: String
+        },
+        methods : {
+            message_click: function () {
+                this.$emit( "clicked-message", this.reply );
+            }
+        }
+    } );
+</script>

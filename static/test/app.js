@@ -7,5 +7,10 @@ var app = new Vue({
         'local-component': {
             template: '<span>Local Component Operational</span>'
         }
+    },
+    methods: {
+        something_happened: function (input) {
+            console.log(input);
+        }
     }
 });
