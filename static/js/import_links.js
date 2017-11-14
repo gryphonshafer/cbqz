@@ -1,8 +1,12 @@
 ( function () {
-    var node_blocks   = [];
+    var node_blocks   = {};
     var link_elements = document.getElementsByTagName("link");
 
     for ( var i = 0; i < link_elements.length; i++ ) {
+        initiate( link_elements[i].href );
+    }
+
+    function initiate (url) {
         var req = new XMLHttpRequest();
         req.overrideMimeType("text/plain");
         req.addEventListener( "load", function () {
@@ -32,20 +36,20 @@
                 }
             }
 
-            finish(nodes_to_add);
+            finish( url, nodes_to_add );
         } );
 
-        req.open( "GET", link_elements[i].href );
+        req.open( "GET", url );
         req.send();
     }
 
-    function finish (nodes_to_add) {
-        node_blocks.push(nodes_to_add);
+    function finish ( url, nodes_to_add ) {
+        node_blocks[url] = nodes_to_add;
 
-        if ( node_blocks.length == link_elements.length ) {
-            for ( var i = 0; i < node_blocks.length; i++ ) {
-                for ( var j = 0; j < node_blocks[i].length; j++ ) {
-                    document.body.appendChild( node_blocks[i][j] );
+        if ( Object.keys(node_blocks).length == link_elements.length ) {
+            for ( var i = 0; i < link_elements.length; i++ ) {
+                for ( var j = 0; j < node_blocks[ link_elements[i].href ].length; j++ ) {
+                    document.body.appendChild( node_blocks[ link_elements[i].href ][j] );
                 }
             }
         }
