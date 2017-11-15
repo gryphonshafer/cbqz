@@ -8,10 +8,11 @@
     page.links.push( '/js/app/material.js' );
 %]
 
-<h2>Materials... eventually...</h2>
-
-<div id="app" v-cloak>
-    <p>Local Data: <b>{{ message }}</b></p>
-    <p>Local Component: <b><local-component></local-component></b></p>
-    <p>Vue Component: <b><hello-world></hello-world></b></p>
+<div id="material" v-cloak>
+    <material-lookup
+        v-bind:material="material"
+        clickable="true"
+        v-on:reference-change="reference_change"
+        v-on:reference-click="reference_click"
+    ></material-lookup>
 </div>

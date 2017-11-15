@@ -139,4 +139,12 @@ sub question_set_rename ($self) {
     }
 }
 
+sub material_data ($self) {
+    return $self->render( json => {
+        material => CBQZ::Model::MaterialSet->new->load(
+            $self->decode_cookie('cbqz_prefs')->{material_set_id}
+        )->get_material
+    } );
+}
+
 1;

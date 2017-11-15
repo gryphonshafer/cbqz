@@ -1,9 +1,127 @@
-<script type="text/x-template" id="hello-world-template">
-    <span>Vue Component Operational</span>
+<script type="text/x-template" id="material-lookup-template">
+    <div id="material_lookup">
+        <span class="label">Ref:</span>
+
+        <select v-model="book">
+            <option v-for="item in books">{{ item }}</option>
+        </select>
+        <select v-model="chapter">
+            <option v-for="item in chapters">{{ item }}</option>
+        </select>
+        <select v-model="verse">
+            <option v-for="item in verses">{{ item.verse }}</option>
+        </select>
+
+        <div id="material_lookup_display">
+            <a
+                v-for="item in verses"
+                v-bind:name="'v' + item.verse"
+                v-bind:class="{
+                    htmlarea: true,
+                    selected: verse == item.verse
+                }"
+            >
+                <span class="outdent">
+                    <b class="material_para_markers" v-if="item.is_new_para">&para;</b>
+
+                    <b v-if="clickable" class="clickable_reference" v-on:click="reference_click(item)"
+                        >{{ item.chapter + ':' + item.verse }}</b>
+                    <b v-else>{{ item.chapter + ':' + item.verse }}</b>
+
+                    <span class="material_key_markers">
+                        <template v-if="item.key_class">
+                            {{ ( item.key_class == 'range' ) ? '&Dagger;' : '&dagger;' }}
+                            {{ ( item.key_type ) ? item.key_type : '' }}
+                        </template>
+                        <template v-else>
+                            -
+                        </template>
+                    </span>
+
+                    <span v-html="item.text"></span>
+                </span>
+            </a>
+        </div>
+    </div>
 </script>
 
 <script type="text/javascript">
-    Vue.component( 'hello-world', {
-        template: '#hello-world-template'
+    Vue.component( 'material-lookup', {
+        template: '#material-lookup-template',
+        data: function () {
+            return {
+                books    : null,
+                book     : null,
+                chapters : null,
+                chapter  : null,
+                verses   : null,
+                verse    : null
+            };
+        },
+        props: {
+            clickable: {
+                type: String,
+                default: ""
+            },
+            material: {
+                type: Object,
+                default: function () {
+                    return {
+                        "No Data": {
+                            1: {
+                                1: {
+                                    book        : "No Data",
+                                    chapter     : 1,
+                                    verse       : 1,
+                                    is_new_para : 0,
+                                    key_class   : null,
+                                    key_type    : null,
+                                    text        : "No material data loaded."
+                                }
+                            }
+                        }
+                    };
+                }
+            }
+        },
+        mounted: function () {
+            this.books = Object.keys( this.material );
+            this.book  = this.books[0];
+        },
+        watch: {
+            book: function () {
+                this.chapters = Object.keys( this.material[ this.book ] ).sort(
+                    function ( a, b ) {
+                        return a - b;
+                    }
+                );
+
+                this.chapter = null;
+                this.$nextTick( function () {
+                    this.chapter = this.chapters[0];
+                } );
+            },
+            chapter: function () {
+                if ( !! this.chapter ) {
+                    this.verses = this.material[ this.book ][ this.chapter ];
+
+                    this.verse = null;
+                    this.$nextTick( function () {
+                        this.verse  = this.verses[1].verse;
+                    } );
+                }
+            },
+            verse: function () {
+                if ( !! this.verse ) {
+                    window.location.href = "#v" + this.verse;
+                    this.$emit( "reference-change", this.book, this.chapter, this.verse );
+                }
+            }
+        },
+        methods: {
+            reference_click: function (verse) {
+                this.$emit( "reference-click", verse );
+            }
+        }
     } );
 </script>
