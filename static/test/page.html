@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name=viewport content="width=device-width, initial-scale=1">
+
+        <link rel="import" href="vue/hello_world.html">
+        <link rel="import" href="vue/message.html">
+        <link rel="import" href="app.js">
+
+        <style>
+            body {
+                background-color: ghostwhite;
+                font: 12px sans-serif;
+            }
+
+            [v-cloak] {
+                display: none;
+            }
+        </style>
+
+        <title>Test Page</title>
+    </head>
+    <body>
+        <h1>Test Page</h1>
+
+        <div id="app" v-cloak>
+            <h2>Tests</h2>
+            <p>Local Data: <b>{{ message }}</b></p>
+            <p>Local Component: <b><local-component></local-component></b></p>
+            <p>Vue Component: <b><hello-world></hello-world></b></p>
+            <hr>
+            <message message="This is a message." v-on:clicked-message="something_happened"></message>
+        </div>
+
+        <script src="https://vuejs.org/js/vue.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue-resource"></script>
+        <script src="/js/import_links.js"></script>
+    </body>
+</html>

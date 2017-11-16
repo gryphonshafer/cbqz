@@ -1,0 +1,194 @@
+<script type="text/x-template" id="material-lookup-template">
+    <div id="material_lookup">
+        <span class="label">Ref:</span>
+
+        <select v-model="book">
+            <option v-for="item in books">{{ item }}</option>
+        </select>
+        <select v-model="chapter">
+            <option v-for="item in chapters">{{ item }}</option>
+        </select>
+        <select v-model="verse">
+            <option v-for="item in verses">{{ item.verse }}</option>
+        </select>
+        <button v-on:click="enter_reference">Enter Reference <span class="key_text">Alt+R</span></button>
+
+        <div id="material_lookup_display">
+            <a
+                v-for="item in verses"
+                v-bind:name="'v' + item.verse"
+                v-bind:class="{
+                    htmlarea: true,
+                    selected: verse == item.verse
+                }"
+            >
+                <span class="outdent">
+                    <b class="material_para_markers" v-if="item.is_new_para">&para;</b>
+
+                    <b v-if="clickable" class="clickable_reference" v-on:click="reference_click(item)"
+                        >{{ item.chapter + ':' + item.verse }}</b>
+                    <b v-else>{{ item.chapter + ':' + item.verse }}</b>
+
+                    <span class="material_key_markers">
+                        <template v-if="item.key_class">
+                            {{ ( item.key_class == 'range' ) ? '&Dagger;' : '&dagger;' }}
+                            {{ ( item.key_type ) ? item.key_type : '' }}
+                        </template>
+                        <template v-else>
+                            -
+                        </template>
+                    </span>
+
+                    <span v-html="item.text"></span>
+                </span>
+            </a>
+        </div>
+    </div>
+</script>
+
+<script type="text/javascript">
+    Vue.component( 'material-lookup', {
+        template: '#material-lookup-template',
+        data: function () {
+            return {
+                books    : null,
+                chapters : null,
+                verses   : null,
+                book     : null,
+                chapter  : null,
+                verse    : null,
+                auto_set : false,
+            };
+        },
+        props: {
+            clickable: {
+                type: String,
+                default: ""
+            },
+            material: {
+                type: Object,
+                default: function () {
+                    return {
+                        "No Data": {
+                            1: {
+                                1: {
+                                    book        : "No Data",
+                                    chapter     : 1,
+                                    verse       : 1,
+                                    is_new_para : 0,
+                                    key_class   : null,
+                                    key_type    : null,
+                                    text        : "No material data loaded."
+                                }
+                            }
+                        }
+                    };
+                }
+            },
+            lookup: {
+                type    : Object,
+                default : function () {
+                    return {
+                        book    : null,
+                        chapter : null,
+                        verse   : null
+                    };
+                }
+            }
+        },
+        mounted: function () {
+            this.books = Object.keys( this.material );
+            this.book  = this.books[0];
+        },
+        computed: {
+            lookup_reference: function () {
+                return this.lookup.book + " " + this.lookup.chapter + ":" + this.lookup.verse
+            }
+        },
+        watch: {
+            book: function () {
+                this.chapters = Object.keys( this.material[ this.book ] ).sort(
+                    function ( a, b ) {
+                        return a - b;
+                    }
+                );
+
+                if ( ! this.auto_set ) {
+                    this.chapter = null;
+                    this.$nextTick( function () {
+                        this.chapter = this.chapters[0];
+                    } );
+                }
+            },
+            chapter: function () {
+                if ( !! this.chapter ) {
+                    this.verses = this.material[ this.book ][ this.chapter ];
+
+                    if ( ! this.auto_set ) {
+                        this.verse = null;
+                        this.$nextTick( function () {
+                            this.verse  = this.verses[1].verse;
+                        } );
+                    }
+                }
+            },
+            verse: function () {
+                if ( !! this.verse ) {
+                    window.location.href = "#v" + this.verse;
+                    this.$emit( "reference-change", this.book, this.chapter, this.verse );
+                }
+            },
+            lookup_reference: function () {
+                this.reference_lookup();
+            }
+        },
+        methods: {
+            reference_lookup: function ( book, chapter, verse ) {
+                if ( ! book )    book    = this.lookup.book;
+                if ( ! chapter ) chapter = this.lookup.chapter;
+                if ( ! verse )   verse   = this.lookup.verse;
+
+                this.auto_set = true;
+                this.book     = book;
+
+                this.$nextTick( function () {
+                    this.chapter = chapter;
+
+                    this.$nextTick( function () {
+                        this.verse = verse;
+
+                        this.$nextTick( function () {
+                            this.auto_set = false;
+                        } );
+                    } );
+                } );
+            },
+            reference_click: function (verse) {
+                this.$emit( "reference-click", verse );
+            },
+            enter_reference: function () {
+                var reference = prompt("Enter a reference to lookup:");
+
+                if ( !! reference ) {
+                    var parts = reference
+                        .toLowerCase()
+                        .replace( /(^\s+|\s+$)/, "" )
+                        .replace( /[\W\s]+/g, " " )
+                        .split(/\s+/);
+
+                    var verse   = parts.pop() || this.verse;
+                    var chapter = parts.pop() || this.chapter;
+                    var book    = parts.join("");
+
+                    book = ( book.length > 0 )
+                        ? this.books.find( function (element) {
+                            return element.toLowerCase().replace( /[\W\s]+/g, "" ).indexOf(book) == 0;
+                        } )
+                        : this.book;
+
+                    this.reference_lookup( book, chapter, verse );
+                }
+            }
+        }
+    } );
+</script>

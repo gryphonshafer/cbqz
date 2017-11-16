@@ -106,7 +106,7 @@ sub startup ( $self, $app = undef ) {
     $self->renderer->default_handler('tt');
 
     # pre-load controllers
-    load_class( 'CBQZ::Control::' . $_ ) for qw( Main Editor );
+    load_class( 'CBQZ::Control::' . $_ ) for qw( Main Editor Quizroom );
 
     # before dispatch tasks
     $self->hook( 'before_dispatch' => sub ($self) {
@@ -134,7 +134,7 @@ sub startup ( $self, $app = undef ) {
                 $self->stash( 'user' => $user );
             }
             else {
-                $self->session->{'user_id'};
+                delete $self->session->{'user_id'};
             }
         }
     });
@@ -154,7 +154,8 @@ sub startup ( $self, $app = undef ) {
         );
 
         $self->info('Login required but not yet met');
-        return $self->redirect_to('/');
+        $self->redirect_to('/');
+        return 0;
     } );
 
     $authorized_user->any('/:controller')->to( action => 'index' );
