@@ -1,0 +1,174 @@
+<script type="text/x-template" id="material-search-template">
+    <div id="material_search">
+        <div class="margin_lift">
+            <input ref="search_text_input" v-model="search_text" placeholder="Search Text">
+            <button v-on:click="go">Go</button>
+            <button v-on:click="find">Find <span class="key_text">Alt+F, F4</span></button>
+        </div>
+
+        <div id="material_search_display">
+            <a
+                v-for="item in matched_verses"
+                v-bind:name="'material_search_display_' + item.verse"
+                v-bind:class="{
+                    htmlarea: true,
+                    selected: lookup.book == item.book && lookup.chapter == item.chapter && lookup.verse == item.verse
+                }"
+            >
+                <span class="outdent">
+                    <b class="material_para_markers" v-if="item.is_new_para">&para;</b>
+
+                    <b v-if="clickable" class="clickable_reference" v-on:click="reference_click(item)"
+                        >{{ item.book + ' ' + item.chapter + ':' + item.verse }}</b>
+                    <b v-else>{{ item.book + ' ' + item.chapter + ':' + item.verse }}</b>
+
+                    <span class="material_key_markers">
+                        <template v-if="item.key_class">
+                            {{ ( item.key_class == 'range' ) ? '&Dagger;' : '&dagger;' }}
+                            {{ ( item.key_type ) ? item.key_type : '' }}
+                        </template>
+                        <template v-else>
+                            -
+                        </template>
+                    </span>
+
+                    <span v-html="item.text"></span>
+                </span>
+            </a>
+        </div>
+    </div>
+</script>
+
+<script type="text/javascript">
+    Vue.component( 'material-search', {
+        template: '#material-search-template',
+        data: function () {
+            return {
+                search_text    : null,
+                matched_verses : null
+            };
+        },
+        props: {
+            clickable: {
+                type: String,
+                default: ""
+            },
+            material: {
+                type    : Object,
+                default : function () {
+                    return {
+                        "No Data": {
+                            1: {
+                                1: {
+                                    book        : "No Data",
+                                    chapter     : 1,
+                                    verse       : 1,
+                                    is_new_para : 0,
+                                    key_class   : null,
+                                    key_type    : null,
+                                    text        : "No material data loaded."
+                                }
+                            }
+                        }
+                    };
+                }
+            },
+            lookup: {
+                type    : Object,
+                default : function () {
+                    return {
+                        book    : null,
+                        chapter : null,
+                        verse   : null
+                    };
+                }
+            }
+        },
+        methods: {
+            go: function () {
+                this.search();
+            },
+            find: function () {
+                var selection = document.getSelection();
+                if ( selection.rangeCount > 0 && selection.isCollapsed == 0 ) {
+                    var search_text = "";
+                    for ( var i = 0; i < selection.rangeCount; i++ ) {
+                        search_text = search_text + selection.getRangeAt(i).toString();
+                    }
+
+                    this.search_text = search_text;
+                }
+                this.$refs.search_text_input.focus();
+            },
+            search: function () {
+                this.matched_verses = [];
+
+                var search_regex = this.search_text
+                    .toLowerCase()
+                    .replace( /\s+/g, " " )
+                    .replace( /['-]/g, "" )
+                    .replace( /\W/g, function (match) {
+                        return "\\" + match;
+                    } )
+                    .replace( /\w/g, function (match) {
+                        return match + "(<[^>]+>)*['-]*(<[^>]+>)*";
+                    } )
+                    .replace( /\\ /g, " " )
+                    .replace( /(^\s+|\s+$)/g, "\\s" )
+                    .replace( /\s/g, "(<[^>]+>|\\W)+" );
+
+                search_regex += '(?![^<]*>)';
+
+                var books = Object.keys( this.material ).sort();
+                for ( var i = 0; i < books.length; i++ ) {
+                    var chapters = Object.keys( this.material[ books[i] ] ).sort(
+                        function ( a, b ) {
+                            return a - b;
+                        }
+                    );
+
+                    for ( var j = 0; j < chapters.length; j++ ) {
+                        var verses = this.material[ books[i] ][ chapters[j] ];
+                        var verse_numbers = Object.keys(verses).sort(
+                            function ( a, b ) {
+                                return a - b;
+                            }
+                        );
+
+                        for ( var k = 0; k < verse_numbers.length; k++ ) {
+                            var verse_number = verse_numbers[k];
+
+                            if ( verses[verse_number].text.search( RegExp( search_regex, 'i' ) ) != -1 ) {
+                                var text = verses[verse_number].text.replace(
+                                    RegExp( search_regex, 'ig' ),
+                                    function (match) {
+                                        return '<span class="match">[</span>' + match + '<span class="match">]</span>';
+                                    }
+                                );
+
+                                this.matched_verses.push({
+                                    book        : verses[verse_number].book,
+                                    chapter     : verses[verse_number].chapter,
+                                    verse       : verses[verse_number].verse,
+                                    is_new_para : verses[verse_number].is_new_para,
+                                    key_class   : verses[verse_number].key_class,
+                                    key_type    : verses[verse_number].key_type,
+                                    text        : text
+                                });
+                            }
+                        }
+                    }
+                }
+            },
+            reference_click: function (verse) {
+                this.$emit( "reference-click", verse );
+            }
+        },
+        watch: {
+            search_text: function () {
+                this.matched_verses = [];
+                if ( this.search_text.length > 3 ) this.search();
+            }
+        }
+    } );
+</script>

@@ -5,14 +5,23 @@
 
     page.js.push( '/main/path.js' );
     page.links.push( '/js/components/material_lookup.html' );
+    page.links.push( '/js/components/material_search.html' );
     page.links.push( '/js/app/material.js' );
 %]
 
 <div id="material" v-cloak>
-    <material-lookup
+    <material-search
+        ref="material_search"
         v-bind:material="material"
+        v-bind:lookup="lookup"
         clickable="true"
-        v-on:reference-change="reference_change"
-        v-on:reference-click="reference_click"
+        v-on:reference-click="search_reference_click"
+    ></material-search>
+
+    <material-lookup
+        ref="material_lookup"
+        v-bind:material="material"
+        v-bind:lookup="lookup"
+        v-on:reference-change="lookup_reference_change"
     ></material-lookup>
 </div>

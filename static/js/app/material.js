@@ -1,5 +1,5 @@
 Vue.http.get( cntlr + "/material_data" ).then( function (response) {
-    new Vue({
+    var vue_app = new Vue({
         el: '#material',
         data: {
             lookup: {
@@ -10,14 +10,28 @@ Vue.http.get( cntlr + "/material_data" ).then( function (response) {
             material: response.body.material
         },
         methods: {
-            reference_change: function ( book, chapter, verse ) {
+            lookup_reference_change: function ( book, chapter, verse ) {
                 this.lookup.book    = book;
                 this.lookup.chapter = chapter;
                 this.lookup.verse   = verse;
             },
-            reference_click: function (verse) {
-                console.log(verse);
+            search_reference_click: function (verse) {
+                this.lookup.book    = verse.book;
+                this.lookup.chapter = verse.chapter;
+                this.lookup.verse   = verse.verse;
             }
         }
     });
+
+    document.addEventListener( "keyup", function(event) {
+        event.preventDefault();
+
+        // for Alt+F, F4: Find Text
+        if ( ( event.altKey && event.keyCode == 70 ) || event.keyCode == 115 )
+            vue_app.$refs.material_search.find();
+
+        // for Alt+R: Prompt for Reference
+        if ( event.altKey && event.keyCode == 82 )
+            vue_app.$refs.material_lookup.enter_reference();
+    } );
 });

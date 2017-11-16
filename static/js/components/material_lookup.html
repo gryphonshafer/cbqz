@@ -11,6 +11,7 @@
         <select v-model="verse">
             <option v-for="item in verses">{{ item.verse }}</option>
         </select>
+        <button v-on:click="enter_reference">Enter Reference <span class="key_text">Alt+R</span></button>
 
         <div id="material_lookup_display">
             <a
@@ -51,11 +52,12 @@
         data: function () {
             return {
                 books    : null,
-                book     : null,
                 chapters : null,
-                chapter  : null,
                 verses   : null,
-                verse    : null
+                book     : null,
+                chapter  : null,
+                verse    : null,
+                auto_set : false,
             };
         },
         props: {
@@ -82,11 +84,26 @@
                         }
                     };
                 }
+            },
+            lookup: {
+                type    : Object,
+                default : function () {
+                    return {
+                        book    : null,
+                        chapter : null,
+                        verse   : null
+                    };
+                }
             }
         },
         mounted: function () {
             this.books = Object.keys( this.material );
             this.book  = this.books[0];
+        },
+        computed: {
+            lookup_reference: function () {
+                return this.lookup.book + " " + this.lookup.chapter + ":" + this.lookup.verse
+            }
         },
         watch: {
             book: function () {
@@ -96,19 +113,23 @@
                     }
                 );
 
-                this.chapter = null;
-                this.$nextTick( function () {
-                    this.chapter = this.chapters[0];
-                } );
+                if ( ! this.auto_set ) {
+                    this.chapter = null;
+                    this.$nextTick( function () {
+                        this.chapter = this.chapters[0];
+                    } );
+                }
             },
             chapter: function () {
                 if ( !! this.chapter ) {
                     this.verses = this.material[ this.book ][ this.chapter ];
 
-                    this.verse = null;
-                    this.$nextTick( function () {
-                        this.verse  = this.verses[1].verse;
-                    } );
+                    if ( ! this.auto_set ) {
+                        this.verse = null;
+                        this.$nextTick( function () {
+                            this.verse  = this.verses[1].verse;
+                        } );
+                    }
                 }
             },
             verse: function () {
@@ -116,11 +137,57 @@
                     window.location.href = "#v" + this.verse;
                     this.$emit( "reference-change", this.book, this.chapter, this.verse );
                 }
+            },
+            lookup_reference: function () {
+                this.reference_lookup();
             }
         },
         methods: {
+            reference_lookup: function ( book, chapter, verse ) {
+                if ( ! book )    book    = this.lookup.book;
+                if ( ! chapter ) chapter = this.lookup.chapter;
+                if ( ! verse )   verse   = this.lookup.verse;
+
+                this.auto_set = true;
+                this.book     = book;
+
+                this.$nextTick( function () {
+                    this.chapter = chapter;
+
+                    this.$nextTick( function () {
+                        this.verse = verse;
+
+                        this.$nextTick( function () {
+                            this.auto_set = false;
+                        } );
+                    } );
+                } );
+            },
             reference_click: function (verse) {
                 this.$emit( "reference-click", verse );
+            },
+            enter_reference: function () {
+                var reference = prompt("Enter a reference to lookup:");
+
+                if ( !! reference ) {
+                    var parts = reference
+                        .toLowerCase()
+                        .replace( /(^\s+|\s+$)/, "" )
+                        .replace( /[\W\s]+/g, " " )
+                        .split(/\s+/);
+
+                    var verse   = parts.pop() || this.verse;
+                    var chapter = parts.pop() || this.chapter;
+                    var book    = parts.join("");
+
+                    book = ( book.length > 0 )
+                        ? this.books.find( function (element) {
+                            return element.toLowerCase().replace( /[\W\s]+/g, "" ).indexOf(book) == 0;
+                        } )
+                        : this.book;
+
+                    this.reference_lookup( book, chapter, verse );
+                }
             }
         }
     } );
