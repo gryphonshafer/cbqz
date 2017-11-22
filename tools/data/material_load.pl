@@ -95,7 +95,7 @@ range.
 The materials data file is expected to be comma-separated values file with each
 row representing a verse. The first column is either going to be "not_para" or
 "para" indicating if the verse is the start of a new paragraph. The second
-column is either going to be "not_key" or "key" indicating if the  verse is a
+column is either going to be "not_key" or "key" indicating if the verse is a
 key verse of any kind. The next 3 columns are book name, chapter, and verse
 number.
 
