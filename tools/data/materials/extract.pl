@@ -30,15 +30,20 @@ for my $pattern ( @{ $settings->{files} } ) {
         my ( $chapter_n, $is_para );
         $dom->at('div.passage-bible div.passage-content div:first-child')->find('span.text')->each( sub {
             my ($verse) = @_;
+            my $first_verse = 0;
 
             if ( not $chapter_n and my $chapternum = $verse->at('span.chapternum') ) {
                 ( $chapter_n = $chapternum->text ) =~ s/\D//g;
                 $chapternum->remove;
+                $first_verse = 1;
             }
 
-            if ( my $versenum = $verse->at('sup.versenum') ) {
-                ( my $verse_n = $versenum->text ) =~ s/\D//g;
-                $versenum->remove;
+            if ( my $versenum = $verse->at('sup.versenum') or $first_verse ) {
+                my $verse_n = 1;
+                if ($versenum) {
+                    ( $verse_n = $versenum->text ) =~ s/\D//g;
+                    $versenum->remove;
+                }
 
                 my $text = unidecode( $verse->all_text );
                 $text =~ s/\s*\[[^\]]*\]\s*/ /g;

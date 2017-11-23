@@ -39,14 +39,14 @@ my $ins_material = $dq->sql(q{
 
 for ( @{ csv( in => $settings->{material} ) } ) {
     my $verse;
-    @$verse{ qw( para key book chapter verse text ) } = @$_;
+    @$verse{ qw( para book chapter verse text ) } = @$_;
 
     $ins_material->run(
         $set_id,
         @$verse{ qw( book chapter verse text ) },
         $kvl->{ $verse->{book} }{ $verse->{chapter} }{ $verse->{verse} }{key_class},
         $kvl->{ $verse->{book} }{ $verse->{chapter} }{ $verse->{verse} }{key_type},
-        ( ( $verse->{para} =~ /^not_/ ) ? 0 : 1 ),
+        $verse->{para},
     );
 }
 
@@ -93,11 +93,9 @@ range.
 =head2 Materials Data File
 
 The materials data file is expected to be comma-separated values file with each
-row representing a verse. The first column is either going to be "not_para" or
-"para" indicating if the verse is the start of a new paragraph. The second
-column is either going to be "not_key" or "key" indicating if the verse is a
-key verse of any kind. The next 3 columns are book name, chapter, and verse
-number.
+row representing a verse. The first column is either going to be "0" or "1"
+indicating if the verse is the start of a new paragraph. The next 3 columns are
+book name, chapter, and verse number.
 
 The last column is the verse text, expected to be in HTML compliant with
 what CBQZ internally expects the database content value to support. What this

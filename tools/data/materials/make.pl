@@ -18,7 +18,7 @@ my $data = [ map {
             $_;
         }
         map {
-            s/[^A-z0-9'\-]/ /g;
+            s/[^A-Za-z0-9'\-]/ /gi;
             s/(?<!\w)'/ /g;
             s/\-{2,}/ /g;
             s/\s+/ /g;
@@ -64,58 +64,49 @@ my $unique_phrases = [
     map { $phrases_map->{$_}{set} } grep { $phrases_map->{$_}{count} == 1 } keys %$phrases_map
 ];
 
+my $x   = qr![^A-Za-z0-9'\-]!;
+my $not = qr!$x+|$x*\-{2}$x*!;
+
 $| = 1;
 for my $verse (@$data) {
     for (@$unique_phrases) {
         my ( $word_a, $word_b ) = @$_;
 
         $verse->{text} =~ s!
-            ^($word_a)
-            ([^A-z0-9'\-]+|[^A-z0-9'\-]*\-\-[^A-z0-9'\-]*)
-            ($word_b)
-            (?=[^A-z0-9']|\-\-)
-            |
-            ([^A-z0-9']|\-\-)
-            ($word_a)
-            ([^A-z0-9'\-]+|[^A-z0-9'\-]*\-\-[^A-z0-9'\-]*)
-            ($word_b)
-            (?=[^A-z0-9']|\-\-)
-            |
-            ([^A-z0-9']|\-\-)
-            ($word_a)
-            ([^A-z0-9'\-]+|[^A-z0-9'\-]*\-\-[^A-z0-9'\-]*)
-            ($word_b)$
+            ^($word_a)($not)($word_b)(?=$not)|
+            ($not)($word_a)($not)($word_b)(?=$not)|
+            ($not)($word_a)($not)($word_b)$
         !
-            ($1) ?      '<^>' . $1 . $2 .  $3  . '</^>' :
-            ($5) ? $4 . '<^>' . $5 .  $6 . $7  . '</^>' :
-            ($9) ? $8 . '<^>' . $9 . $10 . $11 . '</^>' : ' ~~~ERROR~~~ '
+            ($1) ?      '^' . $1 . '/^' .  $2 . '^' .  $3 . '/^' :
+            ($5) ? $4 . '^' . $5 . '/^' .  $6 . '^' .  $7 . '/^' :
+            ($9) ? $8 . '^' . $9 . '/^' . $10 . '^' . $11 . '/^' : ''
         !iex;
     }
+
+    $verse->{text} =~ s!\^{2,}!\^!g;
+    $verse->{text} =~ s!(?:/\^){2,}!/\^!g;
 
     my $markup = sub {
         my ( $mark, $words ) = @_;
 
-        $verse->{text} =~ s!
-            ^($_)(?=[^A-z0-9'\-])
-            |
-            (?<=[^A-z0-9'\-])($_)(?=[^A-z0-9'\-])
-            |
-            (?<=[^A-z0-9'\-])($_)$
-        !
-            '<' . $mark . '>' . ( $1 || $2 || $3 ) . '</' . $mark . '>'
-        !iex for (@$words);
+        for (@$words) {
+            $verse->{text} =~ s!
+                ^($_)(?=$x)|
+                (?<=$x)($_)(?=$x)|
+                (?<=$x)($_)$
+            !
+                $mark . ( $1 || $2 || $3 ) . '/' . $mark
+            !iex;
+        }
     };
 
-    $markup->( '_', $unique_words_by_chapter->{ $verse->{book} . ' ' . $verse->{chapter} } );
+    $markup->( '+', $unique_words_by_chapter->{ $verse->{book} . ' ' . $verse->{chapter} } );
     $markup->( '*', $unique_words );
 
-    $verse->{text} =~ s!<_>(<\*>)!$1!g;
-    $verse->{text} =~ s!(</\*>)</_>!$1!g;
-
-    # $verse->{text} =~ s!<\*>!<span class="unique_word">!g;
-    # $verse->{text} =~ s!<_>!<span class="unique_chapter">!g;
-    # $verse->{text} =~ s!<\^>!<span class="unique_phrase">!g;
-    # $verse->{text} =~ s!</[\*_\^]>!</span>!g;
+    $verse->{text} =~ s!/[\*\+\^]!</span>!g;
+    $verse->{text} =~ s!\*!<span class="unique_word">!g;
+    $verse->{text} =~ s!\+!<span class="unique_chapter">!g;
+    $verse->{text} =~ s!\^!<span class="unique_phrase">!g;
 
     print '.';
 }
