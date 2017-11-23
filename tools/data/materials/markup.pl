@@ -116,7 +116,7 @@ csv( in => [ map { [ @$_{ qw( is_para book chapter verse text ) } ] } @$data ], 
 
 =head1 NAME
 
-make.pl - Make a materials data file from extracted output content files
+markup.pl - Markup a materials data file from extracted output content files
 
 =head1 SYNOPSIS
 
@@ -128,4 +128,4 @@ make.pl - Make a materials data file from extracted output content files
 
 =head1 DESCRIPTION
 
-This program will make a materials data file from extracted output content files.
+This program will markup a materials data file from extracted output content files.
