@@ -64,7 +64,7 @@ CREATE TABLE material (
     key_type TINYTEXT NULL,
     is_new_para BOOL NOT NULL DEFAULT 0,
 PRIMARY KEY(material_id),
-UNIQUE INDEX reference( book, chapter, verse ),
+UNIQUE INDEX reference( material_set_id, book, chapter, verse ),
 FOREIGN KEY(material_set_id)
     REFERENCES material_set(material_set_id)
     ON DELETE CASCADE

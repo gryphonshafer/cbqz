@@ -34,6 +34,8 @@ feature 'tools', 'Tools and Etc.' => sub {
     requires 'Parse::RecDescent';
     requires 'Util::CommandLine';
     requires 'Text::CSV_XS';
+    requires 'Encode';
+    requires 'Text::Unidecode';
 };
 
 feature 'deploy', 'Deployment' => sub {
