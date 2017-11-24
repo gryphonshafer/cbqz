@@ -49,7 +49,7 @@ for my $pattern ( @{ $settings->{files} } ) {
                     }
 
                     my $text = unidecode( $span->all_text );
-                    $text =~ s/\s*\[[^\]]*\]\s*/ /g;
+                    $text =~ s/\[[^\]]*\]//g;
                     $text =~ s/\s{2,}/ /g;
                     $text =~ s/(?:^\s+|\s+$)//g;
 
