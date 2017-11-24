@@ -121,7 +121,7 @@ markup.pl - Markup a materials data file from extracted output content files
 =head1 SYNOPSIS
 
     fetch.pl OPTIONS
-        -i|input INPUT_FILE
+        -i|input  INPUT_FILE
         -o|output OUTPUT_FILE
         -h|help
         -m|man

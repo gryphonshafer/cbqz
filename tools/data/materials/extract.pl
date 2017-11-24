@@ -23,43 +23,51 @@ for my $pattern ( @{ $settings->{files} } ) {
     for my $file ( <"$data_dir/$pattern"> ) {
         my $dom = Mojo::DOM->new( slurp($file) );
 
-        my @book_chapter = split( ' ', $dom->at('h1.bcv')->text );
-        ( my $chapter = pop @book_chapter ) =~ s/(?:^0+|\D+)//g;
-        my $book = join( ' ', @book_chapter );
+        my ( $book, $chapter, $verse, $is_para );
+        $dom->at('div.passage-bible div.passage-content div:first-child')->children->each( sub {
+            my ($node) = @_;
 
-        my ( $chapter_n, $is_para );
-        $dom->at('div.passage-bible div.passage-content div:first-child')->find('span.text')->each( sub {
-            my ($verse) = @_;
-            my $first_verse = 0;
-
-            if ( not $chapter_n and my $chapternum = $verse->at('span.chapternum') ) {
-                ( $chapter_n = $chapternum->text ) =~ s/\D//g;
-                $chapternum->remove;
-                $first_verse = 1;
+            if ( $node->tag eq 'h1' ) {
+                my @book_chapter = split( ' ', $node->at('span.passage-display-bcv')->text );
+                ( $chapter = pop @book_chapter ) =~ s/(?:^0+|\D+)//g;
+                $book = join( ' ', @book_chapter );
             }
-
-            if ( my $versenum = $verse->at('sup.versenum') or $first_verse ) {
-                my $verse_n = 1;
-                if ($versenum) {
-                    ( $verse_n = $versenum->text ) =~ s/\D//g;
-                    $versenum->remove;
-                }
-
-                my $text = unidecode( $verse->all_text );
-                $text =~ s/\s*\[[^\]]*\]\s*/ /g;
-
-                push( @$data, [
-                    $is_para // 1,
-                    $book,
-                    $chapter,
-                    $verse_n,
-                    $text,
-                ] );
-
-                $is_para = 0;
+            elsif ( $node->tag eq 'h3' ) {
+                $is_para = 1;
             }
             else {
-                $is_para = 1;
+                $node->find('span.text')->each( sub {
+                    my ($span) = @_;
+
+                    if ( my $chapternum = $span->at('span.chapternum') ) {
+                        $chapternum->remove;
+                    }
+
+                    if ( my $versenum = $span->at('sup.versenum') ) {
+                        ( $verse = $versenum->text ) =~ s/\D//g;
+                        $versenum->remove;
+                    }
+
+                    my $text = unidecode( $span->all_text );
+                    $text =~ s/\s*\[[^\]]*\]\s*/ /g;
+                    $text =~ s/\s{2,}/ /g;
+                    $text =~ s/(?:^\s+|\s+$)//g;
+
+                    unless ( @$data and $verse and $data->[-1][3] == $verse ) {
+                        push( @$data, [
+                            $is_para // 1,
+                            $book,
+                            $chapter,
+                            $verse // 1,
+                            $text,
+                        ] );
+                    }
+                    else {
+                        $data->[-1][4] .= ' ' . $text;
+                    }
+                } );
+
+                $is_para = 0;
             }
         } );
     }
