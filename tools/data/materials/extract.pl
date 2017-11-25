@@ -9,7 +9,9 @@ use CBQZ;
 use CBQZ::Util::File 'slurp';
 
 my $settings = options( qw( directory|d=s files|f=s@ output|o=s ) );
-pod2usage unless ( $settings->{files} and $settings->{output} );
+pod2usage unless ( $settings->{output} );
+
+$settings->{files} //= ['*'];
 
 my $cbqz     = CBQZ->new;
 my $data_dir = join( '/',
@@ -47,6 +49,9 @@ for my $pattern ( @{ $settings->{files} } ) {
                         ( $verse = $versenum->text ) =~ s/\D//g;
                         $versenum->remove;
                     }
+                    else {
+                        $verse //= 1,
+                    }
 
                     my $text = unidecode( $span->all_text );
                     $text =~ s/\[[^\]]*\]//g;
@@ -58,7 +63,7 @@ for my $pattern ( @{ $settings->{files} } ) {
                             $is_para // 1,
                             $book,
                             $chapter,
-                            $verse // 1,
+                            $verse,
                             $text,
                         ] );
                     }
@@ -82,9 +87,9 @@ extract.pl - Extract materials from raw HTML content and build input files
 =head1 SYNOPSIS
 
     fetch.pl OPTIONS
-        -d|directory
-        -f|files FILE_PATTERN
-        -o|output OUTPUT_FILE
+        -d|directory DIRECTORY    (Optional; default: "html")
+        -f|files     FILE_PATTERN (Optional; default: "*")
+        -o|output    OUTPUT_FILE
         -h|help
         -m|man
 
