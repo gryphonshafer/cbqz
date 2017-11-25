@@ -45,6 +45,8 @@ sub error ( $text, $data ) {
 }
 
 sub type_fork ($data) {
+    $data->{$_} =~ s/<[^>]*>//g for ( qw( question answer ) );
+
     if ( $data->{type} eq 'INT' or $data->{type} eq 'MA' ) {
         $data = process_question( $data, 0, 5, 0 );
         return unless ($data);
