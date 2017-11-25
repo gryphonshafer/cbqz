@@ -3,6 +3,7 @@ use exact;
 use Config::App;
 use Util::CommandLine qw( options pod2usage );
 use Mojo::DOM;
+use Time::Out 'timeout';
 use CBQZ;
 
 my $settings = options( qw( questions|q=s materials|m=s mark|k ) );
@@ -130,11 +131,8 @@ sub fix ($text) {
 
 sub search ( $text, $book, $chapter, $verse, $range ) {
     $text = regex($text);
-    return
-        grep { defined }
-        map {
-            ( $_->{text} =~ /($text)/i ) ? { verse => $_, match => fix($1) } : undef
-        }
+
+    my @matches =
         map { $_->[0] }
         sort { $a->[1] <=> $b->[1] }
         map { [ $_, abs( $verse - $_->{verse} ) ] }
@@ -145,6 +143,18 @@ sub search ( $text, $book, $chapter, $verse, $range ) {
             $_->{verse} <= $verse + $range
         }
         @$material;
+
+    my @filtered_matches;
+    timeout 5 => sub {
+        @filtered_matches =
+            grep { defined }
+            map {
+                ( $_->{text} =~ /($text)/i ) ? { verse => $_, match => fix($1) } : undef
+            }
+            @matches;
+    };
+
+    return @filtered_matches;
 }
 
 sub case ($text) {
