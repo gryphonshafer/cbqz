@@ -70,9 +70,9 @@ for my $pattern ( @{ $settings->{files} } ) {
                     else {
                         $data->[-1][4] .= ' ' . $text;
                     }
-                } );
 
-                $is_para = 0;
+                    $is_para = 0;
+                } );
             }
         } );
     }
