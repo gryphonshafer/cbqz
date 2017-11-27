@@ -58,7 +58,12 @@ sub type_fork ($data) {
         $data->{type} eq 'MACR' or $data->{type} eq 'MACVR'
     ) {
         $data->{question} =~ s/ac\w*\sto\s+(\d\s+)?\w+[,\s]+c\w*\s*\d+(?:[,\s]+v\w*\s*\d+)?[\s:,]*//i;
-        $data = process_question( $data, 1, ( ( $data->{type} eq 'CVR' or $data->{type} eq 'MACVR' ) ? 0 : 5 ), 0 );
+        $data = process_question(
+            $data,
+            'answer_only',
+            ( ( $data->{type} eq 'CVR' or $data->{type} eq 'MACVR' ) ? 0 : 5 ),
+            0,
+        );
         return unless ($data);
         $data->{question} =
             'According to ' . $data->{book} . ', chapter ' . $data->{chapter} .
@@ -205,7 +210,7 @@ sub process_question ( $data, $skip_casing, $range, $skip_interogative ) {
     }
 
     $match = $matches[0]->{match};
-    $match = case($match) unless ($skip_casing);
+    $match = case($match) unless ( $skip_casing and $skip_casing ne 'answer_only' );
     $data->{answer} = $match;
 
     return $data;
