@@ -1,53 +1,58 @@
-document.addEventListener( "keyup", function(event) {
-    event.preventDefault();
-
-    // for Alt+Q: Reset Formatting
-    if ( event.altKey && event.keyCode == 81 ) document.getElementById("format_reset").click();
-
-    // for Alt+W, Ctrl+B: Global Unique
-    if ( ( event.altKey && event.keyCode == 87 ) || ( event.ctrlKey && event.keyCode == 66 ) )
-        document.getElementById("format_unique_word").click();
-
-    // for Alt+E, Ctrl+I: Chapter Unique
-    if ( ( event.altKey && event.keyCode == 69 ) || ( event.ctrlKey && event.keyCode == 73 ) )
-        document.getElementById("format_unique_chapter").click();
-
-    // for Alt+R, Ctrl+U: Unique Phrase
-    if ( ( event.altKey && event.keyCode == 82 ) || ( event.ctrlKey && event.keyCode == 85 ) )
-        document.getElementById("format_unique_phrase").click();
-
-    // for Alt+G, F2: Lookup Verse
-    if ( ( event.altKey && event.keyCode == 71 ) || event.keyCode == 113 )
-        document.getElementById("lookup").click();
-
-    // for Alt+F, F4: Find Text
-    if ( ( event.altKey && event.keyCode == 70 ) || event.keyCode == 115 )
-        document.getElementById("find").click();
-
-    // for Alt+V: Copy Verse
-    if ( event.altKey && event.keyCode == 86 ) document.getElementById("copy_verse").click();
-
-    // for Alt+A, F8: Save As New
-    if ( ( event.altKey && event.keyCode == 65 ) || event.keyCode == 119 )
-        document.getElementById("save_new").click();
-
-    // for Alt+S, F9: Save Changes
-    if ( ( event.altKey && event.keyCode == 83 ) || event.keyCode == 120 )
-        document.getElementById("save_changes").click();
-
-    // for Alt+X: Delete
-    if ( event.altKey && event.keyCode == 88 ) document.getElementById("delete_question").click();
-
-    // for Alt+C: Clear
-    if ( event.altKey && event.keyCode == 67 ) document.getElementById("clear_form").click();
-} );
-
 Vue.http.get( cntlr + "/data" ).then( function (response) {
-    new Vue({
-        el: "#editor",
-        data: response.body,
+    var data = response.body;
+    data.lookup = {
+        book    : null,
+        chapter : null,
+        verse   : null
+    };
 
+    var vue_app = new Vue({
+        el: "#editor",
+        data: data,
         methods: {
+            copy_verse: function () {
+                if (
+                    !! this.question.book &&
+                    parseInt( this.question.chapter ) > 0 &&
+                    parseInt( this.question.verse ) > 0
+                ) {
+                    this.questions.question_id = null;
+
+                    var verse = this.material
+                        [ this.question.book ][ this.question.chapter ][ this.question.verse ];
+
+                    this.question.question = "";
+                    this.question.answer   = "";
+
+                    this.$nextTick( function () {
+                        this.question.question = verse.text;
+                        this.question.answer   = verse.text;
+                    } );
+
+                    this.question.question_id = null;
+                    this.question.used        = null;
+                    this.question.marked      = null;
+                }
+                else {
+                    alert("Incomplete reference; copy verse not possible.");
+                }
+            },
+
+            lookup_reference: function () {
+                if (
+                    !! this.question.book &&
+                    parseInt( this.question.chapter ) > 0 &&
+                    parseInt( this.question.verse ) > 0
+                ) {
+                    this.lookup.book = this.question.book;
+                    this.lookup.chapter = this.question.chapter;
+                    this.lookup.verse = this.question.verse;
+                }
+                else {
+                    alert("Incomplete reference; lookup not possible.");
+                }
+            },
+
             format: function (className) {
                 var selection = document.getSelection();
                 if ( selection.rangeCount > 0 && selection.isCollapsed == 0 ) {
@@ -328,90 +333,6 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 document.getElementById("book").focus();
             },
 
-            lookup: function () {
-                if (
-                    !! this.question.book &&
-                    parseInt( this.question.chapter ) > 0 &&
-                    parseInt( this.question.verse ) > 0
-                ) {
-                    this.material.book = this.question.book;
-                    this.$nextTick( function () {
-                        this.material.chapter = this.question.chapter;
-                        this.$nextTick( function () {
-                            this.material.verse = this.question.verse;
-                        } );
-                    } );
-                }
-                else {
-                    alert("Incomplete reference; lookup not possible.");
-                }
-            },
-
-            find: function () {
-                var selection = document.getSelection();
-                if ( selection.rangeCount > 0 && selection.isCollapsed == 0 ) {
-                    var search_text = "";
-                    for ( var i = 0; i < selection.rangeCount; i++ ) {
-                        search_text = search_text + selection.getRangeAt(i).toString();
-                    }
-
-                    this.material.search = search_text;
-                }
-            },
-
-            copy_verse: function () {
-                if (
-                    !! this.question.book &&
-                    parseInt( this.question.chapter ) > 0 &&
-                    parseInt( this.question.verse ) > 0
-                ) {
-                    this.questions.question_id = null;
-
-                    var verse = this.material.data
-                        [ this.question.book ][ this.question.chapter ][ this.question.verse ];
-
-                    this.question.question = "";
-                    this.question.answer   = "";
-
-                    this.$nextTick( function () {
-                        this.question.question = verse.text;
-                        this.question.answer   = verse.text;
-                    } );
-
-                    this.question.question_id = null;
-                    this.question.used        = null;
-                    this.question.marked      = null;
-                }
-                else {
-                    alert("Incomplete reference; copy verse not possible.");
-                }
-            },
-
-            copy_verse_from_lookup: function (verse) {
-                this.questions.question_id = null;
-
-                this.question.book     = verse.book;
-                this.question.chapter  = verse.chapter;
-                this.question.verse    = verse.verse;
-                this.question.question = verse.text;
-                this.question.answer   = verse.text;
-
-                this.question.question_id = null;
-                this.question.used        = null;
-                this.question.type        = null;
-                this.question.marked      = null;
-            },
-
-            lookup_from_search: function (verse) {
-                this.material.book = verse.book;
-                this.$nextTick( function () {
-                    this.material.chapter = verse.chapter;
-                    this.$nextTick( function () {
-                        this.material.verse = verse.verse;
-                    } );
-                } );
-            },
-
             grep_marked_questions: function () {
                 var marked_questions = [];
 
@@ -428,65 +349,31 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 return marked_questions;
             },
 
-            search: function () {
-                this.material.matched_verses = [];
+            lookup_reference_change: function ( book, chapter, verse ) {
+                this.lookup.book    = book;
+                this.lookup.chapter = chapter;
+                this.lookup.verse   = verse;
+            },
 
-                var search_regex = this.material.search
-                    .toLowerCase()
-                    .replace( /\s+/g, " " )
-                    .replace( /['-]/g, "" )
-                    .replace( /\W/g, function (match) {
-                        return "\\" + match;
-                    } )
-                    .replace( /\w/g, function (match) {
-                        return match + "(<[^>]+>)*['-]*(<[^>]+>)*";
-                    } )
-                    .replace( /\\ /g, " " )
-                    .replace( /(^\s+|\s+$)/g, "\\s" )
-                    .replace( /\s/g, "(<[^>]+>|\\W)+" );
+            lookup_reference_click: function (verse) {
+                this.questions.question_id = null;
 
-                search_regex += '(?![^<]*>)';
+                this.question.book     = verse.book;
+                this.question.chapter  = verse.chapter;
+                this.question.verse    = verse.verse;
+                this.question.question = verse.text;
+                this.question.answer   = verse.text;
 
-                var books = Object.keys( this.material.data ).sort();
-                for ( var i = 0; i < books.length; i++ ) {
-                    var chapters = Object.keys( this.material.data[ books[i] ] ).sort(
-                        function ( a, b ) {
-                            return a - b;
-                        }
-                    );
+                this.question.question_id = null;
+                this.question.used        = null;
+                this.question.type        = null;
+                this.question.marked      = null;
+            },
 
-                    for ( var j = 0; j < chapters.length; j++ ) {
-                        var verses = this.material.data[ books[i] ][ chapters[j] ];
-                        var verse_numbers = Object.keys(verses).sort(
-                            function ( a, b ) {
-                                return a - b;
-                            }
-                        );
-
-                        for ( var k = 0; k < verse_numbers.length; k++ ) {
-                            var verse_number = verse_numbers[k];
-
-                            if ( verses[verse_number].text.search( RegExp( search_regex, 'i' ) ) != -1 ) {
-                                var text = verses[verse_number].text.replace(
-                                    RegExp( search_regex, 'ig' ),
-                                    function (match) {
-                                        return '<span class="match">[</span>' + match + '<span class="match">]</span>';
-                                    }
-                                );
-
-                                this.material.matched_verses.push({
-                                    book        : verses[verse_number].book,
-                                    chapter     : verses[verse_number].chapter,
-                                    verse       : verses[verse_number].verse,
-                                    is_new_para : verses[verse_number].is_new_para,
-                                    key_class   : verses[verse_number].key_class,
-                                    key_type    : verses[verse_number].key_type,
-                                    text        : text
-                                });
-                            }
-                        }
-                    }
-                }
+            search_reference_click: function (verse) {
+                this.lookup.book    = verse.book;
+                this.lookup.chapter = verse.chapter;
+                this.lookup.verse   = verse.verse;
             }
         },
 
@@ -514,33 +401,6 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         },
 
         watch: {
-            "material.book": function () {
-                this.material.chapters = Object.keys( this.material.data[ this.material.book ] ).sort(
-                    function ( a, b ) {
-                        return a - b;
-                    }
-                );
-                this.material.chapter = this.material.chapters[0];
-            },
-
-            "material.chapter": function () {
-                if ( !! this.material.chapter ) {
-                    this.material.verses = this.material.data[ this.material.book ][ this.material.chapter ];
-                    this.material.verse  = this.material.verses[1].verse;
-                }
-            },
-
-            "material.verse": function () {
-                this.$nextTick( function () {
-                    window.location.href = "#v" + this.material.verse;
-                } );
-            },
-
-            "material.search": function () {
-                this.material.matched_verses = [];
-                if ( this.material.search.length > 3 ) this.search();
-            },
-
             "questions.book": function () {
                 if ( !! this.questions.book ) {
                     var sort_by = this.questions.sort_by;
@@ -664,13 +524,58 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         },
 
         mounted: function () {
-            this.material.books = Object.keys( this.material.data );
-            this.material.book  = this.material.books[0];
-
             this.questions.books = Object.keys( this.questions.data ).sort();
             if ( this.questions.books[0] ) this.questions.book = this.questions.books[0];
 
             this.questions.marked_questions = this.grep_marked_questions();
         }
     });
+
+    document.addEventListener( "keyup", function(event) {
+        event.preventDefault();
+
+        // for Alt+V: Copy Verse
+        if ( event.altKey && event.keyCode == 86 ) document.getElementById("copy_verse").click();
+
+        // for Alt+G, F2: Lookup Verse
+        if ( ( event.altKey && event.keyCode == 71 ) || event.keyCode == 113 )
+            document.getElementById("lookup").click();
+
+        // for Alt+Q: Reset Formatting
+        if ( event.altKey && event.keyCode == 81 ) document.getElementById("format_reset").click();
+
+        // for Alt+W, Ctrl+B: Global Unique
+        if ( ( event.altKey && event.keyCode == 87 ) || ( event.ctrlKey && event.keyCode == 66 ) )
+            document.getElementById("format_unique_word").click();
+
+        // for Alt+E, Ctrl+I: Chapter Unique
+        if ( ( event.altKey && event.keyCode == 69 ) || ( event.ctrlKey && event.keyCode == 73 ) )
+            document.getElementById("format_unique_chapter").click();
+
+        // for Alt+R, Ctrl+U: Unique Phrase
+        if ( ( event.altKey && event.keyCode == 82 ) || ( event.ctrlKey && event.keyCode == 85 ) )
+            document.getElementById("format_unique_phrase").click();
+
+        // for Alt+A, F8: Save As New
+        if ( ( event.altKey && event.keyCode == 65 ) || event.keyCode == 119 )
+            document.getElementById("save_new").click();
+
+        // for Alt+S, F9: Save Changes
+        if ( ( event.altKey && event.keyCode == 83 ) || event.keyCode == 120 )
+            document.getElementById("save_changes").click();
+
+        // for Alt+X: Delete
+        if ( event.altKey && event.keyCode == 88 ) document.getElementById("delete_question").click();
+
+        // for Alt+C: Clear
+        if ( event.altKey && event.keyCode == 67 ) document.getElementById("clear_form").click();
+
+        // for Alt+T: Prompt for Reference
+        if ( event.altKey && event.keyCode == 84 )
+            vue_app.$refs.material_lookup.enter_reference();
+
+        // for Alt+F, F4: Find Text
+        if ( ( event.altKey && event.keyCode == 70 ) || event.keyCode == 115 )
+            vue_app.$refs.material_search.find();
+    } );
 } );

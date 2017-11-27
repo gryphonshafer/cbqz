@@ -26,12 +26,7 @@ sub data ($self) {
         question => {
             ( map { $_ => undef } qw( question_id book chapter verse question answer type used marked ) ),
         },
-        material => {
-            data           => $material,
-            search         => undef,
-            matched_verses => undef,
-            ( map { $_ => undef } map { $_, $_ . 's' } qw( book chapter verse ) ),
-        },
+        material  => $material,
         questions => {
             data               => $questions,
             question_id        => undef,

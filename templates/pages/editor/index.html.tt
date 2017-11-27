@@ -2,7 +2,11 @@
     page.title = 'Questions Editor';
     page.menu  = 'editor';
     page.vue   = 1;
-    page.js.push( '/editor/path.js', '/js/app/editor.js' );
+
+    page.js.push('/editor/path.js');
+    page.links.push( '/js/components/material_lookup.html' );
+    page.links.push( '/js/components/material_search.html' );
+    page.links.push( '/js/app/editor.js' );
 %]
 
 <div id="editor" v-cloak>
@@ -20,7 +24,7 @@
                 Copy Verse
                 <span class="key_text">Alt+V</span>
             </button>
-            <button id="lookup" v-on:click="lookup" v-bind:disabled="verse_incomplete">
+            <button id="lookup" v-on:click="lookup_reference" v-bind:disabled="verse_incomplete">
                 Lookup
                 <span class="key_text">Alt+G, F2</span>
             </button>
@@ -123,83 +127,20 @@
         </div>
     </div>
 
-    <div id="material_lookup">
-        <span class="label">Ref:</span>
+    <material-lookup
+        ref="material_lookup"
+        v-bind:material="material"
+        v-bind:lookup="lookup"
+        clickable="true"
+        v-on:reference-change="lookup_reference_change"
+        v-on:reference-click="lookup_reference_click"
+    ></material-lookup>
 
-        <select v-model="material.book">
-            <option v-for="item in material.books">{{ item }}</option>
-        </select>
-        <select v-model="material.chapter">
-            <option v-for="item in material.chapters">{{ item }}</option>
-        </select>
-        <select v-model="material.verse">
-            <option v-for="item in material.verses">{{ item.verse }}</option>
-        </select>
-
-        <div id="material_lookup_display">
-            <a
-                v-for="verse in material.verses"
-                v-bind:name="'v' + verse.verse"
-                v-bind:class="{
-                    htmlarea: true,
-                    selected: material.verse == verse.verse
-                }"
-            >
-                <span class="outdent">
-                    <b class="material_para_markers" v-if="verse.is_new_para">&para;</b>
-                    <b class="clickable_reference" v-on:click="copy_verse_from_lookup(verse)"
-                        >{{ verse.chapter + ':' + verse.verse }}</b>
-
-                    <span class="material_key_markers">
-                        <template v-if="verse.key_class">
-                            {{ ( verse.key_class == 'range' ) ? '&Dagger;' : '&dagger;' }}
-                            {{ ( verse.key_type ) ? verse.key_type : '' }}
-                        </template>
-                        <template v-else>
-                            -
-                        </template>
-                    </span>
-
-                    <span v-html="verse.text"></span>
-                </span>
-            </a>
-        </div>
-    </div>
-
-    <div id="material_search">
-        <div class="margin_lift">
-            <input v-model="material.search" placeholder="Search Text">
-            <button v-on:click="search">Go</button>
-            <button id="find" v-on:click="find">Find <span class="key_text">Alt+F, F4</span></button>
-        </div>
-
-        <div id="material_search_display">
-            <a
-                v-for="verse in material.matched_verses"
-                v-bind:name="'material_search_display_' + verse.verse"
-                v-bind:class="{
-                    htmlarea: true,
-                    selected: material.book == verse.book && material.chapter == verse.chapter && material.verse == verse.verse
-                }"
-            >
-                <span class="outdent">
-                    <b class="material_para_markers" v-if="verse.is_new_para">&para;</b>
-                    <b class="clickable_reference" v-on:click="lookup_from_search(verse)"
-                        >{{ verse.book + ' ' + verse.chapter + ':' + verse.verse }}</b>
-
-                    <span class="material_key_markers">
-                        <template v-if="verse.key_class">
-                            {{ ( verse.key_class == 'range' ) ? '&Dagger;' : '&dagger;' }}
-                            {{ ( verse.key_type ) ? verse.key_type : '' }}
-                        </template>
-                        <template v-else>
-                            -
-                        </template>
-                    </span>
-
-                    <span v-html="verse.text"></span>
-                </span>
-            </a>
-        </div>
-    </div>
+    <material-search
+        ref="material_search"
+        v-bind:material="material"
+        v-bind:lookup="lookup"
+        clickable="true"
+        v-on:reference-click="search_reference_click"
+    ></material-search>
 </div>
