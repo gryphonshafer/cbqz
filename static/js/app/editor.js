@@ -44,9 +44,9 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     parseInt( this.question.chapter ) > 0 &&
                     parseInt( this.question.verse ) > 0
                 ) {
-                    this.lookup.book = this.question.book;
+                    this.lookup.book    = this.question.book;
                     this.lookup.chapter = this.question.chapter;
-                    this.lookup.verse = this.question.verse;
+                    this.lookup.verse   = this.question.verse;
                 }
                 else {
                     alert("Incomplete reference; lookup not possible.");

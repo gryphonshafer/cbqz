@@ -53,12 +53,7 @@ sub data ($self) {
             as_default    => $program->obj->as_default,
             type_ranges   => $self->cbqz->json->decode( $program->obj->question_types ),
         },
-        material => {
-            data           => CBQZ::Model::MaterialSet->new->load( $cbqz_prefs->{material_set_id} )->get_material,
-            search         => undef,
-            matched_verses => undef,
-            ( map { $_ => undef } map { $_, $_ . 's' } qw( book chapter verse ) ),
-        },
+        material  => CBQZ::Model::MaterialSet->new->load( $cbqz_prefs->{material_set_id} )->get_material,
         questions => [
             map {
                 $_->{number} = undef;
