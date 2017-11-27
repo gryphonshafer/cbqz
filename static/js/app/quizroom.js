@@ -7,6 +7,25 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         chapter : null,
         verse   : null
     };
+    data.question = {
+        number   : null,
+        type     : null,
+        as       : null,
+        used     : null,
+        book     : null,
+        chapter  : null,
+        verse    : null,
+        question : null,
+        answer   : null,
+        marked   : null
+    };
+    data.quiz_view_hidden = 1;
+    data.position         = 0;
+    data.timer            = {
+        value : 30,
+        state : "ready",
+        label : "Start Timer",
+    };
 
     var vue_app = new Vue({
         el: "#quizroom",

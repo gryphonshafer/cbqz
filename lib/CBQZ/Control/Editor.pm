@@ -23,19 +23,8 @@ sub data ($self) {
             types => CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} )->types_list,
             books => [ sort { $a cmp $b } keys %$material ],
         },
-        question => {
-            ( map { $_ => undef } qw( question_id book chapter verse question answer type used marked ) ),
-        },
         material  => $material,
-        questions => {
-            data               => $questions,
-            question_id        => undef,
-            marked_question_id => undef,
-            marked_questions   => [],
-            questions          => undef,
-            sort_by            => 'desc_ref',
-            ( map { $_ => undef } map { $_, $_ . 's' } qw( book chapter ) ),
-        },
+        questions => { data => $questions },
     } );
 }
 

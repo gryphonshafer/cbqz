@@ -93,7 +93,6 @@ sub data ($self) {
         program_id      => $cbqz_prefs->{program_id}      || undef,
         question_set_id => $cbqz_prefs->{question_set_id} || undef,
         material_set_id => $cbqz_prefs->{material_set_id} || undef,
-        question_set    => undef,
         question_sets   => [ map {
             my $set = $_->data;
             for ( @{ $set->{statistics} } ) {

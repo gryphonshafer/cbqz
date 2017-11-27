@@ -5,6 +5,26 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         chapter : null,
         verse   : null
     };
+    data.question = {
+        question_id : null,
+        book        : null,
+        chapter     : null,
+        verse       : null,
+        question    : null,
+        answer      : null,
+        type        : null,
+        used        : null,
+        marked      : null
+    };
+    data.questions.question_id        = null;
+    data.questions.marked_question_id = null;
+    data.questions.marked_questions   = [];
+    data.questions.questions          = null;
+    data.questions.sort_by            = "desc_ref";
+    data.questions.book               = null;
+    data.questions.chapter            = null;
+    data.questions.books              = null;
+    data.questions.chapters           = null;
 
     var vue_app = new Vue({
         el: "#editor",

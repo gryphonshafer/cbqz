@@ -62,16 +62,6 @@ sub data ($self) {
                 $_;
             } @{ $quiz->{questions} }
         ],
-        question => {
-            map { $_ => undef } qw( number type as used book chapter verse question answer marked )
-        },
-        quiz_view_hidden => 1,
-        position         => 0,
-        timer            => {
-            value => 30,
-            state => 'ready',
-            label => 'Start Timer',
-        },
         error => ( $quiz->{error} ) ? $quiz->{error} : undef,
     } );
 }

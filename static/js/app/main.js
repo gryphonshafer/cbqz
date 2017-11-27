@@ -1,8 +1,10 @@
 Vue.http.get( cntlr + "/data" ).then( function (response) {
+    var data = response.body;
+    data.question_set = null;
+
     new Vue({
         el: "#main",
-        data: response.body,
-
+        data: data,
         methods: {
             chapter_clicked: function (chapter) {
                 chapter.selected = ! chapter.selected;
