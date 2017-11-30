@@ -355,6 +355,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
             grep_marked_questions: function () {
                 var marked_questions = [];
+                var sort_by          = data.questions.sort_by;
 
                 for ( var book in this.questions.data ) {
                     for ( var chapter in this.questions.data[book] ) {
@@ -366,7 +367,63 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     }
                 }
 
-                return marked_questions;
+                return marked_questions.sort( function ( a, b ) {
+                    if ( sort_by == "desc_ref" ) {
+                        var icmp = b.book.toLowerCase().localeCompare( a.book.toLowerCase() );
+                        if ( icmp != 0 ) return icmp;
+                        if ( a.chapter > b.chapter ) return -1;
+                        if ( a.chapter < b.chapter ) return 1;
+                        if ( a.verse > b.verse ) return -1;
+                        if ( a.verse < b.verse ) return 1;
+
+                        if ( a.type < b.type ) return -1;
+                        if ( a.type > b.type ) return 1;
+                        if ( a.used > b.used ) return -1;
+                        if ( a.used < b.used ) return 1;
+                   }
+                    else if ( sort_by == "ref" ) {
+                        var icmp = a.book.toLowerCase().localeCompare( b.book.toLowerCase() );
+                        if ( icmp != 0 ) return icmp;
+                        if ( a.chapter < b.chapter ) return -1;
+                        if ( a.chapter > b.chapter ) return 1;
+                        if ( a.verse < b.verse ) return -1;
+                        if ( a.verse > b.verse ) return 1;
+
+                        if ( a.type < b.type ) return -1;
+                        if ( a.type > b.type ) return 1;
+                        if ( a.used > b.used ) return -1;
+                        if ( a.used < b.used ) return 1;
+                    }
+                    else if ( sort_by == "type" ) {
+                        if ( a.type < b.type ) return -1;
+                        if ( a.type > b.type ) return 1;
+
+                        var icmp = b.book.toLowerCase().localeCompare( a.book.toLowerCase() );
+                        if ( icmp != 0 ) return icmp;
+                        if ( a.chapter > b.chapter ) return -1;
+                        if ( a.chapter < b.chapter ) return 1;
+                        if ( a.verse > b.verse ) return -1;
+                        if ( a.verse < b.verse ) return 1;
+
+                        if ( a.used > b.used ) return -1;
+                        if ( a.used < b.used ) return 1;
+                    }
+                    else if ( sort_by == "used" ) {
+                        if ( a.used > b.used ) return -1;
+                        if ( a.used < b.used ) return 1;
+                        if ( a.type < b.type ) return -1;
+                        if ( a.type > b.type ) return 1;
+
+                        var icmp = b.book.toLowerCase().localeCompare( a.book.toLowerCase() );
+                        if ( icmp != 0 ) return icmp;
+                        if ( a.chapter > b.chapter ) return -1;
+                        if ( a.chapter < b.chapter ) return 1;
+                        if ( a.verse > b.verse ) return -1;
+                        if ( a.verse < b.verse ) return 1;
+                    }
+
+                    return 0;
+                } );
             },
 
             lookup_reference_change: function ( book, chapter, verse ) {
@@ -540,6 +597,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     this.questions.books = Object.keys( this.questions.data ).sort();
                     if ( this.questions.books[0] ) this.questions.book = this.questions.books[0];
                 } );
+
+                this.questions.marked_questions = this.grep_marked_questions();
             }
         },
 
