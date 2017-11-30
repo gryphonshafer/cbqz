@@ -329,7 +329,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             },
 
             clear_form: function () {
-                this.questions.question_id = null;
+                this.questions.question_id        = null;
+                this.questions.marked_question_id = null;
 
                 this.question.question_id = null;
                 this.question.used        = null;
