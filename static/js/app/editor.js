@@ -20,7 +20,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
     data.questions.marked_question_id = null;
     data.questions.marked_questions   = [];
     data.questions.questions          = null;
-    data.questions.sort_by            = "desc_ref";
+    data.questions.sort_by            = get_cookie("cbqz_editor_sort_by") || "desc_ref";
     data.questions.book               = null;
     data.questions.chapter            = null;
     data.questions.books              = null;
@@ -599,6 +599,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 } );
 
                 this.questions.marked_questions = this.grep_marked_questions();
+
+                set_cookie( "cbqz_editor_sort_by", this.questions.sort_by, 65535 );
             }
         },
 

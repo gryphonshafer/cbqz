@@ -14,7 +14,7 @@ default:
     data: data # location for "data" directory
     optional_include: runtime/config.yaml
     mojolicious:
-        session_cookie_name: cbqz
+        session_cookie_name: cbqz_session
         secrets:
             - acf4631c010fbe6dc0e72b3a8930ebdb
             - 1fb07ba01a3c9f04bf716c28fac3bf15
