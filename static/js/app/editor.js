@@ -26,6 +26,94 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
     data.questions.books              = null;
     data.questions.chapters           = null;
 
+    function delete_question (vue_obj) {
+        delete vue_obj.questions.data
+            [ vue_obj.questions.book ][ vue_obj.questions.chapter ][ vue_obj.questions.question_id ];
+
+        if ( ! Object.keys(
+            vue_obj.questions.data[ vue_obj.questions.book ][ vue_obj.questions.chapter ]
+        ).length )
+            delete vue_obj.questions.data[ vue_obj.questions.book ][ vue_obj.questions.chapter ];
+
+        if ( ! Object.keys(
+            vue_obj.questions.data[ vue_obj.questions.book ]
+        ).length )
+            delete vue_obj.questions.data[ vue_obj.questions.book ];
+
+        if ( ! vue_obj.questions.data[ vue_obj.questions.book ] ) {
+            vue_obj.questions.books = Object.keys( vue_obj.questions.data ).sort();
+            if ( vue_obj.questions.books[0] ) {
+                vue_obj.questions.book = vue_obj.questions.books[0];
+            }
+            else {
+                vue_obj.questions.chapters = null;
+                vue_obj.questions.questions = null;
+            }
+        }
+        else if ( ! vue_obj.questions.data[ vue_obj.questions.book ][ vue_obj.questions.chapter ] ) {
+            vue_obj.questions.chapters = Object.keys( vue_obj.questions.data[ vue_obj.questions.book ] ).sort(
+                function ( a, b ) {
+                    return a - b;
+                }
+            );
+            vue_obj.questions.chapter = vue_obj.questions.chapters[0];
+        }
+        else {
+            var questions_hash = vue_obj.questions.data[ vue_obj.questions.book ][ vue_obj.questions.chapter ];
+            var keys = Object.keys(questions_hash);
+
+            var questions_array = new Array();
+            for ( var i = 0; i < keys.length; i++ ) {
+                questions_array.push( questions_hash[ keys[i] ] );
+            }
+
+            vue_obj.questions.questions = questions_array.sort( function ( a, b ) {
+                if ( a.verse < b.verse ) return -1;
+                if ( a.verse > b.verse ) return 1;
+                if ( a.type < b.type ) return -1;
+                if ( a.type > b.type ) return 1;
+                if ( a.used > b.used ) return -1;
+                if ( a.used < b.used ) return 1;
+                return 0;
+            } );
+        }
+    }
+
+    function create_question ( vue_obj, question, clear_form ) {
+        if ( ! vue_obj.questions.data[ question.book ] )
+            vue_obj.questions.data[ question.book ] = {};
+        if ( ! vue_obj.questions.data[ question.book ][ question.chapter ] )
+            vue_obj.questions.data[ question.book ][ question.chapter ] = {};
+
+        vue_obj.questions.data
+            [ question.book ][ question.chapter ][ question.question_id ] = question;
+
+        vue_obj.questions.books = Object.keys( vue_obj.questions.data ).sort();
+        vue_obj.questions.book = null;
+
+        vue_obj.$nextTick( function () {
+            vue_obj.questions.book = question.book;
+
+            vue_obj.$nextTick( function () {
+                vue_obj.questions.chapter = question.chapter;
+                vue_obj.questions.marked_questions = vue_obj.grep_marked_questions();
+            } );
+        } );
+
+        if ( !! clear_form ) vue_obj.clear_form();
+
+        vue_obj.$nextTick( function () {
+            vue_obj.question.book    = question.book;
+            vue_obj.question.chapter = question.chapter;
+            vue_obj.question.verse   = question.verse;
+
+            document.getElementById("verse").focus();
+            vue_obj.$nextTick( function () {
+                document.getElementById("verse").select();
+            } );
+        } );
+    }
+
     var vue_app = new Vue({
         el: "#editor",
         data: data,
@@ -107,40 +195,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     this.question.question_id = null;
 
                     this.$http.post( cntlr + "/save", this.question ).then( function (response) {
-                        var question = response.body.question;
-
-                        if ( ! this.questions.data[ question.book ] )
-                            this.questions.data[ question.book ] = {};
-                        if ( ! this.questions.data[ question.book ][ question.chapter ] )
-                            this.questions.data[ question.book ][ question.chapter ] = {};
-
-                        this.questions.data
-                            [ question.book ][ question.chapter ][ question.question_id ] = question;
-
-                        this.questions.books = Object.keys( this.questions.data ).sort();
-                        this.questions.book = null;
-
-                        this.$nextTick( function () {
-                            this.questions.book = question.book;
-
-                            this.$nextTick( function () {
-                                this.questions.chapter = question.chapter;
-                                this.questions.marked_questions = this.grep_marked_questions();
-                            } );
-                        } );
-
-                        this.clear_form();
-
-                        this.$nextTick( function () {
-                            this.question.book    = question.book;
-                            this.question.chapter = question.chapter;
-                            this.question.verse   = question.verse;
-
-                            document.getElementById("verse").focus();
-                            this.$nextTick( function () {
-                                document.getElementById("verse").select();
-                            } );
-                        } );
+                        create_question( this, response.body.question, "clear_form" );
                     } );
                 }
                 else {
@@ -155,99 +210,9 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     this.question.marked   = null;
 
                     this.$http.post( cntlr + "/save", this.question ).then( function (response) {
-                        var question = response.body.question;
-
-                        // delete question
-                        // (code copied/duplicated for now for expediency; will refactor later)
-
-                        delete this.questions.data
-                            [ this.questions.book ][ this.questions.chapter ][ this.questions.question_id ];
-
-                        if ( ! Object.keys(
-                            this.questions.data[ this.questions.book ][ this.questions.chapter ]
-                        ).length )
-                            delete this.questions.data[ this.questions.book ][ this.questions.chapter ];
-
-                        if ( ! Object.keys(
-                            this.questions.data[ this.questions.book ]
-                        ).length )
-                            delete this.questions.data[ this.questions.book ];
-
-                        if ( ! this.questions.data[ this.questions.book ] ) {
-                            this.questions.books = Object.keys( this.questions.data ).sort();
-                            if ( this.questions.books[0] ) {
-                                this.questions.book = this.questions.books[0];
-                            }
-                            else {
-                                this.questions.chapters = null;
-                                this.questions.questions = null;
-                            }
-                        }
-                        else if ( ! this.questions.data[ this.questions.book ][ this.questions.chapter ] ) {
-                            this.questions.chapters = Object.keys( this.questions.data[ this.questions.book ] ).sort(
-                                function ( a, b ) {
-                                    return a - b;
-                                }
-                            );
-                            this.questions.chapter = this.questions.chapters[0];
-                        }
-                        else {
-                            var questions_hash = this.questions.data[ this.questions.book ][ this.questions.chapter ];
-                            var keys = Object.keys(questions_hash);
-
-                            var questions_array = new Array();
-                            for ( var i = 0; i < keys.length; i++ ) {
-                                questions_array.push( questions_hash[ keys[i] ] );
-                            }
-
-                            this.questions.questions = questions_array.sort( function ( a, b ) {
-                                if ( a.verse < b.verse ) return -1;
-                                if ( a.verse > b.verse ) return 1;
-                                if ( a.type < b.type ) return -1;
-                                if ( a.type > b.type ) return 1;
-                                if ( a.used > b.used ) return -1;
-                                if ( a.used < b.used ) return 1;
-                                return 0;
-                            } );
-                        }
-
-                        // create question
-                        // (code copied/duplicated for now for expediency; will refactor later)
-
+                        delete_question(this);
                         this.$nextTick( function () {
-                            if ( ! this.questions.data[ question.book ] )
-                                this.questions.data[ question.book ] = {};
-                            if ( ! this.questions.data[ question.book ][ question.chapter ] )
-                                this.questions.data[ question.book ][ question.chapter ] = {};
-
-                            this.questions.data
-                                [ question.book ][ question.chapter ][ question.question_id ] = question;
-
-                            this.questions.books = Object.keys( this.questions.data ).sort();
-                            this.questions.book = null;
-
-                            this.$nextTick( function () {
-                                this.questions.book = question.book;
-
-                                this.$nextTick( function () {
-                                    this.questions.chapter = question.chapter;
-                                    this.questions.marked_questions = this.grep_marked_questions();
-                                } );
-                            } );
-
-                            // this.clear_form();
-                            // (don't clear form when saving a question)
-
-                            this.$nextTick( function () {
-                                this.question.book    = question.book;
-                                this.question.chapter = question.chapter;
-                                this.question.verse   = question.verse;
-
-                                document.getElementById("verse").focus();
-                                this.$nextTick( function () {
-                                    document.getElementById("verse").select();
-                                } );
-                            } );
+                            create_question( this, response.body.question );
                         } );
                     } );
                 }
@@ -263,59 +228,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                         { question_id: this.questions.question_id }
                     ).then( function (response) {
                         if ( response.body.success ) {
-                            delete this.questions.data
-                                [ this.questions.book ][ this.questions.chapter ][ this.questions.question_id ];
-
-                            if ( ! Object.keys(
-                                this.questions.data[ this.questions.book ][ this.questions.chapter ]
-                            ).length )
-                                delete this.questions.data[ this.questions.book ][ this.questions.chapter ];
-
-                            if ( ! Object.keys(
-                                this.questions.data[ this.questions.book ]
-                            ).length )
-                                delete this.questions.data[ this.questions.book ];
-
-                            if ( ! this.questions.data[ this.questions.book ] ) {
-                                this.questions.books = Object.keys( this.questions.data ).sort();
-                                if ( this.questions.books[0] ) {
-                                    this.questions.book = this.questions.books[0];
-                                }
-                                else {
-                                    this.questions.chapters = null;
-                                    this.questions.questions = null;
-                                }
-                            }
-                            else if ( ! this.questions.data[ this.questions.book ][ this.questions.chapter ] ) {
-                                this.questions.chapters = Object.keys(
-                                    this.questions.data[ this.questions.book ]
-                                ).sort(
-                                    function ( a, b ) {
-                                        return a - b;
-                                    }
-                                );
-                                this.questions.chapter = this.questions.chapters[0];
-                            }
-                            else {
-                                var questions_hash = this.questions.data[ this.questions.book ][ this.questions.chapter ];
-                                var keys = Object.keys(questions_hash);
-
-                                var questions_array = new Array();
-                                for ( var i = 0; i < keys.length; i++ ) {
-                                    questions_array.push( questions_hash[ keys[i] ] );
-                                }
-
-                                this.questions.questions = questions_array.sort( function ( a, b ) {
-                                    if ( a.verse < b.verse ) return -1;
-                                    if ( a.verse > b.verse ) return 1;
-                                    if ( a.type < b.type ) return -1;
-                                    if ( a.type > b.type ) return 1;
-                                    if ( a.used > b.used ) return -1;
-                                    if ( a.used < b.used ) return 1;
-                                    return 0;
-                                } );
-                            }
-
+                            delete_question(this);
                             this.questions.marked_questions = this.grep_marked_questions();
                         }
                         else {
