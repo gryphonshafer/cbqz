@@ -36,8 +36,6 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     parseInt( this.question.chapter ) > 0 &&
                     parseInt( this.question.verse ) > 0
                 ) {
-                    this.questions.question_id = null;
-
                     var verse = this.material
                         [ this.question.book ][ this.question.chapter ][ this.question.verse ];
 
@@ -48,10 +46,6 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                         this.question.question = verse.text;
                         this.question.answer   = verse.text;
                     } );
-
-                    this.question.question_id = null;
-                    this.question.used        = null;
-                    this.question.marked      = null;
                 }
                 else {
                     alert("Incomplete reference; copy verse not possible.");
