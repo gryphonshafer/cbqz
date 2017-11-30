@@ -60,9 +60,16 @@ sub startup ( $self, $app = undef ) {
         MojoX::Log::Dispatch::Simple->new(
             dispatch  => $cbqz->log,
             level     => $config->get( 'logging', 'log_level', $self->mode ),
-            format_cb => sub { log_date(shift) . ' [' . uc(shift) . '] ' . join( "\n", @_, '' ) },
-        )->helpers($self)
+            format_cb => sub { log_date(shift) . ' [' . uc(shift) . '] ' . join( "\n", $cbqz->dp( @_, '' ) ) },
+        )
     );
+    for my $level ( qw( debug info warn error fatal notice warning critical alert emergency emerg err crit ) ) {
+        $self->helper( $level => sub {
+            shift;
+            $self->log->$level($_) for ( $cbqz->dp(@_) );
+            return;
+        } );
+    }
 
     # template processing
     my $tt_conf = $config->get('template');
