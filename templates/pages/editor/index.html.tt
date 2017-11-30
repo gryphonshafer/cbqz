@@ -17,8 +17,8 @@
                 <option v-for="item in metadata.books">{{ item }}</option>
             </select>
 
-            <input tabindex="2" size="2" v-model="question.chapter">:<input
-                id="verse" tabindex="3" size="2" v-model="question.verse">
+            <input type="text" tabindex="2" size="2" v-model="question.chapter">:<input
+                type="text" id="verse" tabindex="3" size="2" v-model="question.verse">
 
             <button tabindex="4" id="copy_verse" v-on:click="copy_verse" v-bind:disabled="verse_incomplete">
                 Copy Verse
@@ -104,7 +104,7 @@
         </div>
 
         <div class="margin_lift">
-            <select class="questions_list_list" v-model="questions.question_id" size="12">
+            <select class="questions_list_list" v-model="questions.question_id" size="13">
                 <option v-for="item in questions.questions" v-bind:value="item.question_id">{{
                     item.verse + ' ' +
                     item.type + ' ' +

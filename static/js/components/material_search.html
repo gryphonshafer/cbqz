@@ -1,7 +1,7 @@
 <script type="text/x-template" id="material-search-template">
     <div id="material_search">
         <div class="margin_lift">
-            <input ref="search_text_input" v-model="search_text" placeholder="Search Text">
+            <input type="text" ref="search_text_input" v-model="search_text" placeholder="Search Text">
             <button v-on:click="go">Go</button>
             <button v-on:click="find">Find <span class="key_text">Alt+F, F4</span></button>
         </div>

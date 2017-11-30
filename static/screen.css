@@ -200,6 +200,19 @@ form fieldset label {
     display: block;
 }
 
+select,
+input[type="text"],
+input[type="password"] {
+    border: 1px solid lightgray;
+}
+
+select:hover,
+input[type="text"]:hover,
+input[type="password"]:hover {
+    border-color: gray;
+}
+
+
 form#select_sets fieldset {
     display: inline-block;
     vertical-align: top;
@@ -362,7 +375,7 @@ div#editor div#questions_list select.questions_list_list {
 div#editor div#material_lookup {
     display: inline-block;
     vertical-align: top;
-    width: calc( 100vw - 670px );
+    width: calc( 100vw - 665px );
 }
 
 @media ( max-width: 870px ) {
@@ -373,16 +386,17 @@ div#editor div#material_lookup {
 }
 
 div#editor div#material_lookup_display {
-    height: 375px;
+    height: 388px;
 }
 
 div#editor div#material_search {
     display: block;
     vertical-align: top;
+    margin-top: -20px;
 }
 
 div#editor div#material_search_display {
-    height: calc( 100vh - 535px );
+    height: calc( 100vh - 523px );
 }
 
 @media ( max-height: 640px ) {

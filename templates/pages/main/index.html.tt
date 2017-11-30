@@ -122,7 +122,7 @@
                         <option v-for="chapters in selected_chapters_count">{{ chapters }}</option>
                     </select>
                     chapters at
-                    <input size="1" v-model="weight_percent">%
+                    <input type="text" size="1" v-model="weight_percent">%
                 </fieldset>
             </form>
 
