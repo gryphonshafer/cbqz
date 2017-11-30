@@ -607,6 +607,51 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         }
     });
 
+    function cbqz_html_markup_only (html) {
+        while (true) {
+            var old_html = html;
+            html = html.replace(
+                /<span class="unique_(word|phrase|chapter)">([^<]+)<\/span>/gi,
+                function ( match, type, content ) {
+                    var symbol =
+                        ( type == "word"    ) ? "*" :
+                        ( type == "phrase"  ) ? "^" :
+                        ( type == "chapter" ) ? "_" : "#";
+                    return symbol + content + "/";
+                }
+            );
+            if ( old_html == html ) break;
+        }
+
+        return html.replace( /<[^>]*>/gi, "" ).replace(
+            /(\*|\^|\_|\/)/gi,
+            function ( match, symbol ) {
+                if ( symbol == "*" ) return '<span class="unique_word">';
+                if ( symbol == "^" ) return '<span class="unique_phrase">';
+                if ( symbol == "_" ) return '<span class="unique_chapter">';
+                if ( symbol == "/" ) return '</span>';
+                return "";
+            }
+        );
+    }
+
+    document.addEventListener( "keyup", function(event) {
+        // for Cntl+V: Paste
+        if ( event.ctrlKey && event.keyCode == 86 ) {
+            var element = document.activeElement;
+            var class_name = element.getAttribute("class");
+
+            if ( !! class_name ) {
+                if ( class_name.match(/\bquestion_box\b/) ) {
+                    vue_app.$refs.question.innerHTML = cbqz_html_markup_only( vue_app.$refs.question.innerHTML );
+                }
+                else if ( class_name.match(/\banswer_box\b/) ) {
+                    vue_app.$refs.answer.innerHTML = cbqz_html_markup_only( vue_app.$refs.answer.innerHTML );
+                }
+            }
+        }
+    } );
+
     document.addEventListener( "keyup", function(event) {
         event.preventDefault();
 

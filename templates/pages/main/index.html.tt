@@ -36,9 +36,9 @@
     >
         <fieldset>
             <legend>Create User Account</legend>
-            <label>Name: <input name="name" size="20" placeholder="Name"></label>
+            <label>Name: <input type="text" name="name" size="20" placeholder="Name"></label>
             <label>Password: <input type="password" name="passwd" size="20" placeholder="Password"></label>
-            <label>Email: <input name="email" size="20" placeholder="Email Address"></label>
+            <label>Email: <input type="text" name="email" size="20" placeholder="Email Address"></label>
 
             [% IF programs AND programs.size > 0 %]
                 <label>

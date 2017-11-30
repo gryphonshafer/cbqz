@@ -200,6 +200,11 @@ form fieldset label {
     display: block;
 }
 
+input[type="text"],
+input[type="password"] {
+    padding-left: 3px;
+}
+
 select,
 input[type="text"],
 input[type="password"] {
@@ -212,6 +217,15 @@ input[type="password"]:hover {
     border-color: gray;
 }
 
+div#header_login input[type="text"],
+div#header_login input[type="password"] {
+    border: 1px solid #999999;
+}
+
+div#header_login input[type="text"]:hover,
+div#header_login input[type="password"]:hover {
+    border: 1px solid blue;
+}
 
 form#select_sets fieldset {
     display: inline-block;
