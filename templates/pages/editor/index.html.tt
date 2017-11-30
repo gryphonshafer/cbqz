@@ -30,9 +30,19 @@
             </button>
         </div>
 
+        <div class="margin_lift">
+            <span class="label">Type:</span>
+            <select tabindex="5" v-model="question.type">
+                <option v-for="item in metadata.types">{{ item }}</option>
+            </select>
+
+            <span class="label">Marked:</span>
+            <span id="marked_comment" class="field">{{ question.marked }}</span>
+        </div>
+
         <div>
             <span class="label">Question:</span>
-            <div tabindex="5" class="htmlarea question_box" contenteditable="true"
+            <div tabindex="6" class="htmlarea question_box" contenteditable="true"
                 ref="question" v-html="question.question"></div>
         </div>
 
@@ -52,18 +62,8 @@
 
         <div>
             <span class="label">Answer:</span>
-            <div tabindex="6" class="htmlarea answer_box" contenteditable="true"
+            <div tabindex="7" class="htmlarea answer_box" contenteditable="true"
                 ref="answer" v-html="question.answer"></div>
-        </div>
-
-        <div class="margin_lift">
-            <span class="label">Type:</span>
-            <select tabindex="7" v-model="question.type">
-                <option v-for="item in metadata.types">{{ item }}</option>
-            </select>
-
-            <span class="label">Marked:</span>
-            <span id="marked_comment" class="field">{{ question.marked }}</span>
         </div>
 
         <div>
