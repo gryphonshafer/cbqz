@@ -2,3 +2,4 @@
 .prove
 /data
 /runtime
+/cover_db

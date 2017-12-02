@@ -27,6 +27,7 @@ requires 'Try::Tiny';
 feature 'test', 'Testing' => sub {
     requires 'Test::Most';
     requires 'Test::Moose';
+    requires 'Test::MockModule';
 };
 
 feature 'tools', 'Tools and Etc.' => sub {
