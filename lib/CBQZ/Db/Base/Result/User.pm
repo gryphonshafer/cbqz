@@ -34,21 +34,3 @@ modules can be auto-generated with the schema generator.
 
 When setting the column "passwd" for a challenge, the text of "passwd" will
 be hashed using L<Digest::SHA>'s C<sha256_hex> method.
-
-=head1 INHERITANCE AND DEPENDENCIES
-
-This module inherits from:
-
-=over 1
-
-=item * L<Moose::Role>
-
-=back
-
-This module has the following dependencies:
-
-=over 1
-
-=item * L<Digest::SHA>
-
-=back

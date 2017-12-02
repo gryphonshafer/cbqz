@@ -38,3 +38,45 @@ sub spurt ( $file, $data ) {
 }
 
 1;
+
+=head1 NAME
+
+CBQZ::Util::File
+
+=head1 SYNOPSIS
+
+    use exact;
+    use CBQZ::Util::File qw( filename slurp spurt );
+
+    say filename( 'Things:', 'And+', 'Stuff;' );
+    # returns: "/things/and/stuff"
+
+    my $file_content = slurp('file.txt');
+    spurt( 'file.txt', $file_content );
+
+=head1 DESCRIPTION
+
+This class offers some methods for optional export that are related to files.
+Nothing is exported by default.
+
+=head1 METHODS
+
+=head2 filename
+
+Accepts a list of strings and returns them concatinated together in a path and
+filename that's mostly reasonable.
+
+    say filename( 'Things:', 'And+', 'Stuff;' );
+    # returns: "/things/and/stuff"
+
+=head2 slurp
+
+Slurps up a file's contents and returns it as a scalar.
+
+    my $file_content = slurp('file.txt');
+
+=head2 spurt
+
+Saves scalar string content into a file.
+
+    spurt( 'file.txt', $file_content );

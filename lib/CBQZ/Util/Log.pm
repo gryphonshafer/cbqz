@@ -227,21 +227,3 @@ The following are the log objects and their log level ranges:
     debug  = debug
     stdout = info .. notice
     stderr = warning .. emergency
-
-=head1 INHERITANCE AND DEPENDENCIES
-
-This module inherits from nothing.
-
-This module has the following dependencies:
-
-=over 1
-
-=item * L<Config::App>
-
-=item * L<Log::Dispatch>
-
-=item * L<Term::ANSIColor>
-
-=item * L<CBQZ::Util::Format>
-
-=back

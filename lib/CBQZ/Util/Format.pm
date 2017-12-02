@@ -16,3 +16,30 @@ our @EXPORT_OK = 'log_date';
 }
 
 1;
+
+=head1 NAME
+
+CBQZ::Util::Format
+
+=head1 SYNOPSIS
+
+    use exact;
+    use CBQZ::Util::Format qw( log_date );
+
+    say log_date();
+    say log_date(time);
+
+=head1 DESCRIPTION
+
+This class offers a method for optional export that is related to formatting.
+Nothing is exported by default.
+
+=head1 METHODS
+
+=head2 log_date
+
+Given a timestamp (or if no timestamp is proviced, assumes now), this function
+will return a string format of the timestamp suitable for logging headers.
+
+    say log_date();
+    say log_date(time);

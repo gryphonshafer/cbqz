@@ -141,29 +141,3 @@ L<DBIx::Class> SQL should happen:
 
 See L<DBIx::Class::Storage::Debug::PrettyPrint> for more information on the
 "profile" setting.
-
-=head1 INHERITANCE AND DEPENDENCIES
-
-This module inherits from:
-
-=over 1
-
-=item * L<CBQZ>
-
-=item * L<DBIx::Class::Schema>
-
-=back
-
-This module has the following dependencies:
-
-=over 1
-
-=item * L<Config::App>
-
-=item * L<Moose>
-
-=item * L<MooseX::MarkAsMethods>
-
-=item * L<DBIx::Class::Storage::Debug::PrettyPrint>
-
-=back

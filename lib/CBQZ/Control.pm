@@ -104,8 +104,6 @@ sub startup ( $self, $app = undef ) {
         },
     );
 
-    $self->plugin('PODRenderer') if ( $self->mode eq 'development' );
-
     # JSON rendering
     $self->renderer->add_handler( 'json' => sub { ${ $_[2] } = eval { $cbqz->json->encode( $_[3]{json} ) } } );
 
@@ -172,3 +170,25 @@ sub startup ( $self, $app = undef ) {
 }
 
 1;
+
+=head1 NAME
+
+CBQZ::Control
+
+=head1 SYNOPSIS
+
+    #!/usr/bin/env perl
+    use exact;
+
+    BEGIN {
+        $ENV{CONFIGAPPENV} = $ENV{MOJO_MODE} || $ENV{PLACK_ENV} || 'development';
+    }
+
+    use Config::App;
+    use Mojolicious::Commands;
+
+    Mojolicious::Commands->start_app('CBQZ::Control');
+
+=head1 DESCRIPTION
+
+This class provides the C<startup> method for L<Mojolicious>.
