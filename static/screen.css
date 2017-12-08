@@ -217,6 +217,30 @@ input[type="password"]:hover {
     border-color: gray;
 }
 
+button,
+input[type="submit"],
+input[type="reset"] {
+    border: 1px solid #999999;
+    background-color: #e0e0e0;
+    padding: 1px 10px 1px 10px;
+    margin: 3px 0px 0px 0px;
+}
+
+button:hover:enabled,
+input[type="submit"]:hover:enabled ,
+input[type="reset"]:hover:enabled {
+    border: 1px solid blue;
+    background-color: #eeeeee;
+}
+
+button:disabled,
+input[type="submit"]:disabled,
+input[type="reset"]:disabled {
+    background-color: lightgray;
+}
+
+/* -------------------------------------------------------------------------- */
+
 div#header_login input[type="text"],
 div#header_login input[type="password"] {
     border: 1px solid #999999;
@@ -410,7 +434,7 @@ div#editor div#material_search {
 }
 
 div#editor div#material_search_display {
-    height: calc( 100vh - 523px );
+    height: calc( 100vh - 525px );
 }
 
 @media ( max-height: 640px ) {
@@ -463,7 +487,7 @@ div#quizroom div#material_search {
 }
 
 div#quizroom div#material_search_display {
-    height: calc( 100vh - 505px );
+    height: calc( 100vh - 508px );
 }
 
 @media ( max-height: 640px ) {
