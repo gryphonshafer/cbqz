@@ -59,6 +59,12 @@ class_has dq => ( isa => 'DBIx::Query::db', is => 'ro', lazy => 1, default => su
     );
 } );
 
+sub params_check ( $self, @params ) {
+    for (@params) {
+        E->throw( $_->[0] ) if ( $_->[1]->() );
+    }
+}
+
 sub able ( $self, $obj, $method ) {
     my $rv;
     try {
@@ -111,6 +117,11 @@ CBQZ
     my $json   = $cbqz->json;   # JSON::XS singleton instance
     my $yaml   = $cbqz->yaml;   # YAML::XS singleton instance
     my $dq     = $cbqz->dq;     # DBIx::Query singleton instance
+
+    $cbqz->params_check(
+        [ '"name" not defined in input', sub { not defined $params->{name} } ],
+        [ '"name" length < 2 in input',  sub { length $params->{name} < 2 }  ],
+    );
 
     $cbqz->able( $cbqz, 'able' ); # carefully check if $cbqz->can('able')
     my $clean_error = $cbqz->clean_error('Some error at file.pl line 42.');
@@ -178,6 +189,17 @@ database and therefore ready to use.
 =head1 METHODS
 
 The following are methods provided by this module.
+
+=head2 params_check
+
+This is a simple wrapper method that accepts any number of pairs of a string
+and a subref to execute. If the subref returns false, the string is thrown as
+an error.
+
+    $cbqz->params_check(
+        [ '"name" not defined in input', sub { not defined $params->{name} } ],
+        [ '"name" length < 2 in input',  sub { length $params->{name} < 2 }  ],
+    );
 
 =head2 able
 

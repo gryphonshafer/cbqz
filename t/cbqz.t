@@ -22,6 +22,7 @@ sub main {
     );
     can_ok( PACKAGE, $_ ) for ( qw( able clean_error yaml dp ), @loggers );
 
+    params_check($obj);
     able($obj);
     yaml($obj);
     clean_error($obj);
@@ -31,6 +32,19 @@ sub main {
     done_testing();
     return 0;
 };
+
+sub params_check ($obj) {
+    throws_ok(
+        sub { $obj->params_check( [ 'an error message', sub { 1 == 1 } ] ) },
+        qr/an error message/,
+        'single params_check error',
+    );
+
+    lives_ok(
+        sub { $obj->params_check( [ 'an error message', sub { 1 == 0 } ] ) },
+        'single params_check pass',
+    );
+}
 
 sub able ($obj) {
     ok( $obj->able( $obj, 'able' ), '$obj->able' );
