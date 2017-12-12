@@ -49,7 +49,7 @@ CBQZ::Util::File
     use CBQZ::Util::File qw( filename slurp spurt );
 
     say filename( 'Things:', 'And+', 'Stuff;' );
-    # returns: "/things/and/stuff"
+    # returns: "things/and/stuff"
 
     my $file_content = slurp('file.txt');
     spurt( 'file.txt', $file_content );
@@ -67,7 +67,7 @@ Accepts a list of strings and returns them concatinated together in a path and
 filename that's mostly reasonable.
 
     say filename( 'Things:', 'And+', 'Stuff;' );
-    # returns: "/things/and/stuff"
+    # returns: "things/and/stuff"
 
 =head2 slurp
 
