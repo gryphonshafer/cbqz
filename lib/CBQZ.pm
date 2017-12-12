@@ -77,9 +77,10 @@ sub able ( $self, $obj, $method ) {
     return $rv;
 }
 
-sub clean_error ( $self, $error_with_context ) {
-    ( my $error_without_context = $error_with_context ) =~ s/\s+at\s+(?:(?!\s+at\s+).)*[\r\n]*$//;
-    return $error_without_context;
+sub clean_error ( $self, $error ) {
+    return $error->message if ( ref($error) =~ /^E\b/ and $error->isa('E') );
+    ( my $error_message = $error ) =~ s/\s+at\s+(?:(?!\s+at\s+).)*[\r\n]*$//;
+    return $error_message;
 }
 
 sub dp ( $self, @params ) {
@@ -215,6 +216,9 @@ This method expects a string error message with context (like the "at blah line
 something") and returns a "clean" string with the context removed.
 
     say $cbqz->clean_error('Error happened at somefile.pl line 42.');
+
+If you pass an error object from the superclass "E" (see L<CBQZ::Error>), this
+method will return the C<message> string from the object.
 
 =head2 dp
 

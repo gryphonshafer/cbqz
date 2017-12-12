@@ -22,7 +22,7 @@ package E {
 
             {
                 local $Carp::CarpLevel = 2;
-                croak( $_->message );
+                croak($_);
             }
         };
     };
@@ -48,9 +48,23 @@ CBQZ::Error
 =head1 SYNOPSIS
 
     use CBQZ;
+    use Try::Tiny;
 
-    E->throw('Generic error');
-    E::Db->throw('Database error');
+    E->throw('Throw exception that will look like a typical "die" error');
+
+    try {
+        E->throw('Throw exception and catch it with try/catch block');
+    }
+    catch {
+        my $error_object = $_;
+        say $error_object->message;
+    };
+
+    E::Db->throw('Bland database error');
+    E::Db->throw(
+        message => 'Specific database error with SQL',
+        sql     => 'SELECT a_column FROM some_table',
+    );
 
 =head1 DESCRIPTION
 

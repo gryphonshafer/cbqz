@@ -2,6 +2,8 @@ use Config::App;
 use Test::Most;
 use Test::Moose;
 use Test::MockModule;
+use Try::Tiny;
+use CBQZ::Error;
 use CBQZ::Util::Log;
 use exact;
 
@@ -36,7 +38,7 @@ sub main {
 sub params_check ($obj) {
     throws_ok(
         sub { $obj->params_check( [ 'an error message', sub { 1 == 1 } ] ) },
-        qr/an error message/,
+        'E',
         'single params_check error',
     );
 
@@ -44,6 +46,8 @@ sub params_check ($obj) {
         sub { $obj->params_check( [ 'an error message', sub { 1 == 0 } ] ) },
         'single params_check pass',
     );
+
+    return;
 }
 
 sub able ($obj) {
@@ -66,6 +70,17 @@ sub clean_error ($obj) {
         [ 'Error occured', 'Error occured' ],
         [ 'Error occured at start at Location line 42', 'Error occured at start' ],
     );
+
+    my $e;
+    try {
+        E->throw('Error message in an E object');
+    }
+    catch {
+        $e = $_;
+    };
+
+    is( $obj->clean_error($e), 'Error message in an E object', '$obj->clean_error( E->throw )' );
+
     return;
 }
 
