@@ -28,6 +28,8 @@
                     href="[% c.url_for.path('/quizroom') %]">Quiz Room</a>
                 <a [% IF page.menu == 'material' %]class="selected"[% END %]
                     href="[% c.url_for.path('/main/material') %]">Material</a>
+                <a [% IF page.menu == 'questions' %]class="selected"[% END %]
+                    href="[% c.url_for.path('/editor/questions') %]">Questions</a>
             [% END %]
         [% END %]
     </div>

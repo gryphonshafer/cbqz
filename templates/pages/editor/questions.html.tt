@@ -1,0 +1,6 @@
+[%
+    page.title = 'Questions List';
+    page.menu  = 'questions';
+%]
+
+<p>This is where questions will get displayed.</p>
