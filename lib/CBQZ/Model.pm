@@ -16,6 +16,8 @@ class_has db => (
     default => sub { CBQZ::Db::Schema->connect },
 );
 
+class_has 'schema_name' => ( isa => 'Str', is => 'rw', default => '' );
+
 has obj => ( isa => 'DBIx::Class::Row', is => 'rw' );
 
 sub load ( $self, @params ) {
