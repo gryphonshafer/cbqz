@@ -26,6 +26,103 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
     data.questions.books              = null;
     data.questions.chapters           = null;
 
+    var sort_by = {
+        desc_ref : function ( a, b ) {
+            var icmp = b.book.toLowerCase().localeCompare( a.book.toLowerCase() );
+            if ( icmp != 0 ) return icmp;
+
+            if ( a.chapter > b.chapter ) return -1;
+            if ( a.chapter < b.chapter ) return 1;
+            if ( a.verse > b.verse ) return -1;
+            if ( a.verse < b.verse ) return 1;
+            if ( a.type < b.type ) return -1;
+            if ( a.type > b.type ) return 1;
+            if ( a.used > b.used ) return -1;
+            if ( a.used < b.used ) return 1;
+            return 0;
+        },
+        ref : function ( a, b ) {
+            var icmp = a.book.toLowerCase().localeCompare( b.book.toLowerCase() );
+            if ( icmp != 0 ) return icmp;
+
+            if ( a.chapter < b.chapter ) return -1;
+            if ( a.chapter > b.chapter ) return 1;
+            if ( a.verse < b.verse ) return -1;
+            if ( a.verse > b.verse ) return 1;
+            if ( a.type < b.type ) return -1;
+            if ( a.type > b.type ) return 1;
+            if ( a.used > b.used ) return -1;
+            if ( a.used < b.used ) return 1;
+            return 0;
+        },
+        type : function ( a, b ) {
+            if ( a.type < b.type ) return -1;
+            if ( a.type > b.type ) return 1;
+
+            var icmp = b.book.toLowerCase().localeCompare( a.book.toLowerCase() );
+            if ( icmp != 0 ) return icmp;
+
+            if ( a.chapter > b.chapter ) return -1;
+            if ( a.chapter < b.chapter ) return 1;
+            if ( a.verse > b.verse ) return -1;
+            if ( a.verse < b.verse ) return 1;
+            if ( a.used > b.used ) return -1;
+            if ( a.used < b.used ) return 1;
+            return 0;
+        },
+        used : function ( a, b ) {
+            if ( a.used > b.used ) return -1;
+            if ( a.used < b.used ) return 1;
+            if ( a.type < b.type ) return -1;
+            if ( a.type > b.type ) return 1;
+
+            var icmp = b.book.toLowerCase().localeCompare( a.book.toLowerCase() );
+            if ( icmp != 0 ) return icmp;
+
+            if ( a.chapter > b.chapter ) return -1;
+            if ( a.chapter < b.chapter ) return 1;
+            if ( a.verse > b.verse ) return -1;
+            if ( a.verse < b.verse ) return 1;
+            return 0;
+        },
+        length : function ( a, b ) {
+            if ( a.question.length + a.answer.length < b.question.length + b.answer.length ) return -1;
+            if ( a.question.length + a.answer.length > b.question.length + b.answer.length ) return 1;
+
+            var icmp = a.book.toLowerCase().localeCompare( b.book.toLowerCase() );
+            if ( icmp != 0 ) return icmp;
+
+            if ( a.chapter < b.chapter ) return -1;
+            if ( a.chapter > b.chapter ) return 1;
+            if ( a.verse < b.verse ) return -1;
+            if ( a.verse > b.verse ) return 1;
+            if ( a.type < b.type ) return -1;
+            if ( a.type > b.type ) return 1;
+            if ( a.used > b.used ) return -1;
+            if ( a.used < b.used ) return 1;
+            return 0;
+        },
+        alphabetical : function ( a, b ) {
+            var qa_a = a.question + a.answer;
+            var qa_b = a.question + a.answer;
+            var qcmp = qa_a.toLowerCase().localeCompare( qa_b.toLowerCase() );
+            if ( qcmp != 0 ) return qcmp;
+
+            var icmp = a.book.toLowerCase().localeCompare( b.book.toLowerCase() );
+            if ( icmp != 0 ) return icmp;
+
+            if ( a.chapter < b.chapter ) return -1;
+            if ( a.chapter > b.chapter ) return 1;
+            if ( a.verse < b.verse ) return -1;
+            if ( a.verse > b.verse ) return 1;
+            if ( a.type < b.type ) return -1;
+            if ( a.type > b.type ) return 1;
+            if ( a.used > b.used ) return -1;
+            if ( a.used < b.used ) return 1;
+            return 0;
+        }
+    };
+
     function delete_question (vue_obj) {
         delete vue_obj.questions.data
             [ vue_obj.questions.book ][ vue_obj.questions.chapter ][ vue_obj.questions.question_id ];
@@ -67,15 +164,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 questions_array.push( questions_hash[ keys[i] ] );
             }
 
-            vue_obj.questions.questions = questions_array.sort( function ( a, b ) {
-                if ( a.verse < b.verse ) return -1;
-                if ( a.verse > b.verse ) return 1;
-                if ( a.type < b.type ) return -1;
-                if ( a.type > b.type ) return 1;
-                if ( a.used > b.used ) return -1;
-                if ( a.used < b.used ) return 1;
-                return 0;
-            } );
+            vue_obj.questions.questions = questions_array.sort( sort_by.ref );
         }
     }
 
@@ -263,7 +352,6 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
             grep_marked_questions: function () {
                 var marked_questions = [];
-                var sort_by          = data.questions.sort_by;
 
                 for ( var book in this.questions.data ) {
                     for ( var chapter in this.questions.data[book] ) {
@@ -275,63 +363,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     }
                 }
 
-                return marked_questions.sort( function ( a, b ) {
-                    if ( sort_by == "desc_ref" ) {
-                        var icmp = b.book.toLowerCase().localeCompare( a.book.toLowerCase() );
-                        if ( icmp != 0 ) return icmp;
-                        if ( a.chapter > b.chapter ) return -1;
-                        if ( a.chapter < b.chapter ) return 1;
-                        if ( a.verse > b.verse ) return -1;
-                        if ( a.verse < b.verse ) return 1;
-
-                        if ( a.type < b.type ) return -1;
-                        if ( a.type > b.type ) return 1;
-                        if ( a.used > b.used ) return -1;
-                        if ( a.used < b.used ) return 1;
-                   }
-                    else if ( sort_by == "ref" ) {
-                        var icmp = a.book.toLowerCase().localeCompare( b.book.toLowerCase() );
-                        if ( icmp != 0 ) return icmp;
-                        if ( a.chapter < b.chapter ) return -1;
-                        if ( a.chapter > b.chapter ) return 1;
-                        if ( a.verse < b.verse ) return -1;
-                        if ( a.verse > b.verse ) return 1;
-
-                        if ( a.type < b.type ) return -1;
-                        if ( a.type > b.type ) return 1;
-                        if ( a.used > b.used ) return -1;
-                        if ( a.used < b.used ) return 1;
-                    }
-                    else if ( sort_by == "type" ) {
-                        if ( a.type < b.type ) return -1;
-                        if ( a.type > b.type ) return 1;
-
-                        var icmp = b.book.toLowerCase().localeCompare( a.book.toLowerCase() );
-                        if ( icmp != 0 ) return icmp;
-                        if ( a.chapter > b.chapter ) return -1;
-                        if ( a.chapter < b.chapter ) return 1;
-                        if ( a.verse > b.verse ) return -1;
-                        if ( a.verse < b.verse ) return 1;
-
-                        if ( a.used > b.used ) return -1;
-                        if ( a.used < b.used ) return 1;
-                    }
-                    else if ( sort_by == "used" ) {
-                        if ( a.used > b.used ) return -1;
-                        if ( a.used < b.used ) return 1;
-                        if ( a.type < b.type ) return -1;
-                        if ( a.type > b.type ) return 1;
-
-                        var icmp = b.book.toLowerCase().localeCompare( a.book.toLowerCase() );
-                        if ( icmp != 0 ) return icmp;
-                        if ( a.chapter > b.chapter ) return -1;
-                        if ( a.chapter < b.chapter ) return 1;
-                        if ( a.verse > b.verse ) return -1;
-                        if ( a.verse < b.verse ) return 1;
-                    }
-
-                    return 0;
-                } );
+                return marked_questions.sort( sort_by[ data.questions.sort_by ] );
             },
 
             lookup_reference_change: function ( book, chapter, verse ) {
@@ -412,43 +444,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                         questions_array.push( questions_hash[ keys[i] ] );
                     }
 
-                    var sort_by = this.questions.sort_by;
-                    this.questions.questions = questions_array.sort( function ( a, b ) {
-                        if ( sort_by == "desc_ref" ) {
-                            if ( a.verse > b.verse ) return -1;
-                            if ( a.verse < b.verse ) return 1;
-                            if ( a.type < b.type ) return -1;
-                            if ( a.type > b.type ) return 1;
-                            if ( a.used > b.used ) return -1;
-                            if ( a.used < b.used ) return 1;
-                        }
-                        else if ( sort_by == "ref" ) {
-                            if ( a.verse < b.verse ) return -1;
-                            if ( a.verse > b.verse ) return 1;
-                            if ( a.type < b.type ) return -1;
-                            if ( a.type > b.type ) return 1;
-                            if ( a.used > b.used ) return -1;
-                            if ( a.used < b.used ) return 1;
-                        }
-                        else if ( sort_by == "type" ) {
-                            if ( a.type < b.type ) return -1;
-                            if ( a.type > b.type ) return 1;
-                            if ( a.verse < b.verse ) return -1;
-                            if ( a.verse > b.verse ) return 1;
-                            if ( a.used > b.used ) return -1;
-                            if ( a.used < b.used ) return 1;
-                        }
-                        else if ( sort_by == "used" ) {
-                            if ( a.used > b.used ) return -1;
-                            if ( a.used < b.used ) return 1;
-                            if ( a.type < b.type ) return -1;
-                            if ( a.type > b.type ) return 1;
-                            if ( a.verse < b.verse ) return -1;
-                            if ( a.verse > b.verse ) return 1;
-                        }
-
-                        return 0;
-                    } );
+                    this.questions.questions = questions_array.sort( sort_by[ this.questions.sort_by ] );
                 }
             },
 
