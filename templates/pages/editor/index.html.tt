@@ -70,7 +70,7 @@
 
         <div>
             <button tabindex="8" id="save_new"
-                v-on:click="save_new" v-bind:disabled="new_question_incomplete"
+                v-on:click="save_new" v-bind:disabled="verse_incomplete"
             >Save New <span class="key_text">Alt+A, F8</span></button>
             <button tabindex="9" id="save_changes"
                 v-on:click="save_changes" v-bind:disabled="no_saved_question"
@@ -111,7 +111,7 @@
             <select class="questions_list_list" v-model="questions.question_id" size="13">
                 <option v-for="item in questions.questions" v-bind:value="item.question_id">{{
                     item.verse + ' ' +
-                    item.type + ' ' +
+                    ( ( !! item.type ) ? item.type : '[No Type]' ) + ' ' +
                     '(' + item.used + ')' +
                     ( ( item.marked ) ? ' *' : '' )
                 }}</option>
@@ -125,7 +125,7 @@
                     item.book.replace( ' ', '' ).substr( 0, 2 ) + ' ' +
                     item.chapter + ':' +
                     item.verse + ' ' +
-                    item.type
+                    ( ( !! item.type ) ? item.type : '[No Type]' )
                 }}</option>
             </select>
         </div>

@@ -33,6 +33,12 @@ sub save ($self) {
     my $question   = $self->req_body_json;
     my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
 
+    $question->{marked} = 'Incomplete question' unless (
+        $question->{type} and
+        length( $question->{question} ) > 0 and
+        length( $question->{answer} ) > 0
+    );
+
     my $success = 0;
     unless ( $question->{question_id} ) {
         if (

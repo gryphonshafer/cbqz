@@ -274,12 +274,15 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 if (
                     !! this.question.book &&
                     parseInt( this.question.chapter ) > 0 &&
-                    parseInt( this.question.verse ) > 0 &&
-                    !! this.question.type
+                    parseInt( this.question.verse ) > 0
                 ) {
                     this.question.question = this.$refs.question.innerHTML;
                     this.question.answer   = this.$refs.answer.innerHTML;
-                    this.question.marked   = null;
+                    this.question.marked   = (
+                        !! this.question.type &&
+                        this.question.question.length > 0 &&
+                        this.question.answer.length > 0
+                    ) ? null : "Incomplete question";
 
                     this.question.question_id = null;
 
@@ -296,7 +299,11 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 if ( !! this.questions.question_id ) {
                     this.question.question = this.$refs.question.innerHTML;
                     this.question.answer   = this.$refs.answer.innerHTML;
-                    this.question.marked   = null;
+                    this.question.marked   = (
+                        !! this.question.type &&
+                        this.question.question.length > 0 &&
+                        this.question.answer.length > 0
+                    ) ? null : "Incomplete question";
 
                     this.$http.post( cntlr + "/save", this.question ).then( function (response) {
                         delete_question(this);
@@ -405,15 +412,6 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
             no_saved_question: function () {
                 return ! this.questions.question_id;
-            },
-
-            new_question_incomplete: function () {
-                return (
-                    !! this.question.book &&
-                    parseInt( this.question.chapter ) > 0 &&
-                    parseInt( this.question.verse ) > 0 &&
-                    !! this.question.type
-                ) ? false : true;
             }
         },
 
