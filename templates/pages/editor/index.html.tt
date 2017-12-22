@@ -11,7 +11,7 @@
     );
 %]
 
-<div id="editor" v-cloak>
+<div id="editor" v-cloak v-bind:class="classes">
     <div id="question_form">
         <div>
             <span class="label">Ref:</span>
@@ -38,13 +38,18 @@
                 <option v-for="item in metadata.types">{{ item }}</option>
             </select>
 
+            <button tabindex="6" v-on:click="auto_text" v-bind:disabled="new_question_incomplete">
+                Auto
+                <span class="key_text">Alt+T</span>
+            </button>
+
             <span class="label">Marked:</span>
             <span id="marked_comment" class="field">{{ question.marked }}</span>
         </div>
 
         <div>
             <span class="label">Question:</span>
-            <div tabindex="6" class="htmlarea question_box" contenteditable="true"
+            <div tabindex="7" class="htmlarea question_box" contenteditable="true"
                 ref="question" v-html="question.question"></div>
         </div>
 
@@ -64,21 +69,21 @@
 
         <div>
             <span class="label">Answer:</span>
-            <div tabindex="7" class="htmlarea answer_box" contenteditable="true"
+            <div tabindex="8" class="htmlarea answer_box" contenteditable="true"
                 ref="answer" v-html="question.answer"></div>
         </div>
 
         <div>
-            <button tabindex="8" id="save_new"
+            <button tabindex="9" id="save_new"
                 v-on:click="save_new" v-bind:disabled="verse_incomplete"
             >Save New <span class="key_text">Alt+A, F8</span></button>
-            <button tabindex="9" id="save_changes"
+            <button tabindex="10" id="save_changes"
                 v-on:click="save_changes" v-bind:disabled="no_saved_question"
             >Save Changes <span class="key_text">Alt+S, F9</span></button>
-            <button tabindex="10" id="delete_question"
+            <button tabindex="11" id="delete_question"
                 v-on:click="delete_question" v-bind:disabled="no_saved_question"
             >Delete <span class="key_text">Alt+X</span></button>
-            <button tabindex="11" id="clear_form" v-on:click="clear_form"
+            <button tabindex="12" id="clear_form" v-on:click="clear_form"
             >Clear <span class="key_text">Alt+C</span></button>
         </div>
     </div>

@@ -26,6 +26,9 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         state : "ready",
         label : "Start Timer",
     };
+    data.classes = {
+        cursor_progress : false
+    };
 
     var vue_app = new Vue({
         el: "#quizroom",
@@ -127,9 +130,11 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
             result: function (result) {
                 this.set_timer( this.metadata.timer_default );
+                this.classes.cursor_progress = true;
 
                 this.$http.post( cntlr + "/used", { question_id: this.question.question_id } )
                     .then( function (response) {
+                        this.classes.cursor_progress = false;
                         if ( ! response.body.success ) {
                             alert("There was an error updating the used count for the question.");
                         }
@@ -150,6 +155,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             mark_for_edit: function () {
                 var reason = prompt( "Enter comment about this question:", "Contains an error" );
                 if (reason) {
+                    this.classes.cursor_progress = true;
+
                     this.$http.post(
                         cntlr + "/mark",
                         {
@@ -157,6 +164,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                             reason:      reason
                         }
                     ).then( function (response) {
+                        this.classes.cursor_progress = false;
                         if ( response.body.success ) {
                             this.question.marked = reason;
                         }
@@ -180,6 +188,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             },
 
             replace: function (type) {
+                this.classes.cursor_progress = true;
                 this.$http.post(
                     cntlr + "/replace",
                     {
@@ -187,6 +196,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                         questions: this.questions
                     }
                 ).then( function (response) {
+                    this.classes.cursor_progress = false;
                     if ( response.body.error ) {
                         alert("Unable to replace with that type. Try another.");
                     }

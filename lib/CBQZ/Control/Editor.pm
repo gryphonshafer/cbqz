@@ -96,4 +96,15 @@ sub questions ($self) {
     }
 }
 
+sub auto_text ($self) {
+    return $self->render( json => {
+        question => CBQZ::Model::Question->new->auto_text(
+            CBQZ::Model::MaterialSet->new->load(
+                $self->decode_cookie('cbqz_prefs')->{material_set_id}
+            ),
+            $self->req_body_json,
+        ),
+    } );
+}
+
 1;

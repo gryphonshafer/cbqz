@@ -85,7 +85,7 @@
             page.js.push( '/main/path.js', '/js/app/main.js', '/js/utilities.js' );
         %]
 
-        <div id="main" v-cloak>
+        <div id="main" v-cloak v-bind:class="classes">
             <h2>Select Sets</h2>
             <p>Using the options below, select the sets you want to work with.</p>
 

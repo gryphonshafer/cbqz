@@ -26,6 +26,10 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
     data.questions.books              = null;
     data.questions.chapters           = null;
 
+    data.classes = {
+        cursor_progress : false
+    };
+
     var sort_by = {
         desc_ref : function ( a, b ) {
             var icmp = b.book.toLowerCase().localeCompare( a.book.toLowerCase() );
@@ -208,11 +212,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         data: data,
         methods: {
             copy_verse: function () {
-                if (
-                    !! this.question.book &&
-                    parseInt( this.question.chapter ) > 0 &&
-                    parseInt( this.question.verse ) > 0
-                ) {
+                if ( ! this.verse_incomplete ) {
                     var verse = this.material
                         [ this.question.book ][ this.question.chapter ][ this.question.verse ];
 
@@ -230,17 +230,32 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             },
 
             lookup_reference: function () {
-                if (
-                    !! this.question.book &&
-                    parseInt( this.question.chapter ) > 0 &&
-                    parseInt( this.question.verse ) > 0
-                ) {
+                if ( ! this.verse_incomplete ) {
                     this.lookup.book    = this.question.book;
                     this.lookup.chapter = this.question.chapter;
                     this.lookup.verse   = this.question.verse;
                 }
                 else {
                     alert("Incomplete reference; lookup not possible.");
+                }
+            },
+
+            auto_text: function () {
+                if ( ! this.new_question_incomplete ) {
+                    this.classes.cursor_progress = true;
+
+                    this.question.question = this.$refs.question.innerHTML;
+                    this.question.answer   = this.$refs.answer.innerHTML;
+
+                    this.$http.post( cntlr + "/auto_text", this.question ).then( function (response) {
+                        this.question.question = response.body.question.question;
+                        this.question.answer   = response.body.question.answer;
+
+                        this.classes.cursor_progress = false;
+                    } );
+                }
+                else {
+                    alert("Incomplete reference and type; auto not possible.");
                 }
             },
 
@@ -271,11 +286,9 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             },
 
             save_new: function () {
-                if (
-                    !! this.question.book &&
-                    parseInt( this.question.chapter ) > 0 &&
-                    parseInt( this.question.verse ) > 0
-                ) {
+                if ( ! this.verse_incomplete ) {
+                    this.classes.cursor_progress = true;
+
                     this.question.question = this.$refs.question.innerHTML;
                     this.question.answer   = this.$refs.answer.innerHTML;
                     this.question.marked   = (
@@ -288,6 +301,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
                     this.$http.post( cntlr + "/save", this.question ).then( function (response) {
                         create_question( this, response.body.question, "clear_form" );
+                        this.classes.cursor_progress = false;
                     } );
                 }
                 else {
@@ -296,7 +310,9 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             },
 
             save_changes: function () {
-                if ( !! this.questions.question_id ) {
+                if ( ! this.no_saved_question ) {
+                    this.classes.cursor_progress = true;
+
                     this.question.question = this.$refs.question.innerHTML;
                     this.question.answer   = this.$refs.answer.innerHTML;
                     this.question.marked   = (
@@ -309,6 +325,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                         delete_question(this);
                         this.$nextTick( function () {
                             create_question( this, response.body.question );
+                            this.classes.cursor_progress = false;
                         } );
                     } );
                 }
@@ -318,11 +335,14 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             },
 
             delete_question: function () {
-                if ( !! this.questions.question_id ) {
+                if ( ! this.no_saved_question ) {
+                    this.classes.cursor_progress = true;
+
                     this.$http.post(
                         cntlr + "/delete",
                         { question_id: this.questions.question_id }
                     ).then( function (response) {
+                        this.classes.cursor_progress = false;
                         if ( response.body.success ) {
                             delete_question(this);
                             this.questions.marked_questions = this.grep_marked_questions();
@@ -412,6 +432,15 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
             no_saved_question: function () {
                 return ! this.questions.question_id;
+            },
+
+            new_question_incomplete: function () {
+                return (
+                    !! this.question.book &&
+                    parseInt( this.question.chapter ) > 0 &&
+                    parseInt( this.question.verse ) > 0 &&
+                    !! this.question.type
+                ) ? false : true;
             }
         },
 

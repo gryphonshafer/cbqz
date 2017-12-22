@@ -48,6 +48,12 @@ body, input, button, select {
     color: red;
 }
 
+.cursor_progress,
+.cursor_progress *,
+.cursor_progress a:hover {
+    cursor: progress;
+}
+
 /* -------------------------------------------------------------------------- */
 
 html {
@@ -448,7 +454,7 @@ div#editor div#material_search_display {
 }
 
 span#marked_comment {
-    width: 300px;
+    width: 225px;
 }
 
 /* -------------------------------------------------------------------------- */

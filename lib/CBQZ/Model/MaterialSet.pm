@@ -8,19 +8,27 @@ extends 'CBQZ::Model';
 
 class_has 'schema_name' => ( isa => 'Str', is => 'ro', default => 'MaterialSet' );
 
-sub get_material ($self) {
+has material => ( isa => 'ArrayRef[HashRef]', is => 'rw' );
+
+sub get_material ( $self, $as = {} ) {
+    $self->load_material unless ( $self->material );
+    return $self->material if ( ref $as eq 'ARRAY' );
+
     my $material = {};
-    $material->{ $_->{book} }{ $_->{chapter} }{ $_->{verse} } = $_ for (
-        @{
-            $self->dq->sql(q{
-                SELECT book, chapter, verse, text, key_class, key_type, is_new_para
-                FROM material
-                WHERE material_set_id = ?
-            })->run( $self->obj->id )->all({})
-        }
+    $material->{ $_->{book} }{ $_->{chapter} }{ $_->{verse} } = $_ for ( @{ $self->material } );
+    return $material;
+}
+
+sub load_material ($self) {
+    $self->material(
+        $self->dq->sql(q{
+            SELECT book, chapter, verse, text, key_class, key_type, is_new_para
+            FROM material
+            WHERE material_set_id = ?
+        })->run( $self->obj->id )->all({})
     );
 
-    return $material;
+    return $self;
 }
 
 __PACKAGE__->meta->make_immutable;

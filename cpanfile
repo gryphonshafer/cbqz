@@ -23,6 +23,7 @@ requires 'Log::Dispatch';
 requires 'Log::Dispatch::Email::Mailer';
 requires 'Term::ANSIColor';
 requires 'Term::ReadKey';
+requires 'Time::Out';
 requires 'Try::Tiny';
 
 feature 'test', 'Testing' => sub {
@@ -38,7 +39,6 @@ feature 'tools', 'Tools and Etc.' => sub {
     requires 'Text::CSV_XS';
     requires 'Encode';
     requires 'Text::Unidecode';
-    requires 'Time::Out';
 };
 
 feature 'deploy', 'Deployment' => sub {

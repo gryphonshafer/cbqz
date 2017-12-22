@@ -1,6 +1,9 @@
 Vue.http.get( cntlr + "/data" ).then( function (response) {
     var data = response.body;
     data.question_set = null;
+    data.classes = {
+        cursor_progress : false
+    };
 
     new Vue({
         el: "#main",
@@ -57,10 +60,14 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             question_set_create: function () {
                 var name = prompt("Please enter a question set name:");
                 if ( !! name ) {
+                    this.classes.cursor_progress = true;
+
                     this.$http.post(
                         cntlr + "/question_set_create",
                         { name: name }
                     ).then( function (response) {
+                        this.classes.cursor_progress = false;
+
                         if ( response.body.question_set ) {
                             this.question_sets.push( response.body.question_set );
                         }
@@ -75,10 +82,14 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     "Are you sure you want to delete the \"" + this.question_set.name + "\" question set?"
                 ) ) {
                     if ( confirm("STOP! Are you really, really sure? (There's no undo.)") ) {
+                        this.classes.cursor_progress = true;
+
                         this.$http.post(
                             cntlr + "/question_set_delete",
                             { question_set_id: this.question_set_id }
                         ).then( function (response) {
+                            this.classes.cursor_progress = false;
+
                             if ( response.body.success ) {
                                 for ( var i = 0; i < this.question_sets.length; i++ ) {
                                     if ( this.question_sets[i].question_set_id == this.question_set_id ) {
@@ -100,6 +111,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             question_set_rename: function () {
                 var name = prompt("Please enter a question set name:");
                 if ( !! name ) {
+                    this.classes.cursor_progress = true;
+
                     this.$http.post(
                         cntlr + "/question_set_rename",
                         {
@@ -107,6 +120,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                             question_set_id : this.question_set_id,
                         }
                     ).then( function (response) {
+                        this.classes.cursor_progress = false;
+
                         if ( response.body.success ) {
                             this.question_set.name = name;
                         }
