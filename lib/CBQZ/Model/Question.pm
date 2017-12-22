@@ -208,7 +208,13 @@ sub is_owned_by ( $self, $user ) {
 
     sub auto_text ( $self, $material_set = undef, $question = undef ) {
         $question = $self->data if ( not $question and $self->obj );
-        $material = $material_set->load_material->material;
+
+        try {
+            $material = $material_set->load_material->material;
+        }
+        catch {
+            E->throw('Unable to load material from provided material set');
+        };
 
         try {
             $question = $type_fork->($question);
