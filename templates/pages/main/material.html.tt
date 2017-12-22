@@ -4,9 +4,11 @@
     page.vue   = 1;
 
     page.js.push( '/main/path.js' );
-    page.links.push( '/js/components/material_lookup.html' );
-    page.links.push( '/js/components/material_search.html' );
-    page.links.push( '/js/app/material.js' );
+    page.links.push(
+        '/js/components/material_lookup.html',
+        '/js/components/material_search.html',
+        '/js/app/material.js',
+    );
 %]
 
 <div id="material" v-cloak>

@@ -414,7 +414,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     parseInt( this.question.verse ) > 0 &&
                     !! this.question.type
                 ) ? false : true;
-            },
+            }
         },
 
         watch: {
