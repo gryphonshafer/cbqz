@@ -42,7 +42,11 @@
     ></material-lookup>
 
     <div id="quiz_view" v-bind:class="{ hidden: quiz_view_hidden }">
-        <a href="#" id="quiz_view_close" v-on:click="toggle_quiz_view">Close</a>
+        <div id="quiz_view_buttons">
+            <button v-on:click="print_quiz">Print Quiz</button>
+            <button v-on:click="toggle_quiz_view">Close View</button>
+        </div>
+
         <h2>Quiz Questions Pool View</h2>
 
         <table class="tabular numeric">
@@ -105,6 +109,7 @@
         <div id="mark">
             <button v-on:click="mark_for_edit" v-bind:disabled="question.marked">Mark for Edit</button>
             <button v-on:click="make_beep">Beep</button>
+            <button v-on:click="print_quiz">Print Quiz</button>
         </div>
 
         <div id="replace">

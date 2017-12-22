@@ -17,6 +17,7 @@ requires 'Digest::SHA';
 requires 'Email::Mailer';
 requires 'Exporter';
 requires 'File::Path';
+requires 'MIME::Base64';
 requires 'IO::All';
 requires 'Log::Dispatch';
 requires 'Log::Dispatch::Email::Mailer';

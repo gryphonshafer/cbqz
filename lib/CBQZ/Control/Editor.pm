@@ -2,6 +2,7 @@ package CBQZ::Control::Editor;
 
 use Mojo::Base 'Mojolicious::Controller';
 use exact;
+use MIME::Base64 'decode_base64';
 use CBQZ::Model::MaterialSet;
 use CBQZ::Model::QuestionSet;
 use CBQZ::Model::Question;
@@ -62,6 +63,30 @@ sub delete ($self) {
     if ( $question and $question->is_owned_by( $self->stash('user') ) ) {
         $question->obj->delete;
         return $self->render( json => { success => 1 } );
+    }
+}
+
+sub questions ($self) {
+    if ( $self->param('quiz') ) {
+        $self->stash( questions => [
+            map { $_->data }
+            grep { $_->is_owned_by( $self->stash('user') ) }
+            map { CBQZ::Model::Question->new->load($_) }
+            @{ $self->cbqz->json->decode( decode_base64( $self->param('quiz') ) ) }
+        ] );
+    }
+    else {
+        my $set = CBQZ::Model::QuestionSet->new->load( $self->decode_cookie('cbqz_prefs')->{question_set_id} );
+        $self->stash(
+            questions => [
+                sort {
+                    $a->{book} cmp $b->{book} or
+                    $a->{chapter} <=> $b->{chapter} or
+                    $a->{verse} <=> $b->{verse} or
+                    $a->{type} cmp $b->{type}
+                } @{ $set->get_questions([]) }
+            ],
+        ) if ( $set and $set->is_owned_by( $self->stash('user') ) );
     }
 }
 

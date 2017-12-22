@@ -521,7 +521,7 @@ div#quizroom div#quiz_view h2 {
     padding: 0;
 }
 
-div#quizroom div#quiz_view a#quiz_view_close {
+div#quizroom div#quiz_view div#quiz_view_buttons {
     float: right;
 }
 
@@ -606,4 +606,65 @@ div#material div#material_lookup_display {
 
 div#material div#material_search div.margin_lift {
     margin-top: 0px;
+}
+
+/* -------------------------------------------------------------------------- */
+
+div#printed_questions hr {
+    border-top: 1px dashed lightgray;
+    border-bottom: none;
+    margin: 15px 0px 15px 0px;
+}
+
+/* -------------------------------------------------------------------------- */
+
+@media print {
+    html {
+        background-color: white;
+    }
+
+    body {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    div#header {
+        position: static;
+        background-color: white;
+        padding: 0px;
+        margin-bottom: 20px;
+        border-bottom-color: lightgray;
+    }
+
+    div#header_login,
+    div#footer {
+        display: none;
+    }
+
+    span.field {
+        border: none;
+        padding: 0px 10px 0px 0px;
+        font-family: bold;
+    }
+
+    div.htmlarea {
+        padding: 0px 0px 0px 20px;
+        border: none;
+    }
+
+    .unique_word {
+        font-family: medium;
+        color: black;
+        text-decoration: underline;
+    }
+
+    .unique_phrase {
+        font-family: normal;
+        color: black;
+    }
+
+    .unique_chapter {
+        font-family: medium;
+        color: black;
+    }
 }
