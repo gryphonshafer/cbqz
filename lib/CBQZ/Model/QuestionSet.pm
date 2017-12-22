@@ -25,18 +25,17 @@ sub create ( $self, $user, $name = undef ){
     return $self;
 }
 
-sub get_questions ($self) {
-    my $questions = {};
-    $questions->{ $_->{book} }{ $_->{chapter} }{ $_->{question_id} } = $_ for (
-        @{
-            $self->dq->sql(q{
-                SELECT question_id, book, chapter, verse, question, answer, type, used, marked
-                FROM question
-                WHERE question_set_id = ?
-            })->run( $self->obj->id )->all({})
-        }
-    );
+sub get_questions ( $self, $as = {} ) {
+    my $questions_data = $self->dq->sql(q{
+        SELECT question_id, book, chapter, verse, question, answer, type, used, marked
+        FROM question
+        WHERE question_set_id = ?
+    })->run( $self->obj->id )->all({});
 
+    return $questions_data if ( ref $as eq 'ARRAY' );
+
+    my $questions = {};
+    $questions->{ $_->{book} }{ $_->{chapter} }{ $_->{question_id} } = $_ for (@$questions_data);
     return $questions;
 }
 

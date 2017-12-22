@@ -167,6 +167,18 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 }
             },
 
+            print_quiz: function () {
+                var question_ids = [];
+                for ( var i = 0; i < this.questions.length; i++ ) {
+                    question_ids.push( this.questions[i].question_id );
+                }
+
+                window.open(
+                    "editor/questions?quiz=" + btoa( JSON.stringify(question_ids) ),
+                    "_blank"
+                );
+            },
+
             replace: function (type) {
                 this.$http.post(
                     cntlr + "/replace",
@@ -220,8 +232,6 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.lookup.chapter = verse.chapter;
                 this.lookup.verse   = verse.verse;
             }
-
-
         },
         computed: {
             verse_incomplete: function () {
