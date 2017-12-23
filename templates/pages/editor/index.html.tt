@@ -38,9 +38,12 @@
                 <option v-for="item in metadata.types">{{ item }}</option>
             </select>
 
-            <button tabindex="6" v-on:click="auto_text" v-bind:disabled="new_question_incomplete">
+            <button
+                tabindex="6" id="auto_text"
+                v-on:click="auto_text" v-bind:disabled="new_question_incomplete"
+            >
                 Auto
-                <span class="key_text">Alt+T</span>
+                <span class="key_text">Alt+Z</span>
             </button>
 
             <span class="label">Marked:</span>

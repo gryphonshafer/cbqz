@@ -598,6 +598,9 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         if ( ( event.altKey && event.keyCode == 71 ) || event.keyCode == 113 )
             document.getElementById("lookup").click();
 
+        // for Alt+Z: Auto
+        if ( event.altKey && event.keyCode == 90 ) document.getElementById("auto_text").click();
+
         // for Alt+Q: Reset Formatting
         if ( event.altKey && event.keyCode == 81 ) document.getElementById("format_reset").click();
 
