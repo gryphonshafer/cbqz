@@ -454,7 +454,11 @@ div#editor div#material_search_display {
 }
 
 span#marked_comment {
+    display: inline-block;
     width: 225px;
+    height: 17px;
+    vertical-align: middle;
+    overflow: hidden;
 }
 
 /* -------------------------------------------------------------------------- */

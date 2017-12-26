@@ -248,8 +248,13 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     this.question.answer   = this.$refs.answer.innerHTML;
 
                     this.$http.post( cntlr + "/auto_text", this.question ).then( function (response) {
-                        this.question.question = response.body.question.question;
-                        this.question.answer   = response.body.question.answer;
+                        if ( response.body.question.error ) {
+                            alert( response.body.question.error );
+                        }
+                        else {
+                            this.question.question = response.body.question.question;
+                            this.question.answer   = response.body.question.answer;
+                        }
 
                         this.classes.cursor_progress = false;
                     } );

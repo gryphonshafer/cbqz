@@ -81,7 +81,7 @@ sub is_owned_by ( $self, $user ) {
             @$material;
 
         my @filtered_matches;
-        timeout 5 => sub {
+        timeout 2 => sub {
             @filtered_matches =
                 grep { defined }
                 map {
@@ -189,6 +189,7 @@ sub is_owned_by ( $self, $user ) {
         elsif ( $data->{type} eq 'FT' or $data->{type} eq 'FTN' ) {
             my @verses = $get_2_verses->($data);
             ( $data->{question}, $data->{answer} ) = $first_5->( $data->{question} . ' ' . $data->{answer} );
+
             $data = $process_question->( $data, 1, 0, 1 );
             return unless ($data);
 
@@ -198,7 +199,7 @@ sub is_owned_by ( $self, $user ) {
             $data->{answer} .= ' ' . $verses[1]->{text} if ( $data->{type} eq 'FTN' );
         }
         else {
-            E->throw('Unexpected question type encountered');
+            E->throw('Auto-text not supported for question type');
         }
 
         $data->{answer} =~ s/[,:\-]+$//g;
@@ -208,6 +209,7 @@ sub is_owned_by ( $self, $user ) {
 
     sub auto_text ( $self, $material_set = undef, $question = undef ) {
         $question = $self->data if ( not $question and $self->obj );
+        $question->{previously_marked} = $question->{marked};
 
         try {
             $material = $material_set->load_material->material;
@@ -220,7 +222,7 @@ sub is_owned_by ( $self, $user ) {
             $question = $type_fork->($question);
         }
         catch {
-            $question->{marked} = "Auto-text error: $_";
+            $question->{error} = 'Auto-text error: ' . ( split(/\n/) )[0];
         };
 
         return $question;
