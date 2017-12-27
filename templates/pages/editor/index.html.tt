@@ -15,78 +15,82 @@
     <div id="question_form">
         <div>
             <span class="label">Ref:</span>
-            <select id="book" tabindex="1" v-model="question.book">
+            <select id="book" tabindex="3" v-model="question.book">
                 <option v-for="item in metadata.books">{{ item }}</option>
             </select>
 
-            <input type="text" tabindex="2" size="2" v-model="question.chapter">:<input
-                type="text" id="verse" tabindex="3" size="2" v-model="question.verse">
+            <input type="text" tabindex="4" size="2" v-model="question.chapter">:<input
+                type="text" id="verse" tabindex="5" size="2" v-model="question.verse">
 
-            <button tabindex="4" id="copy_verse" v-on:click="copy_verse" v-bind:disabled="verse_incomplete">
+            <button tabindex="6" id="copy_verse" v-on:click="copy_verse" v-bind:disabled="verse_incomplete">
                 Copy Verse
                 <span class="key_text">Alt+V</span>
             </button>
-            <button id="lookup" v-on:click="lookup_reference" v-bind:disabled="verse_incomplete">
-                Lookup
-                <span class="key_text">Alt+G, F2</span>
-            </button>
-        </div>
 
-        <div class="margin_lift">
             <span class="label">Type:</span>
-            <select tabindex="5" v-model="question.type">
+            <select tabindex="7" v-model="question.type">
                 <option v-for="item in metadata.types">{{ item }}</option>
             </select>
-
-            <button
-                tabindex="6" id="auto_text"
-                v-on:click="auto_text" v-bind:disabled="new_question_incomplete"
-            >
-                Auto
-                <span class="key_text">Alt+Z</span>
-            </button>
-
-            <span class="label">Marked:</span>
-            <span id="marked_comment" class="field">{{ question.marked }}</span>
         </div>
 
         <div>
             <span class="label">Question:</span>
-            <div tabindex="7" class="htmlarea question_box" contenteditable="true"
+            <div tabindex="8" class="htmlarea question_box" contenteditable="true"
                 ref="question" v-html="question.question"></div>
         </div>
 
         <div>
-            <button id="format_reset" v-on:click="format('clear')"
+            <button tabindex="17" id="format_reset" v-on:click="format('clear')"
             >Reset <span class="key_text">Alt+Q</span></button>
 
-            <button id="format_unique_word" v-on:click="format('unique_word')"
+            <button tabindex="18" id="format_unique_word" v-on:click="format('unique_word')"
             >Global <span class="key_text">Alt+W, Ctrl+B</span></button>
 
-            <button id="format_unique_chapter" v-on:click="format('unique_chapter')"
+            <button tabindex="19" id="format_unique_chapter" v-on:click="format('unique_chapter')"
             >Chapter <span class="key_text">Alt+E, Ctrl+I</span></button>
 
-            <button id="format_unique_phrase" v-on:click="format('unique_phrase')"
+            <button tabindex="20" id="format_unique_phrase" v-on:click="format('unique_phrase')"
             >Phrase <span class="key_text">Alt+R, Ctrl+U</span></button>
         </div>
 
         <div>
             <span class="label">Answer:</span>
-            <div tabindex="8" class="htmlarea answer_box" contenteditable="true"
+            <div tabindex="9" class="htmlarea answer_box" contenteditable="true"
                 ref="answer" v-html="question.answer"></div>
         </div>
 
         <div>
-            <button tabindex="9" id="save_new"
+            <button
+                tabindex="10" id="auto_text"
+                v-on:click="auto_text" v-bind:disabled="new_question_incomplete"
+            >
+                Auto-Text
+                <span class="key_text">Alt+Z</span>
+            </button>
+
+            <span class="label">Marked:</span>
+            <input tabindex="15" id="marked_comment" type="text" v-model="question.marked">
+
+            <button tabindex="16" id="lookup" v-on:click="lookup_reference" v-bind:disabled="verse_incomplete">
+                Lookup
+                <span class="key_text">Alt+G, F2</span>
+            </button>
+        </div>
+
+        <div>
+            <button tabindex="11" id="save_new"
                 v-on:click="save_new" v-bind:disabled="verse_incomplete"
             >Save New <span class="key_text">Alt+A, F8</span></button>
-            <button tabindex="10" id="save_changes"
+
+            <button tabindex="12" id="save_changes"
                 v-on:click="save_changes" v-bind:disabled="no_saved_question"
             >Save Changes <span class="key_text">Alt+S, F9</span></button>
-            <button tabindex="11" id="delete_question"
+
+            <button tabindex="13" id="delete_question"
                 v-on:click="delete_question" v-bind:disabled="no_saved_question"
             >Delete <span class="key_text">Alt+X</span></button>
-            <button tabindex="12" id="clear_form" v-on:click="clear_form"
+
+            <button tabindex="14" id="clear_form" v-on:click="clear_form"
             >Clear <span class="key_text">Alt+C</span></button>
         </div>
     </div>
@@ -116,7 +120,7 @@
         </div>
 
         <div class="margin_lift">
-            <select class="questions_list_list" v-model="questions.question_id" size="13">
+            <select tabindex="1" class="questions_list_list" v-model="questions.question_id" size="13">
                 <option v-for="item in questions.questions" v-bind:value="item.question_id">{{
                     item.verse + ' ' +
                     ( ( !! item.type ) ? item.type : '[No Type]' ) + ' ' +
@@ -128,7 +132,7 @@
 
         <span class="label">Marked Questions:</span>
         <div>
-            <select class="questions_list_list" v-model="questions.marked_question_id" size="6">
+            <select tabindex="2" class="questions_list_list" v-model="questions.marked_question_id" size="6">
                 <option v-for="item in this.questions.marked_questions" v-bind:value="item.question_id">{{
                     item.book.replace( ' ', '' ).substr( 0, 2 ) + ' ' +
                     item.chapter + ':' +
