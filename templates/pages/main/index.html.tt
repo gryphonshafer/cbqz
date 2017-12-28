@@ -143,7 +143,8 @@
                         <th>Vrs.</th>
                         <th>Qs.</th>
                         <th>Qs./V.</th>
-                        <th v-for="type in question_set.statistics[0].types">{{ type[0] }}</th>
+                        <th class="question_type_totals"
+                            v-for="type in question_set.statistics[0].types">{{ type[0] }}</th>
                     </tr>
 
                     <tr
@@ -163,7 +164,8 @@
                         <td>{{ chapter.questions }}</td>
                         <td>{{ chapter.verses }}</td>
                         <td>{{ ( chapter.questions / chapter.verses ).toFixed(2) }}</td>
-                        <td v-for="type in chapter.types">{{ type[1] || 0 }}</td>
+                        <td class="question_type_totals"
+                            v-for="type in chapter.types">{{ type[1] || 0 }}</td>
                     </tr>
                 </table>
 

@@ -15,12 +15,13 @@
     page.title =
         ( NOT page.title ) ? 'Christian Bible Quizzing' :
         ( NOT page.title.match('^CBQZ\s') ) ? 'CBQZ: ' _ page.title : page.title;
+    page.alt_title = 'CBQZ';
 -%]
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <meta name=viewport content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=0.9">
 
         <link rel="shortcut icon" href="[% c.url_for.path('/favicon.ico') %]" type="image/x-icon" />
         <link rel="stylesheet" type="text/css" href="[% c.url_for.path('/style.css') %]" />
