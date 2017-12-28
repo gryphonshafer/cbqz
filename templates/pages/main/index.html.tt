@@ -32,7 +32,7 @@
     ) %]
 
     <form id="create_form" method="post"
-        action="[% c.url_for.path('/create-user') %]" autocomplete="new-password"
+        action="[% c.url_for('/create-user') %]" autocomplete="new-password"
     >
         <fieldset>
             <legend>Create User Account</legend>

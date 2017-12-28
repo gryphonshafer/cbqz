@@ -21,7 +21,7 @@ sub index ($self) {
 
 sub path ($self) {
     my $cbqz_prefs       = $self->decode_cookie('cbqz_prefs');
-    my $path             = $self->url_for->path('/quizroom');
+    my $path             = $self->url_for('/quizroom');
     my $result_operation = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} )->obj->result_operation;
 
     return $self->render(

@@ -75,7 +75,7 @@ sub create_user ($self) {
 }
 
 sub path ($self) {
-    return $self->render( text => 'var cntlr = "' . $self->url_for->path('/main') . '";' );
+    return $self->render( text => 'var cntlr = "' . $self->url_for('/main') . '";' );
 }
 
 sub data ($self) {

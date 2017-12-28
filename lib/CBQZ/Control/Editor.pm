@@ -9,7 +9,7 @@ use CBQZ::Model::Question;
 use CBQZ::Model::Program;
 
 sub path ($self) {
-    return $self->render( text => 'var cntlr = "' . $self->url_for->path('/editor') . '";' );
+    return $self->render( text => 'var cntlr = "' . $self->url_for('/editor') . '";' );
 }
 
 sub data ($self) {

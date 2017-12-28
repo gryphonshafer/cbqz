@@ -14,6 +14,9 @@ sub startup ( $self, $app = undef ) {
     my $cbqz   = CBQZ->new;
     my $config = $cbqz->config;
 
+    # base URL handling
+    $self->plugin('RequestBase');
+
     $self->static->paths->[0] =~ s|/public$|/static|;
     $self->sessions->cookie_name( $config->get( 'mojolicious', 'session_cookie_name' ) );
     $self->secrets( $config->get( 'mojolicious', 'secrets' ) );

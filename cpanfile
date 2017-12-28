@@ -7,6 +7,7 @@ requires 'MooseX::ClassAttribute';
 requires 'Mojolicious', '>= 7.10';
 requires 'Mojolicious::Plugin::AccessLog';
 requires 'Mojolicious::Plugin::ToolkitRenderer', '>= 1.01';
+requires 'Mojolicious::Plugin::RequestBase';
 requires 'MojoX::Log::Dispatch::Simple';
 
 requires 'Carp';

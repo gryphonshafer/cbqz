@@ -6,31 +6,31 @@
         [% UNLESS user %]
             [% page.js.push( '/js/utilities.js', '/js/pages/login.js' ) %]
 
-            <form method="post" action="[% c.url_for.path('/login') %]" autocomplete="off">
+            <form method="post" action="[% c.url_for('/login') %]" autocomplete="off">
                 <input type="text" name="name" placeholder="Name" size="12">
                 <input type="password" name="passwd" placeholder="Password" size="12">
                 <input id="login_form_submit" type="submit" value="Login">
             </form>
         [% ELSE %]
             Logged in as: <b>[% user.obj.name %]</b>
-            (<a href="[% c.url_for.path('/logout') %]">Logout</a>)
+            (<a href="[% c.url_for('/logout') %]">Logout</a>)
             <br>
 
             <a [% IF page.menu == 'main' %]class="selected"[% END %]
-                href="[% c.url_for.path('/') %]">Main</a>
+                href="[% c.url_for('/') %]">Main</a>
 
             [% IF
                 user.roles_count > 0 AND user.programs_count > 0
                 AND NOT ( page.menu == 'main' AND material_sets_count == 0 )
             %]
                 <a [% IF page.menu == 'editor' %]class="selected"[% END %]
-                    href="[% c.url_for.path('/editor') %]">Editor</a>
+                    href="[% c.url_for('/editor') %]">Editor</a>
                 <a [% IF page.menu == 'quizroom' %]class="selected"[% END %]
-                    href="[% c.url_for.path('/quizroom') %]">Quiz Room</a>
+                    href="[% c.url_for('/quizroom') %]">Quiz Room</a>
                 <a [% IF page.menu == 'material' %]class="selected"[% END %]
-                    href="[% c.url_for.path('/main/material') %]">Material</a>
+                    href="[% c.url_for('/main/material') %]">Material</a>
                 <a [% IF page.menu == 'questions' %]class="selected"[% END %]
-                    href="[% c.url_for.path('/editor/questions') %]">Questions</a>
+                    href="[% c.url_for('/editor/questions') %]">Questions</a>
             [% END %]
         [% END %]
     </div>
@@ -61,5 +61,11 @@
 </div>
 
 <div id="footer">
-    <p>CBQZ v[% c.config.get('version') %]</p>
+    <p>
+        <a href="/">CBQZ Home Page</a>
+    </p>
+    <p class="right">
+        CBQZ v[% c.config.get('version') %]
+        <a href="https://github.com/gryphonshafer/cbqz" target="github">CBQZ GitHub Project</a>
+    </p>
 </div>
