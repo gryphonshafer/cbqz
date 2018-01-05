@@ -47,7 +47,7 @@ __PACKAGE__->table("program");
 =head2 target_questions
 
   data_type: 'tinyint'
-  default_value: 50
+  default_value: 40
   extra: {unsigned => 1}
   is_nullable: 0
 
@@ -96,7 +96,7 @@ __PACKAGE__->add_columns(
   "target_questions",
   {
     data_type => "tinyint",
-    default_value => 50,
+    default_value => 40,
     extra => { unsigned => 1 },
     is_nullable => 0,
   },
@@ -161,8 +161,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-30 07:46:31
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:gBK2YDjIrOvSJeU3Q0Kyuw
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-01-04 20:42:51
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:B0xWPJ4fjjjfd8qOnJLBOA
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

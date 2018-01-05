@@ -135,6 +135,8 @@ __PACKAGE__->set_primary_key("material_id");
 
 =over 4
 
+=item * L</material_set_id>
+
 =item * L</book>
 
 =item * L</chapter>
@@ -145,7 +147,7 @@ __PACKAGE__->set_primary_key("material_id");
 
 =cut
 
-__PACKAGE__->add_unique_constraint("reference", ["book", "chapter", "verse"]);
+__PACKAGE__->add_unique_constraint("reference", ["material_set_id", "book", "chapter", "verse"]);
 
 =head1 RELATIONS
 
@@ -165,8 +167,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-10 10:17:14
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:MmDkZDvPLwcXns22fXK/Sg
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-01-04 20:42:51
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:XpRG4eRlMe/Gl4Rm4fiMeg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

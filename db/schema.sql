@@ -19,7 +19,7 @@ CREATE TABLE material (
     key_type tinytext,
     is_new_para tinyint(1) NOT NULL DEFAULT '0',
     PRIMARY KEY (material_id),
-    UNIQUE KEY reference (book,chapter,verse),
+    UNIQUE KEY reference (material_set_id,book,chapter,verse),
     KEY material_set_id (material_set_id),
     CONSTRAINT material_ibfk_1 FOREIGN KEY (material_set_id) REFERENCES material_set (material_set_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -39,7 +39,7 @@ CREATE TABLE program (
     program_id int(10) unsigned NOT NULL,
     name varchar(64) DEFAULT NULL,
     question_types tinytext,
-    target_questions tinyint(3) unsigned NOT NULL DEFAULT '50',
+    target_questions tinyint(3) unsigned NOT NULL DEFAULT '40',
     result_operation text,
     timer_values tinytext,
     timer_default tinyint(4) NOT NULL DEFAULT '30',
