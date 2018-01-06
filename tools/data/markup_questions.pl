@@ -28,7 +28,18 @@ catch {
 
 my $question_model = CBQZ::Model::Question->new;
 for my $question ( $question_model->model( $question_set->obj->questions->all ) ) {
-    $question->obj->update( $question->auto_text($material_set) );
+    my $data = $question->auto_text($material_set);
+
+    if ( $data->{error} ) {
+        warn sprintf(
+            "%s on question ID %s; %s %s:%s\n",
+            map { $data->{$_} } qw( error question_id book chapter verse )
+        );
+
+        $data->{marked} = delete $data->{error};
+    }
+
+    $question->obj->update($data);
 }
 
 =head1 NAME
