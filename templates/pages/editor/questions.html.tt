@@ -3,30 +3,38 @@
     page.menu  = 'questions';
 %]
 
-<div id="printed_questions">
-    [% question_number = 0 %]
-    [% FOR question IN questions %]
-        [% question_number = question_number + 1 %]
-        <div>
-            <span class="label">Question #:</span> <span class="field">[% question_number %]</span>
-            <span class="label">Type:</span> <span class="field">[% question.type %]</span>
-            <span class="label">Reference:</span> <span class="field">[%
-                question.book _ ' ' _ question.chapter _ ':' _ question.verse
-            %]</span>
-            <span class="label">Used:</span> <span class="field">[% question.used %]</span>
-            <br>
-
-            [% IF question.marked %]
-                <span class="label">Marked:</span> <span class="field">[% question.marked %]</span>
+[% IF questions %]
+    <div id="printed_questions">
+        [% question_number = 0 %]
+        [% FOR question IN questions %]
+            [% question_number = question_number + 1 %]
+            <div>
+                <span class="label">Question #:</span> <span class="field">[% question_number %]</span>
+                <span class="label">Type:</span> <span class="field">[% question.type %]</span>
+                <span class="label">Reference:</span> <span class="field">[%
+                    question.book _ ' ' _ question.chapter _ ':' _ question.verse
+                %]</span>
+                <span class="label">Used:</span> <span class="field">[% question.used %]</span>
                 <br>
-            [% END %]
 
-            <span class="label">Question:</span>
-            <div class="htmlarea">[% question.question %]</div>
+                [% IF question.marked %]
+                    <span class="label">Marked:</span> <span class="field">[% question.marked %]</span>
+                    <br>
+                [% END %]
 
-            <span class="label">Answer:</span>
-            <div class="htmlarea">[% question.answer %]</div>
-        </div>
-        [% UNLESS loop.last %]<hr>[% END %]
-    [% END %]
-</div>
+                <span class="label">Question:</span>
+                <div class="htmlarea">[% question.question %]</div>
+
+                <span class="label">Answer:</span>
+                <div class="htmlarea">[% question.answer %]</div>
+            </div>
+            [% UNLESS loop.last %]<hr>[% END %]
+        [% END %]
+    </div>
+[% ELSE %]
+    [% message =
+        'An error occurred while trying to load data. ' _
+        'This is likely due to invalid settings on the main page. ' _
+        'Visit the main page and verify your settings.'
+    %]
+[% END %]

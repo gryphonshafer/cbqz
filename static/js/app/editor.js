@@ -1,5 +1,7 @@
 Vue.http.get( cntlr + "/data" ).then( function (response) {
     var data = response.body;
+    if ( data.error ) alert( data.error );
+
     data.lookup = {
         book    : null,
         chapter : null,

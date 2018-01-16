@@ -3,6 +3,7 @@ package CBQZ::Control::Editor;
 use Mojo::Base 'Mojolicious::Controller';
 use exact;
 use MIME::Base64 'decode_base64';
+use Try::Tiny;
 use CBQZ::Model::MaterialSet;
 use CBQZ::Model::QuestionSet;
 use CBQZ::Model::Question;
@@ -14,19 +15,45 @@ sub path ($self) {
 
 sub data ($self) {
     my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
-    my $material   = CBQZ::Model::MaterialSet->new->load( $cbqz_prefs->{material_set_id} )->get_material;
 
-    my $set = CBQZ::Model::QuestionSet->new->load( $cbqz_prefs->{question_set_id} );
-    my $questions = ( $set and $set->is_owned_by( $self->stash('user') ) ) ? $set->get_questions : {};
+    my $data = {
+        metadata  => {},
+        questions => { data => {} },
+        material  => { Error => { 1 => { 1 => {
+            book    => 'Error',
+            chapter => 1,
+            verse   => 1,
+            text    =>
+                'An error occurred while trying to load data. ' .
+                'This is likely due to invalid settings on the main page. ' .
+                'Visit the main page and verify your settings.',
+        } } } },
+    };
 
-    return $self->render( json => {
-        metadata => {
+    try {
+        $data->{material} = CBQZ::Model::MaterialSet->new->load(
+            $cbqz_prefs->{material_set_id},
+        )->get_material;
+
+        $data->{metadata} = {
             types => CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} )->types_list,
-            books => [ sort { $a cmp $b } keys %$material ],
-        },
-        material  => $material,
-        questions => { data => $questions },
-    } );
+            books => [ sort { $a cmp $b } keys %{ $data->{material} } ],
+        };
+
+        my $set = CBQZ::Model::QuestionSet->new->load( $cbqz_prefs->{question_set_id} );
+        $data->{questions} = { data => (
+            ( $set and $set->is_owned_by( $self->stash('user') ) ) ? $set->get_questions : {},
+        ) };
+    }
+    catch {
+        $self->warn($_);
+        $data->{error} =
+            "An error occurred while trying to load data.\n" .
+            "This is likely due to invalid settings on the main page.\n" .
+            "Visit the main page and verify your settings.";
+    };
+
+    return $self->render( json => $data );
 }
 
 sub save ($self) {
@@ -73,27 +100,34 @@ sub delete ($self) {
 }
 
 sub questions ($self) {
-    if ( $self->param('quiz') ) {
-        $self->stash( questions => [
-            map { $_->data }
-            grep { $_->is_owned_by( $self->stash('user') ) }
-            map { CBQZ::Model::Question->new->load($_) }
-            @{ $self->cbqz->json->decode( decode_base64( $self->param('quiz') ) ) }
-        ] );
+    try {
+        if ( $self->param('quiz') ) {
+            $self->stash( questions => [
+                map { $_->data }
+                grep { $_->is_owned_by( $self->stash('user') ) }
+                map { CBQZ::Model::Question->new->load($_) }
+                @{ $self->cbqz->json->decode( decode_base64( $self->param('quiz') ) ) }
+            ] );
+        }
+        else {
+            my $set = CBQZ::Model::QuestionSet->new->load(
+                $self->decode_cookie('cbqz_prefs')->{question_set_id}
+            );
+            $self->stash(
+                questions => [
+                    sort {
+                        $a->{book} cmp $b->{book} or
+                        $a->{chapter} <=> $b->{chapter} or
+                        $a->{verse} <=> $b->{verse} or
+                        $a->{type} cmp $b->{type}
+                    } @{ $set->get_questions([]) }
+                ],
+            ) if ( $set and $set->is_owned_by( $self->stash('user') ) );
+        }
     }
-    else {
-        my $set = CBQZ::Model::QuestionSet->new->load( $self->decode_cookie('cbqz_prefs')->{question_set_id} );
-        $self->stash(
-            questions => [
-                sort {
-                    $a->{book} cmp $b->{book} or
-                    $a->{chapter} <=> $b->{chapter} or
-                    $a->{verse} <=> $b->{verse} or
-                    $a->{type} cmp $b->{type}
-                } @{ $set->get_questions([]) }
-            ],
-        ) if ( $set and $set->is_owned_by( $self->stash('user') ) );
-    }
+    catch {
+        $self->warn($_);
+    };
 }
 
 sub auto_text ($self) {

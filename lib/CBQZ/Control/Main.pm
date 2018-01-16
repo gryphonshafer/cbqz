@@ -139,11 +139,26 @@ sub question_set_rename ($self) {
 }
 
 sub material_data ($self) {
-    return $self->render( json => {
-        material => CBQZ::Model::MaterialSet->new->load(
+    my $material = { Error => { 1 => { 1 => {
+        book    => 'Error',
+        chapter => 1,
+        verse   => 1,
+        text    =>
+            'An error occurred while trying to load data. ' .
+            'This is likely due to invalid settings on the main page. ' .
+            'Visit the main page and verify your settings.',
+    } } } };
+
+    try {
+        $material = CBQZ::Model::MaterialSet->new->load(
             $self->decode_cookie('cbqz_prefs')->{material_set_id}
-        )->get_material
-    } );
+        )->get_material;
+    }
+    catch {
+        $self->warn($_);
+    };
+
+    return $self->render( json => { material => $material } );
 }
 
 1;
