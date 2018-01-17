@@ -130,6 +130,35 @@ table td.right {
 
 /* -------------------------------------------------------------------------- */
 
+div#pagination {
+    font-size: 14px;
+    line-height: 18px;
+    margin-bottom: 15px;
+}
+
+div#pagination a {
+    text-decoration: none;
+    margin-left: 3px;
+}
+
+div#pagination a:hover {
+    text-decoration: underline;
+}
+
+div#pagination a.this_page:before {
+    content: "[";
+    font-family: bold;
+    font-weight: normal;
+}
+
+div#pagination a.this_page:after {
+    content: "]";
+    font-family: bold;
+    font-weight: normal;
+}
+
+/* -------------------------------------------------------------------------- */
+
 div#header {
     position: fixed;
     top: 0px;
@@ -862,6 +891,7 @@ div#printed_questions hr {
         border-bottom-color: lightgray;
     }
 
+    .no_print,
     div#header_login,
     div#footer {
         display: none;

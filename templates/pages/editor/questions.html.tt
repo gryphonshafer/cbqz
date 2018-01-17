@@ -1,12 +1,41 @@
 [%
-    page.title = ( c.param('quiz') ) ? 'Quiz Questions' : 'Questions List';
-    page.menu  = 'questions';
+    page.title     = ( c.param('quiz') ) ? 'Quiz Questions' : 'Questions List';
+    page.menu      = 'questions';
+    items_per_page = ( c.param('page') == 'all' ) ? questions.size : 40;
 %]
 
 [% IF questions %]
+    [% IF questions.size > items_per_page %]
+        [%
+            current_page   = c.param('page') || 1;
+            total_pages    = questions.size / items_per_page + 1;
+            counter_start  = current_page * items_per_page - items_per_page;
+            counter_end    = counter_start + items_per_page - 1;
+            page_questions = questions.slice(
+                counter_start,
+                ( counter_end <= questions.size ) ? counter_end : questions.size - 1
+            );
+        %]
+        <div id="pagination" class="no_print">
+            <b>Page:</b>
+            [% FOREACH this_page = [ 1 .. total_pages ] %]
+                <a
+                    [% IF this_page == current_page %]class="this_page"[% END %]
+                    href="[% c.url_for.query( page => this_page ) %]"
+                >[% this_page %]</a>
+            [% END %]
+            <a href="[% c.url_for.query( page => 'all' ) %]">All</a>
+        </div>
+    [% ELSE %]
+        [%
+            counter_start  = 0;
+            page_questions = questions;
+        %]
+    [% END %]
+
     <div id="printed_questions">
-        [% question_number = 0 %]
-        [% FOR question IN questions %]
+        [% question_number = counter_start %]
+        [% FOR question IN page_questions %]
             [% question_number = question_number + 1 %]
             <div>
                 <span class="label">Question #:</span> <span class="field">[% question_number %]</span>
