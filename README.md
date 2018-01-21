@@ -145,7 +145,7 @@ container based on the CBQZ Docker image.
     docker run \
         --detach \
         --hostname cbqz_docker \
-        --publish 7892:3000 \
+        --publish 3000:3000 \
         --name cbqz \
         --restart unless-stopped \
         --volume /opt/cbqz:/cbqz/runtime \
@@ -167,3 +167,19 @@ container.
 Note that this gives you `sh` access, not `bash` or anything more advanced
 since these other shells are not installed in the image/container for space
 considerations.
+
+### Nginx Container
+
+Although it's possible to run CBQZ through the Hypnotoad-based "cbqz" container
+above, it'll probably be a better option to run Nginx to proxy pass to the
+CBQZ service.
+
+    docker run \
+        --detach \
+        --publish 80:80 \
+        --name cbqz-nginx \
+        --restart unless-stopped \
+        --volume `pwd`/etc/nginx.conf:/etc/nginx/nginx.conf:ro \
+        --volume `pwd`:/cbqz:ro \
+        --volume /opt/nginx/log:/var/log/nginx \
+        nginx:alpine
