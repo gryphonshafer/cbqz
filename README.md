@@ -3,10 +3,14 @@
 This project is a series of tools and an overall system for CBQZ functionality.
 It includes everything that's part of the CBQZ ecosystem (apart from the data).
 
-## Installation
+## Local/Developer Installation
 
 This project expects to run inside a Linux host of some kind with a modern Perl
-version.
+version. The following are instructions for installation in a local or developer
+enviornment (i.e. native or inside virtual machine instead of inside Docker).
+
+These instructions would also work for a production enviornment, but for such,
+you may want to consider the Docker option explained below.
 
 ### Perl
 
@@ -85,7 +89,7 @@ And finally, you'll need to create two directories:
 
     mkdir runtime data
 
-## Service Startup
+### Service Startup
 
 To read about how to start the application web service, run the following from
 the project's root directory:
@@ -100,7 +104,7 @@ To start a development instance of the CBQZ web service:
 Note that at this point, while the service may be running, it by default binds
 to `localhost:3000`. So you may need to tunnel that to gain access.
 
-## Materials Loading
+### Materials Loading
 
 Although the application system will be technically operational in the previous
 step, you can't really do anything useful like work in the questions editor or
@@ -111,7 +115,7 @@ directory.
 
     ./tools/data/material_load.pl -n '2017 Corinthians' -k etc/2017_kvl.csv -m etc/2017_materials.csv
 
-## Upgrading and Staying Current
+### Upgrading and Staying Current
 
 After pulling CBQZ code updates, you may need to update other aspects of your
 enviornment. Generally speaking, you can do that with from the project's root
@@ -121,3 +125,45 @@ directory with:
     dest update
 
 Also check changes on this file for clues as to any other dependencies needed.
+
+## Docker Installation
+
+The following are instructions for installation and execution of CBQZ via use of
+Docker images and containers.
+
+### Build the CBQZ Docker Image
+
+The following as an exampe of how to build a CBQZ Docker image.
+
+    docker build --compress --tag cbqz .
+
+### Run a New CBQZ Docker Container
+
+The following as an exampe of how to create and start new a CBQZ Docker
+container based on the CBQZ Docker image.
+
+    docker run \
+        --detach \
+        --hostname cbqz_docker \
+        --publish 7892:3000 \
+        --name cbqz \
+        --restart unless-stopped \
+        --volume /opt/cbqz:/cbqz/runtime \
+        cbqz
+
+The instance of CBQZ will contain a default configuration (which is a copy of
+the `~/config/app.yaml` file committed in revision control). To override any of
+these defaults, create a `/opt/cbqz/app.yaml` configuration file.
+
+See above for a configuration file explaination.
+
+### Docker Container Shell
+
+The following as an exampe of how to get shell access of a running CBQZ
+container.
+
+    docker exec --interactive --tty cbqz sh
+
+Note that this gives you `sh` access, not `bash` or anything more advanced
+since these other shells are not installed in the image/container for space
+considerations.
