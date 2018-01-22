@@ -144,7 +144,7 @@ container based on the CBQZ Docker image.
 
     docker run \
         --detach \
-        --hostname cbqz_docker \
+        --hostname cbqz-app \
         --publish 3000:3000 \
         --name cbqz \
         --restart unless-stopped \
@@ -183,3 +183,45 @@ CBQZ service.
         --volume `pwd`:/cbqz:ro \
         --volume /opt/nginx/log:/var/log/nginx \
         nginx:alpine
+
+The `nginx:alpine` image is a very small Nginx image based on Alpine Linux. To
+debug any configuration problems, it may be useful to temporarily switch to the
+`nginx:latest` image.
+
+### MySQL Container
+
+Run the following to create and run a MySQL container for CBQZ data, which will
+be stored in `/opt/mysql/data`.
+
+    docker run \
+        --detach \
+        --publish 3306:3306 \
+        --name cbqz-mysql \
+        --restart unless-stopped \
+        --env MYSQL_ROOT_PASSWORD=new_root_password \
+        --volume /opt/mysql/data:/var/lib/mysql \
+        mysql
+
+If you have a MySQL client locally installed, you can access the MySQL server
+via `mysql -h127.0.0.1 -uroot -pnew_root_password`. If more likely you do not,
+you can use the followng.
+
+    docker run \
+        --interactive \
+        --tty \
+        --link cbqz-mysql:mysql \
+        --rm \
+        mysql \
+        sh -c 'exec mysql -hmysql -uroot -pnew_root_password'
+
+Remember that at this point you'll just have a blank/default MySQL server
+instance running. You'll need to run through some of the data/database
+procedures above before you have a fully functional CBQZ database.
+
+### Container Linking
+
+Depending on how you decide to setup and configure your containers, you may want
+to add a link flag into the `run` calls, like so:
+
+    --link cbqz-mysql:mysql
+    --link cbqz-app:cbqz
