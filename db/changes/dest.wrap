@@ -2,6 +2,11 @@
 use exact;
 use Config::App;
 
-my ( $dbname, $username, $password ) = @{ Config::App->new->get('database') }{ qw( dbname username password ) };
+my ( $name, $host, $port, $username, $password ) = @{ Config::App->new->get('database') }{ qw(
+    name host port username password
+) };
 
-system( qq{/usr/bin/env cat $ARGV[0] | /usr/bin/env mysql --skip-column-names -u$username -p'$password' $dbname} );
+system(
+    qq{/usr/bin/env cat $ARGV[0] | } .
+    qq{/usr/bin/env mysql --skip-column-names -h'$host' -P$port -u$username -p'$password' $name}
+);

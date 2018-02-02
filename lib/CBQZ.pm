@@ -50,12 +50,19 @@ class_has yaml => ( isa => 'CBQZ::_YAML', is => 'ro', lazy => 1, default => sub 
     return CBQZ::_YAML->new;
 } );
 
-class_has dq => ( isa => 'DBIx::Query::db', is => 'ro', lazy => 1, default => sub {
+class_has dq => ( isa => 'DBIx::Query::db', is => 'ro', lazy => 1, default => sub ($self) {
     return (
         DBIx::Query->connect(
-            join( '', @{ Config::App->new->get('database') }{ qw( dsn dbname ) } ),
-            @{ Config::App->new->get('database') }{ qw( username password settings ) },
+            $self->dsn,
+            @{ $self->config->get('database') }{ qw( username password settings ) },
         ) or E::Db->throw( $DBI::errstr )
+    );
+} );
+
+class_has dsn => ( isa => 'Str', is => 'ro', lazy => 1, default => sub ($self) {
+    return sprintf(
+        'dbi:mysql:database=%s;host=%s;port=%s',
+        @{ $self->config->get('database') }{ qw( name host port ) },
     );
 } );
 
@@ -118,6 +125,7 @@ CBQZ
     my $json   = $cbqz->json;   # JSON::XS singleton instance
     my $yaml   = $cbqz->yaml;   # YAML::XS singleton instance
     my $dq     = $cbqz->dq;     # DBIx::Query singleton instance
+    my $dsn    = $cbqz->dsn;    # Database DSN string
 
     $cbqz->params_check(
         [ '"name" not defined in input', sub { not defined $params->{name} } ],
@@ -186,6 +194,10 @@ This is a singleton instance of L<DBIx::Class> that's connected to the CBQZ
 database and therefore ready to use.
 
     my $users = $cbqz->dq->get('user')->run->all({});
+
+=head2 dsn
+
+This returns a DSN string based on YAML configuration settings.
 
 =head1 METHODS
 

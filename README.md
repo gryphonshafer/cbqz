@@ -45,7 +45,7 @@ root password and allow for access while not being system root, you can try this
     service mysql stop
     echo "
         UPDATE mysql.user SET
-            Password = PASSWORD('new_root_password'),
+            Password = PASSWORD('root_password'),
             password_expired = 'N', plugin = ''
         WHERE User = 'root' AND Host = 'localhost';
         FLUSH PRIVILEGES;
@@ -145,28 +145,53 @@ container based on the CBQZ Docker image.
     docker run \
         --detach \
         --hostname cbqz-app \
+        --net host \
         --publish 3000:3000 \
-        --name cbqz \
+        --name cbqz-app \
         --restart unless-stopped \
-        --volume /opt/cbqz:/cbqz/runtime \
+        --volume `pwd`:/cbqz \
         cbqz
-
-The instance of CBQZ will contain a default configuration (which is a copy of
-the `~/config/app.yaml` file committed in revision control). To override any of
-these defaults, create a `/opt/cbqz/app.yaml` configuration file.
-
-See above for a configuration file explaination.
 
 ### Docker Container Shell
 
 The following as an exampe of how to get shell access of a running CBQZ
 container.
 
-    docker exec --interactive --tty cbqz sh
+    docker exec --interactive --tty cbqz-app sh
 
 Note that this gives you `sh` access, not `bash` or anything more advanced
 since these other shells are not installed in the image/container for space
 considerations.
+
+### MySQL Container
+
+Run the following to create and run a MySQL container for CBQZ data, which will
+be stored in `/opt/docker/mysql/data`.
+
+    docker run \
+        --detach \
+        --net host \
+        --publish 3306:3306 \
+        --name cbqz-mysql \
+        --restart unless-stopped \
+        --env MYSQL_ROOT_PASSWORD=root_password \
+        --volume /opt/docker/mysql/data:/var/lib/mysql \
+        mysql
+
+If you have a MySQL client locally installed, you can access the MySQL server
+via `mysql -h127.0.0.1 -uroot -proot_password`. If more likely you do not,
+you can use the followng.
+
+    docker run \
+        --interactive \
+        --tty \
+        --rm \
+        mysql \
+        sh -c 'exec mysql -hmysql -uroot -proot_password'
+
+Remember that at this point you'll just have a blank/default MySQL server
+instance running. You'll need to run through some of the data/database
+procedures above before you have a fully functional CBQZ database.
 
 ### Nginx Container
 
@@ -176,52 +201,15 @@ CBQZ service.
 
     docker run \
         --detach \
+        --net host \
         --publish 80:80 \
         --name cbqz-nginx \
         --restart unless-stopped \
         --volume `pwd`/etc/nginx.conf:/etc/nginx/nginx.conf:ro \
         --volume `pwd`:/cbqz:ro \
-        --volume /opt/nginx/log:/var/log/nginx \
+        --volume /opt/docker/nginx/log:/var/log/nginx \
         nginx:alpine
 
 The `nginx:alpine` image is a very small Nginx image based on Alpine Linux. To
 debug any configuration problems, it may be useful to temporarily switch to the
 `nginx:latest` image.
-
-### MySQL Container
-
-Run the following to create and run a MySQL container for CBQZ data, which will
-be stored in `/opt/mysql/data`.
-
-    docker run \
-        --detach \
-        --publish 3306:3306 \
-        --name cbqz-mysql \
-        --restart unless-stopped \
-        --env MYSQL_ROOT_PASSWORD=new_root_password \
-        --volume /opt/mysql/data:/var/lib/mysql \
-        mysql
-
-If you have a MySQL client locally installed, you can access the MySQL server
-via `mysql -h127.0.0.1 -uroot -pnew_root_password`. If more likely you do not,
-you can use the followng.
-
-    docker run \
-        --interactive \
-        --tty \
-        --link cbqz-mysql:mysql \
-        --rm \
-        mysql \
-        sh -c 'exec mysql -hmysql -uroot -pnew_root_password'
-
-Remember that at this point you'll just have a blank/default MySQL server
-instance running. You'll need to run through some of the data/database
-procedures above before you have a fully functional CBQZ database.
-
-### Container Linking
-
-Depending on how you decide to setup and configure your containers, you may want
-to add a link flag into the `run` calls, like so:
-
-    --link cbqz-mysql:mysql
-    --link cbqz-app:cbqz

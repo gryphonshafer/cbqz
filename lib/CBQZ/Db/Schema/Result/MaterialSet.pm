@@ -50,7 +50,7 @@ __PACKAGE__->table("material_set");
 
   data_type: 'timestamp'
   datetime_undef_if_invalid: 1
-  default_value: '1970-01-01 00:00:00'
+  default_value: '1970-01-01 08:00:00'
   is_nullable: 0
 
 =cut
@@ -76,7 +76,7 @@ __PACKAGE__->add_columns(
   {
     data_type => "timestamp",
     datetime_undef_if_invalid => 1,
-    default_value => "1970-01-01 00:00:00",
+    default_value => "1970-01-01 08:00:00",
     is_nullable => 0,
   },
 );
@@ -125,8 +125,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-10 07:40:07
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:k8rgqXQZ9dL7Xc3K2Nvo9g
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-02-02 14:12:30
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:IiyN7+09Hc2XKxtwyPxr4w
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

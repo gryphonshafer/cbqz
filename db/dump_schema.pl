@@ -3,11 +3,13 @@ use exact;
 use Config::App;
 
 my $config = Config::App->new;
-my ( $dbname, $username, $password ) = @{ $config->get('database') }{ qw( dbname username password ) };
+my ( $name, $host, $port, $username, $password ) = @{ Config::App->new->get('database') }{ qw(
+    name host port username password
+) };
 
 my $command = q{
     /usr/bin/env mysqldump --skip-opt --skip-disable-keys --skip-comments --skip-set-charset --no-data
-    } . "-u$username -p'$password' $dbname" . q{
+    } . "-h'$host' -P$port -u$username -p'$password' $name" . q{
     | /bin/sed -e '/^\/\*![0-9]* SET/d'
     | /bin/sed -e 's/`//g'
     | /bin/sed -e 's/^\/\*![0-9]* CREATE.*TRIGGER/CREATE TRIGGER/'

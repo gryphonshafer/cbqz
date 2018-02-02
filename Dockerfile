@@ -10,12 +10,7 @@ RUN apk --no-cache add perl mariadb-client-libs && \
     ./cpanm -n -f --installdeps . && rm -rf ~/.cpanm && \
     apk del .build-dependencies && rm ./cpanm
 
-COPY . .
-
-COPY config/app.yaml /cbqz/app.yaml
-ENV  CONFIGAPPINIT   /cbqz/app.yaml
-
-VOLUME /cbqz/runtime
+VOLUME /cbqz
 EXPOSE 3000
 
 CMD hypnotoad -f app.pl

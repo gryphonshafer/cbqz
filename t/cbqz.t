@@ -22,7 +22,7 @@ sub main {
     my @loggers = qw(
         debug info notice warning warn error err critical crit alert emergency emerg
     );
-    can_ok( PACKAGE, $_ ) for ( qw( able clean_error yaml dp ), @loggers );
+    can_ok( PACKAGE, $_ ) for ( qw( able clean_error yaml dp dsn ), @loggers );
 
     params_check($obj);
     able($obj);
