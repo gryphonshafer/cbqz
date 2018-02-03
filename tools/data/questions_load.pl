@@ -5,23 +5,21 @@ use Util::CommandLine qw( options pod2usage );
 use Text::CSV_XS 'csv';
 use CBQZ;
 
-my $settings = options( qw( set|s=s questions|q=s create|c=s user|u=s delete|d ) );
-pod2usage unless ( $settings->{set} and $settings->{questions} );
+my $settings = options( qw( set|s=s questions|q=s user|u=s create|c delete|d ) );
+pod2usage unless ( $settings->{set} and $settings->{questions} and $settings->{user} );
 
 my $dq = CBQZ->new->dq;
 
-if ( $settings->{create} ) {
-    my $user_id = $dq->sql('SELECT user_id FROM user WHERE name = ?')->run( $settings->{user} )->value;
-    die "Failed to find user $settings->{user}\n" unless ($user_id);
+my $user_id = $dq->sql('SELECT user_id FROM user WHERE name = ?')->run( $settings->{user} )->value;
+die "Failed to find user $settings->{user}\n" unless ($user_id);
 
-    $dq->sql('INSERT INTO question_set ( name, user_id ) VALUES ( ?, ? )')->run(
-        $settings->{create},
-        $user_id,
-    )->value;
-}
+$dq->sql('INSERT INTO question_set ( name, user_id ) VALUES ( ?, ? )')->run(
+    $settings->{set},
+    $user_id,
+)->value if ( $settings->{create} );
 
-my $set_id = $dq->sql('SELECT question_set_id FROM question_set WHERE name = ?')
-    ->run( $settings->{set} )->value;
+my $set_id = $dq->sql('SELECT question_set_id FROM question_set WHERE name = ? AND user_id = ?')
+    ->run( $settings->{set}, $user_id )->value;
 die "Set name $settings->{set} not found\n" unless ($set_id);
 
 $dq->sql('DELETE FROM question WHERE question_set_id = ?')->run($set_id) if ( $settings->{delete} );
@@ -40,10 +38,10 @@ questions_load.pl - Load questions data into the database as a new questions set
 =head1 SYNOPSIS
 
     questions_load.pl OPTIONS
-        -s|set       QUESTIONS_SET_NAME
-        -q|questions QUESTIONS_DATA_FILE
-        -c|create    NEW_QUESTIONS_SET_NAME
-        -u|user      USERNAME
+        -s|set        QUESTIONS_SET_NAME
+        -q|questions  QUESTIONS_DATA_FILE
+        -u|user       USERNAME
+        -c|create
         -d|delete
         -h|help
         -m|man

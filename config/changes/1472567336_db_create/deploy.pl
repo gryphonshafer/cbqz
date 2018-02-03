@@ -2,5 +2,10 @@
 use exact;
 use Config::App;
 
-my ( $dbname, $username, $password ) = @{ Config::App->new->get('database') }{ qw( dbname username password ) };
-system( qq{echo "CREATE DATABASE $dbname CHARACTER SET utf8 COLLATE utf8_general_ci" | /usr/bin/env mysql -u$username -p'$password'} );
+my ( $name, $host, $port, $username, $password ) = @{ Config::App->new->get('database') }{ qw(
+    name host port username password
+) };
+system(
+    qq{echo "CREATE DATABASE $name CHARACTER SET utf8 COLLATE utf8_general_ci" | } .
+    qq{/usr/bin/env mysql -h'$host' -P$port -u$username -p'$password'}
+);

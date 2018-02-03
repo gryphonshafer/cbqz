@@ -1,5 +1,5 @@
-.dest
-.prove
+/cover_db
 /data
 /runtime
-/cover_db
+.dest
+.prove

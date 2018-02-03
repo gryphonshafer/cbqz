@@ -3,10 +3,14 @@
 This project is a series of tools and an overall system for CBQZ functionality.
 It includes everything that's part of the CBQZ ecosystem (apart from the data).
 
-## Installation
+## Local/Developer Installation
 
 This project expects to run inside a Linux host of some kind with a modern Perl
-version.
+version. The following are instructions for installation in a local or developer
+enviornment (i.e. native or inside virtual machine instead of inside Docker).
+
+These instructions would also work for a production enviornment, but for such,
+you may want to consider the Docker option explained below.
 
 ### Perl
 
@@ -41,7 +45,7 @@ root password and allow for access while not being system root, you can try this
     service mysql stop
     echo "
         UPDATE mysql.user SET
-            Password = PASSWORD('new_root_password'),
+            Password = PASSWORD('root_password'),
             password_expired = 'N', plugin = ''
         WHERE User = 'root' AND Host = 'localhost';
         FLUSH PRIVILEGES;
@@ -85,7 +89,7 @@ And finally, you'll need to create two directories:
 
     mkdir runtime data
 
-## Service Startup
+### Service Startup
 
 To read about how to start the application web service, run the following from
 the project's root directory:
@@ -100,7 +104,7 @@ To start a development instance of the CBQZ web service:
 Note that at this point, while the service may be running, it by default binds
 to `localhost:3000`. So you may need to tunnel that to gain access.
 
-## Materials Loading
+### Materials Loading
 
 Although the application system will be technically operational in the previous
 step, you can't really do anything useful like work in the questions editor or
@@ -111,7 +115,7 @@ directory.
 
     ./tools/data/material_load.pl -n '2017 Corinthians' -k etc/2017_kvl.csv -m etc/2017_materials.csv
 
-## Upgrading and Staying Current
+### Upgrading and Staying Current
 
 After pulling CBQZ code updates, you may need to update other aspects of your
 enviornment. Generally speaking, you can do that with from the project's root
@@ -121,3 +125,91 @@ directory with:
     dest update
 
 Also check changes on this file for clues as to any other dependencies needed.
+
+## Docker Installation
+
+The following are instructions for installation and execution of CBQZ via use of
+Docker images and containers.
+
+### Build the CBQZ Docker Image
+
+The following as an exampe of how to build a CBQZ Docker image.
+
+    docker build --compress --tag cbqz .
+
+### Run a New CBQZ Docker Container
+
+The following as an exampe of how to create and start new a CBQZ Docker
+container based on the CBQZ Docker image.
+
+    docker run \
+        --detach \
+        --hostname cbqz-app \
+        --net host \
+        --publish 3000:3000 \
+        --name cbqz-app \
+        --restart unless-stopped \
+        --volume `pwd`:/cbqz \
+        cbqz
+
+### Docker Container Shell
+
+The following as an exampe of how to get shell access of a running CBQZ
+container.
+
+    docker exec --interactive --tty cbqz-app sh
+
+Note that this gives you `sh` access, not `bash` or anything more advanced
+since these other shells are not installed in the image/container for space
+considerations.
+
+### MySQL Container
+
+Run the following to create and run a MySQL container for CBQZ data, which will
+be stored in `/opt/docker/mysql/data`.
+
+    docker run \
+        --detach \
+        --net host \
+        --publish 3306:3306 \
+        --name cbqz-mysql \
+        --restart unless-stopped \
+        --env MYSQL_ROOT_PASSWORD=root_password \
+        --volume /opt/docker/mysql/data:/var/lib/mysql \
+        mysql
+
+If you have a MySQL client locally installed, you can access the MySQL server
+via `mysql -h127.0.0.1 -uroot -proot_password`. If more likely you do not,
+you can use the followng.
+
+    docker run \
+        --interactive \
+        --tty \
+        --rm \
+        mysql \
+        sh -c 'exec mysql -hmysql -uroot -proot_password'
+
+Remember that at this point you'll just have a blank/default MySQL server
+instance running. You'll need to run through some of the data/database
+procedures above before you have a fully functional CBQZ database.
+
+### Nginx Container
+
+Although it's possible to run CBQZ through the Hypnotoad-based "cbqz" container
+above, it'll probably be a better option to run Nginx to proxy pass to the
+CBQZ service.
+
+    docker run \
+        --detach \
+        --net host \
+        --publish 80:80 \
+        --name cbqz-nginx \
+        --restart unless-stopped \
+        --volume `pwd`/etc/nginx.conf:/etc/nginx/nginx.conf:ro \
+        --volume `pwd`:/cbqz:ro \
+        --volume /opt/docker/nginx/log:/var/log/nginx \
+        nginx:alpine
+
+The `nginx:alpine` image is a very small Nginx image based on Alpine Linux. To
+debug any configuration problems, it may be useful to temporarily switch to the
+`nginx:latest` image.

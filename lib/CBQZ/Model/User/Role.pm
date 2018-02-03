@@ -4,7 +4,8 @@ use Moose::Role;
 use exact;
 use Try::Tiny;
 
-before [ qw( role_names roles_count has_role add_role remove_role ) ] => sub ($self) {
+before [ qw( role_names roles_count has_role add_role remove_role ) ] => sub {
+    my ($self) = @_;
     E->throw('Failure because user object data not yet loaded')
         unless ( $self->obj and $self->obj->in_storage );
 };

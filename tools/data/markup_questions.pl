@@ -7,13 +7,19 @@ use CBQZ::Model::Question;
 use CBQZ::Model::QuestionSet;
 use CBQZ::Model::MaterialSet;
 
-my $settings = options( qw( questions|q=s materials|m=s ) );
-pod2usage unless ( $settings->{questions} and $settings->{materials} );
+my $settings = options( qw( user|u=s questions|q=s materials|m=s ) );
+pod2usage unless ( $settings->{user} and $settings->{questions} and $settings->{materials} );
 
 my ( $question_set, $material_set );
 
+my $user_id = $dq->sql('SELECT user_id FROM user WHERE name = ?')->run( $settings->{user} )->value;
+die "Failed to find user $settings->{user}\n" unless ($user_id);
+
 try {
-    $question_set = CBQZ::Model::QuestionSet->new->load({ name => $settings->{questions} });
+    $question_set = CBQZ::Model::QuestionSet->new->load({
+        name    => $settings->{questions},
+        user_id => $user_id,
+    });
 }
 catch {
     die "Failed to load question set\n";
@@ -49,6 +55,7 @@ markup_questions.pl - Add color markup to a plain-text questions set
 =head1 SYNOPSIS
 
     markup_questions.pl OPTIONS
+        -u|user       USERNAME
         -q|questions  QUESTIONS_SET_NAME
         -m|materials  MATERIAL_SET_NAME
         -h|help

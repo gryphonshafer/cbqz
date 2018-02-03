@@ -1,6 +1,6 @@
 ---
 default:
-    version: 10
+    version: 11
     logging:
         log_dir: runtime
         log_file: app.log
@@ -37,8 +37,9 @@ default:
             - templates/pages
             - templates/components
     database:
-        dsn: dbi:mysql:dbname=
-        dbname: cbqz
+        name: cbqz
+        host: 127.0.0.1
+        port: 3306
         username: cbqz
         password: cbqz
         settings:
@@ -62,3 +63,4 @@ default:
     recaptcha:
         public_key: 6LftUTEUAAAAALtbl98u4t4udXIAh9YpVnYRPdoP
         private_key: 6LeGUjEUAAAAAFvCPhrKLU0q5k7hlPS9toYr_Kl3
+optional_include: runtime/config_overrides.yaml

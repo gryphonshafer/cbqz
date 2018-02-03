@@ -3,9 +3,7 @@ use exact;
 use Config::App;
 use DBIx::Class::Schema::Loader 'make_schema_at';
 use Util::CommandLine 'podhelp';
-
-my ( $dsn, $dbname, $username, $password ) =
-    @{ Config::App->new->get('database') }{ qw( dsn dbname username password ) };
+use CBQZ;
 
 make_schema_at(
     'CBQZ::Db::Schema',
@@ -24,7 +22,7 @@ make_schema_at(
             User => ['CBQZ::Db::Base::Result::User'],
         },
     },
-    [ $dsn . $dbname, $username, $password ],
+    [ CBQZ->new->dsn, @{ Config::App->new->get('database') }{ qw( username password ) } ],
 );
 
 =head1 NAME

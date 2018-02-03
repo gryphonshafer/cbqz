@@ -1,0 +1,17 @@
+/cover_db
+/data
+/runtime
+.dest
+.prove
+.git
+.gitignore
+.dockerignore
+Dockerfile
+/config
+!/config/app.yaml
+/db
+/etc
+/t
+/tools
+dest.watch
+README.md
