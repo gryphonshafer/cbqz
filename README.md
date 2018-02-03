@@ -170,7 +170,6 @@ be stored in `/opt/docker/mysql/data`.
 
     docker run \
         --detach \
-        --net host \
         --publish 3306:3306 \
         --name cbqz-mysql \
         --restart unless-stopped \
@@ -186,8 +185,9 @@ you can use the followng.
         --interactive \
         --tty \
         --rm \
+        --net host \
         mysql \
-        sh -c 'exec mysql -hmysql -uroot -proot_password'
+        sh -c 'exec mysql -h127.0.0.1 -uroot -proot_password'
 
 Remember that at this point you'll just have a blank/default MySQL server
 instance running. You'll need to run through some of the data/database
