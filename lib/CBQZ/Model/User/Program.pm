@@ -5,7 +5,8 @@ use exact;
 use Try::Tiny;
 use CBQZ::Model::Program;
 
-before [ qw( programs programs_count add_program remove_program ) ] => sub ($self) {
+before [ qw( programs programs_count add_program remove_program ) ] => sub {
+    my ($self) = @_;
     E->throw('Failure because user object data not yet loaded')
         unless ( $self->obj and $self->obj->in_storage );
 };
