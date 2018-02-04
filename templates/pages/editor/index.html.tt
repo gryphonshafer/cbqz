@@ -96,7 +96,7 @@
     </div>
 
     <div id="questions_list">
-        <span class="label">Saved Questions:</span>
+        <span class="label">Saved Questions ({{ this.total_questions }}):</span>
 
         <div>
             <select v-model="questions.book">
@@ -130,7 +130,7 @@
             </select>
         </div>
 
-        <span class="label">Marked Questions:</span>
+        <span class="label">Marked Questions ({{ this.questions.marked_questions.length }}):</span>
         <div>
             <select tabindex="2" class="questions_list_list" v-model="questions.marked_question_id" size="6">
                 <option v-for="item in this.questions.marked_questions" v-bind:value="item.question_id">{{

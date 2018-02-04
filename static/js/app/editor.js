@@ -32,6 +32,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         cursor_progress : false
     };
 
+    data.total_questions = 0;
+
     var sort_by = {
         desc_ref : function ( a, b ) {
             var icmp = b.book.toLowerCase().localeCompare( a.book.toLowerCase() );
@@ -129,6 +131,18 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         }
     };
 
+    function count_questions (vue_obj) {
+        var questions_count = 0;
+        for ( book in vue_obj.questions.data ) {
+            for ( chapter in vue_obj.questions.data[book] ) {
+                for ( question in vue_obj.questions.data[book][chapter] ) {
+                    questions_count++;
+                }
+            }
+        }
+        vue_obj.total_questions = questions_count;
+    }
+
     function delete_question (vue_obj) {
         delete vue_obj.questions.data
             [ vue_obj.questions.book ][ vue_obj.questions.chapter ][ vue_obj.questions.question_id ];
@@ -172,6 +186,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
             vue_obj.questions.questions = questions_array.sort( sort_by.ref );
         }
+
+        count_questions(vue_obj);
     }
 
     function create_question ( vue_obj, question, clear_form ) {
@@ -207,6 +223,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 document.getElementById("verse").select();
             } );
         } );
+
+        count_questions(vue_obj);
     }
 
     var vue_app = new Vue({
@@ -547,6 +565,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             if ( this.questions.books[0] ) this.questions.book = this.questions.books[0];
 
             this.questions.marked_questions = this.grep_marked_questions();
+            count_questions(this);
         }
     });
 
