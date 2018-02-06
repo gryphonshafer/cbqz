@@ -1,0 +1,13 @@
+<title>CBQZ new user registration: [% name %]</title>
+
+<p>A new CBQZ user has just completed registration.</p>
+
+<ul>
+    <li>Name: <b>[% name %]</b></li>
+    <li>Email: <b>[% email %]</b></li>
+</ul>
+
+<p>
+    The user needs to be allocated a role before being allowed access to
+    anything within the CBQZ application.
+</p>

@@ -9,6 +9,7 @@ use Try::Tiny;
 use CBQZ;
 use CBQZ::Model::User;
 use CBQZ::Util::Format 'log_date';
+use CBQZ::Util::Template 'tt_settings';
 
 sub startup ( $self, $app = undef ) {
     my $cbqz   = CBQZ->new;
@@ -75,36 +76,10 @@ sub startup ( $self, $app = undef ) {
     }
 
     # template processing
-    my $tt_conf = $config->get('template');
     push( @INC, $config->get( 'config_app', 'root_dir' ) );
     $self->plugin(
         'ToolkitRenderer',
-        {
-            config => {
-                INCLUDE_PATH => $tt_conf->{'include_path'},
-                COMPILE_EXT  => $tt_conf->{'compile_ext'},
-                COMPILE_DIR  => $tt_conf->{'compile_dir'},
-                WRAPPER      => $tt_conf->{'wrapper'},
-                CONSTANTS    => {
-                    version => $config->get('version'),
-                },
-                FILTERS => {
-                    ucfirst => sub { return ucfirst shift },
-                    round   => sub { return int( $_[0] + 0.5 ) },
-                },
-                ENCODING => 'utf8',
-            },
-            context => sub {
-                my ($context) = @_;
-
-                $context->define_vmethod( 'scalar', 'lower',   sub { return lc( $_[0] ) } );
-                $context->define_vmethod( 'scalar', 'upper',   sub { return uc( $_[0] ) } );
-                $context->define_vmethod( 'scalar', 'ucfirst', sub { return ucfirst( lc( $_[0] ) ) } );
-
-                $context->define_vmethod( $_, 'ref', sub { return ref( $_[0] ) } )
-                    for ( qw( scalar list hash ) );
-            },
-        },
+        tt_settings( 'web', $config->get('template'), { version => $config->get('version') } ),
     );
 
     # JSON rendering

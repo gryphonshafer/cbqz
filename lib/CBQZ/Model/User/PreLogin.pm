@@ -4,6 +4,7 @@ use Moose::Role;
 use exact;
 use Try::Tiny;
 use Digest::SHA 'sha256_hex';
+use CBQZ::Model::Email;
 
 sub create ( $self, $params ) {
     $self->params_check(
@@ -16,9 +17,9 @@ sub create ( $self, $params ) {
         [ '"name" cannot begin with _', sub { index( $params->{name}, '_' ) == 0 } ],
     ) unless ( delete $params->{_} );
 
+    my $program_id = delete $params->{program};
     try {
-        my $program_id = delete $params->{program};
-        my $passwd     = delete $params->{passwd};
+        my $passwd = delete $params->{passwd};
 
         $self->obj( $self->rs->create($params)->get_from_storage );
         $self->obj->update({ passwd => $passwd });
@@ -32,6 +33,33 @@ sub create ( $self, $params ) {
     };
 
     $self->event('create_user');
+
+    if (
+        my @emails = map { $_->[0] } @{ $self->dq->sql(q{
+            (
+                SELECT DISTINCT email
+                FROM user
+                JOIN role USING (user_id)
+                WHERE role.type = ?
+            )
+            UNION
+            (
+                SELECT DISTINCT email
+                FROM user
+                JOIN role USING (user_id)
+                JOIN user_program USING (user_id)
+                WHERE role.type = ? AND user_program.program_id = ?
+            )
+        })->run( 'admin', 'director', $program_id || 0 )->all }
+    ) {
+        CBQZ::Model::Email->new( type => 'new_user_registration' )->send({
+            to   => \@emails,
+            data => {
+                name  => $self->obj->name,
+                email => $self->obj->email,
+            },
+        });
+    }
 
     # if there are no user with the "admin" role, add the admin roll to this new user
     $self->add_role('admin') unless (

@@ -32,10 +32,16 @@ default:
     template:
         compile_ext: .ttc
         compile_dir: runtime/ttc
-        wrapper: wrapper.html.tt
-        include_path:
-            - templates/pages
-            - templates/components
+        web:
+            wrapper: wrapper.html.tt
+            include_path:
+                - templates/pages
+                - templates/components
+        email:
+            include_path:
+                - templates/emails
+    email:
+        from: CBQZ Application <g@cbqz.org>
     database:
         name: cbqz
         host: 127.0.0.1
