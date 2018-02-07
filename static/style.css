@@ -419,10 +419,19 @@ div#main form#select_sets fieldset {
     margin-bottom: 5px;
 }
 
-div#main form#create_form fieldset label {
-    width: 250px;
+form#create_form fieldset label {
+    width: 300px;
     text-align: right;
     margin-bottom: 3px;
+}
+
+form#create_form fieldset label input[type=text],
+form#create_form fieldset label input[type=password] {
+    width: 210px;
+}
+
+form#create_form fieldset label select {
+    width: 216px;
 }
 
 /* -------------------------------------------------------------------------- */
