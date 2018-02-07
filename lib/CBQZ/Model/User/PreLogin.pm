@@ -50,7 +50,7 @@ sub create ( $self, $params ) {
                 JOIN user_program USING (user_id)
                 WHERE role.type = ? AND user_program.program_id = ?
             )
-        })->run( 'admin', 'director', $program_id || 0 )->all }
+        })->run( 'Administrator', 'Director', $program_id || 0 )->all }
     ) {
         CBQZ::Model::Email->new( type => 'new_user_registration' )->send({
             to   => \@emails,
@@ -61,12 +61,12 @@ sub create ( $self, $params ) {
         });
     }
 
-    # if there are no user with the "admin" role, add the admin roll to this new user
-    $self->add_role('admin') unless (
+    # if there are no user with the "Administrator" role, add the "Administrator" roll to this new user
+    $self->add_role('Administrator') unless (
         $self->rs->search(
             {
                 'me.active'  => 1,
-                'roles.type' => 'admin',
+                'roles.type' => 'Administrator',
             },
             {
                 'join' => 'roles',

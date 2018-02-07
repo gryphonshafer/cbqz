@@ -20,6 +20,7 @@ CREATE TABLE material (
     is_new_para tinyint(1) NOT NULL DEFAULT '0',
     PRIMARY KEY (material_id),
     UNIQUE KEY reference (material_set_id,book,chapter,verse),
+    KEY material_set_id (material_set_id),
     CONSTRAINT material_ibfk_1 FOREIGN KEY (material_set_id) REFERENCES material_set (material_set_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -84,8 +85,8 @@ CREATE TABLE question_set (
     last_modified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created timestamp NOT NULL DEFAULT '1970-01-01 08:00:00',
     PRIMARY KEY (question_set_id),
+    UNIQUE KEY name (name),
     KEY user_id (user_id),
-    KEY name (name),
     CONSTRAINT question_set_ibfk_1 FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -94,7 +95,7 @@ CREATE TRIGGER question_set_before_insert BEFORE INSERT ON question_set FOR EACH
 CREATE TABLE role (
     role_id int(10) unsigned NOT NULL,
     user_id int(10) unsigned NOT NULL,
-    type enum('admin','director','quizmaster','scorekeeper','coach') NOT NULL,
+    type enum('Administrator','Director','Official','User') NOT NULL,
     created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (role_id),
     UNIQUE KEY user_type (user_id,type),
