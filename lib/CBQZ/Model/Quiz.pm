@@ -219,7 +219,7 @@ sub replace ( $self, $request, $cbqz_prefs ) {
     my $chapter_set = $self->chapter_set($cbqz_prefs);
 
     unless ( length $chapter_set->{prime} or length $chapter_set->{weight} ) {
-        $self->warn("Replace quesiton: No chapters selected from which to build a quiz");
+        $self->warn("Replace question: No chapters selected from which to build a quiz");
         return [];
     }
 
