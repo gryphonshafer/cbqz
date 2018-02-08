@@ -20,9 +20,10 @@
                 href="[% c.url_for('/') %]">Main</a>
 
             [% IF
-                user.roles_count > 0 AND user.programs_count > 0
+                user.has_any_role_in_program > 0 AND user.programs_count > 0
                 AND NOT ( page.menu == 'main' AND material_sets_count == 0 )
             %]
+
                 <a [% IF page.menu == 'editor' %]class="selected"[% END %]
                     href="[% c.url_for('/editor') %]">Editor</a>
                 <a [% IF page.menu == 'quizroom' %]class="selected"[% END %]
@@ -31,6 +32,12 @@
                     href="[% c.url_for('/main/material') %]">Material</a>
                 <a [% IF page.menu == 'questions' %]class="selected"[% END %]
                     href="[% c.url_for('/editor/questions') %]">Questions</a>
+
+                [% IF user.has_role('Administrator') OR user.has_role('Director') %]
+                    <a [% IF page.menu == 'admin' %]class="selected"[% END %]
+                        href="[% c.url_for('/admin') %]">Admin</a>
+                [% END %]
+
             [% END %]
         [% END %]
     </div>

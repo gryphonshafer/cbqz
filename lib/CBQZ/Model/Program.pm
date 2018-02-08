@@ -3,6 +3,7 @@ package CBQZ::Model::Program;
 use Moose;
 use MooseX::ClassAttribute;
 use exact;
+use CBQZ::Model::User;
 
 extends 'CBQZ::Model';
 
@@ -101,6 +102,54 @@ sub timer_values ($self) {
             })->run( $self->obj->id )->value
         )
     );
+}
+
+sub users ($self) {
+    my $users = CBQZ::Model::User->new->model( map { $_->user } $self->obj->user_programs );
+    return (wantarray) ? @$users : $users;
+}
+
+sub admin_roles_data ( $self, $user, $roles ) {
+    return [
+        map {
+            my $program = $_;
+
+            +{
+                %{ $program->data },
+                users => [
+                    sort { $a->{name} cmp $b->{name} }
+                    map {
+                        my $user       = $_;
+                        my @user_roles = map {
+                            +{ $_->get_inflated_columns }
+                        } $user->roles( undef, $program->obj->id );
+
+                        +{
+                            %{ $user->data },
+                            roles => [
+                                map {
+                                    my $role = $_;
+
+                                    +{
+                                        name   => $role,
+                                        active => ( grep { $role eq $_->{type} } @user_roles ) ? 1 : 0,
+                                    };
+                                } @$roles
+                            ],
+                        };
+                    } $_->users
+                ],
+            };
+        }
+        sort { $a->obj->name cmp $b->obj->name }
+        (
+            ( $user->has_role('Administrator') )
+                ? CBQZ::Model::Program->new->every
+                : grep {
+                    $user->has_role( 'Director', $_->obj->id )
+                } @{ $user->programs }
+        )
+    ];
 }
 
 __PACKAGE__->meta->make_immutable;

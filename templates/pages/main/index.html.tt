@@ -64,7 +64,7 @@
 
 [% ELSE %]
 
-    [% IF NOT user.roles_count OR NOT user.programs_count %]
+    [% IF NOT user.has_any_role_in_program OR NOT user.programs_count %]
         <h2>Account Pending Approval</h2>
         <p>
             Your account has been created, but it's pending approval.  Your account

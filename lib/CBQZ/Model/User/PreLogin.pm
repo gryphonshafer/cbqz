@@ -40,17 +40,16 @@ sub create ( $self, $params ) {
                 SELECT DISTINCT email
                 FROM user
                 JOIN role USING (user_id)
-                WHERE role.type = ?
+                WHERE role.type = 'Administrator'
             )
             UNION
             (
                 SELECT DISTINCT email
                 FROM user
                 JOIN role USING (user_id)
-                JOIN user_program USING (user_id)
-                WHERE role.type = ? AND user_program.program_id = ?
+                WHERE role.type = 'Director' AND role.program_id = ?
             )
-        })->run( 'Administrator', 'Director', $program_id || 0 )->all }
+        })->run( $program_id || 0 )->all }
     ) {
         CBQZ::Model::Email->new( type => 'new_user_registration' )->send({
             to   => \@emails,

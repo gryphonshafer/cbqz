@@ -89,7 +89,7 @@ sub startup ( $self, $app = undef ) {
     $self->renderer->default_handler('tt');
 
     # pre-load controllers
-    load_class( 'CBQZ::Control::' . $_ ) for qw( Main Editor Quizroom );
+    load_class( 'CBQZ::Control::' . $_ ) for qw( Main Editor Quizroom Admin );
 
     # before dispatch tasks
     $self->hook( 'before_dispatch' => sub ($self) {
@@ -132,7 +132,7 @@ sub startup ( $self, $app = undef ) {
     my $authorized_user = $anyone->under( sub ($self) {
         return 1 if (
             $self->stash('user') and
-            $self->stash('user')->roles_count > 0 and
+            $self->stash('user')->has_any_role_in_program and
             $self->stash('user')->programs_count > 0
         );
 
@@ -140,6 +140,22 @@ sub startup ( $self, $app = undef ) {
         $self->redirect_to('/');
         return 0;
     } );
+
+    my $admin_user = $authorized_user->under( sub ($self) {
+        return 1 if (
+            $self->stash('user') and (
+                $self->stash('user')->has_role('Administrator') or
+                $self->stash('user')->has_role('Director')
+            )
+        );
+
+        $self->info('Unauthorized access attempt to /admin');
+        $self->redirect_to('/');
+        return 0;
+    } );
+
+    $admin_user->any('/admin')->to( controller => 'admin', action => 'index' );
+    $admin_user->any('/admin/:action')->to( controller => 'admin' );
 
     $authorized_user->any('/:controller')->to( action => 'index' );
     $authorized_user->any('/:controller/:action');
