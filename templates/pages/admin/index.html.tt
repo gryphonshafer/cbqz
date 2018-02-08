@@ -35,15 +35,9 @@
         who will have the ability to set roles for users in programs and edit
         program data including its name and rules.
     </dd>
-
-    <dt><b>Administrator</b></dt>
-    <dd>
-        This role is intended to be limited to only a very small number of users
-        for the purpose of global CBQZ administration.
-    </dd>
 </dl>
 
-<form method="post" action="[% c.url_for('/admin/save_roles') %]">
+<form method="post" action="[% c.url_for('/admin/save_roles_changes') %]">
     [% FOR program IN programs %]
         <h2>[% program.name %]</h2>
 
@@ -61,7 +55,11 @@
                         <td class="center">
                             <input type="checkbox"
                                 [% IF role.active %]checked[% END %]
-                                name="[% this_user.user_id %]|[% role.name %]">
+                                name="[%
+                                    this_user.user_id _ '|' _
+                                    role.name _ '|' _
+                                    role.active
+                                %]">
                         </td>
                     [% END %]
                 </tr>
