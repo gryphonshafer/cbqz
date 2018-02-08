@@ -3,6 +3,7 @@ package CBQZ::Model::Program;
 use Moose;
 use MooseX::ClassAttribute;
 use exact;
+use CBQZ::Model::User;
 
 extends 'CBQZ::Model';
 
@@ -101,6 +102,11 @@ sub timer_values ($self) {
             })->run( $self->obj->id )->value
         )
     );
+}
+
+sub users ($self) {
+    my $users = CBQZ::Model::User->new->model( map { $_->user } $self->obj->user_programs );
+    return (wantarray) ? @$users : $users;
 }
 
 __PACKAGE__->meta->make_immutable;

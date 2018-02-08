@@ -95,10 +95,11 @@ CREATE TRIGGER question_set_before_insert BEFORE INSERT ON question_set FOR EACH
 CREATE TABLE role (
     role_id int(10) unsigned NOT NULL,
     user_id int(10) unsigned NOT NULL,
+    program_id int(10) unsigned DEFAULT NULL,
     type enum('Administrator','Director','Official','User') NOT NULL,
     created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (role_id),
-    UNIQUE KEY user_type (user_id,type),
+    UNIQUE KEY user_program_type (user_id,program_id,type),
     KEY user (user_id),
     CONSTRAINT role_ibfk_1 FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );

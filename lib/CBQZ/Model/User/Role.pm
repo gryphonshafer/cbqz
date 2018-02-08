@@ -2,49 +2,47 @@ package CBQZ::Model::User::Role;
 
 use Moose::Role;
 use exact;
-use Try::Tiny;
 
-before [ qw( role_names roles_count has_role add_role remove_role ) ] => sub {
+before [ qw( roles has_role has_any_role_in_program add_role remove_role ) ] => sub {
     my ($self) = @_;
     E->throw('Failure because user object data not yet loaded')
         unless ( $self->obj and $self->obj->in_storage );
 };
 
-sub role_names ($self) {
-    my $role_names = [ map { $_->type } $self->obj->roles->all ];
-    return (wantarray) ? @$role_names : $role_names;
+sub roles ( $self, $role_name = undef, $program_id = undef ) {
+    my $roles = [
+        grep { ($role_name) ? $_->type eq $role_name : 1 }
+        grep { ($program_id) ? $_->program_id && $_->program_id == $program_id : 1 }
+        $self->obj->roles->all
+    ];
+
+    return (wantarray) ? @$roles : $roles;
 }
 
-sub roles_count ($self) {
-    return $self->obj->roles->count;
+sub has_role ( $self, $role_name = undef, $program_id = undef ) {
+    return ( @{ $self->roles( $role_name, $program_id ) } ) ? 1 : 0;
 }
 
-sub has_role ( $self, $role ) {
-    my $roles;
-    try {
-        $roles = $self->roles;
-    }
-    catch {
-        E->throw($_);
-    };
-
-    return ( grep { $_ eq $role } @{$roles} ) ? 1 : 0;
+sub has_any_role_in_program ( $self, $program_id = undef ) {
+    return ( @{ $self->roles( undef, $program_id ) } ) ? 1 : 0;
 }
 
-sub add_role ( $self, $role ) {
+sub add_role ( $self, $role_name, $program_id ) {
     $self->rs('Role')->create({
-        user_id => $self->obj->id,
-        type    => $role,
+        user_id    => $self->obj->id,
+        program_id => $program_id,
+        type       => $role_name,
     });
 
     $self->event('role_change');
     return $self;
 }
 
-sub remove_role ( $self, $role ) {
+sub remove_role ( $self, $role_name, $program_id ) {
     $self->rs('Role')->search({
-        user_id => $self->obj->id,
-        type    => $role,
+        user_id    => $self->obj->id,
+        program_id => $program_id,
+        type       => $role_name,
     })->delete;
 
     $self->event('role_change');

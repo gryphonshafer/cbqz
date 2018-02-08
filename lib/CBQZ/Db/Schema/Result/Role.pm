@@ -40,6 +40,12 @@ __PACKAGE__->table("role");
   is_foreign_key: 1
   is_nullable: 0
 
+=head2 program_id
+
+  data_type: 'integer'
+  extra: {unsigned => 1}
+  is_nullable: 1
+
 =head2 type
 
   data_type: 'enum'
@@ -70,6 +76,8 @@ __PACKAGE__->add_columns(
     is_foreign_key => 1,
     is_nullable => 0,
   },
+  "program_id",
+  { data_type => "integer", extra => { unsigned => 1 }, is_nullable => 1 },
   "type",
   {
     data_type => "enum",
@@ -99,11 +107,13 @@ __PACKAGE__->set_primary_key("role_id");
 
 =head1 UNIQUE CONSTRAINTS
 
-=head2 C<user_type>
+=head2 C<user_program_type>
 
 =over 4
 
 =item * L</user_id>
+
+=item * L</program_id>
 
 =item * L</type>
 
@@ -111,7 +121,7 @@ __PACKAGE__->set_primary_key("role_id");
 
 =cut
 
-__PACKAGE__->add_unique_constraint("user_type", ["user_id", "type"]);
+__PACKAGE__->add_unique_constraint("user_program_type", ["user_id", "program_id", "type"]);
 
 =head1 RELATIONS
 
@@ -131,8 +141,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-02-07 09:55:09
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:0JXkkFoRJQkDH2Zs/vDPzg
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-02-07 14:14:58
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:LLhMb/ZjAmbasCmaeupHRQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

@@ -1,0 +1,73 @@
+[%
+    page.title = 'CBQZ Administration';
+    page.menu  = 'admin';
+%]
+
+<p>
+    Use the following page to select or de-select roles for users. Roles have
+    the following purpose and access levels (not all of which are necessarily
+    currently implemented):
+</p>
+
+<dl>
+    <dt><b>User</b></dt>
+    <dd>
+        General access to most functionality including: questions editor, the
+        quiz room (with optional embedded scorekeeping), questions list/print,
+        materials reference tools, and scorekeeping tools. This role also has
+        the ability to publish a quiz room to a different user and gain acces
+        to a view-only quiz room synchronized off a publish room. This role can
+        also grant copy-ability of a question set to a different user.
+    </dd>
+
+    <dt><b>Official</b></dt>
+    <dd>
+        This role is intended as a layer on top of the User role. It provides
+        the additional ability to register the user's quiz room activity as a
+        source for the program status ticker. (The idea being that during a
+        quiz meet, users will be able to see the published status of this user's
+        quiz room.)
+    </dd>
+
+    <dt><b>Official</b></dt>
+    <dd>
+        This role is intended for the program director or perhaps an assistant
+        who will have the ability to set roles for users in programs and edit
+        program data including its name and rules.
+    </dd>
+
+    <dt><b>Administrator</b></dt>
+    <dd>
+        This role is intended to be limited to only a very small number of users
+        for the purpose of global CBQZ administration.
+    </dd>
+</dl>
+
+<form method="post" action="[% c.url_for('/admin/save_roles') %]">
+    [% FOR program IN programs %]
+        <h2>[% program.name %]</h2>
+
+        <table class="tabular">
+            <tr>
+                <th>Name</th>
+                [% FOR role IN roles %]
+                    <th>[% role %]</th>
+                [% END %]
+            </tr>
+            [% FOR this_user IN program.users %]
+                <tr>
+                    <td>[% this_user.name %]</td>
+                    [% FOR role IN this_user.roles %]
+                        <td class="center">
+                            <input type="checkbox"
+                                [% IF role.active %]checked[% END %]
+                                name="[% this_user.user_id %]|[% role.name %]">
+                        </td>
+                    [% END %]
+                </tr>
+            [% END %]
+        </table>
+    [% END %]
+
+    <input type="submit" value="Save User Roles">
+</form>
