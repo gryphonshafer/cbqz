@@ -167,6 +167,8 @@
                         v-bind:disabled="question_sets.length == 0">Delete</button>
                     <button type="button" v-on:click="question_set_rename"
                         v-bind:disabled="question_sets.length == 0">Rename</button>
+                    <button type="button" v-on:click="question_set_reset"
+                        v-bind:disabled="question_sets.length == 0">Reset</button>
                 </fieldset>
 
                 <fieldset v-if="question_set && selected_chapters_count">

@@ -138,6 +138,14 @@ sub question_set_rename ($self) {
     }
 }
 
+sub question_set_reset ($self) {
+    my $set = CBQZ::Model::QuestionSet->new->load( $self->req_body_json->{question_set_id} );
+    if ( $set and $set->is_owned_by( $self->stash('user') ) ) {
+        $set->obj->questions->update({ used => 0 });
+        return $self->render( json => { success => 1 } );
+    }
+}
+
 sub material_data ($self) {
     my $material = { Error => { 1 => { 1 => {
         book    => 'Error',
