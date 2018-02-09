@@ -9,8 +9,6 @@
     Welcome to the Christian Bible Quizzing (CBQZ) system. This is a public
     resource developed, operated, and maintained entirely by volunteers for the
     purposes of supporting and encouraging Bible quizzing.
-</p>
-<p>
     <b>
         Please do not use CBQZ unless you have been invited and authorized to
         do so.
@@ -68,6 +66,56 @@
 
 [% ELSE %]
 
+    [% page.js.push('/js/pages/account_info.js') %]
+    <h2>My CBQZ Account</h2>
+    <p>
+        The following is information about your CBQZ user account. Click on a value below to change it, or
+        <a href="javascript:account_info('password')">click here to change your password</a>.
+    </p>
+
+    <ul id="cbqz_account_info">
+        <li>Username: <a href="javascript:account_info(
+            'username',
+            'User Name',
+            '[% user.obj.username %]'
+        )">[% user.obj.username %]</a></li>
+        <li>Real Name: <a href="javascript:account_info(
+            'realname',
+            'Real Name',
+            '[% user.obj.realname %]'
+        )">[% user.obj.realname %]</a></li>
+        <li>Email: <a href="javascript:account_info(
+            'email',
+            'Email',
+            '[% user.obj.email %]'
+        )">[% user.obj.email %]</a></li>
+    </ul>
+
+    <form id="edit_user" method="post"
+        action="[% c.url_for('/main/edit_user') %]" autocomplete="new-password"
+    >
+        <fieldset id="edit_user_password">
+            <legend>Edit Account Password</legend>
+            <input type="hidden" name="type" value="password">
+
+            <label>Old: <input id="edit_user_password_old"
+                type="password" name="old" placeholder="Old/Current Password"></label>
+            <label>New: <input type="password" name="new1" placeholder="New Password"></label>
+            <label>New: <input type="password" name="new2" placeholder="New Password Again"></label>
+
+            <input type="submit" value="Save New Password">
+            <input type="button" value="Cancel" onclick="account_edit_clear()">
+        </fieldset>
+
+        <fieldset id="edit_user_general">
+            <legend id="edit_user_legend">Edit Account Field</legend>
+            <input id="edit_user_type" type="hidden" name="type" value="">
+            <input id="edit_user_value" type="text" name="value" placeholder="New Value">
+            <input type="submit" value="Save">
+            <input type="button" value="Cancel" onclick="account_edit_clear()">
+        </fieldset>
+    </form>
+
     [% IF NOT user.has_any_role_in_program OR NOT user.programs_count %]
         <h2>Account Pending Approval</h2>
         <p>
@@ -91,7 +139,10 @@
 
         <div id="main" v-cloak v-bind:class="classes">
             <h2>Select Sets</h2>
-            <p>Using the options below, select the sets you want to work with.</p>
+            <p>
+                Using the options below, select the sets you want to work with.
+                Changes made are automatically saved.
+            </p>
 
             <form id="select_sets">
                 <fieldset>

@@ -161,4 +161,69 @@ sub material_data ($self) {
     return $self->render( json => { material => $material } );
 }
 
+sub edit_user ($self) {
+    if ( $self->req->param('type') eq 'password' ) {
+        unless (
+            $self->req->param('old') and
+            $self->req->param('new1') and
+            $self->req->param('new2')
+        ) {
+            $self->flash( message => 'Not all 3 form fields were filled out.' );
+        }
+        elsif ( $self->req->param('new1') ne $self->req->param('new2') ) {
+            $self->flash( message => 'The 2 new password fields did not match.' );
+        }
+        else {
+            try {
+                $self->stash('user')->change_passwd( $self->req->param('new1'), $self->req->param('old') );
+            }
+            catch {
+                $self->flash( message => $self->clean_error($_) );
+            }
+            finally {
+                unless (@_) {
+                    $self->flash( message => {
+                        type => 'success',
+                        text => 'Password change successful.',
+                    } );
+                }
+            };
+        }
+    }
+    elsif ( $self->req->param('type') eq 'username' ) {
+        try {
+            $self->stash('user')->change_name( $self->req->param('value') );
+        }
+        catch {
+            $self->flash( message => $self->clean_error($_) );
+        }
+        finally {
+            unless (@_) {
+                $self->flash( message => {
+                    type => 'success',
+                    text => 'Username change successful.',
+                } );
+            }
+        };
+    }
+    else {
+        try {
+            $self->stash('user')->obj->update({ $self->req->param('type') => $self->req->param('value') });
+        }
+        catch {
+            $self->flash( message => 'Something went wrong when changing ' . $self->req->param('type') );
+        }
+        finally {
+            unless (@_) {
+                $self->flash( message => {
+                    type => 'success',
+                    text => 'User account edit successful.',
+                } );
+            }
+        };
+    }
+
+    return $self->redirect_to('/');
+}
+
 1;

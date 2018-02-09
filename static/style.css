@@ -434,6 +434,46 @@ form#create_form fieldset label select {
     width: 216px;
 }
 
+ul#cbqz_account_info a {
+    text-decoration: none;
+    font-family: bold;
+    font-weight: normal;
+    color: black;
+}
+
+ul#cbqz_account_info a:hover {
+    text-decoration: underline;
+}
+
+form#edit_user {
+    margin-left: 275px;
+    margin-top: -65px;
+    display: none;
+}
+
+form#edit_user fieldset label {
+    width: 250px;
+    text-align: right;
+    margin-bottom: 3px;
+}
+
+form#edit_user fieldset#edit_user_password,
+form#edit_user fieldset#edit_user_general {
+    display: none;
+}
+
+form#edit_user fieldset label input[type=text],
+form#edit_user fieldset label input[type=password] {
+    width: 210px;
+}
+
+@media ( max-width: 600px ) {
+    form#edit_user {
+        margin-left: 0px;
+        margin-top: 0px;
+    }
+}
+
 /* -------------------------------------------------------------------------- */
 
 div#material_lookup_display,
