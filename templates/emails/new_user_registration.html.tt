@@ -1,4 +1,4 @@
-<title>CBQZ new user registration: [% name %]</title>
+<title>CBQZ new user registration: [% realname || username %]</title>
 
 <p>A new CBQZ user has just completed registration.</p>
 
