@@ -104,7 +104,7 @@
             <label>New: <input type="password" name="new2" placeholder="New Password Again"></label>
 
             <input type="submit" value="Save New Password">
-            <input type="button" value="Cancel" onclick="account_edit_clear()">
+            <button type="button" onclick="account_edit_clear()">Cancel</button>
         </fieldset>
 
         <fieldset id="edit_user_general">
@@ -112,7 +112,7 @@
             <input id="edit_user_type" type="hidden" name="type" value="">
             <input id="edit_user_value" type="text" name="value" placeholder="New Value">
             <input type="submit" value="Save">
-            <input type="button" value="Cancel" onclick="account_edit_clear()">
+            <button type="button" onclick="account_edit_clear()">Cancel</button>
         </fieldset>
     </form>
 
