@@ -3,7 +3,8 @@
 <p>A new CBQZ user has just completed registration.</p>
 
 <ul>
-    <li>Name: <b>[% name %]</b></li>
+    <li>Username: <b>[% username %]</b></li>
+    <li>Real Name: <b>[% realname %]</b></li>
     <li>Email: <b>[% email %]</b></li>
 </ul>
 

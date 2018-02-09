@@ -33,13 +33,19 @@ __PACKAGE__->table("user");
   is_auto_increment: 1
   is_nullable: 0
 
-=head2 name
+=head2 username
 
   data_type: 'varchar'
   is_nullable: 1
   size: 64
 
 =head2 passwd
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 64
+
+=head2 realname
 
   data_type: 'varchar'
   is_nullable: 1
@@ -87,9 +93,11 @@ __PACKAGE__->add_columns(
     is_auto_increment => 1,
     is_nullable => 0,
   },
-  "name",
+  "username",
   { data_type => "varchar", is_nullable => 1, size => 64 },
   "passwd",
+  { data_type => "varchar", is_nullable => 1, size => 64 },
+  "realname",
   { data_type => "varchar", is_nullable => 1, size => 64 },
   "email",
   { data_type => "varchar", is_nullable => 1, size => 64 },
@@ -135,13 +143,13 @@ __PACKAGE__->set_primary_key("user_id");
 
 =over 4
 
-=item * L</name>
+=item * L</username>
 
 =back
 
 =cut
 
-__PACKAGE__->add_unique_constraint("name", ["name"]);
+__PACKAGE__->add_unique_constraint("name", ["username"]);
 
 =head1 RELATIONS
 
@@ -219,8 +227,8 @@ __PACKAGE__->has_many(
 with 'CBQZ::Db::Base::Result::User';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-02-07 09:55:09
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:yvpCAVjKWlyyS7aUsaVDkA
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-02-08 16:12:30
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:naf1prZe0pE1a7LUjs+7bQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

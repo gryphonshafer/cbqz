@@ -24,7 +24,7 @@ sub login ($self) {
     my $user = CBQZ::Model::User->new;
     my $e;
     try {
-        $user = $user->login( { map { $_ => $self->param($_) } qw( name passwd ) } );
+        $user = $user->login( { map { $_ => $self->param($_) } qw( username passwd ) } );
     }
     catch {
         $e = $self->clean_error($_);
@@ -33,7 +33,7 @@ sub login ($self) {
     };
     return $self->redirect_to('/') if ($e);
 
-    $self->info( 'Login success for: ' . $user->obj->name );
+    $self->info( 'Login success for: ' . $user->obj->username );
     $self->session(
         'user_id' => $user->obj->id,
         'time'    => time,
@@ -45,7 +45,7 @@ sub login ($self) {
 sub logout ($self) {
     $self->info(
         'Logout requested from: ' .
-        ( ( $self->stash('user') ) ? $self->stash('user')->obj->name : '(Unlogged-in user)' )
+        ( ( $self->stash('user') ) ? $self->stash('user')->obj->username : '(Unlogged-in user)' )
     );
     $self->session(
         'user_id' => undef,

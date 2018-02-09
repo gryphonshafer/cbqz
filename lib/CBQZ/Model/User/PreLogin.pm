@@ -8,13 +8,13 @@ use CBQZ::Model::Email;
 
 sub create ( $self, $params ) {
     $self->params_check(
-        [ '"name" not defined in input', sub { not defined $params->{name} }                      ],
-        [ '"name" length < 2 in input',  sub { length $params->{name} < 2 }                       ],
+        [ '"username" not defined in input', sub { not defined $params->{username} }                      ],
+        [ '"username" length < 2 in input',  sub { length $params->{username} < 2 }                       ],
         [ '"passwd" complexity not met', sub { not $self->password_quality( $params->{passwd} ) } ],
     );
 
     $self->params_check(
-        [ '"name" cannot begin with _', sub { index( $params->{name}, '_' ) == 0 } ],
+        [ '"username" cannot begin with _', sub { index( $params->{username}, '_' ) == 0 } ],
     ) unless ( delete $params->{_} );
 
     my $program_id = delete $params->{program};
@@ -54,8 +54,9 @@ sub create ( $self, $params ) {
         CBQZ::Model::Email->new( type => 'new_user_registration' )->send({
             to   => \@emails,
             data => {
-                name  => $self->obj->name,
-                email => $self->obj->email,
+                username => $self->obj->username,
+                realname => $self->obj->realname,
+                email    => $self->obj->email,
             },
         });
     }
@@ -78,7 +79,7 @@ sub create ( $self, $params ) {
 
 sub login ( $self, $params ) {
     $self->params_check(
-        [ 'Valid "name" not in input',   sub { not $params->{name} }   ],
+        [ 'Valid "username" not in input', sub { not $params->{username} } ],
         [ 'Valid "passwd" not in input', sub { not $params->{passwd} } ],
     );
 
@@ -89,9 +90,9 @@ sub login ( $self, $params ) {
 
     unless ($user) {
         $self->event( 'login_fail', $user->id )
-            if ( $user = $self->rs->search({ name => $params->{name} })->first );
+            if ( $user = $self->rs->search({ username => $params->{username} })->first );
 
-        $self->info( 'Login failure (in model) for: ' . $params->{name} );
+        $self->info( 'Login failure (in model) for: ' . $params->{username} );
         E->throw('Invalid login');
     }
 

@@ -7,12 +7,12 @@
             [% page.js.push( '/js/utilities.js', '/js/pages/login.js' ) %]
 
             <form method="post" action="[% c.url_for('/login') %]" autocomplete="off">
-                <input type="text" name="name" placeholder="Name" size="12">
+                <input type="text" name="username" placeholder="Username" size="12">
                 <input type="password" name="passwd" placeholder="Password" size="12">
                 <input id="login_form_submit" type="submit" value="Login">
             </form>
         [% ELSE %]
-            Logged in as: <b>[% user.obj.name %]</b>
+            Logged in as: <b>[% user.obj.username %]</b>
             (<a href="[% c.url_for('/logout') %]">Logout</a>)
             <br>
 

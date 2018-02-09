@@ -24,20 +24,20 @@ sub password_quality ( $self, $passwd ) {
     return ( $passwd and length $passwd >= 6 ) ? 1 : 0;
 }
 
-sub change_name ( $self, $name, $underscore_ok = 0 ) {
-    E->throw('"name" not defined in input') unless ($name);
-    E->throw('"name" length < 6 in input') if ( length $name < 6 );
+sub change_name ( $self, $username, $underscore_ok = 0 ) {
+    E->throw('"username" not defined in input') unless ($username);
+    E->throw('"username" length < 6 in input') if ( length $username < 6 );
 
-    E->throw('"name" cannot begin with _') if (
+    E->throw('"username" cannot begin with _') if (
         not $underscore_ok and
-        index( $name, '_' ) == 0
+        index( $username, '_' ) == 0
     );
 
     try {
-        $self->obj->update({ name => $name });
+        $self->obj->update({ username => $username });
     }
     catch {
-        E->throw('Failed to rename user; name already in use' )
+        E->throw('Failed to rename user; username already in use' )
             if ( index( $_, 'Duplicate entry' ) > -1 );
         E->throw($_);
     };

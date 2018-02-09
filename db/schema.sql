@@ -106,15 +106,16 @@ CREATE TABLE role (
 
 CREATE TABLE user (
     user_id int(10) unsigned NOT NULL,
-    name varchar(64) DEFAULT NULL,
+    username varchar(64) DEFAULT NULL,
     passwd varchar(64) DEFAULT NULL,
+    realname varchar(64) DEFAULT NULL,
     email varchar(64) DEFAULT NULL,
     last_login timestamp NULL DEFAULT NULL,
     last_modified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created timestamp NOT NULL DEFAULT '1970-01-01 08:00:00',
     active tinyint(1) NOT NULL DEFAULT '1',
     PRIMARY KEY (user_id),
-    UNIQUE KEY name (name)
+    UNIQUE KEY name (username)
 );
 
 CREATE TRIGGER user_before_insert BEFORE INSERT ON user FOR EACH ROW SET NEW.created = NOW();

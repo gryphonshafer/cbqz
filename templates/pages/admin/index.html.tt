@@ -43,14 +43,16 @@
 
         <table class="tabular">
             <tr>
-                <th>Name</th>
+                <th>Username</th>
+                <th>Real Name</th>
                 [% FOR role IN roles %]
                     <th>[% role %]</th>
                 [% END %]
             </tr>
             [% FOR this_user IN program.users %]
                 <tr>
-                    <td>[% this_user.name %]</td>
+                    <td>[% this_user.username %]</td>
+                    <td>[% this_user.realname %]</td>
                     [% FOR role IN this_user.roles %]
                         <td class="center">
                             <input type="checkbox"
