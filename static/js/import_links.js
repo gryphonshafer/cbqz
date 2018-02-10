@@ -49,7 +49,8 @@
         if ( Object.keys(node_blocks).length == link_elements.length ) {
             for ( var i = 0; i < link_elements.length; i++ ) {
                 for ( var j = 0; j < node_blocks[ link_elements[i].href ].length; j++ ) {
-                    document.body.appendChild( node_blocks[ link_elements[i].href ][j] );
+                    var node = node_blocks[ link_elements[i].href ][j];
+                    if ( node.nodeName == "SCRIPT" ) document.body.appendChild(node);
                 }
             }
         }
