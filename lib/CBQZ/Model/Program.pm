@@ -117,7 +117,7 @@ sub admin_roles_data ( $self, $user, $roles ) {
             +{
                 %{ $program->data },
                 users => [
-                    sort { $a->{name} cmp $b->{name} }
+                    sort { lc $a->{username} cmp lc $b->{username} }
                     map {
                         my $user       = $_;
                         my @user_roles = map {

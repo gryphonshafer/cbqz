@@ -13,7 +13,7 @@ has 'statistics' => ( isa => 'ArrayRef[HashRef]', is => 'rw', lazy => 1, default
 } );
 
 sub create ( $self, $user, $name = undef ){
-    $name //= 'Default ' . ucfirst( $user->obj->name ) . ' Set';
+    $name //= 'Default ' . ucfirst( $user->obj->realname || $user->obj->username ) . ' Set';
 
     $self->obj(
         $self->rs->create({
