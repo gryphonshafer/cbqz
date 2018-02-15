@@ -20,6 +20,8 @@ my $data_dir = join( '/',
 for my $book ( @{ $settings->{books} } ) {
     my $chapter = 1;
     while (1) {
+        say $book, ' ', $chapter;
+
         my $result = $cbqz->ua->get(
             'https://www.biblegateway.com/passage/?version=NIV&search=' . join( ' ', $book, $chapter )
         )->result;
@@ -34,6 +36,7 @@ for my $book ( @{ $settings->{books} } ) {
 
         my $title  = join( ' ', $book, sprintf( '%03d', $chapter ) );
         $title =~ tr/ /_/;
+
         spurt( $data_dir . '/' . $title . '.html', decode_utf8( $result->body ) );
         $chapter++;
     }
@@ -46,7 +49,8 @@ fetch.pl - Fetch materials raw HTML content
 =head1 SYNOPSIS
 
     fetch.pl OPTIONS
-        -d|directory
+        -b|books      BOOK_NAMES   (i.e. "1 Corinthians")
+        -d|directory  DIRECTORY    (Optional; default: "html")
         -h|help
         -m|man
 
@@ -56,3 +60,5 @@ This program will fetch materials raw HTML content. It will store the HTML
 result files (1 file per chapter of books provided) in the CBQZ system's data
 directory under a subdirectory defined by the "directory" value (which defaults
 to "html").
+
+    ./fetch.pl -b '1 Corinthians' -b '2 Corinthians'

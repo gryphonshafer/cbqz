@@ -86,7 +86,7 @@ extract.pl - Extract materials from raw HTML content and build input files
 
 =head1 SYNOPSIS
 
-    fetch.pl OPTIONS
+    extract.pl OPTIONS
         -d|directory DIRECTORY    (Optional; default: "html")
         -f|files     FILE_PATTERN (Optional; default: "*")
         -o|output    OUTPUT_FILE
