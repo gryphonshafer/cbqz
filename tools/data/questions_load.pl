@@ -10,13 +10,13 @@ pod2usage unless ( $settings->{set} and $settings->{questions} and $settings->{u
 
 my $dq = CBQZ->new->dq;
 
-my $user_id = $dq->sql('SELECT user_id FROM user WHERE name = ?')->run( $settings->{user} )->value;
+my $user_id = $dq->sql('SELECT user_id FROM user WHERE username = ?')->run( $settings->{user} )->value;
 die "Failed to find user $settings->{user}\n" unless ($user_id);
 
 $dq->sql('INSERT INTO question_set ( name, user_id ) VALUES ( ?, ? )')->run(
     $settings->{set},
     $user_id,
-)->value if ( $settings->{create} );
+) if ( $settings->{create} );
 
 my $set_id = $dq->sql('SELECT question_set_id FROM question_set WHERE name = ? AND user_id = ?')
     ->run( $settings->{set}, $user_id )->value;
@@ -25,11 +25,12 @@ die "Set name $settings->{set} not found\n" unless ($set_id);
 $dq->sql('DELETE FROM question WHERE question_set_id = ?')->run($set_id) if ( $settings->{delete} );
 
 my $insert = $dq->sql(q{
-    INSERT INTO question ( question_set_id, type, book, chapter, verse, question, answer )
-    VALUES ( ?, ?, ?, ?, ?, ?, ? )
+    INSERT INTO question ( question_set_id, type, book, chapter, verse, question, answer, used )
+    VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
 });
 
-$insert->run( $set_id, @$_ ) for ( @{ csv( in => $settings->{questions} ) } );
+$insert->run( $set_id, @$_ )
+    for ( map { ( @$_ == 6 ) ? [ @$_, 0 ] : $_ } @{ csv( in => $settings->{questions} ) } );
 
 =head1 NAME
 

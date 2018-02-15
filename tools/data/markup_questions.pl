@@ -13,7 +13,7 @@ pod2usage unless ( $settings->{user} and $settings->{questions} and $settings->{
 
 my ( $question_set, $material_set );
 
-my $user_id = CBQZ->new->dq->sql('SELECT user_id FROM user WHERE name = ?')->run( $settings->{user} )->value;
+my $user_id = CBQZ->new->dq->sql('SELECT user_id FROM user WHERE username = ?')->run( $settings->{user} )->value;
 die "Failed to find user $settings->{user}\n" unless ($user_id);
 
 try {
