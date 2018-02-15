@@ -340,11 +340,21 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
                     this.question.question = this.$refs.question.innerHTML;
                     this.question.answer   = this.$refs.answer.innerHTML;
-                    this.question.marked   = (
-                        !! this.question.type &&
-                        this.question.question.length > 0 &&
-                        this.question.answer.length > 0
-                    ) ? null : "Incomplete question";
+
+                    var marked_original = this.questions.data
+                        [ this.questions.book ][ this.questions.chapter ]
+                        [ this.questions.question_id ]['marked'];
+
+                    this.question.marked =
+                        (
+                            ! (
+                                !! this.question.type &&
+                                this.question.question.length > 0 &&
+                                this.question.answer.length > 0
+                            )
+                        ) ? "Incomplete question" :
+                        ( this.question.marked == marked_original ) ? null :
+                        ( !! this.question.marked ) ? this.question.marked : null;
 
                     this.$http.post( cntlr + "/save", this.question ).then( function (response) {
                         delete_question(this);
