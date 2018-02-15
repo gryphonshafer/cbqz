@@ -174,12 +174,10 @@ This will spin up a new container and put you in to the `sh` shell of that
 container. When you exit the container, the container will delete itself. To get
 this temporarily container to a point where you can run command-line tools:
 
-    cd / && \
-        apk update && \
-        apk add build-base curl wget perl-dev mariadb-dev && \
+    apk update && apk add build-base curl wget perl-dev mariadb-dev && \
         curl -sL http://xrl.us/cpanm > cpanm && chmod +x cpanm && \
         ./cpanm -n -f --with-develop --with-all-features --installdeps . && \
-        cd /cbqz
+        rm cpanm
 
 Depending on how CBQZ configuration is structured, you may need to set an
 enviornment variable on your command-line to ensure you pick up the production
