@@ -163,6 +163,30 @@ Note that this gives you `sh` access, not `bash` or anything more advanced
 since these other shells are not installed in the image/container for space
 considerations.
 
+### Command-Line Tools in a Container
+
+If you need to run command-line tools from within a CBQZ Docker container, you
+can run such a container as follows:
+
+    docker run --interactive --tty --rm --net host --volume `pwd`:/cbqz cbqz-app sh
+
+This will spin up a new container and put you in to the `sh` shell of that
+container. When you exit the container, the container will delete itself. To get
+this temporarily container to a point where you can run command-line tools:
+
+    cd / && \
+        apk update && \
+        apk add build-base curl wget perl-dev mariadb-dev && \
+        curl -sL http://xrl.us/cpanm > cpanm && chmod +x cpanm && \
+        ./cpanm -n -f --with-develop --with-all-features --installdeps . && \
+        cd /cbqz
+
+Depending on how CBQZ configuration is structured, you may need to set an
+enviornment variable on your command-line to ensure you pick up the production
+configuration.
+
+    CONFIGAPPENV=production ./tools/data/material_load.pl --help
+
 ### MySQL Container
 
 Run the following to create and run a MySQL container for CBQZ data, which will
