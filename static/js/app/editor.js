@@ -548,10 +548,12 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
                     this.questions.book = marked_question.book;
                     this.$nextTick( function () {
-                        this.questions.chapter = marked_question.chapter;
-
                         this.$nextTick( function () {
-                            this.questions.question_id = this.questions.marked_question_id;
+                            this.questions.chapter = marked_question.chapter;
+
+                            this.$nextTick( function () {
+                                this.questions.question_id = this.questions.marked_question_id;
+                            } );
                         } );
                     } );
                 }
