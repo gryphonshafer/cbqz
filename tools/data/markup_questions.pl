@@ -3,6 +3,7 @@ use exact;
 use Config::App;
 use Try::Tiny;
 use Util::CommandLine qw( options pod2usage );
+use CBQZ;
 use CBQZ::Model::Question;
 use CBQZ::Model::QuestionSet;
 use CBQZ::Model::MaterialSet;
@@ -12,7 +13,7 @@ pod2usage unless ( $settings->{user} and $settings->{questions} and $settings->{
 
 my ( $question_set, $material_set );
 
-my $user_id = $dq->sql('SELECT user_id FROM user WHERE name = ?')->run( $settings->{user} )->value;
+my $user_id = CBQZ->new->dq->sql('SELECT user_id FROM user WHERE name = ?')->run( $settings->{user} )->value;
 die "Failed to find user $settings->{user}\n" unless ($user_id);
 
 try {
