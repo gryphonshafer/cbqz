@@ -14,8 +14,8 @@
 <div id="quizroom" v-cloak v-bind:class="classes">
     <div id="question">
         <span class="label">Question #:</span> <span class="field">{{ question.number }}</span>
-        <span class="label">Type:</span> <span class="field">{{ question.type }}</span>
         <span class="label">As:</span> <span class="field">{{ question.as }}</span>
+        <span class="label">Type:</span> <span class="field">{{ question.type }}</span>
         <span class="label">Used:</span> <span class="field">{{ question.used }}</span>
         <br>
         <span class="label">Reference:</span> <span class="field">{{
