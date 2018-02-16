@@ -1,12 +1,9 @@
 #!/usr/bin/env perl
 use exact;
 use Config::App;
+use CBQZ;
 use Util::CommandLine 'podhelp';
 use Term::ReadKey 'ReadMode';
-
-my ( $name, $host, $port, $username, $password ) = @{ Config::App->new->get('database') }{ qw(
-    name host port username password
-) };
 
 my $origin = `/sbin/ip route|awk '/default/ { print \$3 }'`;
 chomp($origin);
@@ -19,10 +16,18 @@ ReadMode('original');
 print "\n";
 chomp($root_password);
 
-system( qq{echo "$_" | /usr/bin/env mysql -h'$host' -P$port -uroot -p'$root_password'} ) for (
-    qq{CREATE USER '$username'\@'$origin' IDENTIFIED BY '$password'},
-    qq{GRANT ALL ON $name.* TO '$username'\@'$origin'},
-);
+my $cbqz = CBQZ->new;
+my ( $database, $username, $password ) = @{ $cbqz->config->get('database') }{ qw( database username password ) };
+
+$cbqz->config->put( qw( database settings mysql_multi_statements ) => 1 );
+$cbqz->config->put( qw( database database ) => undef );
+$cbqz->config->put( qw( database username ) => 'root' );
+$cbqz->config->put( qw( database password ) => $root_password );
+
+$cbqz->dq->sql(q{
+    CREATE USER '$username'\@'$origin' IDENTIFIED BY ?;
+    GRANT ALL ON $database.* TO '$username'\@'$origin';
+})->run($password);
 
 =head1 NAME
 

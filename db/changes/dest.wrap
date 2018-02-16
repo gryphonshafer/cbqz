@@ -1,12 +1,10 @@
 #!/usr/bin/env perl
 use exact;
 use Config::App;
+use CBQZ;
+use CBQZ::Util::File 'slurp';
 
-my ( $name, $host, $port, $username, $password ) = @{ Config::App->new->get('database') }{ qw(
-    name host port username password
-) };
+my $cbqz = CBQZ->new;
 
-system(
-    qq{/usr/bin/env cat $ARGV[0] | } .
-    qq{/usr/bin/env mysql --skip-column-names -h'$host' -P$port -u$username -p'$password' $name}
-);
+$cbqz->config->put( qw( database settings mysql_multi_statements ) => 1 );
+$cbqz->dq->sql( slurp( $ARGV[0] ) )->run;

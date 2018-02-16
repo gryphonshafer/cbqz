@@ -60,9 +60,13 @@ class_has dq => ( isa => 'DBIx::Query::db', is => 'ro', lazy => 1, default => su
 } );
 
 class_has dsn => ( isa => 'Str', is => 'ro', lazy => 1, default => sub ($self) {
-    return sprintf(
-        'dbi:mysql:database=%s;host=%s;port=%s',
-        @{ $self->config->get('database') }{ qw( name host port ) },
+    my $config = $self->config->get('database');
+
+    return 'dbi:mysql:' . join( ';',
+        map { join( '=', @$_ ) }
+        grep { defined $_->[1] }
+        map { [ $_, $config->{$_} ] }
+        qw( database host port )
     );
 } );
 
