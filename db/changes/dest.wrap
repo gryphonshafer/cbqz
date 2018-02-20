@@ -1,10 +1,14 @@
 #!/usr/bin/env perl
 use exact;
 use Config::App;
+use Try::Tiny;
 use CBQZ;
 use CBQZ::Util::File 'slurp';
 
 my $cbqz = CBQZ->new;
 
 $cbqz->config->put( qw( database settings mysql_multi_statements ) => 1 );
-$cbqz->dq->sql( slurp( $ARGV[0] ) )->run;
+
+try {
+    say $cbqz->dq->prepare( slurp( $ARGV[0] ) )->run->value;
+};

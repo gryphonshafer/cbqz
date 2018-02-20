@@ -30,6 +30,10 @@ sub tt_settings ( $type, $tt_conf, $constants ) {
 
             $context->define_vmethod( $_, 'ref', sub { return ref( $_[0] ) } )
                 for ( qw( scalar list hash ) );
+
+            $context->define_vmethod( 'scalar', 'commify', sub {
+                return scalar( reverse join( ',', unpack( '(A3)*', scalar( reverse $_[0] ) ) ) );
+            } );
         },
     };
 }

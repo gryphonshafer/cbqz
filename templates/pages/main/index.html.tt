@@ -159,16 +159,16 @@
 
                 <fieldset>
                     <legend>Questions Set</legend>
-                    <label v-for="set in question_sets"><input type="radio" name="questions"
-                        v-bind:value="set.question_set_id" v-model="question_set_id">{{ set.name }}</label>
 
-                    <button type="button" v-on:click="question_set_create">Create</button>
-                    <button type="button" v-on:click="question_set_delete"
-                        v-bind:disabled="question_sets.length == 0">Delete</button>
-                    <button type="button" v-on:click="question_set_rename"
-                        v-bind:disabled="question_sets.length == 0">Rename</button>
-                    <button type="button" v-on:click="question_set_reset"
-                        v-bind:disabled="question_sets.length == 0">Reset</button>
+                    <label v-for="set in question_sets"><input type="radio" name="questions"
+                        v-bind:value="set.question_set_id" v-model="question_set_id"
+                    >
+                        {{ set.name }}
+                        <b v-if="set.share">[Shared]</b>
+                    </label>
+
+                    <a id="manage_sets_link"
+                        href="[% c.url_for('/main/question_sets') %]">Manage Question Sets</a>
                 </fieldset>
 
                 <fieldset v-if="question_set && selected_chapters_count">

@@ -213,6 +213,21 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 user_question_sets
+
+Type: has_many
+
+Related object: L<CBQZ::Db::Schema::Result::UserQuestionSet>
+
+=cut
+
+__PACKAGE__->has_many(
+  "user_question_sets",
+  "CBQZ::Db::Schema::Result::UserQuestionSet",
+  { "foreign.user_id" => "self.user_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head1 L<Moose> ROLES APPLIED
 
 =over 4
@@ -227,8 +242,8 @@ __PACKAGE__->has_many(
 with 'CBQZ::Db::Base::Result::User';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-02-08 16:12:30
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:naf1prZe0pE1a7LUjs+7bQ
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-02-19 12:59:22
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:BjAY6KB3nVBXsF4PMPpYdg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

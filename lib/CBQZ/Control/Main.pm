@@ -85,65 +85,140 @@ sub data ($self) {
         $_->{book} . '|' . $_->{chapter}
     } @{ $cbqz_prefs->{selected_chapters} };
 
+
     return $self->render( json => {
-        programs        => [ map { $_->data } $self->stash('user')->programs ],
-        material_sets   => [ CBQZ::Model::MaterialSet->new->every_data ],
         weight_chapters => $cbqz_prefs->{weight_chapters} // 0,
         weight_percent  => $cbqz_prefs->{weight_percent}  // 50,
         program_id      => $cbqz_prefs->{program_id}      || undef,
         question_set_id => $cbqz_prefs->{question_set_id} || undef,
         material_set_id => $cbqz_prefs->{material_set_id} || undef,
-        question_sets   => [ map {
-            my $set = $_->data;
-            for ( @{ $set->{statistics} } ) {
-                unless (
-                    $cbqz_prefs->{question_set_id} and
-                    $cbqz_prefs->{question_set_id} == $set->{question_set_id}
-                ) {
-                    $_->{selected} = 0;
-                }
-                else {
-                    my $id = $_->{book} . '|' . $_->{chapter};
-                    $_->{selected} = ( grep { $id eq $_ } @selected_chapters ) ? 1 : 0;
-                }
+        material_sets   => [
+            sort { $b->{name} cmp $a->{name} }
+            CBQZ::Model::MaterialSet->new->every_data
+        ],
+        programs => [
+            sort { $a->{name} cmp $b->{name} }
+            map { $_->data }
+            $self->stash('user')->programs
+        ],
+        question_sets => [
+            sort {
+                $b->{share} cmp $a->{share} ||
+                $b->{name} cmp $a->{name}
             }
-            $set;
-        } $self->stash('user')->question_sets ],
+            map {
+                my $set = $_;
+                for ( @{ $set->{statistics} } ) {
+                    unless (
+                        $cbqz_prefs->{question_set_id} and
+                        $cbqz_prefs->{question_set_id} == $set->{question_set_id}
+                    ) {
+                        $_->{selected} = 0;
+                    }
+                    else {
+                        my $id = $_->{book} . '|' . $_->{chapter};
+                        $_->{selected} = ( grep { $id eq $_ } @selected_chapters ) ? 1 : 0;
+                    }
+                }
+                $set;
+            }
+            ( map { +{ %{ $_->data }, share => 0 } } $self->stash('user')->question_sets ),
+            ( map { +{ %{ $_->data }, share => 1 } } $self->stash('user')->shared_question_sets ),
+        ],
     } );
 }
 
 sub question_set_create ($self) {
-    return $self->render( json => {
-        question_set => CBQZ::Model::QuestionSet->new->create(
-            $self->stash('user'),
-            $self->req_body_json->{name},
-        )->data
-    } );
-}
+    CBQZ::Model::QuestionSet->new->create(
+        $self->stash('user'),
+        $self->req->param('name'),
+    );
 
-sub question_set_delete ($self) {
-    my $set = CBQZ::Model::QuestionSet->new->load( $self->req_body_json->{question_set_id} );
-    if ( $set and $set->is_owned_by( $self->stash('user') ) ) {
-        $set->obj->delete;
-        return $self->render( json => { success => 1 } );
-    }
+    $self->flash( message => {
+        type => 'success',
+        text => 'Question set created.',
+    } );
+
+    return $self->redirect_to('/main/question_sets');
 }
 
 sub question_set_rename ($self) {
-    my $data = $self->req_body_json;
-    my $set  = CBQZ::Model::QuestionSet->new->load( $data->{question_set_id} );
+    my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
+
     if ( $set and $set->is_owned_by( $self->stash('user') ) ) {
-        $set->obj->update({ name => $data->{name} });
-        return $self->render( json => { success => 1 } );
+        $set->obj->update({ name => $self->req->param('name') });
+
+        $self->flash( message => {
+            type => 'success',
+            text => 'Question set renamed.',
+        } );
     }
+    else {
+        $self->flash( message => 'Failed to rename question set.' );
+    }
+
+    return $self->redirect_to('/main/question_sets');
+}
+
+sub question_set_delete ($self) {
+    my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
+
+    if ( $set and $set->is_owned_by( $self->stash('user') ) ) {
+        $set->obj->delete;
+
+        $self->flash( message => {
+            type => 'success',
+            text => 'Question set deleted.',
+        } );
+    }
+    else {
+        $self->flash( message => 'Failed to delete question set.' );
+    }
+
+    return $self->redirect_to('/main/question_sets');
 }
 
 sub question_set_reset ($self) {
-    my $set = CBQZ::Model::QuestionSet->new->load( $self->req_body_json->{question_set_id} );
+    my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
     if ( $set and $set->is_owned_by( $self->stash('user') ) ) {
         $set->obj->questions->update({ used => 0 });
-        return $self->render( json => { success => 1 } );
+
+        $self->flash( message => {
+            type => 'success',
+            text => 'Question set use counters reset.',
+        } );
     }
+    else {
+        $self->flash( message => 'An error occurred; unable to reset set.' );
+    };
+
+    return $self->redirect_to('/main/question_sets');
+}
+
+sub clone_question_set ($self) {
+    my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
+    try {
+        $set->clone(
+            $self->stash('user'),
+            $self->req->param('new_set_name'),
+            'fork',
+        );
+
+        $self->flash( message => {
+            type => 'success',
+            text => join( ' ',
+                'Question set clone process started successfully.',
+                'It cant take potentially up to 60 seconds to complete.',
+                'You can refresh this page to view the progress.',
+            ),
+        } );
+    }
+    catch {
+        $self->error($_);
+        $self->flash( message => 'An error occurred; unable to clone set.' );
+    };
+
+    return $self->redirect_to('/main/question_sets');
 }
 
 sub material_data ($self) {
@@ -232,6 +307,67 @@ sub edit_user ($self) {
     }
 
     return $self->redirect_to('/');
+}
+
+sub question_sets ($self) {
+    $self->stash(
+        user_question_sets => [
+            map {
+                +{
+                    %{ $_->data },
+                    count => $_->obj->questions->count,
+                    used  => $_->obj->questions->search( { used => { '>', 0 } } )->count,
+                    users => [
+                        sort { $a->{username} cmp $b->{username} }
+                        map {
+                            +{
+                                username => $_->user->username,
+                                realname => $_->user->realname,
+                                type     => $_->type,
+                            }
+                        }
+                        $_->obj->user_question_sets
+                    ],
+                };
+            } $self->stash('user')->question_sets
+        ],
+        published_sets => [ map { +{
+            $_->question_set->get_inflated_columns,
+            count => $_->question_set->questions->count,
+            used  => $_->question_set->questions->search( { used => { '>', 0 } } )->count,
+        } } $self->stash('user')->obj->user_question_sets->search({ type => 'Publish' })->all ],
+    );
+}
+
+sub set_select_users ($self) {
+    my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
+
+    $self->stash(
+        set   => $set,
+        users => $set->users_to_select( $self->stash('user'), $self->req->param('type') ),
+    );
+}
+
+sub save_set_select_users ($self) {
+    my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
+
+    try {
+        $set->save_set_select_users(
+            $self->stash('user'),
+            $self->req->param('type'),
+            $self->req->every_param('selected_users'),
+        );
+
+        $self->flash( message => {
+            type => 'success',
+            text => 'User selection saved.',
+        } );
+    }
+    catch {
+        $self->flash( message => 'An error occurred; failed to save user selection.' );
+    };
+
+    return $self->redirect_to('/main/question_sets');
 }
 
 1;

@@ -474,6 +474,12 @@ form#edit_user fieldset label input[type=password] {
     }
 }
 
+div#main a#manage_sets_link {
+    display: block;
+    margin-top: 5px;
+    margin-left: 25px;
+}
+
 /* -------------------------------------------------------------------------- */
 
 div#material_lookup_display,

@@ -107,20 +107,6 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key("question_set_id");
 
-=head1 UNIQUE CONSTRAINTS
-
-=head2 C<name>
-
-=over 4
-
-=item * L</name>
-
-=back
-
-=cut
-
-__PACKAGE__->add_unique_constraint("name", ["name"]);
-
 =head1 RELATIONS
 
 =head2 questions
@@ -153,9 +139,24 @@ __PACKAGE__->belongs_to(
   { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
 
+=head2 user_question_sets
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-02-07 09:55:09
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:ij3AfvTx0BQgtCSsz/0Ybg
+Type: has_many
+
+Related object: L<CBQZ::Db::Schema::Result::UserQuestionSet>
+
+=cut
+
+__PACKAGE__->has_many(
+  "user_question_sets",
+  "CBQZ::Db::Schema::Result::UserQuestionSet",
+  { "foreign.question_set_id" => "self.question_set_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-02-19 12:59:22
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:OBPe6IEyFfkg7NgcthNXww
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

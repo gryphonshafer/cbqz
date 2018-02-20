@@ -87,6 +87,94 @@ sub is_owned_by ( $self, $user ) {
     ) ? 1 : 0;
 }
 
+sub is_usable_by ( $self, $user ) {
+    return (
+        $self->is_owned_by($user) or
+        grep { $_->question_set_id == $self->obj->id }
+            $user->obj->user_question_sets->search({ type => 'Share' })->all
+    ) ? 1 : 0;
+}
+
+sub clone ( $self, $user, $new_set_name, $fork = 0 ) {
+    E->throw('User not authorized to clone this question set') unless (
+        $self->is_owned_by($user) or
+        grep { $_->question_set_id == $self->obj->id }
+            $user->obj->user_question_sets->search({ type => 'Publish' })->all
+    );
+
+    my $new_set = $self->rs->create({
+        user_id => $user->obj->id,
+        name    => $new_set_name,
+    });
+
+    my $questions = $self->obj->questions;
+
+    my $code = sub {
+        while ( my $question = $questions->next ) {
+            my $question_data = { $question->get_inflated_columns };
+            delete $question_data->{question_id};
+            $question_data->{question_set_id} = $new_set->id;
+            $self->rs('Question')->create($question_data);
+        }
+    };
+
+    if ($fork) {
+        $self->fork($code);
+    }
+    else {
+        $code->();
+    }
+
+    return $new_set;
+}
+
+sub users_to_select ( $self, $user, $type ) {
+    return [
+        sort { $a->{username} cmp $b->{username} }
+        @{
+            $self->dq->sql(q{
+                SELECT
+                    u.user_id AS id, u.username, u.realname,
+                    SUM( IF( uqs.question_set_id = ? AND uqs.type = ?, 1, 0 ) ) AS checked
+                FROM user_program AS up
+                JOIN user AS u USING (user_id)
+                LEFT OUTER JOIN user_question_set AS uqs USING (user_id)
+                WHERE
+                    up.program_id IN (
+                       SELECT program_id FROM user_program WHERE user_id = ?
+                    )
+                    AND u.user_id != ?
+                GROUP BY 1
+
+            })->run(
+                $self->obj->id,
+                $type,
+                ( $user->obj->id ) x 2,
+            )->all({})
+        }
+    ];
+}
+
+sub save_set_select_users ( $self, $user, $type, $selected_user_ids ) {
+    E->throw('User not authorized to save select users on this set')
+        unless ( $self and $self->is_owned_by($user) );
+
+    $self->dq->sql('DELETE FROM user_question_set WHERE question_set_id = ? AND type = ?')
+        ->run( $self->obj->id, $type );
+
+    my $insert = $self->dq->sql(q{
+        INSERT INTO user_question_set ( question_set_id, user_id, type ) VALUES ( ?, ?, ? )
+    });
+
+    $insert->run(
+        $self->obj->id,
+        $_,
+        $type,
+    ) for (@$selected_user_ids);
+
+    return;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
