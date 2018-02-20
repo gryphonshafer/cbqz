@@ -182,7 +182,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 }
 
                 window.open(
-                    "editor/questions?quiz=" + btoa( JSON.stringify(question_ids) ),
+                    cntlr +
+                    "/../editor/questions?quiz=" + btoa( JSON.stringify(question_ids) ),
                     "_blank"
                 );
             },
