@@ -187,6 +187,10 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 );
             },
 
+            exit_quiz: function () {
+                document.location.href = cntlr;
+            },
+
             replace: function (type) {
                 this.classes.cursor_progress = true;
                 this.$http.post(

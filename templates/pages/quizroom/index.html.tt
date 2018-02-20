@@ -3,136 +3,73 @@
     page.menu  = 'quizroom';
     page.vue   = 1;
 
-    page.js.push( '/quizroom/path.js' );
-    page.links.push(
-        '/js/components/material_lookup.html',
-        '/js/components/material_search.html',
-        '/js/app/quizroom.js',
-    );
+    page.js.push( '/quizroom/path.js', '/js/app/quiz_setup.js', '/js/utilities.js' );
 %]
 
-<div id="quizroom" v-cloak v-bind:class="classes">
-    <div id="question">
-        <span class="label">Question #:</span> <span class="field">{{ question.number }}</span>
-        <span class="label">As:</span> <span class="field">{{ question.as }}</span>
-        <span class="label">Type:</span> <span class="field">{{ question.type }}</span>
-        <span class="label">Used:</span> <span class="field">{{ question.used }}</span>
-        <br>
-        <span class="label">Reference:</span> <span class="field">{{
-            ( question.book && question.chapter && question.verse )
-                ? question.book + ' ' + question.chapter + ':' + question.verse
-                : ''
-        }}</span>
+<div id="quiz_setup" v-cloak>
+    <h2>Select Chapters and Weighting from: {{ question_set.name }}</h2>
 
-        <button id="lookup"
-            v-on:click="lookup_reference" v-bind:disabled="verse_incomplete"
-        >Lookup <span class="key_text">Alt+G, F2</span></button>
+    <form>
+        <fieldset>
+            <legend>Chapter Weighting</legend>
+            Weight last
+            <select v-model="weight_chapters">
+                <option>0</option>
+                <template v-if="selected_chapters_count">
+                    <option v-for="chapters in selected_chapters_count">{{ chapters }}</option>
+                </template>
+            </select>
+            chapters at
+            <input type="text" size="1" v-model="weight_percent">%
+        </fieldset>
 
-        <br>
-        <span class="label">Question:</span>
-        <div class="htmlarea question_box" v-html="question.question"></div>
+        <button type="button"
+            v-on:click="start_quiz" v-bind:disabled="! selected_chapters_count">Start Quiz</button>
+    </form>
 
-        <span class="label">Answer:</span>
-        <div class="htmlarea answer_box" v-html="question.answer"></div>
-    </div>
+    <div>
+        <p>
+            Auto-Select Chapters:
+            <button v-on:click="select_chapters('all')">All</button>
+            <button v-on:click="select_chapters('none')">None</button>
+        </p>
 
-    <material-lookup
-        ref="material_lookup"
-        v-bind:material="material"
-        v-bind:lookup="lookup"
-        v-on:reference-change="lookup_reference_change"
-    ></material-lookup>
-
-    <div id="quiz_view" v-bind:class="{ hidden: quiz_view_hidden }">
-        <div id="quiz_view_buttons">
-            <button v-on:click="print_quiz">Print Quiz</button>
-            <button v-on:click="toggle_quiz_view">Close View</button>
-        </div>
-
-        <h2>Quiz Questions Pool View</h2>
-
-        <table class="tabular numeric">
+        <table class="tabular numeric" v-if="question_set.statistics.length > 0">
             <tr>
-                <th>Index</th>
-                <th>Q#</th>
-                <th>Reference</th>
-                <th>Type</th>
-                <th>As</th>
-                <th>Used</th>
-                <th v-for="type in metadata.type_ranges">{{ type[2] }}#</th>
+                <th></th>
+                <th>Book</th>
+                <th>Ch.</th>
+                <th>Vrs.</th>
+                <th>Qs.</th>
+                <th>Qs./V.</th>
+                <th class="question_type_totals"
+                    v-for="type in question_set.statistics[0].types">{{ type[0] }}</th>
             </tr>
-            <tr v-for="( this_question, index ) in questions"
-                v-bind:class="{ selected: this_question.question_id == question.question_id }"
-                v-on:click="move_question( index + 1 )"
+
+            <tr
+                v-for="chapter in question_set.statistics"
+                v-on:click="chapter_clicked(chapter)"
+                v-bind:class="{ selected: chapter.selected }"
             >
-                <td><a href="#" v-on:click="move_question( index + 1 )">{{ index + 1 }}</a></td>
-                <td>{{ this_question.number }}</td>
-                <td class="left">{{ this_question.book + " " + this_question.chapter + ":" + this_question.verse }}</td>
-                <td class="left">{{ this_question.type }}</td>
-                <td class="left">{{ this_question.as }}</td>
-                <td>{{ this_question.used }}</td>
-                <td v-for="type in metadata.type_ranges"
-                    v-bind:class="{
-                       below_min : type[3][index] < type[1][0],
-                       in_range  : type[3][index] >= type[1][0] && type[3][index] <= type[1][1],
-                       above_max : type[3][index] > type[1][1]
-                    }"
-                >{{ type[3][index] }}</td>
+                <td class="center">
+                    <input type="checkbox"
+                        name="selected_chapters"
+                        v-bind:value="chapter.book + '|' + chapter.chapter"
+                        v-model="chapter.selected"
+                    >
+                </td>
+                <td class="left">{{ chapter.book }}</td>
+                <td>{{ chapter.chapter }}</td>
+                <td>{{ chapter.questions }}</td>
+                <td>{{ chapter.verses }}</td>
+                <td>{{ ( chapter.questions / chapter.verses ).toFixed(2) }}</td>
+                <td class="question_type_totals"
+                    v-for="type in chapter.types">{{ type[1] || 0 }}</td>
             </tr>
         </table>
+
+        <p v-if="question_set.statistics.length == 0">
+            There are no questions yet written for this question set.
+        </p>
     </div>
-
-    <div id="manage">
-        <div class="manage_group">
-            <div>
-                <button v-on:click="move_question('back')">&larr;</button>
-                <button v-on:click="move_question('forward')">&rarr;</button>
-                <button v-on:click="toggle_quiz_view">View</button>
-            </div>
-
-            <div id="timer">
-                <div id="timer_display">{{ timer.value }}</div>
-                [% BLOCK timer_button %]
-                    <button v-on:click="set_timer([% value %])">[% value %]</button>
-                [% END %]
-                [% FOR i IN [ 0 .. 2 ] %]
-                    [% PROCESS timer_button value = timer_values.$i %]<br>
-                [% END %]
-                <button id="prime_timer_button" v-on:click="timer_click">{{ timer.label }}</button>
-                [% PROCESS timer_button value = timer_values.last %]
-            </div>
-        </div>
-
-        <div class="manage_group">
-            <div id="result">
-                <b>Result</b><br>
-                <button v-on:click="result('correct')">Correct</button>
-                <button v-on:click="result('error')">Error</button>
-                <button v-on:click="result('no_jump')">No Jump</button>
-            </div>
-
-            <div id="mark">
-                <button v-on:click="mark_for_edit" v-bind:disabled="question.marked">Mark for Edit</button>
-                <button v-on:click="make_beep">Beep</button>
-                <button v-on:click="print_quiz">Print Quiz</button>
-            </div>
-        </div>
-
-        <div class="manage_group">
-            <div id="replace">
-                <b>Replace</b><br>
-                [% FOR type IN question_types %]
-                    <button v-on:click="replace('[% type %]')">[% type %]</button>
-                [% END %]
-            </div>
-        </div>
-    </div>
-
-    <material-search
-        ref="material_search"
-        v-bind:material="material"
-        v-bind:lookup="lookup"
-        clickable="true"
-        v-on:reference-click="search_reference_click"
-    ></material-search>
 </div>

@@ -137,7 +137,7 @@
             page.js.push( '/main/path.js', '/js/app/main.js', '/js/utilities.js' );
         %]
 
-        <div id="main" v-cloak v-bind:class="classes">
+        <div id="main" v-cloak>
             <h2>Select Sets</h2>
             <p>
                 Using the options below, select the sets you want to work with.
@@ -170,31 +170,13 @@
                     <a id="manage_sets_link"
                         href="[% c.url_for('/main/question_sets') %]">Manage Question Sets</a>
                 </fieldset>
-
-                <fieldset v-if="question_set && selected_chapters_count">
-                    <legend>Chapter Weighting</legend>
-                    Weight last
-                    <select v-model="weight_chapters">
-                        <option>0</option>
-                        <option v-for="chapters in selected_chapters_count">{{ chapters }}</option>
-                    </select>
-                    chapters at
-                    <input type="text" size="1" v-model="weight_percent">%
-                </fieldset>
             </form>
 
             <div v-if="question_set">
                 <h3>Questions Set: {{ question_set.name }}</h3>
 
-                <p>
-                    Auto-Select Chapters:
-                    <button v-on:click="select_chapters('all')">All</button>
-                    <button v-on:click="select_chapters('none')">None</button>
-                </p>
-
                 <table class="tabular numeric" v-if="question_set.statistics.length > 0">
                     <tr>
-                        <th></th>
                         <th>Book</th>
                         <th>Ch.</th>
                         <th>Vrs.</th>
@@ -204,18 +186,7 @@
                             v-for="type in question_set.statistics[0].types">{{ type[0] }}</th>
                     </tr>
 
-                    <tr
-                        v-for="chapter in question_set.statistics"
-                        v-on:click="chapter_clicked(chapter)"
-                        v-bind:class="{ selected: chapter.selected }"
-                    >
-                        <td class="center">
-                            <input type="checkbox"
-                                name="selected_chapters"
-                                v-bind:value="chapter.book + '|' + chapter.chapter"
-                                v-model="chapter.selected"
-                            >
-                        </td>
+                    <tr v-for="chapter in question_set.statistics">
                         <td class="left">{{ chapter.book }}</td>
                         <td>{{ chapter.chapter }}</td>
                         <td>{{ chapter.questions }}</td>
