@@ -1,0 +1,43 @@
+[%
+    page.title = 'Select User(s) for Set ' _ c.req.param('type');
+    page.menu  = 'main';
+%]
+
+[% IF users %]
+    <p>
+        Select one or more users from the list below to which CBQZ should
+        <b>[% c.req.param('type').lower %]</b> the "<b>[% set.obj.name %]</b>" question set.
+    </p>
+
+    <form method="post" action="[% c.url_for('/main/save_set_select_users') %]">
+        <table class="tabular">
+            <tr>
+                <th></th>
+                <th>Username</th>
+                <th>Real Name</th>
+            </tr>
+            [% FOR this_user IN users %]
+                <tr>
+                    <td class="center">
+                        <input type="checkbox"
+                            name="selected_users"
+                            value="[% this_user.id %]"
+                            [% IF this_user.checked %]checked[% END %]
+                        >
+                    </td>
+                    <td>[% this_user.username %]</td>
+                    <td>[% this_user.realname %]</td>
+                </tr>
+            [% END %]
+        </table>
+
+        <input type="hidden" name="question_set_id" value="[% set.obj.id %]">
+        <input type="hidden" name="type" value="[% c.req.param('type') %]">
+        <input type="submit" value="Save [% c.req.param('type') %] Selection List">
+    </form>
+[% ELSE %]
+    <p>
+        There don't appear to be any users with whom you can
+        <b>[% c.req.param('type').lower %]</b> the "<b>[% set.obj.name %]</b>" question set.
+    </p>
+[% END %]

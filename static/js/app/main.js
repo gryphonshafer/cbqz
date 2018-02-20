@@ -130,22 +130,6 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                         }
                     } );
                 }
-            },
-            question_set_reset: function () {
-                if ( confirm(
-                    "Are you sure you want to reset the \"" + this.question_set.name + "\" question set?\n" +
-                    "This will set all questions to having been asked 0 times. There's no undo."
-                ) ) {
-                    this.classes.cursor_progress = true;
-
-                    this.$http.post(
-                        cntlr + "/question_set_reset",
-                        { question_set_id: this.question_set_id }
-                    ).then( function (response) {
-                        this.classes.cursor_progress = false;
-                        if ( ! response.body.success ) alert("There was an error deleting the question set.");
-                    } );
-                }
             }
         },
 

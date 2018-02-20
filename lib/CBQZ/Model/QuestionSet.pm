@@ -87,6 +87,21 @@ sub is_owned_by ( $self, $user ) {
     ) ? 1 : 0;
 }
 
+sub clone ( $self, $user, $new_set_name ) {
+    my $new_set = $self->rs->create({
+        user_id => $user->obj->id,
+        name    => $new_set_name,
+    });
+
+    my $questions = $self->obj->questions;
+    while ( my $question = $questions->next ) {
+        my $question_data = { $question->get_inflated_columns };
+        delete $question_data->{question_id};
+        $question_data->{question_set_id} = $new_set->id;
+        $self->rs('Question')->create($question_data);
+    }
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;

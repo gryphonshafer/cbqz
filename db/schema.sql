@@ -20,7 +20,6 @@ CREATE TABLE material (
     is_new_para tinyint(1) NOT NULL DEFAULT '0',
     PRIMARY KEY (material_id),
     UNIQUE KEY reference (material_set_id,book,chapter,verse),
-    KEY material_set_id (material_set_id),
     CONSTRAINT material_ibfk_1 FOREIGN KEY (material_set_id) REFERENCES material_set (material_set_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -66,17 +65,11 @@ CREATE TABLE question (
     CONSTRAINT question_ibfk_1 FOREIGN KEY (question_set_id) REFERENCES question_set (question_set_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TRIGGER question_after_insert AFTER INSERT ON question
-FOR EACH ROW
-UPDATE question_set SET last_modified = NOW() WHERE question_set_id = NEW.question_set_id;
+CREATE TRIGGER question_after_insert AFTER INSERT ON question FOR EACH ROW UPDATE question_set SET last_modified = NOW() WHERE question_set_id = NEW.question_set_id;
 
-CREATE TRIGGER question_after_update AFTER UPDATE ON question
-FOR EACH ROW
-UPDATE question_set SET last_modified = NOW() WHERE question_set_id IN ( NEW.question_set_id, OLD.question_set_id );
+CREATE TRIGGER question_after_update AFTER UPDATE ON question FOR EACH ROW UPDATE question_set SET last_modified = NOW() WHERE question_set_id IN ( NEW.question_set_id, OLD.question_set_id );
 
-CREATE TRIGGER question_after_delete AFTER DELETE ON question
-FOR EACH ROW
-UPDATE question_set SET last_modified = NOW() WHERE question_set_id = OLD.question_set_id;
+CREATE TRIGGER question_after_delete AFTER DELETE ON question FOR EACH ROW UPDATE question_set SET last_modified = NOW() WHERE question_set_id = OLD.question_set_id;
 
 CREATE TABLE question_set (
     question_set_id int(10) unsigned NOT NULL,
@@ -85,8 +78,8 @@ CREATE TABLE question_set (
     last_modified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created timestamp NOT NULL DEFAULT '1970-01-01 08:00:00',
     PRIMARY KEY (question_set_id),
-    UNIQUE KEY name (name),
     KEY user_id (user_id),
+    KEY name (name),
     CONSTRAINT question_set_ibfk_1 FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -128,5 +121,15 @@ CREATE TABLE user_program (
     KEY program_id (program_id),
     CONSTRAINT user_program_ibfk_1 FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT user_program_ibfk_2 FOREIGN KEY (program_id) REFERENCES program (program_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE user_question_set (
+    user_id int(10) unsigned NOT NULL,
+    question_set_id int(10) unsigned NOT NULL,
+    type enum('Publish','Share') NOT NULL,
+    PRIMARY KEY (user_id,question_set_id),
+    KEY question_set_id (question_set_id),
+    CONSTRAINT user_question_set_ibfk_1 FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT user_question_set_ibfk_2 FOREIGN KEY (question_set_id) REFERENCES question_set (question_set_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 

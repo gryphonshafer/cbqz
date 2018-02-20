@@ -1,0 +1,66 @@
+[%
+    page.title = 'Manage Question Sets';
+    page.menu  = 'main';
+
+    page.js.push( '/main/path.js', '/js/pages/question_sets.js' );
+%]
+
+[% IF user_question_sets %]
+    <h2>Question Sets for User: [% user.obj.username %]</h2>
+
+    [% FOR set IN user_question_sets %]
+        <h3>[% set.name %]</h3>
+        <ul>
+            <li>Created: <b>[% set.created %]</b></li>
+            <li>Last Modified: <b>[% set.last_modified %]</b></li>
+            <li>Questions Count: <b>[% set.count.commify %]</b></li>
+            <li>Questions Used: <b>[% set.used.commify %]</b></li>
+        </ul>
+
+        [% IF set.users.size %]
+            <p>You have published or shared this question set to the following users:</p>
+            <ul>
+                [% FOR this_user IN set.users %]
+                    <li>[% this_user.username %] ([% this_user.type %])</li>
+                [% END %]
+            </ul>
+        [% END %]
+
+        <button type="button" onclick="question_set_reset([% set.question_set_id %])">Reset</button>
+        <button type="button" onclick="
+            clone_question_set(
+                [% set.question_set_id %],
+                '[% set.name.replace( '\'', '\\\'' ) %]'
+            )
+        ">Clone</button>
+        <button type="button"
+            onclick="publish_share_set( [% set.question_set_id %], 'Publish' )">Set Publish To</button>
+        <button type="button"
+            onclick="publish_share_set( [% set.question_set_id %], 'Share' )">Set Share To</button>
+    [% END %]
+[% ELSE %]
+    <h2>No Question Sets for User: [% user.obj.username %]</h2>
+    <p>There don't appear to be any question sets for user: [% user.obj.username %].</p>
+[% END %]
+
+<!-- TODO -->
+[% IF other_question_sets %]
+    <h2>Published and Shared Question Sets</h2>
+
+    <table class="tabular">
+        <tr>
+            <th>Name</th>
+            <th>Created</th>
+            <th>Last Modified</th>
+            <th>Questions</th>
+        </tr>
+        [% FOR set IN other_question_sets %]
+            <tr>
+                <td>[% set.name %]</td>
+                <td>[% set.created %]</td>
+                <td>[% set.last_modified %]</td>
+                <td class="right">[% set.count.commify %]</td>
+            </tr>
+        [% END %]
+    </table>
+[% END %]
