@@ -87,6 +87,14 @@ sub is_owned_by ( $self, $user ) {
     ) ? 1 : 0;
 }
 
+sub is_usable_by ( $self, $user ) {
+    return (
+        $self->is_owned_by($user) or
+        grep { $_->question_set_id == $self->obj->id }
+            $user->obj->user_question_sets->search({ type => 'Share' })->all
+    ) ? 1 : 0;
+}
+
 sub clone ( $self, $user, $new_set_name, $fork = 0 ) {
     E->throw('User not authorized to clone this question set') unless (
         $self->is_owned_by($user) or

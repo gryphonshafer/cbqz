@@ -85,30 +85,46 @@ sub data ($self) {
         $_->{book} . '|' . $_->{chapter}
     } @{ $cbqz_prefs->{selected_chapters} };
 
+
     return $self->render( json => {
-        programs        => [ map { $_->data } $self->stash('user')->programs ],
-        material_sets   => [ CBQZ::Model::MaterialSet->new->every_data ],
         weight_chapters => $cbqz_prefs->{weight_chapters} // 0,
         weight_percent  => $cbqz_prefs->{weight_percent}  // 50,
         program_id      => $cbqz_prefs->{program_id}      || undef,
         question_set_id => $cbqz_prefs->{question_set_id} || undef,
         material_set_id => $cbqz_prefs->{material_set_id} || undef,
-        question_sets   => [ map {
-            my $set = $_->data;
-            for ( @{ $set->{statistics} } ) {
-                unless (
-                    $cbqz_prefs->{question_set_id} and
-                    $cbqz_prefs->{question_set_id} == $set->{question_set_id}
-                ) {
-                    $_->{selected} = 0;
-                }
-                else {
-                    my $id = $_->{book} . '|' . $_->{chapter};
-                    $_->{selected} = ( grep { $id eq $_ } @selected_chapters ) ? 1 : 0;
-                }
+        material_sets   => [
+            sort { $b->{name} cmp $a->{name} }
+            CBQZ::Model::MaterialSet->new->every_data
+        ],
+        programs => [
+            sort { $a->{name} cmp $b->{name} }
+            map { $_->data }
+            $self->stash('user')->programs
+        ],
+        question_sets => [
+            sort {
+                $b->{share} cmp $a->{share} ||
+                $b->{name} cmp $a->{name}
             }
-            $set;
-        } $self->stash('user')->question_sets ],
+            map {
+                my $set = $_;
+                for ( @{ $set->{statistics} } ) {
+                    unless (
+                        $cbqz_prefs->{question_set_id} and
+                        $cbqz_prefs->{question_set_id} == $set->{question_set_id}
+                    ) {
+                        $_->{selected} = 0;
+                    }
+                    else {
+                        my $id = $_->{book} . '|' . $_->{chapter};
+                        $_->{selected} = ( grep { $id eq $_ } @selected_chapters ) ? 1 : 0;
+                    }
+                }
+                $set;
+            }
+            ( map { +{ %{ $_->data }, share => 0 } } $self->stash('user')->question_sets ),
+            ( map { +{ %{ $_->data }, share => 1 } } $self->stash('user')->shared_question_sets ),
+        ],
     } );
 }
 
@@ -127,6 +143,7 @@ sub question_set_delete ($self) {
         $set->obj->delete;
         return $self->render( json => { success => 1 } );
     }
+    return $self->render( json => { success => 0 } );
 }
 
 sub question_set_rename ($self) {
@@ -136,6 +153,7 @@ sub question_set_rename ($self) {
         $set->obj->update({ name => $data->{name} });
         return $self->render( json => { success => 1 } );
     }
+    return $self->render( json => { success => 0 } );
 }
 
 sub question_set_reset ($self) {

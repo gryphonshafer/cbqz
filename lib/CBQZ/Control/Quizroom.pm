@@ -81,7 +81,7 @@ sub data ($self) {
     try {
         my $program = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
         my $set     = CBQZ::Model::QuestionSet->new->load( $cbqz_prefs->{question_set_id} );
-        my $quiz    = ( $set and $set->is_owned_by( $self->stash('user') ) )
+        my $quiz    = ( $set and $set->is_usable_by( $self->stash('user') ) )
             ? CBQZ::Model::Quiz->new->generate($cbqz_prefs)
             : { error => 'User does not own requested question set' };
 
@@ -122,7 +122,7 @@ sub data ($self) {
 
 sub used ($self) {
     my $question = CBQZ::Model::Question->new->load( $self->req_body_json->{question_id} );
-    if ( $question and $question->is_owned_by( $self->stash('user') ) ) {
+    if ( $question and $question->is_usable_by( $self->stash('user') ) ) {
         $question->obj->update({ used => \'used + 1' });
         return $self->render( json => { success => 1 } );
     }
@@ -131,7 +131,7 @@ sub used ($self) {
 sub mark ($self) {
     my $json     = $self->req_body_json;
     my $question = CBQZ::Model::Question->new->load( $self->req_body_json->{question_id} );
-    if ( $question and $question->is_owned_by( $self->stash('user') ) ) {
+    if ( $question and $question->is_usable_by( $self->stash('user') ) ) {
         $question->obj->update({ marked => $json->{reason} });
         return $self->render( json => { success => 1 } );
     }
@@ -140,7 +140,7 @@ sub mark ($self) {
 sub replace ($self) {
     my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
     my $set = CBQZ::Model::QuestionSet->new->load( $cbqz_prefs->{question_set_id} );
-    if ( $set and $set->is_owned_by( $self->stash('user') ) ) {
+    if ( $set and $set->is_usable_by( $self->stash('user') ) ) {
         my $results = CBQZ::Model::Quiz->new->replace( $self->req_body_json, $cbqz_prefs );
         return $self->render( json => {
             question => (@$results) ? $results->[0] : undef,

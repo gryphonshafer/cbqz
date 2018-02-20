@@ -15,7 +15,7 @@ with 'CBQZ::Model::User::Program';
 
 class_has 'schema_name' => ( isa => 'Str', is => 'ro', default => 'User' );
 
-before [ qw( change_name change_passwd ) ] => sub ($self) {
+before [ qw( change_name change_passwd question_sets ) ] => sub ($self) {
     E->throw('Failure because user object data not yet loaded')
         unless ( $self->obj and $self->obj->in_storage );
 };
@@ -63,12 +63,17 @@ sub event ( $self, $type, $user_id = undef ) {
 }
 
 sub question_sets ($self) {
-    E->throw('Failure because user object data not yet loaded')
-        unless ( $self->obj and $self->obj->in_storage );
-
     my $question_sets = CBQZ::Model::QuestionSet->new->model( $self->obj->question_sets->all );
     $question_sets = [ CBQZ::Model::QuestionSet->new->create($self) ]
         unless (@$question_sets);
+
+    return (wantarray) ? @$question_sets : $question_sets;
+}
+
+sub shared_question_sets ($self) {
+    my $question_sets = CBQZ::Model::QuestionSet->new->model(
+        map { $_->question_set } $self->obj->user_question_sets->search({ type => 'Share' })->all
+    );
 
     return (wantarray) ? @$question_sets : $question_sets;
 }

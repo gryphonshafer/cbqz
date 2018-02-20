@@ -127,7 +127,7 @@ CREATE TABLE user_question_set (
     user_id int(10) unsigned NOT NULL,
     question_set_id int(10) unsigned NOT NULL,
     type enum('Publish','Share') NOT NULL,
-    PRIMARY KEY (user_id,question_set_id),
+    PRIMARY KEY (user_id,question_set_id,type),
     KEY question_set_id (question_set_id),
     CONSTRAINT user_question_set_ibfk_1 FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT user_question_set_ibfk_2 FOREIGN KEY (question_set_id) REFERENCES question_set (question_set_id) ON DELETE CASCADE ON UPDATE CASCADE

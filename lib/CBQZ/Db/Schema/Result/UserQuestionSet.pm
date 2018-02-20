@@ -79,11 +79,13 @@ __PACKAGE__->add_columns(
 
 =item * L</question_set_id>
 
+=item * L</type>
+
 =back
 
 =cut
 
-__PACKAGE__->set_primary_key("user_id", "question_set_id");
+__PACKAGE__->set_primary_key("user_id", "question_set_id", "type");
 
 =head1 RELATIONS
 
@@ -118,8 +120,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-02-19 12:59:22
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:+wlVvfGSNPmWgHaV6uRglw
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-02-20 08:18:40
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:h+mKow54X6LhjtvmcKRUVQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
