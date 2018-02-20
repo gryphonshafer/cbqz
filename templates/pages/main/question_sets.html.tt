@@ -43,9 +43,8 @@
     <p>There don't appear to be any question sets for user: [% user.obj.username %].</p>
 [% END %]
 
-<!-- TODO -->
-[% IF other_question_sets %]
-    <h2>Published and Shared Question Sets</h2>
+[% IF published_sets %]
+    <h2>Published Question Sets from Other Users</h2>
 
     <table class="tabular">
         <tr>
@@ -53,13 +52,20 @@
             <th>Created</th>
             <th>Last Modified</th>
             <th>Questions</th>
+            <th>Used</th>
         </tr>
-        [% FOR set IN other_question_sets %]
+        [% FOR set IN published_sets %]
             <tr>
-                <td>[% set.name %]</td>
+                <td><a href="#" onclick="
+                    clone_question_set(
+                        [% set.question_set_id %],
+                        '[% set.name.replace( '\'', '\\\'' ) %]'
+                    )
+                ">[% set.name %]</a></td>
                 <td>[% set.created %]</td>
                 <td>[% set.last_modified %]</td>
                 <td class="right">[% set.count.commify %]</td>
+                <td class="right">[% set.used.commify %]</td>
             </tr>
         [% END %]
     </table>

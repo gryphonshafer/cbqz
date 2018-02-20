@@ -158,27 +158,22 @@ sub question_set_reset ($self) {
 }
 
 sub clone_question_set ($self) {
+    my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
     try {
-        my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
-        if ( $set and $set->is_owned_by( $self->stash('user') ) ) {
-            my $pid = fork();
-            if ( defined($pid) and $pid == 0 ) {
-                $set->clone(
-                    $self->stash('user'),
-                    $self->req->param('new_set_name'),
-                );
-                exit;
-            }
+        $set->clone(
+            $self->stash('user'),
+            $self->req->param('new_set_name'),
+            'fork',
+        );
 
-            $self->flash( message => {
-                type => 'success',
-                text => join( ' ',
-                    'Question set clone process started successfully.',
-                    'It cant take potentially up to 60 seconds to complete.',
-                    'You can refresh this page to view the progress.',
-                ),
-            } );
-        }
+        $self->flash( message => {
+            type => 'success',
+            text => join( ' ',
+                'Question set clone process started successfully.',
+                'It cant take potentially up to 60 seconds to complete.',
+                'You can refresh this page to view the progress.',
+            ),
+        } );
     }
     catch {
         $self->error($_);
@@ -297,11 +292,14 @@ sub question_sets ($self) {
                     ],
                 };
             } $self->stash('user')->question_sets
-        ]
+        ],
+        published_sets => [ map { +{
+            $_->question_set->get_inflated_columns,
+            count => $_->question_set->questions->count,
+            used  => $_->question_set->questions->search( { used => { '>', 0 } } )->count,
+        } } $self->stash('user')->obj->user_question_sets->search({ type => 'Publish' })->all ],
     );
 }
-
-# TODO: move most of below to model layer
 
 sub set_select_users ($self) {
     $self->stash(

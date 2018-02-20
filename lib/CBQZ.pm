@@ -111,6 +111,14 @@ sub alert     ( $self, @params ) { return $self->log->alert    ( $self->dp(@para
 sub emergency ( $self, @params ) { return $self->log->emergency( $self->dp(@params) ) }
 sub emerg     ( $self, @params ) { return $self->log->emerg    ( $self->dp(@params) ) }
 
+sub fork ( $self, $code ) {
+    my $pid = fork();
+    if ( defined($pid) and $pid == 0 ) {
+        $code->();
+        exit;
+    }
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
