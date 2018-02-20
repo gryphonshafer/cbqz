@@ -1,12 +1,11 @@
 [%
     page.title = 'Manage Question Sets';
-    page.menu  = 'main';
-
     page.js.push( '/main/path.js', '/js/pages/question_sets.js' );
 %]
 
 [% IF user_question_sets %]
     <h2>Question Sets for User: [% user.obj.username %]</h2>
+    <button type="button" onclick="question_set_create()">Create New Set</button>
 
     [% FOR set IN user_question_sets %]
         <h3>[% set.name %]</h3>
@@ -27,6 +26,7 @@
         [% END %]
 
         <button type="button" onclick="question_set_reset([% set.question_set_id %])">Reset</button>
+        <button type="button" onclick="question_set_rename([% set.question_set_id %])">Rename</button>
         <button type="button" onclick="
             clone_question_set(
                 [% set.question_set_id %],
@@ -37,6 +37,7 @@
             onclick="publish_share_set( [% set.question_set_id %], 'Publish' )">Set Publish To</button>
         <button type="button"
             onclick="publish_share_set( [% set.question_set_id %], 'Share' )">Set Share To</button>
+        <button type="button" onclick="question_set_delete([% set.question_set_id %])">Delete</button>
     [% END %]
 [% ELSE %]
     <h2>No Question Sets for User: [% user.obj.username %]</h2>

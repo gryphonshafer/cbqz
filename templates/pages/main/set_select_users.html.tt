@@ -1,7 +1,4 @@
-[%
-    page.title = 'Select User(s) for Set ' _ c.req.param('type');
-    page.menu  = 'main';
-%]
+[% page.title = 'Select User(s) for Set ' _ c.req.param('type') %]
 
 [% IF users %]
     <p>

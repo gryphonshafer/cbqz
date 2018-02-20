@@ -27,3 +27,22 @@ function publish_share_set ( question_set_id, type ) {
     document.location.href = cntlr + "/set_select_users" +
         "?question_set_id=" + question_set_id + "&type=" + type;
 }
+
+function question_set_create () {
+    var name = prompt("Please enter a question set name:");
+    if ( !! name ) document.location.href = cntlr + "/question_set_create" + "?name=" + encodeURI(name);
+}
+
+function question_set_rename (question_set_id) {
+    var name = prompt("Please enter a question set name:");
+    if ( !! name ) document.location.href = cntlr + "/question_set_rename" +
+        "?question_set_id=" + question_set_id + "&name=" + encodeURI(name);
+}
+
+function question_set_delete (question_set_id) {
+    if ( confirm("Are you sure you want to delete the question set?") ) {
+        if ( confirm("STOP! Are you really, really sure? (There's no undo.)") ) {
+            document.location.href = cntlr + "/question_set_delete" + "?question_set_id=" + question_set_id;
+        }
+    }
+}

@@ -129,46 +129,66 @@ sub data ($self) {
 }
 
 sub question_set_create ($self) {
-    return $self->render( json => {
-        question_set => CBQZ::Model::QuestionSet->new->create(
-            $self->stash('user'),
-            $self->req_body_json->{name},
-        )->data
-    } );
-}
+    CBQZ::Model::QuestionSet->new->create(
+        $self->stash('user'),
+        $self->req->param('name'),
+    );
 
-sub question_set_delete ($self) {
-    my $set = CBQZ::Model::QuestionSet->new->load( $self->req_body_json->{question_set_id} );
-    if ( $set and $set->is_owned_by( $self->stash('user') ) ) {
-        $set->obj->delete;
-        return $self->render( json => { success => 1 } );
-    }
-    return $self->render( json => { success => 0 } );
+    $self->flash( message => {
+        type => 'success',
+        text => 'Question set created.',
+    } );
+
+    return $self->redirect_to('/main/question_sets');
 }
 
 sub question_set_rename ($self) {
-    my $data = $self->req_body_json;
-    my $set  = CBQZ::Model::QuestionSet->new->load( $data->{question_set_id} );
+    my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
+
     if ( $set and $set->is_owned_by( $self->stash('user') ) ) {
-        $set->obj->update({ name => $data->{name} });
-        return $self->render( json => { success => 1 } );
+        $set->obj->update({ name => $self->req->param('name') });
+
+        $self->flash( message => {
+            type => 'success',
+            text => 'Question set renamed.',
+        } );
     }
-    return $self->render( json => { success => 0 } );
+    else {
+        $self->flash( message => 'Failed to rename question set.' );
+    }
+
+    return $self->redirect_to('/main/question_sets');
+}
+
+sub question_set_delete ($self) {
+    my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
+
+    if ( $set and $set->is_owned_by( $self->stash('user') ) ) {
+        $set->obj->delete;
+
+        $self->flash( message => {
+            type => 'success',
+            text => 'Question set deleted.',
+        } );
+    }
+    else {
+        $self->flash( message => 'Failed to delete question set.' );
+    }
+
+    return $self->redirect_to('/main/question_sets');
 }
 
 sub question_set_reset ($self) {
-    try {
-        my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
-        if ( $set and $set->is_owned_by( $self->stash('user') ) ) {
-            $set->obj->questions->update({ used => 0 });
+    my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
+    if ( $set and $set->is_owned_by( $self->stash('user') ) ) {
+        $set->obj->questions->update({ used => 0 });
 
-            $self->flash( message => {
-                type => 'success',
-                text => 'Question set use counters reset.',
-            } );
-        }
+        $self->flash( message => {
+            type => 'success',
+            text => 'Question set use counters reset.',
+        } );
     }
-    catch {
+    else {
         $self->flash( message => 'An error occurred; unable to reset set.' );
     };
 
@@ -320,61 +340,32 @@ sub question_sets ($self) {
 }
 
 sub set_select_users ($self) {
-    $self->stash(
-        set   => CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') ),
-        users => [
-            sort { $a->{username} cmp $b->{username} }
-            @{
-                $self->dq->sql(q{
-                    SELECT
-                        u.user_id AS id, u.username, u.realname,
-                        SUM( IF( uqs.question_set_id = ? AND uqs.type = ?, 1, 0 ) ) AS checked
-                    FROM user_program AS up
-                    JOIN user AS u USING (user_id)
-                    LEFT OUTER JOIN user_question_set AS uqs USING (user_id)
-                    WHERE
-                        up.program_id IN (
-                           SELECT program_id FROM user_program WHERE user_id = ?
-                        )
-                        AND u.user_id != ?
-                    GROUP BY 1
+    my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
 
-                })->run(
-                    $self->req->param('question_set_id'),
-                    $self->req->param('type'),
-                    ( $self->stash('user')->obj->id ) x 2,
-                )->all({})
-            }
-        ],
+    $self->stash(
+        set   => $set,
+        users => $set->users_to_select( $self->stash('user'), $self->req->param('type') ),
     );
 }
 
 sub save_set_select_users ($self) {
     my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
-    if ( $set and $set->is_owned_by( $self->stash('user') ) ) {
-        $self->dq->sql('DELETE FROM user_question_set WHERE question_set_id = ? AND type = ?')->run(
-            $set->obj->id,
+
+    try {
+        $set->save_set_select_users(
+            $self->stash('user'),
             $self->req->param('type'),
+            $self->req->every_param('selected_users'),
         );
-
-        my $insert = $self->dq->sql(q{
-            INSERT INTO user_question_set ( question_set_id, user_id, type ) VALUES ( ?, ?, ? )
-        });
-
-        $insert->run(
-            $set->obj->id,
-            $_,
-            $self->req->param('type'),
-        ) for ( @{ $self->req->every_param('selected_users') } );
 
         $self->flash( message => {
             type => 'success',
             text => 'User selection saved.',
         } );
     }
-    else {
+    catch {
         $self->flash( message => 'An error occurred; failed to save user selection.' );
-    }
+    };
 
     return $self->redirect_to('/main/question_sets');
 }

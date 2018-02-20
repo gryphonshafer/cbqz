@@ -167,13 +167,8 @@
                         <b v-if="set.share">[Shared]</b>
                     </label>
 
-                    <button type="button" v-on:click="question_set_create">Create</button>
-                    <button type="button" v-on:click="question_set_delete"
-                        v-bind:disabled="question_sets.length == 0">Delete</button>
-                    <button type="button" v-on:click="question_set_rename"
-                        v-bind:disabled="question_sets.length == 0">Rename</button>
-
-                    <br><a href="[% c.url_for('/main/question_sets') %]">Manage Question Sets</a>
+                    <a id="manage_sets_link"
+                        href="[% c.url_for('/main/question_sets') %]">Manage Question Sets</a>
                 </fieldset>
 
                 <fieldset v-if="question_set && selected_chapters_count">
