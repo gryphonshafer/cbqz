@@ -886,7 +886,7 @@ div#material div#material_search div.margin_lift {
     margin-top: 0px;
 }
 
-@media ( max-width: 796px ) {
+@media ( max-width: 840px ) {
     div#material div#material_search,
     div#material div#material_lookup {
         display: block;

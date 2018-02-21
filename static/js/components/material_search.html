@@ -4,6 +4,10 @@
             <input type="text" ref="search_text_input" v-model="search_text" placeholder="Search Text" size="30">
             <button v-on:click="go">Go</button>
             <button v-on:click="find">Find <span class="key_text">Alt+F, F4</span></button>
+
+            <span id="material_serach_match_count" v-if="matched_verses && matched_verses.length">
+                {{ matched_verses.length }}
+            </span>
         </div>
 
         <div id="material_search_display">
