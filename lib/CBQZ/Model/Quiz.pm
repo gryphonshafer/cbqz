@@ -30,6 +30,7 @@ sub generate ( $self, $cbqz_prefs ) {
         die "No chapters selected from which to build a quiz; select chapters and retry"
             unless ( length $chapter_set->{prime} or length $chapter_set->{weight} );
 
+        # select the minimum questions for each question type
         for my $question_type (@question_types) {
             my $types = join( ', ', map { $self->dq->quote($_) } @{ $question_type->[0] } );
             my $min   = $question_type->[1][0];
@@ -89,24 +90,20 @@ sub generate ( $self, $cbqz_prefs ) {
             push( @questions, @pending_questions );
         }
 
+        # randomly sort the minimum questions set
         @questions = map { $_->[0] } sort { $a->[1] <=> $b->[1] } map { [ $_, rand ] } @questions;
 
-        @question_types = (
-            (
-                map { $_->[0] }
-                sort { $a->[1] <=> $b->[1] }
-                map { [ $_, rand() ] }
-                grep { $_->[1][1] - $_->[1][0] > 0 } @question_types
-            ),
-            (
-                map { $_->[0] }
-                sort { $a->[1] <=> $b->[1] }
-                map { [ $_, rand() ] }
-                map { ($_) x ( $_->[1][1] - $_->[1][0] - 1 ) }
-                grep { $_->[1][1] - $_->[1][0] > 1 } @question_types
-            ),
-        );
+        # pseudo-randomize question types not yet at max based on reaching max as late as possible
+        @question_types =
+            sort { $b->[3] <=> $a->[3] }
+            map {
+                my $type = $_;
+                map { [ @$type, $_ + rand() ] } 0 .. ( $_->[1][1] - $_->[1][0] );
+            }
+            grep { $_->[1][1] - $_->[1][0] > 0 }
+            @question_types;
 
+        # append additional questions based on question type order up to target count
         while ( @questions < $target_questions_count and @question_types ) {
             my $question_type = shift @question_types;
 
@@ -154,6 +151,7 @@ sub generate ( $self, $cbqz_prefs ) {
             push( @questions, @$results );
         }
 
+        # append additional questions up to target count
         while ( @questions < $target_questions_count ) {
             my $selection_set = $chapter_set->{
                 ( $cbqz_prefs->{weight_percent} >= rand() * 100 ) ? 'weight' : 'prime'
