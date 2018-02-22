@@ -16,7 +16,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         answer      : null,
         type        : null,
         used        : null,
-        marked      : null
+        marked      : null,
+        score       : null
     };
     data.questions.question_id        = null;
     data.questions.marked_question_id = null;

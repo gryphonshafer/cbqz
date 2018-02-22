@@ -16,8 +16,11 @@
         <span class="label">Question #:</span> <span class="field">{{ question.number }}</span>
         <span class="label">Type:</span> <span class="field">{{ question.type }}</span>
         <span class="label">As:</span> <span class="field">{{ question.as }}</span>
+        <span class="label">Score:</span> <span class="field">{{ question.score }}</span>
         <span class="label">Used:</span> <span class="field">{{ question.used }}</span>
+
         <br>
+
         <span class="label">Reference:</span> <span class="field">{{
             ( question.book && question.chapter && question.verse )
                 ? question.book + ' ' + question.chapter + ':' + question.verse
@@ -29,6 +32,7 @@
         >Lookup <span class="key_text">Alt+G, F2</span></button>
 
         <br>
+
         <span class="label">Question:</span>
         <div class="htmlarea question_box" v-html="question.question"></div>
 
@@ -45,6 +49,7 @@
 
     <div id="quiz_view" v-bind:class="{ hidden: quiz_view_hidden }">
         <div id="quiz_view_buttons">
+            Mean Question Score = {{ mean_score }}
             <button v-on:click="print_quiz">Print Quiz</button>
             <button v-on:click="toggle_quiz_view">Close View</button>
         </div>
@@ -58,6 +63,7 @@
                 <th>Reference</th>
                 <th>Type</th>
                 <th>As</th>
+                <th>Score</th>
                 <th>Used</th>
                 <th v-for="type in metadata.type_ranges">{{ type[2] }}#</th>
             </tr>
@@ -70,6 +76,7 @@
                 <td class="left">{{ this_question.book + " " + this_question.chapter + ":" + this_question.verse }}</td>
                 <td class="left">{{ this_question.type }}</td>
                 <td class="left">{{ this_question.as }}</td>
+                <td>{{ this_question.score }}</td>
                 <td>{{ this_question.used }}</td>
                 <td v-for="type in metadata.type_ranges"
                     v-bind:class="{

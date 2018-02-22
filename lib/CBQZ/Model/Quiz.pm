@@ -55,7 +55,7 @@ sub generate ( $self, $cbqz_prefs ) {
                     : '';
 
                 my $results = $self->dq->sql(qq{
-                    SELECT question_id, book, chapter, verse, question, answer, type, used
+                    SELECT question_id, book, chapter, verse, question, answer, type, used, score
                     FROM question
                     WHERE
                         type IN ($types) $refs AND marked IS NULL AND question_set_id = ? AND
@@ -73,7 +73,7 @@ sub generate ( $self, $cbqz_prefs ) {
                         : '';
 
                     push( @$results, @{ $self->dq->sql(qq{
-                        SELECT question_id, book, chapter, verse, question, answer, type, used
+                        SELECT question_id, book, chapter, verse, question, answer, type, used, score
                         FROM question
                         WHERE
                             type IN ($types) $ids AND marked IS NULL AND question_set_id = ? AND
@@ -119,7 +119,7 @@ sub generate ( $self, $cbqz_prefs ) {
             next unless ($selection_set);
 
             my $results = $self->dq->sql(qq{
-                SELECT question_id, book, chapter, verse, question, answer, type, used
+                SELECT question_id, book, chapter, verse, question, answer, type, used, score
                 FROM question
                 WHERE
                     type IN ($types) AND
@@ -135,7 +135,7 @@ sub generate ( $self, $cbqz_prefs ) {
                 my $ids = join( ', ', map { $_->{question_id} } @questions, @$results );
 
                 push( @$results, @{ $self->dq->sql(qq{
-                    SELECT question_id, book, chapter, verse, question, answer, type, used
+                    SELECT question_id, book, chapter, verse, question, answer, type, used, score
                     FROM question
                     WHERE
                         type IN ($types) AND
@@ -164,7 +164,7 @@ sub generate ( $self, $cbqz_prefs ) {
             );
 
             my ($question) = @{ $self->dq->sql(qq{
-                SELECT question_id, book, chapter, verse, question, answer, type, used
+                SELECT question_id, book, chapter, verse, question, answer, type, used, score
                 FROM question
                 WHERE
                     CONCAT( book, ' ', chapter, ':', verse ) NOT IN ($refs) AND
@@ -188,7 +188,7 @@ sub generate ( $self, $cbqz_prefs ) {
             my $ids = join( ', ', map { $_->{question_id} } @questions );
 
             my ($question) = @{ $self->dq->sql(qq{
-                SELECT question_id, book, chapter, verse, question, answer, type, used
+                SELECT question_id, book, chapter, verse, question, answer, type, used, score
                 FROM question
                 WHERE
                     question_id NOT IN ($ids) AND marked IS NULL AND question_set_id = ? AND
@@ -232,7 +232,7 @@ sub replace ( $self, $request, $cbqz_prefs ) {
     );
 
     my $results = $self->dq->sql(qq{
-        SELECT question_id, book, chapter, verse, question, answer, type, used
+        SELECT question_id, book, chapter, verse, question, answer, type, used, score
         FROM question
         WHERE
             type = ? AND marked IS NULL AND
@@ -246,7 +246,7 @@ sub replace ( $self, $request, $cbqz_prefs ) {
         my $ids = join( ', ', 0, map { $_->{question_id} } @{ $request->{questions} } );
 
         $results = $self->dq->sql(qq{
-            SELECT question_id, book, chapter, verse, question, answer, type, used
+            SELECT question_id, book, chapter, verse, question, answer, type, used, score
             FROM question
             WHERE
                 type = ? AND marked IS NULL AND

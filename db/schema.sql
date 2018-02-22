@@ -59,6 +59,7 @@ CREATE TABLE question (
     type tinytext,
     used tinyint(3) unsigned NOT NULL DEFAULT '0',
     marked text,
+    score decimal(3,1) unsigned DEFAULT NULL,
     PRIMARY KEY (question_id),
     KEY reference (book,chapter,verse),
     KEY question_set_id (question_set_id),

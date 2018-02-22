@@ -27,7 +27,7 @@ sub create ( $self, $user, $name = undef ){
 
 sub get_questions ( $self, $as = {} ) {
     my $questions_data = $self->dq->sql(q{
-        SELECT question_id, book, chapter, verse, question, answer, type, used, marked
+        SELECT question_id, book, chapter, verse, question, answer, type, used, marked, score
         FROM question
         WHERE question_set_id = ?
     })->run( $self->obj->id )->all({});

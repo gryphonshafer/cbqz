@@ -76,7 +76,14 @@ sub save ($self) {
             $question->{used}            = 0;
             $question->{question_set_id} = $cbqz_prefs->{question_set_id};
 
-            $question = CBQZ::Model::Question->new->create($question)->data;
+            my $question_model = CBQZ::Model::Question->new->create($question);
+            $question_model->calculate_score(
+                CBQZ::Model::MaterialSet->new->load(
+                    $self->decode_cookie('cbqz_prefs')->{material_set_id}
+                )
+            );
+
+            $question = $question_model->data;
             $success  = 1;
         }
     }
@@ -84,6 +91,11 @@ sub save ($self) {
         my $question_model = CBQZ::Model::Question->new->load( $question->{question_id} );
         if ( $question_model and $question_model->is_usable_by( $self->stash('user') ) ) {
             $question_model->obj->update($question);
+            $question->{score} = $question_model->calculate_score(
+                CBQZ::Model::MaterialSet->new->load(
+                    $self->decode_cookie('cbqz_prefs')->{material_set_id}
+                )
+            );
             $success = 1;
         }
     }

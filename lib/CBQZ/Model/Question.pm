@@ -215,7 +215,7 @@ sub is_usable_by ( $self, $user ) {
         return $data;
     };
 
-    sub auto_text ( $self, $material_set = undef, $question = undef ) {
+    sub auto_text ( $self, $material_set, $question = undef ) {
         $question = $self->data if ( not $question and $self->obj );
 
         try {
@@ -234,6 +234,97 @@ sub is_usable_by ( $self, $user ) {
 
         return $question;
     }
+}
+
+sub calculate_score ( $self, $material_set, $question = undef ) {
+    $question = $self->data if ( not $question and $self->obj );
+
+    my $clean = sub {
+        my ($text) = @_;
+        $text =~ s/<[^>]*>//msg;
+        $text =~ s/\[[^\]]*\]//msg;
+        $text =~ s/[^a-z0-9 ]+//msgi;
+        return lc($text);
+    };
+
+    my $words = sub {
+        return scalar( split( /\s+/, $_[0] ) );
+    };
+
+    my $chars = sub {
+        return scalar( grep { /\S/ } split( '', $_[0] ) );
+    };
+
+    my $de_int = sub {
+        my ($text) = @_;
+        $text =~ s/\s+(who|what|when|where|why|how|whom|whose)$// or
+            $text =~ s/^(who|what|when|where|why|how|whom|whose)\s+//;
+        return $text;
+    };
+
+    my @verses = map { $clean->( $_->{text} ) } @{ $material_set->load_material->material };
+
+    my $common_words = sub {
+        my @words = split( /\s+/, $_[0] );
+        my @active;
+
+        while (@words) {
+            push( @active, shift @words );
+            my $phrase = join( ' ', @active );
+            last if ( scalar( grep { index( $_, $phrase ) > -1 } @verses ) < 2 );
+        }
+
+        return scalar @active;
+    };
+
+    my $question_text = $clean->( $question->{question} );
+    my $answer_text   = $clean->( $question->{answer}   );
+
+    my $score;
+    if ( $question->{type} eq 'INT' ) {
+        $score =
+            $common_words->( $de_int->($question_text) ) ** 1.4 +
+            ( $words->($question_text) + $words->($answer_text) ) / 24;
+    }
+    elsif ( $question->{type} eq 'MA' ) {
+        $score =
+            $common_words->( $de_int->($question_text) ) ** 1.6 +
+            ( $chars->($question_text) + $chars->($answer_text) ) / 140;
+    }
+    elsif ( $question->{type} =~ /^F/ ) {
+        $score =
+            $common_words->( $de_int->($question_text) ) ** 1.9 +
+            ( $words->($question_text) + $words->($answer_text) ) / 24;
+    }
+    elsif ( $question->{type} =~ /^Q/ ) {
+        $score =
+            $common_words->( $de_int->($question_text) ) ** 1.5 +
+            ( $words->($question_text) + $words->($answer_text) ) / 16;
+    }
+    elsif ( $question->{type} =~ /CV?R/ ) {
+        ( $question_text = $question->{question} )
+            =~ s/ac\w*\sto\s+(\d\s+)?\w+[,\s]+c\w*\s*\d+(?:[,\s]+v\w*\s*\d+)?[\s:,]*//i;
+        $question_text = $clean->($question_text);
+
+        if ( $question->{type} =~ /CR/ ) {
+            $score =
+                $common_words->( $de_int->($question_text) ) ** 1.7 +
+                ( $words->($question_text) + $words->($answer_text) ) / 8;
+        }
+        elsif ( $question->{type} =~ /CVR/ ) {
+            $score =
+                $common_words->( $de_int->($question_text) ) ** 1.2 +
+                ( $words->($question_text) + $words->($answer_text) ) / 8;
+        }
+    }
+    elsif ( $question->{type} eq /SIT/ ) {
+        $score =
+            $common_words->( $de_int->($question_text) ) ** 1.4 +
+            ( $words->($question_text) + $words->($answer_text) ) / 8;
+    }
+
+    $self->obj->update({ score => $score }) if ( $self->obj );
+    return $score;
 }
 
 __PACKAGE__->meta->make_immutable;

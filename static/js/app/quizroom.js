@@ -17,7 +17,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         verse    : null,
         question : null,
         answer   : null,
-        marked   : null
+        marked   : null,
+        score    : null
     };
     data.quiz_view_hidden = 1;
     data.position         = 0;
@@ -29,6 +30,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
     data.classes = {
         cursor_progress : false
     };
+    data.mean_score = null;
 
     var vue_app = new Vue({
         el: "#quizroom",
@@ -234,6 +236,12 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                         ranges[j][3][i] = ranges[j][4];
                     }
                 }
+
+                var mean_score = 0;
+                for ( var i = 0; i < this.questions.length; i++ ) {
+                    mean_score += parseFloat( this.questions[i].score );
+                }
+                this.mean_score = Number( mean_score / this.questions.length ).toFixed(1);
             },
 
             lookup_reference_change: function ( book, chapter, verse ) {
