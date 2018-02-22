@@ -124,7 +124,8 @@
                 <option v-for="item in questions.questions" v-bind:value="item.question_id">{{
                     item.verse + ' ' +
                     ( ( !! item.type ) ? item.type : '[No Type]' ) + ' ' +
-                    '(' + item.used + ') [' + item.score + ']' +
+                    '(' + item.used + ')' +
+                    ( ( !! item.score ) ? ' [' + item.score + ']' : '' ) +
                     ( ( item.marked ) ? ' *' : '' )
                 }}</option>
             </select>
