@@ -44,7 +44,7 @@
     <p>There don't appear to be any question sets for user: [% user.obj.username %].</p>
 [% END %]
 
-[% IF published_sets %]
+[% IF published_sets.size %]
     <h2>Published Question Sets from Other Users</h2>
 
     <table class="tabular">
