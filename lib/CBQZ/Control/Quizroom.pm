@@ -63,45 +63,26 @@ sub quiz_setup ($self) {
         $_->{book} . '|' . $_->{chapter}
     } @{ $cbqz_prefs->{selected_chapters} };
 
+    my ($question_set) =
+        grep { $cbqz_prefs->{question_set_id} == $_->{question_set_id} }
+        ( map { +{ %{ $_->data }, share => 0 } } $self->stash('user')->question_sets ),
+        ( map { +{ %{ $_->data }, share => 1 } } $self->stash('user')->shared_question_sets );
+
+    my $chapter_counter = 0;
+    for ( @{ $question_set->{statistics} } ) {
+        my $id = $_->{book} . '|' . $_->{chapter};
+        $_->{selected} = ( grep { $id eq $_ } @selected_chapters ) ? 1 : 0;
+        $_->{last_chapter} = @{ $question_set->{statistics} } - $chapter_counter;
+        $chapter_counter++;
+    }
+
     return $self->render( json => {
         weight_chapters => $cbqz_prefs->{weight_chapters} // 0,
         weight_percent  => $cbqz_prefs->{weight_percent}  // 50,
         program_id      => $cbqz_prefs->{program_id}      || undef,
         question_set_id => $cbqz_prefs->{question_set_id} || undef,
         material_set_id => $cbqz_prefs->{material_set_id} || undef,
-        material_sets   => [
-            sort { $b->{name} cmp $a->{name} }
-            CBQZ::Model::MaterialSet->new->every_data
-        ],
-        programs => [
-            sort { $a->{name} cmp $b->{name} }
-            map { $_->data }
-            $self->stash('user')->programs
-        ],
-        question_sets => [
-            sort {
-                $b->{share} cmp $a->{share} ||
-                $b->{name} cmp $a->{name}
-            }
-            map {
-                my $set = $_;
-                for ( @{ $set->{statistics} } ) {
-                    unless (
-                        $cbqz_prefs->{question_set_id} and
-                        $cbqz_prefs->{question_set_id} == $set->{question_set_id}
-                    ) {
-                        $_->{selected} = 0;
-                    }
-                    else {
-                        my $id = $_->{book} . '|' . $_->{chapter};
-                        $_->{selected} = ( grep { $id eq $_ } @selected_chapters ) ? 1 : 0;
-                    }
-                }
-                $set;
-            }
-            ( map { +{ %{ $_->data }, share => 0 } } $self->stash('user')->question_sets ),
-            ( map { +{ %{ $_->data }, share => 1 } } $self->stash('user')->shared_question_sets ),
-        ],
+        question_set    => $question_set,
     } );
 }
 

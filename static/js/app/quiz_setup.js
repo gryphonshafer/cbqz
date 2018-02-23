@@ -1,6 +1,5 @@
 Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
     var data = response.body;
-    data.question_set = null;
 
     new Vue({
         el: "#quiz_setup",
@@ -45,15 +44,6 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
                     65535
                 );
             },
-            set_question_set: function () {
-                var question_set_id = this.question_set_id;
-
-                var question_set = this.question_sets.find( function(set) {
-                    return question_set_id == set.question_set_id;
-                } );
-
-                this.question_set = question_set;
-            },
             start_quiz: function () {
                 document.location.href = cntlr + "/quiz";
             }
@@ -75,10 +65,6 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
         watch: {
             weight_chapters: function () { this.save_settings() },
             weight_percent:  function () { this.save_settings() }
-        },
-
-        created: function () {
-            this.set_question_set();
         }
     });
 });

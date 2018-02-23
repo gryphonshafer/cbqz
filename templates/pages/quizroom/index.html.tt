@@ -49,7 +49,10 @@
             <tr
                 v-for="chapter in question_set.statistics"
                 v-on:click="chapter_clicked(chapter)"
-                v-bind:class="{ selected: chapter.selected }"
+                v-bind:class="{
+                    selected: chapter.selected,
+                    selected_extra: chapter.last_chapter <= weight_chapters
+                }"
             >
                 <td class="center">
                     <input type="checkbox"

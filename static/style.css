@@ -112,6 +112,10 @@ tr.selected td {
     background-color: #ccffcc;
 }
 
+tr.selected_extra td {
+    background-color: #ffeeaa;
+}
+
 table.numeric td {
     text-align: right;
 }
