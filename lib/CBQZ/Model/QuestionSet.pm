@@ -65,7 +65,8 @@ sub generate_statistics ($self) {
             SELECT
                 book, chapter,
                 COUNT( DISTINCT verse ) AS verses,
-                COUNT(*) AS questions
+                COUNT(*) AS questions,
+                SUM( IF( marked IS NOT NULL, 1, 0 ) ) AS marked
             FROM question
             WHERE question_set_id = ?
             GROUP BY book, chapter

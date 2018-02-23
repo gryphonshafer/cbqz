@@ -44,6 +44,7 @@
                 <th>Qs./V.</th>
                 <th class="question_type_totals"
                     v-for="type in question_set.statistics[0].types">{{ type[0] }}</th>
+                <th>Marked</th>
             </tr>
 
             <tr
@@ -68,6 +69,7 @@
                 <td>{{ ( chapter.questions / chapter.verses ).toFixed(2) }}</td>
                 <td class="question_type_totals"
                     v-for="type in chapter.types">{{ type[1] || 0 }}</td>
+                <td>{{ chapter.marked }}</td>
             </tr>
         </table>
 
