@@ -7,7 +7,15 @@
 %]
 
 <div id="quiz_setup" v-cloak>
-    <h2>Select Chapters and Weighting from: {{ question_set.name }}</h2>
+    <h2>Quiz Generation Configuration Settings</h2>
+
+    <p>
+        Use the following page form to select and set the configuration settings
+        for quiz generation. <b>Note that changing the question types settings
+        will only change this setting for quizzes generated in this session.</b>
+        Revisiting this settings page and clicking on "Start Quiz" will revert
+        to the program/district/zone default configuration.
+    </p>
 
     <form>
         <fieldset>
@@ -23,9 +31,16 @@
             <input type="text" size="1" v-model="weight_percent">%
         </fieldset>
 
+        <fieldset>
+            <legend>Question Types</legend>
+            <textarea v-model="question_types"></textarea>
+        </fieldset>
+
         <button type="button"
             v-on:click="start_quiz" v-bind:disabled="! selected_chapters_count">Start Quiz</button>
     </form>
+
+    <h3>{{ question_set.name }}</h3>
 
     <div>
         <p>

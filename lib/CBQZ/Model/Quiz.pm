@@ -22,8 +22,14 @@ sub chapter_set ( $self, $cbqz_prefs ) {
 sub generate ( $self, $cbqz_prefs ) {
     my $chapter_set            = $self->chapter_set($cbqz_prefs);
     my $program                = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
-    my @question_types         = @{ $self->json->decode( $program->obj->question_types ) };
     my $target_questions_count = $program->obj->target_questions;
+    my @question_types         =
+        map {
+            my ( $label, $min, $max, @types ) = split(/\W+/);
+            [ \@types, [ $min, $max ], $label ];
+        }
+        grep { /^\W*\w+\W+\w+\W+\w+\W+\w+/ }
+        split( /\r?\n/, $cbqz_prefs->{question_types} );
 
     my ( @questions, $error );
     try {

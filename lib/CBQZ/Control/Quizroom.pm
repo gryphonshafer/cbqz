@@ -80,6 +80,13 @@ sub quiz_setup ($self) {
         question_set_id => $cbqz_prefs->{question_set_id} || undef,
         material_set_id => $cbqz_prefs->{material_set_id} || undef,
         question_set    => $question_set,
+        question_types  => join( "\n",
+            map {
+                $_->[2] . ': ' . $_->[1][0] . '-' . $_->[1][1] . ' (' . join( ' ', @{ $_->[0] } ) . ')'
+            } @{ $self->cbqz->json->decode(
+                CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} )->obj->question_types
+            ) }
+        ),
     } );
 }
 
@@ -118,7 +125,12 @@ sub data ($self) {
             types         => $program->types_list,
             timer_default => $program->obj->timer_default,
             as_default    => $program->obj->as_default,
-            type_ranges   => $self->cbqz->json->decode( $program->obj->question_types ),
+            type_ranges   => [
+                map {
+                    my ( $label, $min, $max, @types ) = split(/\W+/);
+                    [ \@types, [ $min, $max ], $label ];
+                } split( /\r?\n/, $cbqz_prefs->{question_types} )
+            ],
         };
 
         $data->{material} = CBQZ::Model::MaterialSet->new->load(
@@ -140,8 +152,8 @@ sub data ($self) {
         $self->warn($_);
         $data->{error} =
             'An error occurred while trying to load data. ' .
-            'This is likely due to invalid settings on the main page. ' .
-            'Visit the main page and verify your settings';
+            'This is likely due to invalid settings on the quiz configuration settings page. ' .
+            'Visit the quiz configuration settings page and verify your settings';
     };
 
     return $self->render( json => $data );

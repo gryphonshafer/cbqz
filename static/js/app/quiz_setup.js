@@ -41,7 +41,8 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
                         question_set_id: this.question_set_id,
                         material_set_id: this.material_set_id,
                         weight_chapters: this.weight_chapters,
-                        weight_percent: this.weight_percent
+                        weight_percent: this.weight_percent,
+                        question_types: this.question_types
                     },
                     65535
                 );
@@ -79,6 +80,7 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
         watch: {
             weight_chapters: function () { this.save_settings() },
             weight_percent:  function () { this.save_settings() },
+            question_types:  function () { this.save_settings() }
         },
 
         created: function () {

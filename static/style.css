@@ -295,12 +295,14 @@ input[type="password"] {
 }
 
 select,
+textarea,
 input[type="text"],
 input[type="password"] {
     border: 1px solid lightgray;
 }
 
 select:hover,
+textarea:hover,
 input[type="text"]:hover,
 input[type="password"]:hover {
     border-color: gray;
@@ -657,6 +659,26 @@ div#editor input#marked_comment {
     div#editor div#material_search_display {
         height: 100px;
     }
+}
+
+/* -------------------------------------------------------------------------- */
+
+div#quiz_setup fieldset {
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+div#quiz_setup textarea {
+    font-family: normal;
+    font-size: 13px;
+    width: 240px;
+    height: 50px;
+}
+
+div#quiz_setup button {
+    margin-top: 14px;
 }
 
 /* -------------------------------------------------------------------------- */
