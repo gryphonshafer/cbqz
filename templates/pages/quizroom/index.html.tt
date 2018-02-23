@@ -51,7 +51,7 @@
                 v-on:click="chapter_clicked(chapter)"
                 v-bind:class="{
                     selected: chapter.selected,
-                    selected_extra: chapter.last_chapter <= weight_chapters
+                    selected_extra: chapter.weighted
                 }"
             >
                 <td class="center">

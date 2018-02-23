@@ -31,6 +31,8 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
                     } );
                 }
 
+                this.set_weighted_chapters();
+
                 set_json_cookie(
                     "cbqz_prefs",
                     {
@@ -43,6 +45,17 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
                     },
                     65535
                 );
+            },
+            set_weighted_chapters: function () {
+                var weight_chapters_remaining = this.weight_chapters;
+                for ( var i = this.question_set.statistics.length - 1; i >= 0; i-- ) {
+                    this.question_set.statistics[i].weighted = false;
+
+                    if ( weight_chapters_remaining > 0 && this.question_set.statistics[i].selected ) {
+                        this.question_set.statistics[i].weighted = true;
+                        weight_chapters_remaining--;
+                    }
+                }
             },
             start_quiz: function () {
                 document.location.href = cntlr + "/quiz";
@@ -58,13 +71,18 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
                     if ( chapters[i].selected ) count++;
                 }
 
+                if ( this.weight_chapters > count ) this.weight_chapters = count;
                 return count;
             }
         },
 
         watch: {
             weight_chapters: function () { this.save_settings() },
-            weight_percent:  function () { this.save_settings() }
+            weight_percent:  function () { this.save_settings() },
+        },
+
+        created: function () {
+            this.set_weighted_chapters();
         }
     });
 });

@@ -68,12 +68,9 @@ sub quiz_setup ($self) {
         ( map { +{ %{ $_->data }, share => 0 } } $self->stash('user')->question_sets ),
         ( map { +{ %{ $_->data }, share => 1 } } $self->stash('user')->shared_question_sets );
 
-    my $chapter_counter = 0;
     for ( @{ $question_set->{statistics} } ) {
         my $id = $_->{book} . '|' . $_->{chapter};
         $_->{selected} = ( grep { $id eq $_ } @selected_chapters ) ? 1 : 0;
-        $_->{last_chapter} = @{ $question_set->{statistics} } - $chapter_counter;
-        $chapter_counter++;
     }
 
     return $self->render( json => {
