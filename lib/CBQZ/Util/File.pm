@@ -3,11 +3,12 @@ package CBQZ::Util::File;
 use exact;
 use Mojo::File 'path';
 use IO::All '-utf8';
+use File::Find 'find';
 
 require Exporter;
 
 our @ISA       = 'Exporter';
-our @EXPORT_OK = qw( filename slurp spurt );
+our @EXPORT_OK = qw( filename slurp spurt most_recent_modified );
 
 sub filename (@filenames) {
     return join( '/', map {
@@ -35,6 +36,19 @@ sub spurt ( $file, $data ) {
     $data > io($path);
 
     return;
+}
+
+sub most_recent_modified ( @directories ) {
+    my $most_recent_modified = 0;
+
+    find( sub {
+        if ( -f $File::Find::name ) {
+            my $last = ( stat($File::Find::name) )[9];
+            $most_recent_modified = $last if ( $most_recent_modified < $last );
+        }
+    }, @directories );
+
+    return $most_recent_modified;
 }
 
 1;

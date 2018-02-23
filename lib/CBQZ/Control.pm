@@ -10,10 +10,23 @@ use CBQZ;
 use CBQZ::Model::User;
 use CBQZ::Util::Format 'log_date';
 use CBQZ::Util::Template 'tt_settings';
+use CBQZ::Util::File 'most_recent_modified';
 
 sub startup ( $self, $app = undef ) {
     my $cbqz   = CBQZ->new;
     my $config = $cbqz->config;
+
+    $config->put( sub_version => sprintf(
+        '%d.%02d.%02d.%02d.%02d',
+        (
+            localtime(
+                most_recent_modified(
+                    map { $config->get( 'config_app', 'root_dir' ) . '/' . $_ }
+                        qw( config db lib static templates )
+                )
+            )
+        )[ 5, 4, 3, 2, 1, 0 ]
+    ) );
 
     # base URL handling
     $self->plugin('RequestBase');

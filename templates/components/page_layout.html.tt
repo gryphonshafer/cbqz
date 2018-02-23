@@ -68,11 +68,13 @@
 </div>
 
 <div id="footer">
-    <p>
+    <p class="left">
         <a href="/">CBQZ Home Page</a>
+        |
+        <a href="https://github.com/gryphonshafer/cbqz" target="github">GitHub Project</a>
     </p>
     <p class="right">
-        CBQZ v[% c.config.get('version') %]
-        <a href="https://github.com/gryphonshafer/cbqz" target="github">CBQZ GitHub Project</a>
+        Version [% c.config.get('version') %].[% c.config.get('sub_version') %]
+        [% c.app.mode.ucfirst %]
     </p>
 </div>
