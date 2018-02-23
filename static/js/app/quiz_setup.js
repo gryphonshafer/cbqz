@@ -85,6 +85,10 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
 
         created: function () {
             this.set_weighted_chapters();
+        },
+
+        mounted: function () {
+            this.save_settings();
         }
     });
 });
