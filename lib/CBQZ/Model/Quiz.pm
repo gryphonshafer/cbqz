@@ -235,12 +235,12 @@ sub replace ( $self, $request, $cbqz_prefs ) {
         SELECT question_id, book, chapter, verse, question, answer, type, used, score
         FROM question
         WHERE
-            type = ? AND marked IS NULL AND
+            question_set_id = ? AND type = ? AND marked IS NULL AND
             CONCAT( book, " ", chapter ) IN ($selection_set) AND
             CONCAT( book, ' ', chapter, ':', verse ) NOT IN ($refs)
         ORDER BY used, RAND()
         LIMIT 1
-    })->run( $request->{type} )->all({});
+    })->run( $cbqz_prefs->{question_set_id}, $request->{type} )->all({});
 
     unless (@$results) {
         my $ids = join( ', ', 0, map { $_->{question_id} } @{ $request->{questions} } );
@@ -249,12 +249,12 @@ sub replace ( $self, $request, $cbqz_prefs ) {
             SELECT question_id, book, chapter, verse, question, answer, type, used, score
             FROM question
             WHERE
-                type = ? AND marked IS NULL AND
+                question_set_id = ? AND type = ? AND marked IS NULL AND
                 CONCAT( book, " ", chapter ) IN ($selection_set) AND
                 question_id NOT IN ($ids)
             ORDER BY used, RAND()
             LIMIT 1
-        })->run( $request->{type} )->all({});
+        })->run( $cbqz_prefs->{question_set_id}, $request->{type} )->all({});
     }
 
     return $results;
