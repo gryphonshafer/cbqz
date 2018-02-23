@@ -110,12 +110,13 @@
         <div class="margin_lift">
             <span class="label">Sort by:</span>
             <select v-model="questions.sort_by">
-                <option value="desc_ref">Desc. Ref.</option>
                 <option value="ref">Reference</option>
+                <option value="ref_desc">Ref. Desc.</option>
                 <option value="type">Type</option>
-                <option value="used">Used Desc.</option>
-                <option value="length">Length</option>
-                <option value="alphabetical">Alphabetical</option>
+                <option value="used_desc">Used</option>
+                <option value="used_desc">Used Desc.</option>
+                <option value="score">Score</option>
+                <option value="score_desc">Score Desc.</option>
             </select>
         </div>
 
