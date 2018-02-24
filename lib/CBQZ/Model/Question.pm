@@ -68,13 +68,20 @@ sub is_usable_by ( $self, $user ) {
         return $text;
     };
 
-    my $search = sub ( $text, $book, $chapter, $verse, $range ) {
+    my $prep_text_re = sub ($text) {
+        $text =~ s/\[[^\]]*\]//g;
         $text =~ s/\s+/ /g;
         $text =~ s/[^\w\s]+//g;
         $text =~ s/(\w)/$1(?:<[^>]+>)*['-]*(?:<[^>]+>)*/g;
         $text =~ s/(?:^\s+|\s+$)//g;
         $text =~ s/\s/(?:<[^>]+>|\\W)+/g;
         $text = '(?:<[^>]+>)*\b' . $text . '\b';
+
+        return $text;
+    };
+
+    my $search = sub ( $text, $book, $chapter, $verse, $range ) {
+        $text = $prep_text_re->($text);
 
         my @matches =
             map { $_->[0] }
@@ -101,6 +108,17 @@ sub is_usable_by ( $self, $user ) {
         return @filtered_matches;
     };
 
+    my $save_back_match = sub ( $original, $match ) {
+        my @brackets;
+        push( @brackets, $1 ) while ( $original =~ /\[([^\]]*)\]/g );
+
+        return join( ' ', grep { defined } map {
+            my $text = $prep_text_re->($_);
+            my $section = ( $match =~ s|^($text(?:\S+)?)||i ) ? $1 : undef;
+            $section, ( (@brackets) ? '[' . shift(@brackets) . ']' : undef );
+        } split( /\[[^\]]*\]/, $original ) ) . $match;
+    };
+
     my $process_question = sub ( $data, $skip_casing, $range, $skip_interogative ) {
         $range //= 5;
 
@@ -116,6 +134,7 @@ sub is_usable_by ( $self, $user ) {
                 $int->{pos}    = 'fore';
             }
         }
+
         my @matches = $search->( @$data{ qw( question book chapter verse ) }, $range );
 
         E->throw('Multiple question matches found where only 1 expected') if ( @matches > 1 );
@@ -131,14 +150,14 @@ sub is_usable_by ( $self, $user ) {
                 $match = $int->{phrase} . $match;
             }
         }
-        $data->{question} = $match;
+        $data->{question} = $save_back_match->( $data->{question}, $match );
 
         @matches = $search->( @$data{ qw( answer book chapter verse ) }, $range );
         E->throw('Unable to find answer match') if ( @matches == 0 );
 
         $match = $matches[0]->{match};
         $match = $case->($match) unless ( $skip_casing and $skip_casing ne 'answer_only' );
-        $data->{answer} = $match;
+        $data->{answer} = $save_back_match->( $data->{answer}, $match );
 
         return $data;
     };
@@ -241,9 +260,9 @@ sub calculate_score ( $self, $material_set, $question = undef ) {
 
     my $clean = sub {
         my ($text) = @_;
-        $text =~ s/<[^>]*>//msg;
-        $text =~ s/\[[^\]]*\]//msg;
-        $text =~ s/[^a-z0-9 ]+//msgi;
+        $text =~ s/<[^>]*>//g;
+        $text =~ s/\[[^\]]*\]//g;
+        $text =~ s/[^a-z0-9 ]+//gi;
         return lc($text);
     };
 
