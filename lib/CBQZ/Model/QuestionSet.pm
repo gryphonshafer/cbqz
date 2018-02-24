@@ -96,7 +96,7 @@ sub is_usable_by ( $self, $user ) {
     ) ? 1 : 0;
 }
 
-sub clone ( $self, $user, $new_set_name, $fork = 0 ) {
+sub clone ( $self, $user, $new_set_name ) {
     E->throw('User not authorized to clone this question set') unless (
         $self->is_owned_by($user) or
         grep { $_->question_set_id == $self->obj->id }
@@ -108,23 +108,16 @@ sub clone ( $self, $user, $new_set_name, $fork = 0 ) {
         name    => $new_set_name,
     });
 
-    my $questions = $self->obj->questions;
-
-    my $code = sub {
-        while ( my $question = $questions->next ) {
-            my $question_data = { $question->get_inflated_columns };
-            delete $question_data->{question_id};
-            $question_data->{question_set_id} = $new_set->id;
-            $self->rs('Question')->create($question_data);
-        }
-    };
-
-    if ($fork) {
-        $self->fork($code);
-    }
-    else {
-        $code->();
-    }
+    $self->dq->sql(q{
+        INSERT INTO question (
+            question_set_id,
+            book, chapter, verse, question, answer, type, used, marked, score
+        )
+        SELECT
+            ?,
+            book, chapter, verse, question, answer, type, used, marked, score
+        FROM question WHERE question_set_id = ?
+    })->run( $new_set->id, $self->obj->id );
 
     return $new_set;
 }

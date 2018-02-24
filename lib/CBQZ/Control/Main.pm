@@ -178,7 +178,6 @@ sub clone_question_set ($self) {
         $set->clone(
             $self->stash('user'),
             $self->req->param('new_set_name'),
-            'fork',
         );
 
         $self->flash( message => {
