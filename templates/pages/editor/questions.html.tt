@@ -44,6 +44,7 @@
                     question.book _ ' ' _ question.chapter _ ':' _ question.verse
                 %]</span>
                 <span class="label">Used:</span> <span class="field">[% question.used %]</span>
+                <span class="label">Score:</span> <span class="field">[% question.score %]</span>
                 <br>
 
                 [% IF question.marked %]

@@ -11,6 +11,20 @@
     );
 %]
 
+[% sort_select = BLOCK %]
+    <span class="label">Sort by:</span>
+    <select v-model="questions.sort_by">
+        <option value="ref">Reference</option>
+        <option value="ref_desc">Ref. Desc.</option>
+        <option value="type">Type</option>
+        <option value="used_desc">Used</option>
+        <option value="used_desc">Used Desc.</option>
+        <option value="score">Score</option>
+        <option value="score_desc">Score Desc.</option>
+        <option value="marked">Marked</option>
+    </select>
+[% END %]
+
 <div id="editor" v-cloak v-bind:class="classes">
     <div id="question_form">
         <div>
@@ -40,16 +54,16 @@
         </div>
 
         <div>
-            <button tabindex="17" id="format_reset" v-on:click="format('clear')"
+            <button tabindex="18" id="format_reset" v-on:click="format('clear')"
             >Reset <span class="key_text">Alt+Q</span></button>
 
-            <button tabindex="18" id="format_unique_word" v-on:click="format('unique_word')"
+            <button tabindex="19" id="format_unique_word" v-on:click="format('unique_word')"
             >Global <span class="key_text">Alt+W, Ctrl+B</span></button>
 
-            <button tabindex="19" id="format_unique_chapter" v-on:click="format('unique_chapter')"
+            <button tabindex="20" id="format_unique_chapter" v-on:click="format('unique_chapter')"
             >Chapter <span class="key_text">Alt+E, Ctrl+I</span></button>
 
-            <button tabindex="20" id="format_unique_phrase" v-on:click="format('unique_phrase')"
+            <button tabindex="21" id="format_unique_phrase" v-on:click="format('unique_phrase')"
             >Phrase <span class="key_text">Alt+R, Ctrl+U</span></button>
         </div>
 
@@ -59,22 +73,26 @@
                 ref="answer" v-html="question.answer"></div>
         </div>
 
+        <div class="margin_lift">
+            <span class="label">Marked:</span>
+            <input tabindex="15" id="marked_comment" type="text" v-model="question.marked">
+        </div>
+
         <div>
             <button
                 tabindex="10" id="auto_text"
                 v-on:click="auto_text" v-bind:disabled="new_question_incomplete"
             >
-                Auto-Text
+                Auto-Text Magic
                 <span class="key_text">Alt+Z</span>
             </button>
 
-            <span class="label">Marked:</span>
-            <input tabindex="15" id="marked_comment" type="text" v-model="question.marked">
-
             <button tabindex="16" id="lookup" v-on:click="lookup_reference" v-bind:disabled="verse_incomplete">
-                Lookup
+                Lookup Verse
                 <span class="key_text">Alt+G, F2</span>
             </button>
+
+            <button tabindex="17" v-on:click="toggle_questions_view">View All Questions List</button>
         </div>
 
         <div>
@@ -95,6 +113,65 @@
         </div>
     </div>
 
+    <div id="questions_view" v-bind:class="{
+        page_panel: 1,
+        page_panel_full: 1,
+        hidden: questions_view_hidden
+    }">
+        <div class="page_panel_buttons">
+            <span class="label">Page:</span>
+            <input type="text" v-model="questions_view_page" size="2">
+
+            <button v-on:click="questions_view_page--">&larr;</button>
+            <button v-on:click="questions_view_page++">&rarr;</button>
+
+            <span class="label">Size:</span>
+            <input type="text" v-model="questions_view_size" size="2">
+
+            [% sort_select %]
+
+            <span class="label">Compact:</span>
+            <input type="checkbox" v-model="overflow_active">
+
+            <button v-on:click="toggle_questions_view">Close View</button>
+        </div>
+
+        <h2>All Questions List View</h2>
+
+        <table
+            v-if="all_questions.length > 0"
+            v-bind:class="{
+                tabular: 1,
+                overflow_active: overflow_active
+            }"
+        >
+            <tr>
+                <th>Reference</th>
+                <th>Type</th>
+                <th>Used</th>
+                <th>Score</th>
+                <th>Marked</th>
+                <th>Question</th>
+                <th>Answer</th>
+            </tr>
+            <tr v-for="this_q in all_questions">
+                <td>{{ this_q.book + " " + this_q.chapter + ":" + this_q.verse }}</td>
+                <td><a href="#"
+                    v-on:click="view_question( this_q.book, this_q.chapter, this_q.question_id )"
+                >{{ this_q.type }}</a></td>
+                <td class="right">{{ this_q.used }}</td>
+                <td class="right">{{ this_q.score }}</td>
+                <td class="overflow_toggle">{{ this_q.marked }}</td>
+                <td class="overflow_toggle" v-html="this_q.question"></td>
+                <td class="overflow_toggle" v-html="this_q.answer"></td>
+            </tr>
+        </table>
+
+        <p v-if="all_questions.length == 0">
+            There is no data to display.
+        </p>
+    </div>
+
     <div id="questions_list">
         <span class="label">Saved Questions ({{ this.total_questions }}):</span>
 
@@ -108,20 +185,11 @@
         </div>
 
         <div class="margin_lift">
-            <span class="label">Sort by:</span>
-            <select v-model="questions.sort_by">
-                <option value="ref">Reference</option>
-                <option value="ref_desc">Ref. Desc.</option>
-                <option value="type">Type</option>
-                <option value="used_desc">Used</option>
-                <option value="used_desc">Used Desc.</option>
-                <option value="score">Score</option>
-                <option value="score_desc">Score Desc.</option>
-            </select>
+            [% sort_select %]
         </div>
 
         <div id="questions_list_prime_list" class="margin_lift">
-            <select tabindex="1" class="questions_list_list" v-model="questions.question_id" size="13">
+            <select tabindex="1" class="questions_list_list" v-model="questions.question_id" size="14">
                 <option v-for="item in questions.questions" v-bind:value="item.question_id">{{
                     item.verse + ' ' +
                     ( ( !! item.type ) ? item.type : '[No Type]' ) + ' ' +

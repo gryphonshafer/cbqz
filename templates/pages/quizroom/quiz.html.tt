@@ -47,8 +47,8 @@
         v-on:reference-change="lookup_reference_change"
     ></material-lookup>
 
-    <div id="quiz_view" v-bind:class="{ hidden: quiz_view_hidden }">
-        <div id="quiz_view_buttons">
+    <div id="quiz_view" v-bind:class="{ page_panel: 1, hidden: quiz_view_hidden }">
+        <div class="page_panel_buttons">
             Mean Question Score = {{ mean_score }}
             <button v-on:click="print_quiz">Print Quiz</button>
             <button v-on:click="toggle_quiz_view">Close View</button>

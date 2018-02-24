@@ -23,7 +23,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
     data.questions.marked_question_id = null;
     data.questions.marked_questions   = [];
     data.questions.questions          = null;
-    data.questions.sort_by            = get_cookie("cbqz_editor_sort_by") || "desc_ref";
+    data.questions.sort_by            = get_cookie("cbqz_editor_sort_by") || "ref";
     data.questions.book               = null;
     data.questions.chapter            = null;
     data.questions.books              = null;
@@ -33,7 +33,11 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         cursor_progress : false
     };
 
-    data.total_questions = 0;
+    data.total_questions       = 0;
+    data.questions_view_hidden = 1;
+    data.overflow_active       = 1;
+    data.questions_view_page   = 1;
+    data.questions_view_size   = 40;
 
     var sort_by = {};
     sort_by._base = function ( a, b ) {
@@ -85,20 +89,36 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         return sort_by.ref( a, b );
     };
     sort_by.score = function ( a, b ) {
-        if ( a.score < b.score ) return -1;
-        if ( a.score > b.score ) return 1;
+        var _a = ( !! a.score ) ? a.score : 0;
+        var _b = ( !! b.score ) ? b.score : 0;
+
+        if ( _a < _b ) return -1;
+        if ( _a > _b ) return 1;
 
         return sort_by.ref( a, b );
     };
     sort_by.score_desc = function ( a, b ) {
-        if ( a.score > b.score ) return -1;
-        if ( a.score < b.score ) return 1;
+        var _a = ( !! a.score ) ? a.score : 0;
+        var _b = ( !! b.score ) ? b.score : 0;
+
+        if ( _a > _b ) return -1;
+        if ( _a < _b ) return 1;
+
+        return sort_by.ref( a, b );
+    };
+    sort_by.marked = function ( a, b ) {
+        var _a = ( !! a.marked ) ? a.marked : 'z'.repeat(255);
+        var _b = ( !! b.marked ) ? b.marked : 'z'.repeat(255);
+
+        var icmp = _a.toLowerCase().localeCompare( _b.toLowerCase() );
+        if ( icmp != 0 ) return icmp;
 
         return sort_by.ref( a, b );
     };
 
     function count_questions (vue_obj) {
         var questions_count = 0;
+
         for ( book in vue_obj.questions.data ) {
             for ( chapter in vue_obj.questions.data[book] ) {
                 for ( question in vue_obj.questions.data[book][chapter] ) {
@@ -106,6 +126,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 }
             }
         }
+
         vue_obj.total_questions = questions_count;
     }
 
@@ -419,6 +440,26 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.lookup.book    = verse.book;
                 this.lookup.chapter = verse.chapter;
                 this.lookup.verse   = verse.verse;
+            },
+
+            toggle_questions_view: function () {
+                this.questions_view_hidden = ! this.questions_view_hidden;
+            },
+
+            view_question: function ( book, chapter, question_id ) {
+                this.questions.book = book;
+
+                this.$nextTick( function () {
+                    this.$nextTick( function () {
+                        this.questions.chapter = chapter;
+
+                        this.$nextTick( function () {
+                            this.questions.question_id = question_id;
+                        } );
+                    } );
+                } );
+
+                this.toggle_questions_view();
             }
         },
 
@@ -442,6 +483,30 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     parseInt( this.question.verse ) > 0 &&
                     !! this.question.type
                 ) ? false : true;
+            },
+
+            all_questions: function () {
+                var all_questions = [];
+                if ( this.questions_view_hidden ) return all_questions;
+
+                this.questions_view_page = parseInt( 0 + this.questions_view_page );
+                this.questions_view_size = parseInt( 0 + this.questions_view_size );
+
+                if ( this.questions_view_page == 0 ) this.questions_view_page = 1;
+                if ( this.questions_view_size == 0 ) this.questions_view_size = 40;
+
+                for ( book in this.questions.data ) {
+                    for ( chapter in this.questions.data[book] ) {
+                        for ( question in this.questions.data[book][chapter] ) {
+                            all_questions.push( this.questions.data[book][chapter][question] );
+                        }
+                    }
+                }
+
+                return all_questions.sort( sort_by[ this.questions.sort_by ] ).splice(
+                    ( this.questions_view_page - 1 ) * this.questions_view_size,
+                    this.questions_view_size
+                );
             }
         },
 
