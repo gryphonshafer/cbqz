@@ -3,6 +3,7 @@ use exact;
 use Config::App;
 use Util::CommandLine qw( options pod2usage );
 use Text::CSV_XS 'csv';
+use Text::Unidecode 'unidecode';
 use CBQZ;
 
 my $settings = options( qw( set|s=s questions|q=s user|u=s create|c delete|d ) );
@@ -29,8 +30,19 @@ my $insert = $dq->sql(q{
     VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
 });
 
-$insert->run( $set_id, @$_ )
-    for ( map { ( @$_ == 6 ) ? [ @$_, 0 ] : $_ } @{ csv( in => $settings->{questions} ) } );
+for my $line (
+    map { ( @$_ == 6 ) ? [ @$_, 0 ] : $_ }
+    map {
+        [ map {
+            s/(?:^\s+|\s+$)//g;
+            unidecode($_);
+        } @$_ ]
+    }
+    @{ csv( in => $settings->{questions} ) }
+) {
+    $line->[0] = 'MA' . $1 if ( $line->[0] =~ /(CV?R)MA/ );
+    $insert->run( $set_id, @$line );
+}
 
 =head1 NAME
 
@@ -50,3 +62,5 @@ questions_load.pl - Load questions data into the database as a new questions set
 =head1 DESCRIPTION
 
 This program will load questions data into the database as a new questions set.
+The questions data file needs to be a CSV with columns in the following order:
+type, book, chapter, verse, question, answer, used. Used is optional.
