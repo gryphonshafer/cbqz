@@ -3,11 +3,10 @@
     page.menu  = 'editor';
     page.vue   = 1;
 
-    page.js.push( '/editor/path.js', '/js/utilities.js' );
+    page.js.push( '/editor/path.js', '/js/utilities.js', '/js/app/editor.js' );
     page.links.push(
         '/js/components/material_lookup.html',
         '/js/components/material_search.html',
-        '/js/app/editor.js',
     );
 %]
 

@@ -45,8 +45,8 @@
                 %]">
                 [% link_seen.$file = ( link_seen.$file || 0 ) + 1 %]
             [% END %]
-            [% IF loop.first %]
-                [% page.js.push('/js/import_links.js') %]
+            [% IF loop.last %]
+                [% page.js.unshift('/js/import_links.js') %]
             [% END %]
         [% END %]
 

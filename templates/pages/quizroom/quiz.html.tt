@@ -3,11 +3,10 @@
     page.menu  = 'quizroom';
     page.vue   = 1;
 
-    page.js.push( '/quizroom/path.js' );
+    page.js.push( '/quizroom/path.js', '/js/app/quizroom.js' );
     page.links.push(
         '/js/components/material_lookup.html',
         '/js/components/material_search.html',
-        '/js/app/quizroom.js',
     );
 %]
 
