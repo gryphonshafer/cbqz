@@ -270,7 +270,11 @@ sub edit_user ($self) {
             $self->stash('user')->obj->update({ $self->req->param('type') => $self->req->param('value') });
         }
         catch {
-            $self->flash( message => 'Something went wrong when changing ' . $self->req->param('type') );
+            $self->flash( message =>
+                'Something went wrong' . (
+                    ( $self->req->param('type') ) ? ' when changing ' . $self->req->param('type') : ''
+                ) . '.'
+            );
         }
         finally {
             unless (@_) {

@@ -15,7 +15,8 @@ with 'CBQZ::Model::User::Program';
 
 class_has 'schema_name' => ( isa => 'Str', is => 'ro', default => 'User' );
 
-before [ qw( change_name change_passwd question_sets ) ] => sub ($self) {
+before [ qw( change_name change_passwd question_sets ) ] => sub {
+    my ($self) = @_;
     E->throw('Failure because user object data not yet loaded')
         unless ( $self->obj and $self->obj->in_storage );
 };

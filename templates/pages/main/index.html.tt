@@ -96,7 +96,6 @@
     >
         <fieldset id="edit_user_password">
             <legend>Edit Account Password</legend>
-            <input type="hidden" name="type" value="password">
 
             <label>Old: <input id="edit_user_password_old"
                 type="password" name="old" placeholder="Old/Current Password"></label>

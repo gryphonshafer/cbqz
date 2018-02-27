@@ -1,8 +1,9 @@
 function account_info( type, label, old_value ) {
     account_edit_clear();
 
+    document.getElementById("edit_user_type").value = type;
+
     if ( type != "password" ) {
-        document.getElementById("edit_user_type").value = type;
         document.getElementById("edit_user_value").value = old_value;
         document.getElementById("edit_user_legend").innerHTML = "Edit Account " + label;
     }

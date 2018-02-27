@@ -26,6 +26,18 @@
         <link rel="shortcut icon" href="[% c.url_for('/favicon.ico') %]" type="image/x-icon" />
         <link rel="stylesheet" type="text/css" href="[% c.url_for('/style.css') %]" />
 
+        <title>[% page.title %]</title>
+    </head>
+    <body>
+        [% PROCESS page_layout.html.tt %]
+
+        [% IF page.vue %]
+            <script type="text/javascript" src="[% c.url_for(
+                '/js/lib/' _ ( ( c.app.mode == 'development' ) ? 'vue.js' : 'vue.min.js' )
+            ) %]"></script>
+            <script type="text/javascript" src="[% c.url_for('/js/lib/vue-resource.js') %]"></script>
+        [% END %]
+
         [% FOREACH file IN page.links %]
             [% UNLESS link_seen.$file %]
                 <link rel="import" href="[%
@@ -38,17 +50,6 @@
             [% END %]
         [% END %]
 
-        <title>[% page.title %]</title>
-    </head>
-    <body>
-        [% PROCESS page_layout.html.tt %]
-
-        [% IF page.vue %]
-            <script type="text/javascript" src="[% c.url_for(
-                '/js/lib/' _ ( ( c.app.mode == 'development' ) ? 'vue.js' : 'vue.min.js' )
-            ) %]"></script>
-            <script type="text/javascript" src="[% c.url_for('/js/lib/vue-resource.js') %]"></script>
-        [% END %]
         [% FOREACH file IN page.js %]
             [% UNLESS js_seen.$file %]
                 <script type="text/javascript" src="[%
