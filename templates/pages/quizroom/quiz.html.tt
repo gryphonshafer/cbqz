@@ -136,11 +136,210 @@
         </div>
     </div>
 
-    <material-search
-        ref="material_search"
-        v-bind:material="material"
-        v-bind:lookup="lookup"
-        clickable="true"
-        v-on:reference-click="search_reference_click"
-    ></material-search>
+    <div id="material_search_wrapper" class="make_scorekeeping_space">
+        <material-search
+            ref="material_search"
+            v-bind:material="material"
+            v-bind:lookup="lookup"
+            clickable="true"
+            v-on:reference-click="search_reference_click"
+        ></material-search>
+    </div>
+
+    <div id="scorekeeping" class="">
+        <table class="tabular" style="margin: 5px">
+            <tr>
+                <td rowspan="4"></td>
+                <td colspan="6">LH5</td>
+                <td colspan="6">ABC2</td>
+                <td colspan="6">NSA1</td>
+            </tr>
+
+            <tr>
+                <td>1</td><td>2</td><td>3</td><td>4</td><td>5</td>
+                <td rowspan="3"></td>
+                <td>1</td><td>2</td><td>3</td><td>4</td><td>5</td>
+                <td rowspan="3"></td>
+                <td>1</td><td>2</td><td>3</td><td>4</td><td>5</td>
+                <td rowspan="3"></td>
+            </tr>
+
+            <tr id="quizzer_names">
+                <td><a href="#">Lynnette T</a></td>
+                <td><a href="#">Yolonda L</a></td>
+                <td><a href="#">Sly D</a></td>
+                <td><a href="#">Everitt S</a></td>
+                <td><a href="#">Alethea M</a></td>
+
+                <td><a href="#">Cat A</a></td>
+                <td><a href="#">Nigel B</a></td>
+                <td><a href="#">Alannis D</a></td>
+                <td><a href="#">Antonia L</a></td>
+                <td><a href="#">Rosalie M</a></td>
+
+                <td><a href="#">Lawrence E</a></td>
+                <td><a href="#">Brenda R</a></td>
+                <td><a href="#">Christy T</a></td>
+                <td><a href="#">Haley M</a></td>
+                <td><a href="#">Claude R</a></td>
+            </tr>
+
+            <tr>
+                <td>0-2</td><td>4-0</td><td>0-0</td><td>0-0</td><td>0-0</td>
+                <td>1-0</td><td>0-0</td><td>0-0</td><td>0-0</td><td>0-0</td>
+                <td>1-1</td><td>0-0</td><td>0-0</td><td>2-0</td><td>1-0</td>
+            </tr>
+
+            <tr>
+                <td>15</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>100</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>60</td>
+                <td></td><td></td><td></td><td>20</td><td></td>
+                <td>110</td>
+            </tr>
+
+            <tr>
+                <td>14</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>100</td>
+                <td></td><td>20B</td><td></td><td></td><td></td>
+                <td>60</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>90</td>
+            </tr>
+
+            <tr>
+                <td>13</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>100</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>40</td>
+                <td>E</td><td></td><td></td><td></td><td></td>
+                <td>90</td>
+            </tr>
+
+            <tr>
+                <td>12</td>
+                <td>E-</td><td></td><td></td><td></td><td></td>
+                <td>100</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>40</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>90</td>
+            </tr>
+
+            <tr>
+                <td>11</td>
+                <td></td><td>20+</td><td></td><td></td><td></td>
+                <td>110</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>40</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>90</td>
+            </tr>
+
+            <tr>
+                <td>10</td>
+                <td></td><td>20</td><td></td><td></td><td></td>
+                <td>80</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>40</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>90</td>
+            </tr>
+
+            <tr>
+                <td>9</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>60</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>40</td>
+                <td></td><td></td><td></td><td>20+</td><td></td>
+                <td>90</td>
+            </tr>
+
+            <tr>
+                <td>8</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>60</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>40</td>
+                <td></td><td></td><td></td><td></td><td>20</td>
+                <td>60</td>
+            </tr>
+
+            <tr>
+                <td>7</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>60</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>40</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>40</td>
+            </tr>
+
+            <tr>
+                <td>6</td>
+                <td>E</td><td></td><td></td><td></td><td></td>
+                <td>60</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>40</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>40</td>
+            </tr>
+
+            <tr>
+                <td>5</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>60</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>40</td>
+                <td>20</td><td></td><td></td><td></td><td></td>
+                <td>40</td>
+            </tr>
+
+            <tr>
+                <td>4</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>60</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>40</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>20</td>
+            </tr>
+
+            <tr>
+                <td>3</td>
+                <td></td><td>20</td><td></td><td></td><td></td>
+                <td>60</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>40</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>20</td>
+            </tr>
+
+            <tr>
+                <td>2</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>40</td>
+                <td>20</td><td></td><td></td><td></td><td></td>
+                <td>40</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>20</td>
+            </tr>
+
+            <tr>
+                <td>1</td>
+                <td></td><td>20</td><td></td><td></td><td></td>
+                <td>40</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>20</td>
+                <td></td><td></td><td></td><td></td><td></td>
+                <td>20</td>
+            </tr>
+
+        </table>
+    </div>
 </div>

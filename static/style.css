@@ -360,7 +360,7 @@ div#header_login input[type="password"]:hover {
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -710,14 +710,49 @@ div#quizroom div#material_lookup_display {
     height: 375px;
 }
 
-div#quizroom div#material_search {
-    display: block;
+div#quizroom div#material_search_wrapper {
+    display: inline-block;
     vertical-align: top;
     margin-top: -25px;
+    width: 100%;
+}
+
+div#quizroom div.make_scorekeeping_space {
+    width: calc( 50vw - 20px ) !important;
 }
 
 div#quizroom div#material_search_display {
     height: calc( 100vh - 508px );
+}
+
+div#quizroom div#scorekeeping {
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 5px;
+    margin-left: 2px;
+    width: calc( 50vw - 20px );
+    height: calc( 100vh - 508px );
+    background: white;
+    border: 1px solid lightgray;
+    overflow: auto;
+    overflow-x: hidden;
+}
+
+div#quizroom div#scorekeeping table td {
+    text-align: center;
+    width: 20px;
+}
+
+div#quizroom div#scorekeeping table tr#quizzer_names td {
+    writing-mode: tb-rl;
+    vertical-align: top;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+div#quizroom div#scorekeeping table tr#quizzer_names td a {
+    text-decoration: none;
+    color: black;
 }
 
 div#quizroom div#manage {
