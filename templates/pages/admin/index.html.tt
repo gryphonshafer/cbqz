@@ -14,22 +14,27 @@
     <dd>
         General access to most functionality including: questions editor, the
         quiz room (with optional embedded scorekeeping), questions list/print,
-        materials reference tools, and scorekeeping tools. This role also has
-        the ability to publish a quiz room to a different user and gain acces
-        to a view-only quiz room synchronized off a publish room. This role can
-        also grant copy-ability of a question set to a different user.
+        materials reference tools, and scorekeeping tools.
+        <!--
+            This role also has the ability to publish a quiz room to a different
+            user and gain acces to a view-only quiz room synchronized off a publish
+            room. This role can also grant copy-ability of a question set to a
+            different user.
+        -->
     </dd>
 
     <dt><b>Official</b></dt>
     <dd>
-        This role is intended as a layer on top of the User role. It provides
-        the additional ability to register the user's quiz room activity as a
-        source for the program status ticker. (The idea being that during a
-        quiz meet, users will be able to see the published status of this user's
-        quiz room.)
+        This role is intended as a layer on top of the User role.
+        <!--
+            It provides the additional ability to register the user's quiz room
+            activity as a source for the program status ticker. (The idea being that
+            during a quiz meet, users will be able to see the published status of
+            this user's quiz room.)
+        -->
     </dd>
 
-    <dt><b>Official</b></dt>
+    <dt><b>Director</b></dt>
     <dd>
         This role is intended for the program director or perhaps an assistant
         who will have the ability to set roles for users in programs and edit
