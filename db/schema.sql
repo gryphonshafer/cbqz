@@ -86,6 +86,50 @@ CREATE TABLE question_set (
 
 CREATE TRIGGER question_set_before_insert BEFORE INSERT ON question_set FOR EACH ROW SET NEW.created = NOW();
 
+CREATE TABLE quiz (
+    quiz_id int(10) unsigned NOT NULL,
+    program_id int(10) unsigned NOT NULL,
+    user_id int(10) unsigned DEFAULT NULL,
+    name varchar(64) DEFAULT NULL,
+    state enum('pending','active','closed') NOT NULL DEFAULT 'pending',
+    quizmaster varchar(64) DEFAULT NULL,
+    room tinyint(3) unsigned NOT NULL DEFAULT '1',
+    official tinyint(1) NOT NULL DEFAULT '0',
+    scheduled datetime DEFAULT NULL,
+    metadata mediumtext,
+    last_modified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created timestamp NOT NULL DEFAULT '1970-01-01 16:00:00',
+    PRIMARY KEY (quiz_id),
+    KEY program_id (program_id),
+    KEY user_id (user_id),
+    CONSTRAINT quiz_ibfk_1 FOREIGN KEY (program_id) REFERENCES program (program_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT quiz_ibfk_2 FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+CREATE TRIGGER quiz_before_insert BEFORE INSERT ON quiz FOR EACH ROW SET NEW.created = NOW();
+;
+CREATE TABLE quiz_question (
+    quiz_question_id int(10) unsigned NOT NULL,
+    question_id int(10) unsigned DEFAULT NULL,
+    book varchar(32) DEFAULT NULL,
+    chapter tinyint(3) unsigned DEFAULT NULL,
+    verse tinyint(3) unsigned DEFAULT NULL,
+    question text,
+    answer text,
+    type tinytext,
+    score decimal(3,1) unsigned DEFAULT NULL,
+    question_as varchar(16) DEFAULT NULL,
+    question_number varchar(16) DEFAULT NULL,
+    team varchar(64) DEFAULT NULL,
+    quizzer varchar(64) DEFAULT NULL,
+    result enum('success','failure','none') DEFAULT NULL,
+    form enum('question','foul','timeout','sub-in','sub-out','challenge') NOT NULL DEFAULT 'question',
+    created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (quiz_question_id),
+    KEY question_id (question_id),
+    CONSTRAINT quiz_question_ibfk_1 FOREIGN KEY (question_id) REFERENCES question (question_id) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
 CREATE TABLE role (
     role_id int(10) unsigned NOT NULL,
     user_id int(10) unsigned NOT NULL,

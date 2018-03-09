@@ -183,6 +183,21 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 quizzes
+
+Type: has_many
+
+Related object: L<CBQZ::Db::Schema::Result::Quiz>
+
+=cut
+
+__PACKAGE__->has_many(
+  "quizzes",
+  "CBQZ::Db::Schema::Result::Quiz",
+  { "foreign.user_id" => "self.user_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 roles
 
 Type: has_many
@@ -242,8 +257,8 @@ __PACKAGE__->has_many(
 with 'CBQZ::Db::Base::Result::User';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-02-19 12:59:22
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:BjAY6KB3nVBXsF4PMPpYdg
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-03-09 10:22:59
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:HPoLG9t/wZReswrnASWW1g
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

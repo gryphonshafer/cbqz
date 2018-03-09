@@ -145,6 +145,21 @@ __PACKAGE__->add_unique_constraint("name", ["name"]);
 
 =head1 RELATIONS
 
+=head2 quizzes
+
+Type: has_many
+
+Related object: L<CBQZ::Db::Schema::Result::Quiz>
+
+=cut
+
+__PACKAGE__->has_many(
+  "quizzes",
+  "CBQZ::Db::Schema::Result::Quiz",
+  { "foreign.program_id" => "self.program_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 user_programs
 
 Type: has_many
@@ -161,8 +176,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-01-04 20:42:51
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:B0xWPJ4fjjjfd8qOnJLBOA
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-03-09 10:22:59
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:oU+STpsgNI90N59JGMxdTA
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

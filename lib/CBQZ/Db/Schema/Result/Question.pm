@@ -168,9 +168,24 @@ __PACKAGE__->belongs_to(
   { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
 
+=head2 quiz_questions
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-02-21 13:58:17
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:T5Q5QTS2NwZkV2odmf0OOQ
+Type: has_many
+
+Related object: L<CBQZ::Db::Schema::Result::QuizQuestion>
+
+=cut
+
+__PACKAGE__->has_many(
+  "quiz_questions",
+  "CBQZ::Db::Schema::Result::QuizQuestion",
+  { "foreign.question_id" => "self.question_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-03-09 10:22:59
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:UI/brDck0GV630uH0/94RQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
