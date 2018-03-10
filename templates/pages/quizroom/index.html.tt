@@ -1,5 +1,5 @@
 [%
-    page.title = 'Quiz Room';
+    page.title = 'Quiz Setup';
     page.menu  = 'quizroom';
     page.vue   = 1;
 
@@ -16,20 +16,26 @@
                 <th>Quizmaster</th>
                 <th>Scheduled</th>
                 <th>Room</th>
-                <th>Official</th>
+                <th>Type</th>
                 <th>State</th>
-                <th>Last Modified</th>
                 <th>Created</th>
+                <th>Last Modified</th>
             </tr>
-            <tr v-for="quiz in saved_quizzes">
+            <tr
+                v-for="quiz in saved_quizzes"
+                v-bind:class="{
+                    selected: quiz.official,
+                    selected_extra: ( quiz.state == 'active' ) ? true : false
+                }"
+            >
                 <td><a href="#" v-on:click="start_quiz( quiz.quiz_id )">{{ quiz.name }}</a></td>
                 <td>{{ quiz.quizmaster }}</td>
-                <td>{{ quiz.scheduled }}</td>
-                <td>{{ quiz.room }}</td>
-                <td>{{ quiz.official }}</td>
+                <td class="right">{{ quiz.scheduled }}</td>
+                <td class="right">{{ quiz.room }}</td>
+                <td>{{ ( quiz.official ) ? "Official" : "Practice" }}</td>
                 <td>{{ quiz.state.charAt(0).toUpperCase() + quiz.state.slice(1) }}</td>
-                <td>{{ quiz.last_modified }}</td>
-                <td>{{ quiz.created }}</td>
+                <td class="right">{{ quiz.created }}</td>
+                <td class="right">{{ quiz.last_modified }}</td>
             </tr>
         </table>
     </div>

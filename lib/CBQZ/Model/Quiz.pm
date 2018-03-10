@@ -40,7 +40,10 @@ sub quizzes_for_user ( $self, $user, $program ) {
                 state      => [ qw( pending active ) ],
             },
             {
-                order_by => { -desc => [ qw( official scheduled room ) ] },
+                order_by => [
+                    { -desc => 'official' },
+                    { -asc  => [ qw( scheduled room ) ] },
+                ],
             },
         )->all
     ];
