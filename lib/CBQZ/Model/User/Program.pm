@@ -16,6 +16,10 @@ sub programs ($self) {
     return (wantarray) ? @$programs : $programs;
 }
 
+sub has_program_id ( $self, $program_id ) {
+    return $self->obj->user_programs->search({ program_id => $program_id })->count;
+}
+
 sub programs_count ($self) {
     return $self->obj->user_programs->count;
 }

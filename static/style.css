@@ -680,12 +680,52 @@ div#quiz_setup fieldset {
 div#quiz_setup textarea {
     font-family: normal;
     font-size: 13px;
-    width: 240px;
-    height: 50px;
+    width: 200px;
+    height: 138px;
 }
 
 div#quiz_setup button {
     margin-top: 14px;
+}
+
+div#quiz_setup form fieldset label {
+    width: 200px;
+    text-align: right;
+    margin-bottom: 3px;
+}
+
+div#quiz_setup form fieldset label input[type=text] {
+    width: 120px;
+}
+
+div#quiz_setup form fieldset#questions_and_timers input[type=text] {
+    width: 80px;
+}
+
+div#quiz_setup form fieldset label#room {
+    display: inline-block;
+    vertical-align: top;
+    width: auto;
+    margin-left: 43px;
+    text-align: left;
+}
+
+div#quiz_setup div#checkboxes {
+    display: inline-block;
+    vertical-align: top;
+}
+
+div#quiz_setup div#checkboxes label {
+    text-align: left;
+    display: block;
+    width: auto;
+    margin-top: -1px;
+    margin-bottom: -2px;
+}
+
+div#quiz_setup button[type=submit] {
+    display: block;
+    margin-left: auto;
 }
 
 /* -------------------------------------------------------------------------- */

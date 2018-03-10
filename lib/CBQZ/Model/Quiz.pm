@@ -1,11 +1,50 @@
 package CBQZ::Model::Quiz;
 
 use Moose;
+use MooseX::ClassAttribute;
 use exact;
 use Try::Tiny;
 use CBQZ::Model::Program;
 
-extends 'CBQZ';
+extends 'CBQZ::Model';
+
+class_has 'schema_name' => ( isa => 'Str', is => 'ro', default => 'Quiz' );
+
+sub create ( $self, $config ){
+
+    # TODO: generate "questions" data -> into metadata
+
+    $self->obj(
+        $self->rs->create({
+            metadata => $self->json->encode( {
+                timer_values => $self->json->encode( [
+                    map { 0 + $_ } grep { /^\d+$/ } split( /\D+/, $config->{timer_values} )
+                ] ),
+                map { $_ => $config->{$_} } qw( target_questions timer_default quiz_teams_quizzers )
+            }),
+            official => ( ( $config->{official} ) ? 1 : 0 ),
+            map { $_ => $config->{$_} } qw( program_id user_id name quizmaster room scheduled )
+        } )->get_from_storage
+    );
+
+    return $self;
+}
+
+sub quizzes_for_user ( $self, $user, $program ) {
+    return [
+        map { +{ $_->get_inflated_columns } }
+        $self->rs->search(
+            {
+                user_id    => $user->obj->id,
+                program_id => $program->obj->id,
+                state      => [ qw( pending active ) ],
+            },
+            {
+                order_by => { -desc => [ qw( official scheduled room ) ] },
+            },
+        )->all
+    ];
+}
 
 sub chapter_set ( $self, $cbqz_prefs ) {
     my @chapter_set_prime = map { $_->{book} . ' ' . $_->{chapter} } @{ $cbqz_prefs->{selected_chapters} };
@@ -20,6 +59,9 @@ sub chapter_set ( $self, $cbqz_prefs ) {
 }
 
 sub generate ( $self, $cbqz_prefs ) {
+
+    # TODO: generate quiz based on quiz row data...
+
     my $chapter_set            = $self->chapter_set($cbqz_prefs);
     my $program                = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
     my $target_questions_count = $program->obj->target_questions;
@@ -33,7 +75,7 @@ sub generate ( $self, $cbqz_prefs ) {
 
     my ( @questions, $error );
     try {
-        die "No chapters selected from which to build a quiz; select chapters and retry"
+        E->throw('No chapters selected from which to build a quiz; select chapters and retry')
             unless ( length $chapter_set->{prime} or length $chapter_set->{weight} );
 
         # select the minimum questions for each question type
@@ -92,7 +134,7 @@ sub generate ( $self, $cbqz_prefs ) {
                 push( @pending_questions, @$results );
             }
 
-            die 'Unable to meet quiz set minimum requirements' if ( @pending_questions < $min );
+            E->throw('Unable to meet quiz set minimum requirements') if ( @pending_questions < $min );
             push( @questions, @pending_questions );
         }
 
@@ -207,7 +249,7 @@ sub generate ( $self, $cbqz_prefs ) {
             push( @questions, $question );
         }
 
-        die 'Failed to create a question set to target size' if ( @questions < $target_questions_count );
+        E->throw('Failed to create a question set to target size') if ( @questions < $target_questions_count );
     }
     catch {
         $error = $self->clean_error($_);
