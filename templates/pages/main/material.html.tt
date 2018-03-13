@@ -3,8 +3,9 @@
     page.menu  = 'material';
     page.vue   = 1;
 
-    page.js.push( '/main/path.js', '/js/app/material.js' );
     page.links.push(
+        '/main/path.js',
+        '/js/app/material.js',
         '/js/components/material_lookup.html',
         '/js/components/material_search.html',
     );
