@@ -128,7 +128,7 @@
         </div>
     </div>
 
-    <div id="material_search_wrapper" class="make_scorekeeping_space">
+    <div id="material_search_wrapper">
         <material-search
             ref="material_search"
             v-bind:material="material"
@@ -138,13 +138,11 @@
         ></material-search>
     </div>
 
-    <div id="scorekeeping" class="">
+    <div id="scorekeeping">
         <table class="tabular" style="margin: 5px">
             <tr>
                 <td rowspan="4"></td>
-                <td colspan="6">LH5</td>
-                <td colspan="6">ABC2</td>
-                <td colspan="6">NSA1</td>
+                <td colspan="6" v-for="team in metadata.quiz_teams_quizzers">{{ team.team }}</td>
             </tr>
 
             <tr>
@@ -157,23 +155,9 @@
             </tr>
 
             <tr id="quizzer_names">
-                <td><a href="#">Lynnette T</a></td>
-                <td><a href="#">Yolonda L</a></td>
-                <td><a href="#">Sly D</a></td>
-                <td><a href="#">Everitt S</a></td>
-                <td><a href="#">Alethea M</a></td>
-
-                <td><a href="#">Cat A</a></td>
-                <td><a href="#">Nigel B</a></td>
-                <td><a href="#">Alannis D</a></td>
-                <td><a href="#">Antonia L</a></td>
-                <td><a href="#">Rosalie M</a></td>
-
-                <td><a href="#">Lawrence E</a></td>
-                <td><a href="#">Brenda R</a></td>
-                <td><a href="#">Christy T</a></td>
-                <td><a href="#">Haley M</a></td>
-                <td><a href="#">Claude R</a></td>
+                <template v-for="team in metadata.quiz_teams_quizzers">
+                    <td v-for="quizzer in team.quizzers"><div>{{ quizzer.name }}</div></td>
+                </template>
             </tr>
 
             <tr>
@@ -189,7 +173,7 @@
                 <td></td><td></td><td></td><td></td><td></td>
                 <td>60</td>
                 <td></td><td></td><td></td><td>20</td><td></td>
-                <td>110</td>
+                <td>230</td>
             </tr>
 
             <tr>

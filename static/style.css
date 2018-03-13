@@ -755,11 +755,7 @@ div#quizroom div#material_search_wrapper {
     display: inline-block;
     vertical-align: top;
     margin-top: -25px;
-    width: 100%;
-}
-
-div#quizroom div.make_scorekeeping_space {
-    width: calc( 50vw - 20px ) !important;
+    width: calc( 100vw - 537px );
 }
 
 div#quizroom div#material_search_display {
@@ -771,7 +767,7 @@ div#quizroom div#scorekeeping {
     vertical-align: top;
     margin-top: 5px;
     margin-left: 2px;
-    width: calc( 50vw - 20px );
+    width: 500px;
     height: calc( 100vh - 508px );
     background: white;
     border: 1px solid lightgray;
@@ -779,21 +775,38 @@ div#quizroom div#scorekeeping {
     overflow-x: hidden;
 }
 
+div#quizroom div#scorekeeping table {
+    table-layout: fixed;
+    width: calc( 100% + 2px );
+    margin: -1px !important;
+}
+
+div#quizroom div#scorekeeping table th,
+div#quizroom div#scorekeeping table td {
+    padding: 3px 0px 3px 0px;
+}
+
 div#quizroom div#scorekeeping table td {
     text-align: center;
-    width: 20px;
 }
 
 div#quizroom div#scorekeeping table tr#quizzer_names td {
-    writing-mode: tb-rl;
+    height: 75px;
     vertical-align: top;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    text-align: left;
 }
 
-div#quizroom div#scorekeeping table tr#quizzer_names td a {
-    text-decoration: none;
-    color: black;
+div#quizroom div#scorekeeping table tr#quizzer_names td:hover {
+    background-color: #f0f0f0;
+    cursor: pointer;
+}
+
+div#quizroom div#scorekeeping table tr#quizzer_names td div {
+    width: 70px;
+    transform: rotate(90deg) translate( 30px, 23px );
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 div#quizroom div#manage {
