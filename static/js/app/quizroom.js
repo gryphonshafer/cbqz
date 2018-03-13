@@ -23,7 +23,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
     data.quiz_view_hidden = 1;
     data.position         = 0;
     data.timer            = {
-        value : 30,
+        value : data.metadata.timer_default,
         state : "ready",
         label : "Start Timer",
     };

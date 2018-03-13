@@ -90,6 +90,11 @@ __PACKAGE__->table("quiz");
   data_type: 'mediumtext'
   is_nullable: 1
 
+=head2 questions
+
+  data_type: 'mediumtext'
+  is_nullable: 1
+
 =head2 last_modified
 
   data_type: 'timestamp'
@@ -155,6 +160,8 @@ __PACKAGE__->add_columns(
     is_nullable => 1,
   },
   "metadata",
+  { data_type => "mediumtext", is_nullable => 1 },
+  "questions",
   { data_type => "mediumtext", is_nullable => 1 },
   "last_modified",
   {
@@ -222,8 +229,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-03-10 10:44:24
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:ZkGjZL4S92Oq4w82Z1Q5ig
+# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-03-13 08:16:21
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:uEIHF9noXVNm5Aj75nHBiA
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

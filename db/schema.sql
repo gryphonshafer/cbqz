@@ -97,6 +97,7 @@ CREATE TABLE quiz (
     official tinyint(1) NOT NULL DEFAULT '0',
     scheduled datetime DEFAULT NULL,
     metadata mediumtext,
+    questions mediumtext,
     last_modified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created timestamp NOT NULL DEFAULT '1970-01-01 16:00:00',
     PRIMARY KEY (quiz_id),

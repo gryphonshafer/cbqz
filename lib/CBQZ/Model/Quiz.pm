@@ -10,19 +10,15 @@ extends 'CBQZ::Model';
 
 class_has 'schema_name' => ( isa => 'Str', is => 'ro', default => 'Quiz' );
 
-sub create ( $self, $config ){
-
-    # TODO: generate "questions" data -> into metadata
-
+sub create ( $self, $config ) {
     $self->obj(
         $self->rs->create({
-            metadata => $self->json->encode( {
-                timer_values => $self->json->encode( [
-                    map { 0 + $_ } grep { /^\d+$/ } split( /\D+/, $config->{timer_values} )
-                ] ),
+            official  => ( ( $config->{official} ) ? 1 : 0 ),
+            questions => $self->json->encode( $self->generate($config) ),
+            metadata  => $self->json->encode( {
+                timer_values => [ map { 0 + $_ } grep { /^\d+$/ } split( /\D+/, $config->{timer_values} ) ],
                 map { $_ => $config->{$_} } qw( target_questions timer_default quiz_teams_quizzers )
             }),
-            official => ( ( $config->{official} ) ? 1 : 0 ),
             map { $_ => $config->{$_} } qw( program_id user_id name quizmaster room scheduled )
         } )->get_from_storage
     );
@@ -62,9 +58,6 @@ sub chapter_set ( $self, $cbqz_prefs ) {
 }
 
 sub generate ( $self, $cbqz_prefs ) {
-
-    # TODO: generate quiz based on quiz row data...
-
     my $chapter_set            = $self->chapter_set($cbqz_prefs);
     my $program                = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
     my $target_questions_count = $program->obj->target_questions;
@@ -255,13 +248,17 @@ sub generate ( $self, $cbqz_prefs ) {
         E->throw('Failed to create a question set to target size') if ( @questions < $target_questions_count );
     }
     catch {
-        $error = $self->clean_error($_);
+        E->throw($_);
     };
 
-    return {
-        questions => \@questions,
-        error     => $error,
-    };
+    return [
+        map {
+            $_->{number} = undef;
+            $_->{as}     = undef;
+            $_->{marked} = undef;
+            $_;
+        } @questions
+    ];
 }
 
 sub replace ( $self, $request, $cbqz_prefs ) {

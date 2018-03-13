@@ -23,8 +23,6 @@ sub path ($self) {
         $self->warn($_);
     };
 
-    # TODO: move "result_operation" definition out of here and into (probably) the "data" sub
-
     return $self->render(
         text => qq/
             var cntlr = "$path";
@@ -164,34 +162,13 @@ sub generate_quiz ($self) {
 }
 
 sub quiz ($self) {
-    my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
-
-    # TODO: remove this bit as it's no longer necessary (probably)
-
-    try {
-        my $program = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
-
-        $self->stash(
-            question_types => $program->types_list,
-            timer_values   => $program->timer_values,
-        );
-    }
-    catch {
-        $self->warn($_);
-        $self->flash( message =>
-            "An error occurred while trying to load data.\n" .
-            "This is likely due to invalid settings on the main page.\n" .
-            "Visit the main page and verify your settings."
-        );
-    };
-
+    $self->session( quiz_id => $self->req->param('id') );
     return;
 }
 
 sub data ($self) {
     my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
-
-    # TODO: load up the quiz from the quiz table
+    my $quiz_id    = delete $self->session->{quiz_id} || $self->req->param('id');
 
     my $data = {
         metadata => {
@@ -206,54 +183,49 @@ sub data ($self) {
             verse   => 1,
             text    =>
                 'An error occurred while trying to load data. ' .
-                'This is likely due to invalid settings on the main page. ' .
-                'Visit the main page and verify your settings.',
+                'This is likely due to invalid quiz configuration settings.',
         } } } },
         questions => [],
     };
 
     try {
         my $program = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
-        my $set     = CBQZ::Model::QuestionSet->new->load( $cbqz_prefs->{question_set_id} );
-        my $quiz    = ( $set and $set->is_usable_by( $self->stash('user') ) )
-            ? CBQZ::Model::Quiz->new->generate($cbqz_prefs)
-            : { error => 'User does not own requested question set' };
 
-        $self->notice( $quiz->{error} ) if ( $quiz->{error} );
+        E->throw('User does not have access to the quiz referenced by quiz ID') unless (
+            grep { $_->{quiz_id} == $quiz_id } @{
+                CBQZ::Model::Quiz->new->quizzes_for_user( $self->stash('user'), $program )
+            }
+        );
 
-        $data->{metadata} = {
-            types         => $program->types_list,
-            timer_default => $program->obj->timer_default,
-            as_default    => $program->obj->as_default,
-            type_ranges   => [
+        my $set = CBQZ::Model::QuestionSet->new->load( $cbqz_prefs->{question_set_id} );
+        E->throw('Question set in preferences noet usable by user')
+            unless ( $set and $set->is_usable_by( $self->stash('user') ) );
+
+        my $quiz     = CBQZ::Model::Quiz->new->load($quiz_id);
+        my $metadata = $quiz->json->decode( $quiz->obj->metadata );
+
+        $data->{questions} = $quiz->json->decode( $quiz->obj->questions );
+        $data->{metadata}  = {
+            types       => $program->types_list,
+            as_default  => $program->obj->as_default,
+            type_ranges => [
                 map {
                     my ( $label, $min, $max, @types ) = split(/\W+/);
                     [ \@types, [ $min, $max ], $label ];
                 } split( /\r?\n/, $cbqz_prefs->{question_types} )
             ],
+            %$metadata,
         };
 
         $data->{material} = CBQZ::Model::MaterialSet->new->load(
             $cbqz_prefs->{material_set_id}
         )->get_material;
-
-        $data->{questions} = [
-            map {
-                $_->{number} = undef;
-                $_->{as}     = undef;
-                $_->{marked} = undef;
-                $_;
-            } @{ $quiz->{questions} }
-        ];
-
-        $data->{error} = ( $quiz->{error} ) ? $quiz->{error} : undef;
     }
     catch {
         $self->warn($_);
         $data->{error} =
             'An error occurred while trying to load data. ' .
-            'This is likely due to invalid settings on the quiz configuration settings page. ' .
-            'Visit the quiz configuration settings page and verify your settings';
+            'This is likely due to invalid quiz configuration settings.';
     };
 
     return $self->render( json => $data );

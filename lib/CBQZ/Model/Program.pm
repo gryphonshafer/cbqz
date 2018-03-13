@@ -64,7 +64,7 @@ sub create_default ($self) {
                 number = parseInt(number) + 1;
             }
         /,
-        timer_values  => $self->json->encode([ 5, 30, 60, 90 ]),
+        timer_values  => $self->json->encode([ 5, 30, 60 ]),
         timer_default => 30,
         as_default    => 'Standard',
     })->get_from_storage ]);
