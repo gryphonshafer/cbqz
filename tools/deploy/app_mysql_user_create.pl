@@ -5,6 +5,10 @@ use CBQZ;
 use Util::CommandLine 'podhelp';
 use Term::ReadKey 'ReadMode';
 
+my $cbqz = CBQZ->new;
+my ( $host, $database, $username, $password ) =
+    @{ $cbqz->config->get('database') }{ qw( host database username password ) };
+
 my $origin = `/sbin/ip route|awk '/default/ { print \$3 }'`;
 chomp($origin);
 $origin = $host if ( $host eq 'localhost' or $host eq '127.0.0.1' or $host eq '0.0.0.0' );
@@ -16,15 +20,12 @@ ReadMode('original');
 print "\n";
 chomp($root_password);
 
-my $cbqz = CBQZ->new;
-my ( $database, $username, $password ) = @{ $cbqz->config->get('database') }{ qw( database username password ) };
-
 $cbqz->config->put( qw( database settings mysql_multi_statements ) => 1 );
 $cbqz->config->put( qw( database database ) => undef );
 $cbqz->config->put( qw( database username ) => 'root' );
 $cbqz->config->put( qw( database password ) => $root_password );
 
-$cbqz->dq->sql(q{
+$cbqz->dq->sql(qq{
     CREATE USER '$username'\@'$origin' IDENTIFIED BY ?;
     GRANT ALL ON $database.* TO '$username'\@'$origin';
 })->run($password);
