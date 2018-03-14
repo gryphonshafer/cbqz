@@ -25,7 +25,7 @@ sub startup ( $self, $app = undef ) {
                         qw( config db lib static templates )
                 )
             )
-        )[ 5, 4, 3, 2, 1, 0 ]
+        )[ 5, 4, 3, 2, 1 ]
     ) );
 
     # base URL handling
