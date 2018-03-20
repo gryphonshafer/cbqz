@@ -768,6 +768,8 @@ div#quizroom div#material_search_display {
     height: calc( 100vh - 508px );
 }
 
+/* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
+
 div#quizroom div#scorekeeping {
     display: inline-block;
     vertical-align: top;
@@ -800,7 +802,7 @@ div#quizroom div#scorekeeping table tr#quizzer_names > td {
     padding: 0px;
 }
 
-div#quizroom div#scorekeeping table tr#quizzer_names td:hover table td {
+div#quizroom div#scorekeeping table tr#quizzer_names td:hover:not(.selected) table td {
     background-color: #eeeeff;
     cursor: pointer;
 }
@@ -819,6 +821,8 @@ div#quizroom div#scorekeeping table tr#quizzer_names td table td.quizzer_name di
     text-overflow: ellipsis;
 }
 
+/* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
+
 div#quizroom div#manage {
     margin-left: 5px;
     width: 130px;
@@ -829,6 +833,7 @@ div#quizroom div#manage div#timer {
 }
 
 div#quizroom div#manage div#result,
+div#quizroom div#manage div#quiz,
 div#quizroom div#manage div#replace {
     margin-top: 10px;
 }
@@ -854,6 +859,7 @@ div#quizroom div#manage div#timer button {
 div#quizroom div#manage div#timer button#prime_timer_button {
     width: 89px;
     overflow: hidden;
+    margin-right: -1px;
 }
 
 div#quizroom div#manage div#replace button {

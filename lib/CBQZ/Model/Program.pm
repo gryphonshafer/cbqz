@@ -31,11 +31,11 @@ sub create_default ($self) {
         ),
         target_questions => 40,
         result_operation => q/
-            if ( result == "correct" ) {
+            if ( result == "success" ) {
                 as     = "Standard";
                 number = parseInt(number) + 1;
             }
-            else if ( result == "error" ) {
+            else if ( result == "failure" ) {
                 if ( as == "Standard" ) {
                     as = "Toss-Up";
                 }
@@ -59,7 +59,7 @@ sub create_default ($self) {
                     number = parseInt(number) + 1;
                 }
             }
-            else if ( result == "no_jump" ) {
+            else if ( result == "none" ) {
                 as     = "Standard";
                 number = parseInt(number) + 1;
             }

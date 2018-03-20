@@ -101,22 +101,27 @@
                 <div id="timer_display">{{ timer.value }}</div>
                 <button v-for="timer_value in metadata.timer_values" v-on:click="set_timer(timer_value)">{{ timer_value }}</button>
                 <button id="prime_timer_button" v-on:click="timer_click">{{ timer.label }}</button>
+                <button v-on:click="make_beep">Beep</button>
             </div>
         </div>
 
         <div class="manage_group">
             <div id="result">
                 <b>Result</b><br>
-                <button v-on:click="result('correct')">Correct</button>
-                <button v-on:click="result('error')">Error</button>
-                <button v-on:click="result('no_jump')">No Jump</button>
+                <button v-on:click="result('success')">Correct</button>
+                <button v-on:click="result('failure')">Error</button>
+                <button v-on:click="result('none')">No Jump</button>
+            </div>
+
+            <div id="quiz">
+                <b>Quiz</b><br>
+                <button v-on:click="print_quiz">Print</button>
+                <button v-on:click="exit_quiz">Exit</button>
+                <button v-on:click="close_quiz">Close</button>
             </div>
 
             <div id="mark">
                 <button v-on:click="mark_for_edit" v-bind:disabled="question.marked">Mark for Edit</button>
-                <button v-on:click="make_beep">Beep</button>
-                <button v-on:click="print_quiz">Print Quiz</button>
-                <button v-on:click="exit_quiz">Exit Quiz</button>
             </div>
         </div>
 
@@ -145,7 +150,7 @@
                 <td
                     v-for="team in metadata.quiz_teams_quizzers"
                     v-bind:colspan="team.quizzers.length + 1"
-                    v-bind:class="{ selected: team.team.id == active_team.id }"
+                    v-bind:class="{ selected: team.team.name == active_team.name }"
                 >
                     {{ team.team.name }} : {{ team.team.score }}
                 </td>
@@ -157,7 +162,7 @@
                         class="quizzer_name"
                         v-for="quizzer in team.quizzers"
                         v-on:click="select_quizzer( team.team, quizzer )"
-                        v-bind:class="{ selected: quizzer.id == active_quizzer.id }"
+                        v-bind:class="{ selected: quizzer.name == active_quizzer.name }"
                     >
                         <table class="tabular clear">
                             <tr><td>{{ quizzer.bib }}</td></tr>
@@ -169,18 +174,13 @@
                 </template>
             </tr>
 
-<!-- TODO
-            <tr>
-                <td>15</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>100</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>60</td>
-                <td></td><td></td><td></td><td>20</td><td></td>
-                <td>230</td>
+            <tr v-for="event in quiz_questions">
+                <td>{{ event.question_number }}</td>
+                <template v-for="team in metadata.quiz_teams_quizzers">
+                    <td v-for="quizzer in team.quizzers"></td>
+                    <td></td>
+                </template>
             </tr>
--->
-
         </table>
     </div>
 </div>

@@ -53,12 +53,6 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 }
             },
 
-            setup_question: function () {
-                this.question        = this.questions[ this.position ];
-                this.question.number = 1;
-                this.question.as     = this.metadata.as_default;
-            },
-
             move_question: function (target) {
                 if ( target == parseInt(target) ) {
                     target--;
@@ -147,8 +141,11 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     if ( ! response.body.success ) {
                         alert(
                             "There was an error updating the used count for the question.\n" +
-                            response.body.error
+                            response.body.error + "."
                         );
+                    }
+                    else {
+                        this.quiz_questions.unshift( response.body.quiz_question );
                     }
                 } );
 
@@ -181,7 +178,10 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                             this.question.marked = reason;
                         }
                         else {
-                            alert("There was an error marking the question for edit.");
+                            alert(
+                                "There was an error marking the question for edit.\n" +
+                                response.body.error + "."
+                            );
                         }
                     } );
                 }
@@ -204,18 +204,29 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 document.location.href = cntlr;
             },
 
+            close_quiz: function () {
+                if ( confirm("Are you sure you want to close this quiz?") ) {
+                    document.location.href = cntlr + "/close?quiz_id=" + this.metadata.quiz_id;
+                }
+            },
+
             replace: function (type) {
                 this.classes.cursor_progress = true;
                 this.$http.post(
                     cntlr + "/replace",
                     {
-                        type:      type,
-                        questions: this.questions
+                        type      : type,
+                        questions : this.questions,
+                        position  : this.position,
+                        quiz_id   : this.metadata.quiz_id
                     }
                 ).then( function (response) {
                     this.classes.cursor_progress = false;
                     if ( response.body.error ) {
-                        alert("Unable to replace with that type. Try another.");
+                        alert(
+                            "Unable to replace question.\n" +
+                            response.body.error
+                        );
                     }
                     else {
                         var question = response.body.question;
@@ -270,7 +281,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.active_team    = team;
                 this.active_quizzer = quizzer;
 
-                this.timer_click();
+                if ( this.timer.state != "running" ) this.timer_click();
             }
         },
         computed: {
@@ -291,7 +302,29 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             this.set_type_counts();
         },
         mounted: function () {
-            if ( this.questions.length > 0 ) this.setup_question();
+            if ( this.questions.length > 0 ) {
+                if ( this.quiz_questions.length == 0 ) {
+                    this.question        = this.questions[ this.position ];
+                    this.question.number = 1;
+                    this.question.as     = this.metadata.as_default;
+                }
+                else {
+                    var reverse_quiz_questions = this.quiz_questions.slice().reverse();
+
+                    for ( var i = 0; i < reverse_quiz_questions.length; i++ ) {
+                        if ( reverse_quiz_questions[i].form == "question" ) {
+                            var as     = this.questions[i].as     = reverse_quiz_questions[i].question_as;
+                            var number = this.questions[i].number = reverse_quiz_questions[i].question_number;
+
+                            this.move_question("forward");
+                            var as_number = result_operation( reverse_quiz_questions[i].result, as, number );
+
+                            this.question.as     = as_number.as;
+                            this.question.number = as_number.number;
+                        }
+                    }
+                }
+            }
 
             if ( this.error ) {
                 this.question.question = '<span class="unique_chapter">' + this.error + '.</span>';

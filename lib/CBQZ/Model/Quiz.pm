@@ -305,6 +305,15 @@ sub replace ( $self, $request, $cbqz_prefs ) {
         })->run( $cbqz_prefs->{question_set_id}, $request->{type} )->all({});
     }
 
+    my $questions = $self->json->decode( $self->obj->questions );
+    my $question  = \%{ $results->[0] };
+
+    $question->{$_}     = $questions->[ $request->{position} ]{$_} for ( qw( number as ) );
+    $question->{marked} = undef;
+
+    $questions->[ $request->{position} ] = $question;
+    $self->obj->update({ questions => $self->json->encode($questions) });
+
     return $results;
 }
 
