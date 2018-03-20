@@ -33,6 +33,13 @@ __PACKAGE__->table("quiz_question");
   is_auto_increment: 1
   is_nullable: 0
 
+=head2 quiz_id
+
+  data_type: 'integer'
+  extra: {unsigned => 1}
+  is_foreign_key: 1
+  is_nullable: 1
+
 =head2 question_id
 
   data_type: 'integer'
@@ -134,6 +141,13 @@ __PACKAGE__->add_columns(
     is_auto_increment => 1,
     is_nullable => 0,
   },
+  "quiz_id",
+  {
+    data_type => "integer",
+    extra => { unsigned => 1 },
+    is_foreign_key => 1,
+    is_nullable => 1,
+  },
   "question_id",
   {
     data_type => "integer",
@@ -226,9 +240,29 @@ __PACKAGE__->belongs_to(
   },
 );
 
+=head2 quiz
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-03-09 10:22:59
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:iigaoh9M+Ot9XoX53deyoQ
+Type: belongs_to
+
+Related object: L<CBQZ::Db::Schema::Result::Quiz>
+
+=cut
+
+__PACKAGE__->belongs_to(
+  "quiz",
+  "CBQZ::Db::Schema::Result::Quiz",
+  { quiz_id => "quiz_id" },
+  {
+    is_deferrable => 1,
+    join_type     => "LEFT",
+    on_delete     => "CASCADE",
+    on_update     => "CASCADE",
+  },
+);
+
+
+# Created by DBIx::Class::Schema::Loader v0.07048 @ 2018-03-19 17:15:18
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:49YTGPlBCsKL8oduIl/jdg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

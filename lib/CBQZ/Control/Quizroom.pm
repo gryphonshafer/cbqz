@@ -3,6 +3,7 @@ package CBQZ::Control::Quizroom;
 use Mojo::Base 'Mojolicious::Controller';
 use exact;
 use Try::Tiny;
+use Digest::SHA 'sha256_hex';
 use CBQZ::Model::Quiz;
 use CBQZ::Model::Program;
 use CBQZ::Model::MaterialSet;
@@ -103,7 +104,11 @@ sub generate_quiz ($self) {
                 ( my $team = shift @quizzers ) =~ s/^\s+|\s+$//g;
                 E->throw('Team name parsing failed') unless ( $team and $team =~ /\w/ and $team !~ /\n/ );
                 {
-                    team     => $team,
+                    team => {
+                        name  => $team,
+                        score => 0,
+                        id    => sha256_hex( $team . time . rand ),
+                    },
                     quizzers => [
                         map {
                             /^\s*(?<bib>\d+)\D\s*(?<name>\w[\w\s]*)/;
@@ -122,7 +127,12 @@ sub generate_quiz ($self) {
                                 $quizzer->{bib} =~ /^\d+$/
                             );
 
-                            $quizzer;
+                            +{
+                                %$quizzer,
+                                correct   => 0,
+                                incorrect => 0,
+                                id        => sha256_hex( $quizzer->{bib} . $quizzer->{name} . time . rand ),
+                            };
                         } @quizzers
                     ],
                 };
@@ -206,6 +216,7 @@ sub data ($self) {
 
         $data->{questions} = $quiz->json->decode( $quiz->obj->questions );
         $data->{metadata}  = {
+            quiz_id     => $quiz_id,
             types       => $program->types_list,
             as_default  => $program->obj->as_default,
             type_ranges => [
@@ -232,14 +243,52 @@ sub data ($self) {
 }
 
 sub used ($self) {
+    my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
+    my $event      = $self->req_body_json;
 
-    # TODO: return a value on failure that allows for continuing quiz OK
+    try {
+        my $program = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
+        E->throw('User does not have access to the quiz referenced by quiz ID') unless (
+            grep { $_->{quiz_id} == $event->{metadata}{quiz_id} } @{
+                CBQZ::Model::Quiz->new->quizzes_for_user( $self->stash('user'), $program )
+            }
+        );
 
-    my $question = CBQZ::Model::Question->new->load( $self->req_body_json->{question_id} );
-    if ( $question and $question->is_usable_by( $self->stash('user') ) ) {
-        $question->obj->update({ used => \'used + 1' });
+        CBQZ::Model::Quiz->new->load( $event->{metadata}{quiz_id} )->obj
+            ->update({ metadata => $self->cbqz->json->encode( $event->{metadata} ) });
+
+        my $result =
+            ( $event->{result} eq 'correct' ) ? 'success' :
+            ( $event->{result} eq 'error'   ) ? 'failure' : 'none';
+
+        # TODO
+
+        # CBQZ::Model::QuizQuestion->new->create({
+        #     quiz_id         => $event->{metadata}{quiz_id},
+        #     question_as     => $event->{question}{as},
+        #     question_number => $event->{question}{number},
+        #     team            => $event->{team}{name},
+        #     quizzer         => $event->{quizzer}{name},
+        #     result          => $result,
+        #     ( map { $_ => $event->{question}{$_} } qw(
+        #         question_id book chapter verse question answer type score
+        #     ) ),
+        # });
+
         return $self->render( json => { success => 1 } );
     }
+    catch {
+        $self->warn($_);
+        return $self->render( json => { error => $self->clean_error($_) } );
+    };
+
+    # TODO
+
+    # my $question = CBQZ::Model::Question->new->load( $self->req_body_json->{question_id} );
+    # if ( $question and $question->is_usable_by( $self->stash('user') ) ) {
+    #     $question->obj->update({ used => \'used + 1' });
+    #     return $self->render( json => { success => 1 } );
+    # }
 }
 
 sub mark ($self) {

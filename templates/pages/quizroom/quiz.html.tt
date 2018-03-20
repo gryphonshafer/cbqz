@@ -139,33 +139,37 @@
     </div>
 
     <div id="scorekeeping">
-        <table class="tabular" style="margin: 5px">
+        <table class="tabular">
             <tr>
-                <td rowspan="4"></td>
-                <td colspan="6" v-for="team in metadata.quiz_teams_quizzers">{{ team.team }}</td>
-            </tr>
-
-            <tr>
-                <td>1</td><td>2</td><td>3</td><td>4</td><td>5</td>
-                <td rowspan="3"></td>
-                <td>1</td><td>2</td><td>3</td><td>4</td><td>5</td>
-                <td rowspan="3"></td>
-                <td>1</td><td>2</td><td>3</td><td>4</td><td>5</td>
-                <td rowspan="3"></td>
+                <td rowspan="2"></td>
+                <td
+                    v-for="team in metadata.quiz_teams_quizzers"
+                    v-bind:colspan="team.quizzers.length + 1"
+                    v-bind:class="{ selected: team.team.id == active_team.id }"
+                >
+                    {{ team.team.name }} : {{ team.team.score }}
+                </td>
             </tr>
 
             <tr id="quizzer_names">
                 <template v-for="team in metadata.quiz_teams_quizzers">
-                    <td v-for="quizzer in team.quizzers"><div>{{ quizzer.name }}</div></td>
+                    <td
+                        class="quizzer_name"
+                        v-for="quizzer in team.quizzers"
+                        v-on:click="select_quizzer( team.team, quizzer )"
+                        v-bind:class="{ selected: quizzer.id == active_quizzer.id }"
+                    >
+                        <table class="tabular clear">
+                            <tr><td>{{ quizzer.bib }}</td></tr>
+                            <tr><td class="quizzer_name"><div>{{ quizzer.name }}</div></td></tr>
+                            <tr><td>{{ quizzer.correct }}-{{ quizzer.incorrect }}</td></tr>
+                        </table>
+                    </td>
+                    <td></td>
                 </template>
             </tr>
 
-            <tr>
-                <td>0-2</td><td>4-0</td><td>0-0</td><td>0-0</td><td>0-0</td>
-                <td>1-0</td><td>0-0</td><td>0-0</td><td>0-0</td><td>0-0</td>
-                <td>1-1</td><td>0-0</td><td>0-0</td><td>2-0</td><td>1-0</td>
-            </tr>
-
+<!-- TODO
             <tr>
                 <td>15</td>
                 <td></td><td></td><td></td><td></td><td></td>
@@ -175,146 +179,7 @@
                 <td></td><td></td><td></td><td>20</td><td></td>
                 <td>230</td>
             </tr>
-
-            <tr>
-                <td>14</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>100</td>
-                <td></td><td>20B</td><td></td><td></td><td></td>
-                <td>60</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>90</td>
-            </tr>
-
-            <tr>
-                <td>13</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>100</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>40</td>
-                <td>E</td><td></td><td></td><td></td><td></td>
-                <td>90</td>
-            </tr>
-
-            <tr>
-                <td>12</td>
-                <td>E-</td><td></td><td></td><td></td><td></td>
-                <td>100</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>40</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>90</td>
-            </tr>
-
-            <tr>
-                <td>11</td>
-                <td></td><td>20+</td><td></td><td></td><td></td>
-                <td>110</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>40</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>90</td>
-            </tr>
-
-            <tr>
-                <td>10</td>
-                <td></td><td>20</td><td></td><td></td><td></td>
-                <td>80</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>40</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>90</td>
-            </tr>
-
-            <tr>
-                <td>9</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>60</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>40</td>
-                <td></td><td></td><td></td><td>20+</td><td></td>
-                <td>90</td>
-            </tr>
-
-            <tr>
-                <td>8</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>60</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>40</td>
-                <td></td><td></td><td></td><td></td><td>20</td>
-                <td>60</td>
-            </tr>
-
-            <tr>
-                <td>7</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>60</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>40</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>40</td>
-            </tr>
-
-            <tr>
-                <td>6</td>
-                <td>E</td><td></td><td></td><td></td><td></td>
-                <td>60</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>40</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>40</td>
-            </tr>
-
-            <tr>
-                <td>5</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>60</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>40</td>
-                <td>20</td><td></td><td></td><td></td><td></td>
-                <td>40</td>
-            </tr>
-
-            <tr>
-                <td>4</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>60</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>40</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>20</td>
-            </tr>
-
-            <tr>
-                <td>3</td>
-                <td></td><td>20</td><td></td><td></td><td></td>
-                <td>60</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>40</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>20</td>
-            </tr>
-
-            <tr>
-                <td>2</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>40</td>
-                <td>20</td><td></td><td></td><td></td><td></td>
-                <td>40</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>20</td>
-            </tr>
-
-            <tr>
-                <td>1</td>
-                <td></td><td>20</td><td></td><td></td><td></td>
-                <td>40</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>20</td>
-                <td></td><td></td><td></td><td></td><td></td>
-                <td>20</td>
-            </tr>
+-->
 
         </table>
     </div>

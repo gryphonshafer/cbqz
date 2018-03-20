@@ -22,6 +22,9 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
     };
     data.quiz_view_hidden = 1;
     data.position         = 0;
+    data.mean_score       = null;
+    data.active_team      = { id: null };
+    data.active_quizzer   = { id: null };
     data.timer            = {
         value : data.metadata.timer_default,
         state : "ready",
@@ -30,7 +33,6 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
     data.classes = {
         cursor_progress : false
     };
-    data.mean_score = null;
 
     var vue_app = new Vue({
         el: "#quizroom",
@@ -134,13 +136,21 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.set_timer( this.metadata.timer_default );
                 this.classes.cursor_progress = true;
 
-                this.$http.post( cntlr + "/used", { question_id: this.question.question_id } )
-                    .then( function (response) {
-                        this.classes.cursor_progress = false;
-                        if ( ! response.body.success ) {
-                            alert("There was an error updating the used count for the question.");
-                        }
-                    } );
+                this.$http.post( cntlr + "/used", {
+                    metadata : this.metadata,
+                    question : this.question,
+                    team     : this.active_team,
+                    quizzer  : this.active_quizzer,
+                    result   : result
+                } ).then( function (response) {
+                    this.classes.cursor_progress = false;
+                    if ( ! response.body.success ) {
+                        alert(
+                            "There was an error updating the used count for the question.\n" +
+                            response.body.error
+                        );
+                    }
+                } );
 
                 this.question.used++;
 
@@ -254,6 +264,13 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.lookup.book    = verse.book;
                 this.lookup.chapter = verse.chapter;
                 this.lookup.verse   = verse.verse;
+            },
+
+            select_quizzer: function ( team, quizzer ) {
+                this.active_team    = team;
+                this.active_quizzer = quizzer;
+
+                this.timer_click();
             }
         },
         computed: {

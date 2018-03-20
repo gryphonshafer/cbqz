@@ -11,6 +11,7 @@ CREATE TABLE quiz (
     official BOOL NOT NULL DEFAULT 0,
     scheduled DATETIME NULL,
     metadata MEDIUMTEXT NULL,
+    questions MEDIUMTEXT NULL,
     last_modified TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     created TIMESTAMP NOT NULL DEFAULT '1970-01-01 08:00:00',
 PRIMARY KEY(quiz_id),
@@ -28,6 +29,7 @@ CREATE TRIGGER quiz_before_insert BEFORE INSERT ON quiz FOR EACH ROW SET NEW.cre
 
 CREATE TABLE quiz_question (
     quiz_question_id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+    quiz_id INTEGER UNSIGNED NULL,
     question_id INTEGER UNSIGNED NULL,
     book VARCHAR(32) NULL,
     chapter TINYINT UNSIGNED NULL,
@@ -44,6 +46,10 @@ CREATE TABLE quiz_question (
     form ENUM( 'question', 'foul', 'timeout', 'sub-in', 'sub-out', 'challenge' ) NOT NULL DEFAULT 'question',
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY(quiz_question_id),
+FOREIGN KEY(quiz_id)
+    REFERENCES quiz(quiz_id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
 FOREIGN KEY(question_id)
     REFERENCES question(question_id)
     ON DELETE SET NULL

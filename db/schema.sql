@@ -111,6 +111,7 @@ CREATE TRIGGER quiz_before_insert BEFORE INSERT ON quiz FOR EACH ROW SET NEW.cre
 ;
 CREATE TABLE quiz_question (
     quiz_question_id int(10) unsigned NOT NULL,
+    quiz_id int(10) unsigned DEFAULT NULL,
     question_id int(10) unsigned DEFAULT NULL,
     book varchar(32) DEFAULT NULL,
     chapter tinyint(3) unsigned DEFAULT NULL,
@@ -127,8 +128,10 @@ CREATE TABLE quiz_question (
     form enum('question','foul','timeout','sub-in','sub-out','challenge') NOT NULL DEFAULT 'question',
     created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (quiz_question_id),
+    KEY quiz_id (quiz_id),
     KEY question_id (question_id),
-    CONSTRAINT quiz_question_ibfk_1 FOREIGN KEY (question_id) REFERENCES question (question_id) ON DELETE SET NULL ON UPDATE CASCADE
+    CONSTRAINT quiz_question_ibfk_1 FOREIGN KEY (quiz_id) REFERENCES quiz (quiz_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT quiz_question_ibfk_2 FOREIGN KEY (question_id) REFERENCES question (question_id) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 CREATE TABLE role (
