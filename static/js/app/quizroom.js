@@ -23,8 +23,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
     data.quiz_view_hidden = 1;
     data.position         = 0;
     data.mean_score       = null;
-    data.active_team      = { id: null };
-    data.active_quizzer   = { id: null };
+    data.active_team      = {};
+    data.active_quizzer   = {};
     data.timer            = {
         value : data.metadata.timer_default,
         state : "ready",
@@ -130,6 +130,28 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.set_timer( this.metadata.timer_default );
                 this.classes.cursor_progress = true;
 
+                // TODO
+
+                // for ( var i = 0; i < this.metadata.quiz_teams_quizzers.length; i++ ) {
+                //     if ( this.active_team.name == this.metadata.quiz_teams_quizzers[i].team.name ) {
+                //         for ( var j = 0; j < this.metadata.quiz_teams_quizzers[i].quizzers.length; j++ ) {
+                //             if ( this.active_quizzer.name == this.metadata.quiz_teams_quizzers[i].quizzers[j].name ) {
+
+                //                 this.metadata.quiz_teams_quizzers[i].quizzers[j].events[
+
+                //                 {
+                //                     number : this.question.number,
+                //                     as     : this.question.as,
+                //                     result : result
+                //                 };
+
+                //                 break;
+                //             }
+                //         }
+                //         break;
+                //     }
+                // }
+
                 this.$http.post( cntlr + "/used", {
                     metadata : this.metadata,
                     question : this.question,
@@ -138,6 +160,9 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     result   : result
                 } ).then( function (response) {
                     this.classes.cursor_progress = false;
+                    this.active_team             = {};
+                    this.active_quizzer          = {};
+
                     if ( ! response.body.success ) {
                         alert(
                             "There was an error updating the used count for the question.\n" +
