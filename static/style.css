@@ -977,6 +977,45 @@ div#quizroom div#manage div#mark {
 
 /* -------------------------------------------------------------------------- */
 
+form#program_config fieldset {
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+form#program_config textarea {
+    font-family: normal;
+    font-size: 13px;
+    width: 200px;
+    height: 137px;
+}
+
+form#program_config fieldset label {
+    width: 250px;
+    text-align: right;
+    margin-bottom: 3px;
+}
+
+form#program_config fieldset label input[type=text] {
+    width: 130px;
+}
+
+form#program_config fieldset#questions_and_timers input[type=text] {
+    width: 80px;
+}
+
+form#program_config input[type=submit] {
+    display: block;
+    margin-left: auto;
+}
+
+form#program_config fieldset#result_operation textarea {
+    width: 476px;
+}
+
+/* -------------------------------------------------------------------------- */
+
 div#material div#material_search,
 div#material div#material_lookup {
     display: inline-block;

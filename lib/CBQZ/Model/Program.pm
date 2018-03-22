@@ -109,14 +109,16 @@ sub users ($self) {
     return (wantarray) ? @$users : $users;
 }
 
-sub admin_roles_data ( $self, $user, $roles ) {
+sub admin_data ( $self, $user, $roles ) {
     return [
         map {
             my $program = $_;
 
             +{
                 %{ $program->data },
-                users => [
+                question_types => $program->question_types_as_text,
+                timer_values   => join( ', ', @{ $self->json->decode( $program->obj->timer_values ) } ),
+                users          => [
                     sort { lc $a->{username} cmp lc $b->{username} }
                     map {
                         my $user       = $_;
@@ -150,6 +152,27 @@ sub admin_roles_data ( $self, $user, $roles ) {
                 } @{ $user->programs }
         )
     ];
+}
+
+sub question_types_parse ( $self, $text ) {
+    return [
+        map {
+            my ( $label, $min, $max, @types ) = split(/\W+/);
+            [ \@types, [ $min, $max ], $label ];
+        }
+        grep { /^\W*\w+\W+\w+\W+\w+\W+\w+/ }
+        split( /\r?\n/, $text )
+    ];
+}
+
+sub question_types_as_text ( $self, $json = undef ) {
+    $json //= $self->obj->question_types;
+
+    return join( "\n",
+        map {
+            $_->[2] . ': ' . $_->[1][0] . '-' . $_->[1][1] . ' (' . join( ' ', @{ $_->[0] } ) . ')'
+        } @{ $self->json->decode($json) }
+    );
 }
 
 __PACKAGE__->meta->make_immutable;

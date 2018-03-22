@@ -78,11 +78,7 @@ sub path ($self) {
             timer_default       => $program->obj->timer_default,
             timer_values        => join( ', ', @{ $self->cbqz->json->decode( $program->obj->timer_values ) } ),
             saved_quizzes       => CBQZ::Model::Quiz->new->quizzes_for_user( $self->stash('user'), $program ),
-            question_types      => join( "\n",
-                map {
-                    $_->[2] . ': ' . $_->[1][0] . '-' . $_->[1][1] . ' (' . join( ' ', @{ $_->[0] } ) . ')'
-                } @{ $self->cbqz->json->decode( $program->obj->question_types ) }
-            ),
+            question_types      => $program->question_types_as_text,
         } );
     }
 }
@@ -217,12 +213,7 @@ sub data ($self) {
             quiz_id     => $quiz_id,
             types       => $program->types_list,
             as_default  => $program->obj->as_default,
-            type_ranges => [
-                map {
-                    my ( $label, $min, $max, @types ) = split(/\W+/);
-                    [ \@types, [ $min, $max ], $label ];
-                } split( /\r?\n/, $cbqz_prefs->{question_types} )
-            ],
+            type_ranges => $program->question_types_parse( $cbqz_prefs->{question_types} ),
             %$metadata,
         };
         $data->{quiz_questions} = [
