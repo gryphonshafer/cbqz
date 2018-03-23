@@ -4,6 +4,7 @@ use Moose;
 use MooseX::ClassAttribute;
 use exact;
 use CBQZ::Model::User;
+use CBQZ::Util::File 'slurp';
 
 extends 'CBQZ::Model';
 
@@ -30,40 +31,9 @@ sub create_default ($self) {
             ],
         ),
         target_questions => 40,
-        result_operation => q/
-            if ( result == "success" ) {
-                as     = "Standard";
-                number = parseInt(number) + 1;
-            }
-            else if ( result == "failure" ) {
-                if ( as == "Standard" ) {
-                    as = "Toss-Up";
-                }
-                else if ( as == "Toss-Up" ) {
-                    as = "Bonus";
-                }
-                else if ( as == "Bonus" ) {
-                    as = "Standard";
-                }
-
-                if ( parseInt(number) < 16 ) {
-                    number = parseInt(number) + 1;
-                }
-                else if ( number == parseInt(number) ) {
-                    number = parseInt(number) + "A";
-                }
-                else if ( number == parseInt(number) + "A" ) {
-                    number = parseInt(number) + "B";
-                }
-                else if ( number == parseInt(number) + "B" ) {
-                    number = parseInt(number) + 1;
-                }
-            }
-            else if ( result == "none" ) {
-                as     = "Standard";
-                number = parseInt(number) + 1;
-            }
-        /,
+        result_operation => slurp(
+            $self->config->get( qw( config_app root_dir ) ) . '/static/js/pages/result_operation.js'
+        ),
         timer_values  => $self->json->encode([ 5, 30, 60 ]),
         timer_default => 30,
         as_default    => 'Standard',

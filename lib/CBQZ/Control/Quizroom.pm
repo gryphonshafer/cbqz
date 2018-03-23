@@ -16,9 +16,13 @@ sub path ($self) {
     my $result_operation = '';
 
     try {
-        $result_operation = CBQZ::Model::Program->new->load(
-            $cbqz_prefs->{program_id}
-        )->obj->result_operation;
+        # $result_operation = CBQZ::Model::Program->new->load(
+        #     $cbqz_prefs->{program_id}
+        # )->obj->result_operation;
+
+        # TODO: revert to above code before being "done"
+        use CBQZ::Util::File 'slurp';
+        $result_operation = slurp( $self->config->get( qw( config_app root_dir ) ) . '/static/js/pages/result_operation.js' );
     }
     catch {
         $self->warn($_);
