@@ -152,6 +152,15 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 //     }
                 // }
 
+                var result_data = result_operation( {
+                    as      : this.question.as,
+                    number  : this.question.number,
+                    result  : result,
+                    quizzer : this.active_quizzer.name,
+                    team    : this.active_team.name,
+                    quiz    : JSON.parse( JSON.stringify( this.metadata.quiz_teams_quizzers ) )
+                } );
+
                 this.$http.post( cntlr + "/used", {
                     metadata : this.metadata,
                     question : this.question,
@@ -159,9 +168,16 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     quizzer  : this.active_quizzer,
                     result   : result
                 } ).then( function (response) {
+                    this.active_team    = {};
+                    this.active_quizzer = {};
+
+                    this.question.used++;
+                    this.move_question("forward");
+
+                    this.question.as     = result_data.as;
+                    this.question.number = result_data.number;
+
                     this.classes.cursor_progress = false;
-                    this.active_team             = {};
-                    this.active_quizzer          = {};
 
                     if ( ! response.body.success ) {
                         alert(
@@ -173,17 +189,6 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                         this.quiz_questions.unshift( response.body.quiz_question );
                     }
                 } );
-
-                this.question.used++;
-
-                var as     = this.question.as;
-                var number = this.question.number;
-
-                this.move_question("forward");
-
-                var as_number        = result_operation( result, as, number );
-                this.question.as     = as_number.as;
-                this.question.number = as_number.number;
             },
 
             mark_for_edit: function () {
@@ -341,11 +346,19 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                             var as     = this.questions[i].as     = reverse_quiz_questions[i].question_as;
                             var number = this.questions[i].number = reverse_quiz_questions[i].question_number;
 
-                            this.move_question("forward");
-                            var as_number = result_operation( reverse_quiz_questions[i].result, as, number );
+                            var result_data = result_operation( {
+                                as      : as,
+                                number  : number,
+                                result  : reverse_quiz_questions[i].result,
+                                quizzer : reverse_quiz_questions[i].quizzer,
+                                team    : reverse_quiz_questions[i].team,
+                                quiz    : JSON.parse( JSON.stringify( this.metadata.quiz_teams_quizzers ) )
+                            } );
 
-                            this.question.as     = as_number.as;
-                            this.question.number = as_number.number;
+                            this.move_question("forward");
+
+                            this.question.as     = result_data.as;
+                            this.question.number = result_data.number;
                         }
                     }
                 }

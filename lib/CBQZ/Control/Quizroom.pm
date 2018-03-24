@@ -31,9 +31,11 @@ sub path ($self) {
     return $self->render(
         text => qq/
             var cntlr = "$path";
-            function result_operation( result, as, number ) {
+
+            function result_operation(input) {
+                var output = {};
                 $result_operation
-                return { result: result, as: as, number: number };
+                return output;
             }
         /,
     );
