@@ -61,7 +61,7 @@ sub generate ( $self, $cbqz_prefs ) {
     my $chapter_set            = $self->chapter_set($cbqz_prefs);
     my $program                = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
     my $target_questions_count = $program->obj->target_questions;
-    my @question_types         = $program->question_types_parse( $cbqz_prefs->{question_types} );
+    my @question_types         = @{ $program->question_types_parse( $cbqz_prefs->{question_types} ) };
 
     my ( @questions, $error );
     try {

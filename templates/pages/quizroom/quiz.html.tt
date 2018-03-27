@@ -148,20 +148,20 @@
             <tr>
                 <td rowspan="2"></td>
                 <td
-                    v-for="team in metadata.quiz_teams_quizzers"
-                    v-bind:colspan="team.quizzers.length + 1"
-                    v-bind:class="{ selected: team.team.name == active_team.name }"
+                    v-for="team_set in metadata.quiz_teams_quizzers"
+                    v-bind:colspan="team_set.quizzers.length + 1"
+                    v-bind:class="{ selected: team_set.team.name == active_team.name }"
                 >
-                    {{ team.team.name }} : {{ team.team.score }}
+                    {{ team_set.team.name }}: {{ team_set.team.score }}
                 </td>
             </tr>
 
             <tr id="quizzer_names">
-                <template v-for="team in metadata.quiz_teams_quizzers">
+                <template v-for="team_set in metadata.quiz_teams_quizzers">
                     <td
                         class="quizzer_name"
-                        v-for="quizzer in team.quizzers"
-                        v-on:click="select_quizzer( team.team, quizzer )"
+                        v-for="quizzer in team_set.quizzers"
+                        v-on:click="select_quizzer( team_set.team, quizzer )"
                         v-bind:class="{ selected: quizzer.name == active_quizzer.name }"
                     >
                         <table class="tabular clear">
@@ -176,9 +176,21 @@
 
             <tr v-for="event in quiz_questions">
                 <td>{{ event.question_number }}</td>
-                <template v-for="team in metadata.quiz_teams_quizzers">
-                    <td v-for="quizzer in team.quizzers"></td>
-                    <td></td>
+                <template v-for="team_set in metadata.quiz_teams_quizzers">
+                    <td v-for="quizzer in team_set.quizzers">{{
+                        (
+                            !! quizzer.events &&
+                            !! event.question_number &&
+                            !! quizzer.events[ event.question_number ]
+                        ) ? quizzer.events[ event.question_number ] : ""
+                    }}</td>
+                    <td>{{
+                        (
+                            !! team_set.team.events &&
+                            !! event.question_number &&
+                            !! team_set.team.events[ event.question_number ]
+                        ) ? team_set.team.events[ event.question_number ] : ""
+                    }}</td>
                 </template>
             </tr>
         </table>

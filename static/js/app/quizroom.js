@@ -69,7 +69,10 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     else {
                         direction = 1;
                     }
-                    if ( this.position + direction > -1 && this.position + direction < this.questions.length ) {
+                    if (
+                        this.position + direction > -1 &&
+                        this.position + direction < this.questions.length
+                    ) {
                         this.position += direction;
                         this.question = this.questions[ this.position ];
                     }
@@ -130,36 +133,53 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.set_timer( this.metadata.timer_default );
                 this.classes.cursor_progress = true;
 
-                // TODO
-
-                // for ( var i = 0; i < this.metadata.quiz_teams_quizzers.length; i++ ) {
-                //     if ( this.active_team.name == this.metadata.quiz_teams_quizzers[i].team.name ) {
-                //         for ( var j = 0; j < this.metadata.quiz_teams_quizzers[i].quizzers.length; j++ ) {
-                //             if ( this.active_quizzer.name == this.metadata.quiz_teams_quizzers[i].quizzers[j].name ) {
-
-                //                 this.metadata.quiz_teams_quizzers[i].quizzers[j].events[
-
-                //                 {
-                //                     number : this.question.number,
-                //                     as     : this.question.as,
-                //                     result : result
-                //                 };
-
-                //                 break;
-                //             }
-                //         }
-                //         break;
-                //     }
-                // }
-
                 var result_data = result_operation( {
-                    as      : this.question.as,
                     number  : this.question.number,
+                    as      : this.question.as,
+                    form    : "question",
                     result  : result,
                     quizzer : this.active_quizzer.name,
                     team    : this.active_team.name,
                     quiz    : JSON.parse( JSON.stringify( this.metadata.quiz_teams_quizzers ) )
                 } );
+
+                for ( var i = 0; i < this.metadata.quiz_teams_quizzers.length; i++ ) {
+                    if ( this.active_team.name == this.metadata.quiz_teams_quizzers[i].team.name ) {
+                        if ( !! result_data.team ) {
+                            if ( ! this.metadata.quiz_teams_quizzers[i].team.events )
+                                this.metadata.quiz_teams_quizzers[i].team.events = {};
+
+                            this.metadata.quiz_teams_quizzers[i].team.score += result_data.team;
+
+                            this.metadata.quiz_teams_quizzers[i].team.events[
+                                this.question.number
+                            ] = this.metadata.quiz_teams_quizzers[i].team.score;
+                        }
+
+                        for ( var j = 0; j < this.metadata.quiz_teams_quizzers[i].quizzers.length; j++ ) {
+                            if (
+                                this.active_quizzer.name ==
+                                this.metadata.quiz_teams_quizzers[i].quizzers[j].name
+                            ) {
+                                if ( result == "success" )
+                                        this.metadata.quiz_teams_quizzers[i].quizzers[j].correct++;
+                                if ( result == "failure" )
+                                        this.metadata.quiz_teams_quizzers[i].quizzers[j].incorrect++;
+
+                                if ( !! result_data.label ) {
+                                    if ( ! this.metadata.quiz_teams_quizzers[i].quizzers[j].events )
+                                        this.metadata.quiz_teams_quizzers[i].quizzers[j].events = {};
+
+                                    this.metadata.quiz_teams_quizzers[i].quizzers[j].events[
+                                        this.question.number
+                                    ] = result_data.label;
+                                }
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
 
                 this.$http.post( cntlr + "/used", {
                     metadata : this.metadata,
@@ -346,6 +366,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                             var as     = this.questions[i].as     = reverse_quiz_questions[i].question_as;
                             var number = this.questions[i].number = reverse_quiz_questions[i].question_number;
 
+                            // TODO: probably need to remove this entirely and clean up
                             var result_data = result_operation( {
                                 as      : as,
                                 number  : number,
