@@ -146,7 +146,9 @@
     <div id="scorekeeping">
         <table class="tabular">
             <tr>
-                <td rowspan="2"></td>
+                <td rowspan="2" class="vertical_text"><div>
+                    <a href="#" title="Foul">Rearrange</a>
+                </div></td>
                 <td
                     v-for="team_set in metadata.quiz_teams_quizzers"
                     v-bind:colspan="team_set.quizzers.length + 1"
@@ -159,18 +161,22 @@
             <tr id="quizzer_names">
                 <template v-for="team_set in metadata.quiz_teams_quizzers">
                     <td
-                        class="quizzer_name"
+                        class="vertical_text quizzer_name"
                         v-for="quizzer in team_set.quizzers"
                         v-on:click="select_quizzer( team_set.team, quizzer )"
                         v-bind:class="{ selected: quizzer.name == active_quizzer.name }"
                     >
-                        <table class="tabular clear">
+                        <table class="tabular clear" v-bind:title="quizzer.name">
                             <tr><td>{{ quizzer.bib }}</td></tr>
                             <tr><td class="quizzer_name"><div>{{ quizzer.name }}</div></td></tr>
                             <tr><td>{{ quizzer.correct }}-{{ quizzer.incorrect }}</td></tr>
                         </table>
                     </td>
-                    <td></td>
+                    <td class="vertical_text"><div>
+                        <a href="#" title="Time Out">T/O</a> |
+                        <a href="#" title="Substitution">Sub</a> |
+                        <a href="#" title="Foul">Foul</a>
+                    </div></td>
                 </template>
             </tr>
 

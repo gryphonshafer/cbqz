@@ -784,6 +784,17 @@ div#quizroom div#scorekeeping {
     overflow-x: hidden;
 }
 
+div#quizroom div#scorekeeping a {
+    text-decoration: none;
+    color: black;
+    padding: 3px 5px 3px 5px;
+}
+
+div#quizroom div#scorekeeping a:hover {
+    text-decoration: underline;
+    color: blue;
+}
+
 div#quizroom div#scorekeeping table {
     table-layout: fixed;
     width: calc( 100% + 2px );
@@ -808,16 +819,23 @@ div#quizroom div#scorekeeping table tr#quizzer_names td:hover:not(.selected) tab
     cursor: pointer;
 }
 
-div#quizroom div#scorekeeping table tr#quizzer_names td table td.quizzer_name {
-    height: 75px;
+div#quizroom div#scorekeeping table td.vertical_text {
     vertical-align: top;
-    text-align: left;
+    padding-left: 2px;
 }
 
-div#quizroom div#scorekeeping table tr#quizzer_names td table td.quizzer_name div {
+div#quizroom div#scorekeeping table td.vertical_text div {
     width: 70px;
     transform: rotate(90deg) translate( 30px, 23px );
     white-space: nowrap;
+}
+
+div#quizroom div#scorekeeping table td.quizzer_name {
+    height: 75px;
+    vertical-align: top;
+}
+
+div#quizroom div#scorekeeping table td.quizzer_name div {
     overflow: hidden;
     text-overflow: ellipsis;
 }
