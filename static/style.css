@@ -754,93 +754,19 @@ div#quizroom div#material_lookup {
 }
 
 div#quizroom div#material_lookup_display {
-    height: 375px;
+    height: 336px;
 }
 
 div#quizroom div#material_search_wrapper {
     display: inline-block;
     vertical-align: top;
     margin-top: -25px;
-    width: calc( 100vw - 537px );
+    width: calc( 100vw - 562px );
 }
 
 div#quizroom div#material_search_display {
-    height: calc( 100vh - 508px );
+    height: calc( 100vh - 469px );
 }
-
-/* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
-
-div#quizroom div#scorekeeping {
-    display: inline-block;
-    vertical-align: top;
-    margin-top: 5px;
-    margin-left: 2px;
-    width: 500px;
-    min-width: 500px;
-    height: calc( 100vh - 508px );
-    background: white;
-    border: 1px solid lightgray;
-    overflow: auto;
-    overflow-x: hidden;
-}
-
-div#quizroom div#scorekeeping a {
-    text-decoration: none;
-    color: black;
-    padding: 3px 5px 3px 5px;
-}
-
-div#quizroom div#scorekeeping a:hover {
-    text-decoration: underline;
-    color: blue;
-}
-
-div#quizroom div#scorekeeping table {
-    table-layout: fixed;
-    width: calc( 100% + 2px );
-    margin: -1px !important;
-}
-
-div#quizroom div#scorekeeping table th,
-div#quizroom div#scorekeeping table td {
-    padding: 3px 0px 3px 0px;
-}
-
-div#quizroom div#scorekeeping table td {
-    text-align: center;
-}
-
-div#quizroom div#scorekeeping table tr#quizzer_names > td {
-    padding: 0px;
-}
-
-div#quizroom div#scorekeeping table tr#quizzer_names td:hover:not(.selected) table td {
-    background-color: #eeeeff;
-    cursor: pointer;
-}
-
-div#quizroom div#scorekeeping table td.vertical_text {
-    vertical-align: top;
-    padding-left: 2px;
-}
-
-div#quizroom div#scorekeeping table td.vertical_text div {
-    width: 70px;
-    transform: rotate(90deg) translate( 30px, 23px );
-    white-space: nowrap;
-}
-
-div#quizroom div#scorekeeping table td.quizzer_name {
-    height: 75px;
-    vertical-align: top;
-}
-
-div#quizroom div#scorekeeping table td.quizzer_name div {
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
 
 div#quizroom div#manage {
     margin-left: 5px;
@@ -854,7 +780,7 @@ div#quizroom div#manage div#timer {
 div#quizroom div#manage div#result,
 div#quizroom div#manage div#quiz,
 div#quizroom div#manage div#replace {
-    margin-top: 10px;
+    margin-top: 5px;
 }
 
 div#quizroom div#manage button {
@@ -899,9 +825,118 @@ div#quizroom div#timer div#timer_display {
     font-family: medium;
 }
 
-div#quizroom div#manage div#mark {
-    margin-top: 12px;
+/* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
+
+div#quizroom div#scorekeeping {
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 5px;
+    margin-left: 2px;
+    width: 525px;
+    min-width: 525px;
+    height: calc( 100vh - 469px );
+    background: white;
+    border: 1px solid lightgray;
+    overflow: auto;
+    overflow-x: hidden;
 }
+
+div#quizroom div#scorekeeping a {
+    text-decoration: none;
+    color: black;
+    margin-right: 2px;
+}
+
+div#quizroom div#scorekeeping a:hover {
+    text-decoration: underline;
+    color: #0000cc;
+}
+
+div#quizroom div#scorekeeping table {
+    table-layout: fixed;
+    width: calc( 100% + 2px );
+    margin: -1px !important;
+}
+
+div#quizroom div#scorekeeping table td {
+    text-align: center;
+    padding: 0px 0px 0px 0px;
+}
+
+div#quizroom div#scorekeeping table tr#quizzer_names > td {
+    padding: 0px;
+}
+
+div#quizroom div#scorekeeping table tr#quizzer_names td:hover:not(.selected) table td {
+    background-color: #ffccff;
+    cursor: pointer;
+}
+
+div#quizroom div#scorekeeping table tr td.selected,
+div#quizroom div#scorekeeping table tr td.selected table td {
+    font-family: bold;
+    font-weight: normal;
+}
+
+div#quizroom div#scorekeeping table td.vertical_text {
+    vertical-align: top;
+}
+
+div#quizroom div#scorekeeping table td.vertical_text div {
+    width: 70px;
+    transform: rotate(90deg) translate( 34px, -3px );
+    white-space: nowrap;
+    margin-left: calc( 50% - 37px );
+}
+
+div#quizroom div#scorekeeping table td.quizzer_name {
+    vertical-align: top;
+    text-align: left;
+    height: 82px;
+}
+
+div#quizroom div#scorekeeping table td.quizzer_name div {
+    transform: rotate(90deg) translate( 34px, 0px );
+    width: 75px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+div#quizroom div#scorekeeping table td.shaded {
+    background-color: #f0f0f0;
+}
+
+div#quizroom div#scorekeeping table td.team_0_bold {
+    background-color: #ffe0e0;
+}
+
+div#quizroom div#scorekeeping table td.team_0_mild {
+    background-color: #fffafa;
+}
+
+div#quizroom div#scorekeeping table td.team_1_bold {
+    background-color: #ffffe0;
+}
+
+div#quizroom div#scorekeeping table td.team_1_mild {
+    background-color: #fffffa;
+}
+
+div#quizroom div#scorekeeping table td.team_2_bold {
+    background-color: #f0f0ff;
+}
+
+div#quizroom div#scorekeeping table td.team_2_mild {
+    background-color: #fafaff;
+}
+
+div#quizroom div#scorekeeping table td.team_3_bold,
+div#quizroom div#scorekeeping table td.team_4_bold,
+div#quizroom div#scorekeeping table td.team_5_bold {
+    background-color: #f6f6f6;
+}
+
+/* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
 
 @media ( max-width: 1000px ) and ( min-width: 850px ) {
     div#quizroom div#material_lookup button {
@@ -909,7 +944,7 @@ div#quizroom div#manage div#mark {
     }
 
     div#quizroom div#material_lookup_display {
-        height: 355px;
+        height: 316px;
     }
 }
 
@@ -925,7 +960,7 @@ div#quizroom div#manage div#mark {
 
 @media ( max-width: 850px ) and ( max-height: 966px ) {
     div#quizroom div#material_search_display {
-        height: 130px;
+        height: 91px;
     }
 }
 
@@ -942,7 +977,7 @@ div#quizroom div#manage div#mark {
     }
     div#quizroom div#scorekeeping {
         order: 3;
-        height: 201px !important;
+        height: 162px !important;
         margin-left: 0px !important;
     }
     div#quizroom div#material_lookup {
@@ -957,7 +992,7 @@ div#quizroom div#manage div#mark {
     }
 
     div#quizroom div#material_search_display {
-        height: 355px !important;
+        height: 316px !important;
     }
 }
 
