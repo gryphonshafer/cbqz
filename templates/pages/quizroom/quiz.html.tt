@@ -115,6 +115,7 @@
                 <b>Result</b><br>
                 <button v-on:click="result('success')">Correct</button>
                 <button v-on:click="result('failure')">Error</button>
+                <!-- TODO: implement foul -->
                 <button v-on:click="result('none')">Foul</button>
                 <button v-on:click="result('none')">No Jump</button>
             </div>
@@ -149,6 +150,7 @@
         <table class="tabular">
             <tr>
                 <td rowspan="2" class="vertical_text shaded"><div>
+                    <!-- TODO: implement rearrange -->
                     <a href="#" title="Rearrange Quizzer Listing Order">Rearrange Quizzers</a>
                 </div></td>
                 <td
@@ -192,11 +194,14 @@
 
             <tr v-for="event in quiz_questions">
                 <td class="shaded">
-                    <a href="#" v-bind:title=" 'Edit Event ' + event.question_number ">
+                    <a href="#"
+                        title="Delete This Quiz Event"
+                        v-on:click="delete_quiz_event( event.question_number )"
+                    >
                         {{
-                            (
-                                event.question_number.toString().indexOf("|") == -1
-                            ) ? event.question_number : ""
+                            ( event.question_number.toString().indexOf("|") == -1 )
+                                ? event.question_number
+                                : event.question_number.toString().split("|")[1]
                         }}
                     </a>
                 </td>

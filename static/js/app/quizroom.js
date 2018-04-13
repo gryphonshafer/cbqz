@@ -212,67 +212,96 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             },
 
             team_event: function ( team_name, event_type ) {
-                if (
-                    (
-                        event_type == "timeout" &&
-                        confirm( "Call a timeout for " + team_name + " and start the counter?" )
-                    )
-                    ||
-                    (
-                        event_type == "challenge" &&
-                        confirm( "Have you ruled on the challenge from " + team_name + "?" )
-                    )
-                ) {
-                    var challenge_accepted  = false;
-                    var event_symbol        = event_type.substr( 0, 1 ).toUpperCase();
-                    var event_symbol_suffix = "";
+                var challenge_accepted  = false;
+                var event_symbol        = event_type.substr( 0, 1 ).toUpperCase();
+                var event_symbol_suffix = "";
 
-                    if ( event_type == "timeout" ) {
-                        this.set_timer( this.metadata.timer_default * 2 );
-                        this.timer_click();
+                if ( event_type == "timeout" ) {
+                    this.set_timer( this.metadata.timer_default * 2 );
+                    this.timer_click();
+                }
+                if ( event_type == "challenge" ) {
+                    challenge_accepted = confirm(
+                        "Did you accept the challenge? Click \"OK\".\n" +
+                        "Did you decline the challenge? Click \"Cancel\"."
+                    );
+                    event_symbol_suffix = (challenge_accepted) ? "+" : "-";
+                }
+
+                this.classes.cursor_progress = true;
+
+                var event_key =
+                    Date.now().toString().substr( 4, 6 ) +
+                    Math.round( Math.random() * 1000 + 1000 ) +
+                    "|" +
+                    event_symbol;
+
+                for ( var i = 0; i < this.metadata.quiz_teams_quizzers.length; i++ ) {
+                    if ( team_name == this.metadata.quiz_teams_quizzers[i].team.name ) {
+                        if ( ! this.metadata.quiz_teams_quizzers[i].team.events )
+                            this.metadata.quiz_teams_quizzers[i].team.events = {};
+
+                        this.metadata.quiz_teams_quizzers[i].team.events[event_key] =
+                            event_symbol + event_symbol_suffix;
                     }
-                    if ( event_type == "challenge" ) {
-                        challenge_accepted = confirm(
-                            "Did you accept the challenge? Click \"OK\".\n" +
-                            "Did you decline the challenge? Click \"Cancel\"."
+                }
+
+                var event_data = {
+                    metadata        : this.metadata,
+                    team            : team_name,
+                    form            : event_type,
+                    question_number : event_key
+                };
+                if ( event_type == "challenge" ) {
+                    event_data["result"] = (challenge_accepted) ? "success" : "failure";
+                }
+
+                this.$http.post( cntlr + "/team_event", event_data ).then( function (response) {
+                    this.classes.cursor_progress = false;
+
+                    if ( ! response.body.success ) {
+                        alert(
+                            "There was an error recording the " + event_type + " to the server.\n" +
+                            response.body.error + "."
                         );
-                        event_symbol_suffix = (challenge_accepted) ? "+" : "-";
                     }
+                    else {
+                        this.quiz_questions.unshift( response.body.quiz_question );
+                    }
+                } );
+            },
 
+            delete_quiz_event: function (question_number) {
+                if ( confirm("Are you sure you want to delete this quiz event?") ) {
                     this.classes.cursor_progress = true;
 
                     for ( var i = 0; i < this.metadata.quiz_teams_quizzers.length; i++ ) {
-                        if ( team_name == this.metadata.quiz_teams_quizzers[i].team.name ) {
-                            if ( ! this.metadata.quiz_teams_quizzers[i].team.events )
-                                this.metadata.quiz_teams_quizzers[i].team.events = {};
+                        if ( !! this.metadata.quiz_teams_quizzers[i].team.events )
+                            delete this.metadata.quiz_teams_quizzers[i].team.events[question_number];
 
-                            this.metadata.quiz_teams_quizzers[i].team.events[
-                                this.question.number + "|" + event_symbol
-                            ] = event_symbol + event_symbol_suffix;
+                        for ( var j = 0; j < this.metadata.quiz_teams_quizzers[i].quizzers.length; j++ ) {
+                            if ( !! this.metadata.quiz_teams_quizzers[i].quizzers[j].events )
+                                delete this.metadata.quiz_teams_quizzers[i].quizzers[j].events[question_number];
                         }
                     }
 
-                    var event_data = {
-                        metadata : this.metadata,
-                        question : this.question,
-                        team     : team_name,
-                        form     : event_type
-                    };
-                    if ( event_type == "challenge" ) {
-                        event_data["result"] = (challenge_accepted) ? "success" : "failure";
-                    }
-
-                    this.$http.post( cntlr + "/team_event", event_data ).then( function (response) {
+                    this.$http.post( cntlr + "/delete_quiz_event", {
+                        metadata        : this.metadata,
+                        question_number : question_number
+                    } ).then( function (response) {
                         this.classes.cursor_progress = false;
 
                         if ( ! response.body.success ) {
                             alert(
-                                "There was an error recording the " + event_type + " to the server.\n" +
+                                "There was an error deleting this quiz event.\n" +
                                 response.body.error + "."
                             );
                         }
                         else {
-                            this.quiz_questions.unshift( response.body.quiz_question );
+                            for ( var i = 0; i < this.quiz_questions.length; i++ ) {
+                                if ( this.quiz_questions[i].question_number == question_number )
+                                    this.quiz_questions.splice( i, 1 );
+                            }
                         }
                     } );
                 }

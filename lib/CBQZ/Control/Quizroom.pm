@@ -308,8 +308,7 @@ sub team_event ($self) {
 
         my $quiz_question = CBQZ::Model::QuizQuestion->new->create({
             quiz_id         => $event->{metadata}{quiz_id},
-            question_as     => $event->{question}{as},
-            question_number => $event->{question}{number} . '|' . uc( substr( $event->{form}, 0, 1 ) ),
+            question_number => $event->{question_number},
             team            => $event->{team},
             form            => $event->{form},
         });
@@ -318,6 +317,34 @@ sub team_event ($self) {
             success       => 1,
             quiz_question => $quiz_question->data,
         } );
+    }
+    catch {
+        $self->warn($_);
+        return $self->render( json => { error => $self->clean_error($_) } );
+    };
+}
+
+sub delete_quiz_event ($self) {
+    my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
+    my $event      = $self->req_body_json;
+
+    try {
+        my $program = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
+        E->throw('User does not have access to the quiz referenced') unless (
+            grep { $_->{quiz_id} == $event->{metadata}{quiz_id} } @{
+                CBQZ::Model::Quiz->new->quizzes_for_user( $self->stash('user'), $program )
+            }
+        );
+
+        CBQZ::Model::Quiz->new->load( $event->{metadata}{quiz_id} )->obj
+            ->update({ metadata => $self->cbqz->json->encode( $event->{metadata} ) });
+
+        CBQZ::Model::QuizQuestion->new->load({
+            quiz_id         => $event->{metadata}{quiz_id},
+            question_number => $event->{question_number},
+        })->obj->delete;
+
+        return $self->render( json => { success => 1 } );
     }
     catch {
         $self->warn($_);

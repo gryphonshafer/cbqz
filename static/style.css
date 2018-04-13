@@ -884,7 +884,7 @@ div#quizroom div#scorekeeping table td.vertical_text {
 
 div#quizroom div#scorekeeping table td.vertical_text div {
     width: 70px;
-    transform: rotate(90deg) translate( 34px, -3px );
+    transform: rotate(90deg) translate( 34px, -2px );
     white-space: nowrap;
     margin-left: calc( 50% - 37px );
 }
