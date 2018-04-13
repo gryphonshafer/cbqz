@@ -83,8 +83,11 @@ sub path ($self) {
             target_questions    => $program->obj->target_questions,
             timer_default       => $program->obj->timer_default,
             timer_values        => join( ', ', @{ $self->cbqz->json->decode( $program->obj->timer_values ) } ),
-            saved_quizzes       => CBQZ::Model::Quiz->new->quizzes_for_user( $self->stash('user'), $program ),
             question_types      => $program->question_types_as_text,
+            saved_quizzes       => [
+                sort { $a->{scheduled} cmp $b->{scheduled} }
+                @{ CBQZ::Model::Quiz->new->quizzes_for_user( $self->stash('user'), $program ) },
+            ],
         } );
     }
 }
