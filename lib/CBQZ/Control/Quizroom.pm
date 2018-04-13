@@ -224,7 +224,9 @@ sub data ($self) {
         };
         $data->{quiz_questions} = [
             map {
-                +{ $_->get_inflated_columns }
+                my $question = +{ $_->get_inflated_columns };
+                delete $question->{question};
+                $question;
             } $quiz->obj->quiz_questions->search( {}, { order_by => { -desc => 'created' } } )->all
         ];
 
