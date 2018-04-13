@@ -211,6 +211,73 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 } );
             },
 
+            team_event: function ( team_name, event_type ) {
+                if (
+                    (
+                        event_type == "timeout" &&
+                        confirm( "Call a timeout for " + team_name + " and start the counter?" )
+                    )
+                    ||
+                    (
+                        event_type == "challenge" &&
+                        confirm( "Have you ruled on the challenge from " + team_name + "?" )
+                    )
+                ) {
+                    var challenge_accepted  = false;
+                    var event_symbol        = event_type.substr( 0, 1 ).toUpperCase();
+                    var event_symbol_suffix = "";
+
+                    if ( event_type == "timeout" ) {
+                        this.set_timer( this.metadata.timer_default * 2 );
+                        this.timer_click();
+                    }
+                    if ( event_type == "challenge" ) {
+                        challenge_accepted = confirm(
+                            "Did you accept the challenge? Click \"OK\".\n" +
+                            "Did you decline the challenge? Click \"Cancel\"."
+                        );
+                        event_symbol_suffix = (challenge_accepted) ? "+" : "-";
+                    }
+
+                    this.classes.cursor_progress = true;
+
+                    for ( var i = 0; i < this.metadata.quiz_teams_quizzers.length; i++ ) {
+                        if ( team_name == this.metadata.quiz_teams_quizzers[i].team.name ) {
+                            if ( ! this.metadata.quiz_teams_quizzers[i].team.events )
+                                this.metadata.quiz_teams_quizzers[i].team.events = {};
+
+                            this.metadata.quiz_teams_quizzers[i].team.events[
+                                this.question.number + "|" + event_symbol
+                            ] = event_symbol + event_symbol_suffix;
+                        }
+                    }
+
+                    var event_data = {
+                        metadata : this.metadata,
+                        question : this.question,
+                        team     : team_name,
+                        form     : event_type
+                    };
+                    if ( event_type == "challenge" ) {
+                        event_data["result"] = (challenge_accepted) ? "success" : "failure";
+                    }
+
+                    this.$http.post( cntlr + "/team_event", event_data ).then( function (response) {
+                        this.classes.cursor_progress = false;
+
+                        if ( ! response.body.success ) {
+                            alert(
+                                "There was an error recording the " + event_type + " to the server.\n" +
+                                response.body.error + "."
+                            );
+                        }
+                        else {
+                            this.quiz_questions.unshift( response.body.quiz_question );
+                        }
+                    } );
+                }
+            },
+
             mark_for_edit: function () {
                 var reason = prompt( "Enter comment about this question:", "Contains an error" );
                 if (reason) {

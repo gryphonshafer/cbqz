@@ -181,8 +181,11 @@
                         </table>
                     </td>
                     <td v-bind:class="[ 'vertical_text', 'team_' + index + '_bold' ]"><div>
-                        <a href="#" title="Timeout">Timeout</a> |
-                        <a href="#" title="Challenge">Chal.</a>
+                        <a href="#" title="Timeout"
+                            v-on:click="team_event( team_set.team.name, 'timeout' )">Timeout</a>
+                        |
+                        <a href="#" title="Challenge"
+                            v-on:click="team_event( team_set.team.name, 'challenge' )">Chall.</a>
                     </div></td>
                 </template>
             </tr>
@@ -190,7 +193,11 @@
             <tr v-for="event in quiz_questions">
                 <td class="shaded">
                     <a href="#" v-bind:title=" 'Edit Event ' + event.question_number ">
-                        {{ event.question_number }}
+                        {{
+                            (
+                                event.question_number.toString().indexOf("|") == -1
+                            ) ? event.question_number : ""
+                        }}
                     </a>
                 </td>
                 <template v-for="( team_set, index ) in metadata.quiz_teams_quizzers">
