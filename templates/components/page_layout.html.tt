@@ -74,7 +74,7 @@
         <a href="https://github.com/gryphonshafer/cbqz" target="github">GitHub Project</a>
     </p>
     <p class="right">
-        Version [% c.config.get('version') %].[% c.config.get('sub_version') %]
+        Version [% version %]
         [% c.app.mode.ucfirst %]
     </p>
 </div>

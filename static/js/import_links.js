@@ -14,7 +14,7 @@
         req.addEventListener( "load", function () {
             var nodes_to_add = [];
 
-            if ( this.responseURL.search("\.js$") != -1 ) {
+            if ( this.responseURL.search(/\.js$|\.js\?/) != -1 ) {
                 var element       = document.createElement("script");
                 element.innerHTML = this.responseText;
                 nodes_to_add.push(element);

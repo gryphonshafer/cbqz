@@ -5,8 +5,9 @@
         page.title = '',
         page.vue   = 0,
         page.js    = [],
-        page.links = [],
-     ;
+        page.links = [];
+
+    version = c.config.get('version') _ '.' _ c.config.get('sub_version');
 
     content = BLOCK;
         PROCESS $template;
@@ -23,8 +24,10 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=0.9">
 
-        <link rel="shortcut icon" href="[% c.url_for('/favicon.ico') %]" type="image/x-icon" />
-        <link rel="stylesheet" type="text/css" href="[% c.url_for('/style.css') %]" />
+        <link rel="shortcut icon" type="image/x-icon"
+            href="[% c.url_for('/favicon.ico').query( version => version ) %]" />
+        <link rel="stylesheet" type="text/css"
+            href="[% c.url_for('/style.css').query( version => version ) %]" />
 
         <title>[% page.title %]</title>
     </head>
@@ -32,16 +35,20 @@
         [% PROCESS page_layout.html.tt %]
 
         [% IF page.vue %]
-            <script type="text/javascript" src="[% c.url_for(
-                '/js/lib/' _ ( ( c.app.mode == 'development' ) ? 'vue.js' : 'vue.min.js' )
-            ) %]"></script>
-            <script type="text/javascript" src="[% c.url_for('/js/lib/vue-resource.js') %]"></script>
+            <script type="text/javascript" src="[%
+                c.url_for(
+                    '/js/lib/' _ ( ( c.app.mode == 'development' ) ? 'vue.js' : 'vue.min.js' )
+                ).query( version => version )
+            %]"></script>
+            <script type="text/javascript" src="[%
+                c.url_for('/js/lib/vue-resource.js').query( version => version )
+            %]"></script>
         [% END %]
 
         [% FOREACH file IN page.links %]
             [% UNLESS link_seen.$file %]
                 <link rel="import" href="[%
-                    ( file.match('^\w+://') ) ? file : c.url_for(file)
+                    ( file.match('^\w+://') ) ? file : c.url_for(file).query( version => version )
                 %]">
                 [% link_seen.$file = ( link_seen.$file || 0 ) + 1 %]
             [% END %]
@@ -53,7 +60,7 @@
         [% FOREACH file IN page.js %]
             [% UNLESS js_seen.$file %]
                 <script type="text/javascript" src="[%
-                    ( file.match('^\w+://') ) ? file : c.url_for(file)
+                    ( file.match('^\w+://') ) ? file : c.url_for(file).query( version => version )
                 %]"></script>
                 [% js_seen.$file = ( js_seen.$file || 0 ) + 1 %]
             [% END %]
