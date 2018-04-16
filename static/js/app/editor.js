@@ -89,8 +89,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         return sort_by.ref( a, b );
     };
     sort_by.score = function ( a, b ) {
-        var _a = ( !! a.score ) ? a.score : 0;
-        var _b = ( !! b.score ) ? b.score : 0;
+        var _a = ( !! a.score ) ? parseFloat( a.score ) : 0;
+        var _b = ( !! b.score ) ? parseFloat( b.score ) : 0;
 
         if ( _a < _b ) return -1;
         if ( _a > _b ) return 1;
@@ -98,8 +98,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         return sort_by.ref( a, b );
     };
     sort_by.score_desc = function ( a, b ) {
-        var _a = ( !! a.score ) ? a.score : 0;
-        var _b = ( !! b.score ) ? b.score : 0;
+        var _a = ( !! a.score ) ? parseFloat( a.score ) : 0;
+        var _b = ( !! b.score ) ? parseFloat( b.score ) : 0;
 
         if ( _a > _b ) return -1;
         if ( _a < _b ) return 1;
