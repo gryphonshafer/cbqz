@@ -7,10 +7,10 @@ use CBQZ::Model::Question;
 use CBQZ::Model::QuestionSet;
 use CBQZ::Model::MaterialSet;
 
-my $settings = options( qw( all|a user|u=s questions|q=s materials|m=s ) );
+my $settings = options( qw( all|a id|i=s user|u=s questions|q=s materials|m=s ) );
 pod2usage unless (
     (
-        $settings->{all} or
+        $settings->{all} or $settings->{id} or
         ( $settings->{user} and $settings->{questions} )
     ) and $settings->{materials}
 );
@@ -24,7 +24,7 @@ catch {
 };
 
 my $question_set;
-unless ( $settings->{all} ) {
+unless ( $settings->{all} or $settings->{id} ) {
     try {
         $question_set = CBQZ::Model::QuestionSet->new->load(
             {
@@ -42,11 +42,15 @@ unless ( $settings->{all} ) {
 }
 
 $| = 1;
-for my $question ( CBQZ::Model::Question->new->model(
-    ( $settings->{all} )
-        ? CBQZ::Model::Question->new->rs->search->all
-        : $question_set->obj->questions->all
-) ) {
+for my $question (
+    ( $settings->{id} )
+        ? CBQZ::Model::Question->new->load( $settings->{id} )
+        : CBQZ::Model::Question->new->model(
+            ( $settings->{all} )
+                ? CBQZ::Model::Question->new->rs->search->all
+                : $question_set->obj->questions->all
+        )
+) {
     $question->calculate_score($material_set);
     print '.';
 }
@@ -62,6 +66,7 @@ score_questions.pl - Calculate and save question score for a question set.
         -u|user       USERNAME
         -q|questions  QUESTION_SET_NAME
         -a|all
+        -i|id         QUESTION_DATABASE_PK_ID
         -m|materials  MATERIAL_SET_NAME
         -h|help
         -m|man
@@ -74,3 +79,4 @@ indicating all questions in the database. It also needs a material set named.
 
     ./score_questions.pl -u username -q 'Questions' -m 'Materials'
     ./score_questions.pl -a -m 'Materials'
+    ./score_questions.pl -i 42 -m 'Materials'

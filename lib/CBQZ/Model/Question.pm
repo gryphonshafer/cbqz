@@ -281,16 +281,25 @@ sub calculate_score ( $self, $material_set, $question = undef ) {
         return $text;
     };
 
-    my @verses = map { $clean->( $_->{text} ) } @{ $material_set->load_material->material };
+    my %verses;
+    for ( @{ $material_set->load_material->material } ) {
+        my $clean = $clean->( $_->{text} );
+        push( @{ $verses{all} }, $clean );
+        push( @{ $verses{key} }, $clean ) if ( $_->{key_class} );
+        push( @{ $verses{ $_->{book} . ' ' . $_->{chapter} } }, $clean );
+    }
 
     my $common_words = sub {
-        my @words = split( /\s+/, $_[0] );
+        my ( $words, $type ) = @_;
+        $type //= 'all';
+
+        my @words = split( /\s+/, $words );
         my @active;
 
         while (@words) {
             push( @active, shift @words );
             my $phrase = join( ' ', @active );
-            last if ( scalar( grep { index( $_, $phrase ) > -1 } @verses ) < 2 );
+            last if ( scalar( grep { index( $_, $phrase ) > -1 } @{ $verses{$type} } ) < 2 );
         }
 
         return scalar @active;
@@ -312,7 +321,7 @@ sub calculate_score ( $self, $material_set, $question = undef ) {
     }
     elsif ( $question->{type} =~ /^F/ ) {
         $score =
-            $common_words->( $de_int->($question_text) ) ** 1.9 +
+            $common_words->( $de_int->($question_text), 'key' ) ** 1.9 +
             ( $words->($question_text) + $words->($answer_text) ) / 24;
     }
     elsif ( $question->{type} =~ /^Q/ ) {
@@ -327,7 +336,10 @@ sub calculate_score ( $self, $material_set, $question = undef ) {
 
         if ( $question->{type} =~ /CR/ ) {
             $score =
-                $common_words->( $de_int->($question_text) ) ** 1.7 +
+                $common_words->(
+                    $de_int->($question_text),
+                    $question->{book} . ' ' . $question->{chapter},
+                ) ** 1.7 +
                 ( $words->($question_text) + $words->($answer_text) ) / 8;
         }
         elsif ( $question->{type} =~ /CVR/ ) {
