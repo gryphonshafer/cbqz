@@ -110,7 +110,7 @@
                 var search_regex = this.search_text
                     .toLowerCase()
                     .replace( /\s+/g, " " )
-                    .replace( /['-]/g, "" )
+                    .replace( /['-<>]/g, "" )
                     .replace( /\W/g, function (match) {
                         return "\\" + match;
                     } )
@@ -143,14 +143,16 @@
                             var verse_number = verse_numbers[k];
 
                             if ( verses[verse_number].text.search( RegExp( search_regex, 'i' ) ) != -1 ) {
+                                var skip = false;
                                 var text = verses[verse_number].text.replace(
                                     RegExp( search_regex, 'ig' ),
                                     function (match) {
+                                        if ( match.search(/^[^<]+>/) != -1 ) skip = true;
                                         return '<span class="match">[</span>' + match + '<span class="match">]</span>';
                                     }
                                 );
 
-                                this.matched_verses.push({
+                                if ( ! skip ) this.matched_verses.push({
                                     book        : verses[verse_number].book,
                                     chapter     : verses[verse_number].chapter,
                                     verse       : verses[verse_number].verse,
