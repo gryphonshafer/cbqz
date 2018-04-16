@@ -348,7 +348,7 @@ sub calculate_score ( $self, $material_set, $question = undef ) {
                 ( $words->($question_text) + $words->($answer_text) ) / 8;
         }
     }
-    elsif ( $question->{type} eq /SIT/ ) {
+    elsif ( $question->{type} eq 'SIT' ) {
         $score =
             $common_words->( $de_int->($question_text) ) ** 1.4 +
             ( $words->($question_text) + $words->($answer_text) ) / 8;
