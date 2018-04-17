@@ -20,7 +20,7 @@ sub path ($self) {
         #     $cbqz_prefs->{program_id}
         # )->obj->result_operation;
 
-        # TODO: revert to above code before being "done"
+        # TODO-END: revert to above code before being "done"
         use CBQZ::Util::File 'slurp';
         $result_operation = slurp( $self->config->get( qw( config_app root_dir ) ) . '/static/js/pages/result_operation.js' );
     }
@@ -82,6 +82,7 @@ sub path ($self) {
             user_is_official    => $self->stash('user')->has_role('Official'),
             target_questions    => $program->obj->target_questions,
             timer_default       => $program->obj->timer_default,
+            timeout             => $program->obj->timeout,
             timer_values        => join( ', ', @{ $self->cbqz->json->decode( $program->obj->timer_values ) } ),
             question_types      => $program->question_types_as_text,
             saved_quizzes       => [
@@ -187,6 +188,7 @@ sub data ($self) {
         metadata => {
             types         => [],
             timer_default => 0,
+            timeout       => 0,
             as_default    => 'Error',
             type_ranges   => [],
         },

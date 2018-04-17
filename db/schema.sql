@@ -42,6 +42,7 @@ CREATE TABLE program (
     result_operation text,
     timer_values tinytext,
     timer_default tinyint(4) NOT NULL DEFAULT '30',
+    timeout tinyint(4) NOT NULL DEFAULT '60',
     as_default tinytext,
     created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (program_id),

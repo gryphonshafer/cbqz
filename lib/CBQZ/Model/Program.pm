@@ -23,19 +23,17 @@ sub create_default ($self) {
         question_types => $self->json->encode(
             [
                 [ ['INT'],                     [ 8, 12 ], 'INT' ],
-                [ [ qw( MA MACR MACVR ) ],     [ 2,  7 ], 'MA'  ],
+                [ ['MA'],                      [ 2,  7 ], 'MA'  ],
                 [ [ qw( CR CVR MACR MACVR ) ], [ 3,  5 ], 'Ref' ],
                 [ [ qw( Q Q2V ) ],             [ 1,  2 ], 'Q'   ],
                 [ [ qw( FT FTN FTV F2V ) ],    [ 2,  3 ], 'F'   ],
                 [ ['SIT'],                     [ 0,  4 ], 'SIT' ],
             ],
         ),
-        target_questions => 40,
         result_operation => slurp(
             $self->config->get( qw( config_app root_dir ) ) . '/static/js/pages/result_operation.js'
         ),
         timer_values  => $self->json->encode([ 5, 30, 60 ]),
-        timer_default => 30,
         as_default    => 'Standard',
     })->get_from_storage ]);
 

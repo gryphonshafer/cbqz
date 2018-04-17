@@ -17,7 +17,7 @@ sub create ( $self, $config ) {
             questions => $self->json->encode( $self->generate($config) ),
             metadata  => $self->json->encode( {
                 timer_values => [ map { 0 + $_ } grep { /^\d+$/ } split( /\D+/, $config->{timer_values} ) ],
-                map { $_ => $config->{$_} } qw( target_questions timer_default quiz_teams_quizzers )
+                map { $_ => $config->{$_} } qw( target_questions timer_default timeout quiz_teams_quizzers )
             }),
             map { $_ => $config->{$_} } qw( program_id user_id name quizmaster room scheduled )
         } )->get_from_storage

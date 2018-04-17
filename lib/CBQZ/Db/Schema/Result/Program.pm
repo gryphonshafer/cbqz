@@ -67,6 +67,12 @@ __PACKAGE__->table("program");
   default_value: 30
   is_nullable: 0
 
+=head2 timeout
+
+  data_type: 'tinyint'
+  default_value: 60
+  is_nullable: 0
+
 =head2 as_default
 
   data_type: 'tinytext'
@@ -106,6 +112,8 @@ __PACKAGE__->add_columns(
   { data_type => "tinytext", is_nullable => 1 },
   "timer_default",
   { data_type => "tinyint", default_value => 30, is_nullable => 0 },
+  "timeout",
+  { data_type => "tinyint", default_value => 60, is_nullable => 0 },
   "as_default",
   { data_type => "tinytext", is_nullable => 1 },
   "created",
@@ -176,8 +184,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-03-09 10:22:59
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:oU+STpsgNI90N59JGMxdTA
+# Created by DBIx::Class::Schema::Loader v0.07048 @ 2018-04-17 08:21:06
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:fCvqTE5GP88DUYulQbAERg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
