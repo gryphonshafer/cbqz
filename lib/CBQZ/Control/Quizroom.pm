@@ -251,18 +251,20 @@ sub data ($self) {
     return $self->render( json => $data );
 }
 
-sub used ($self) {
+sub quiz_event ($self) {
     my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
     my $event      = $self->req_body_json;
 
-    try {
-        my $question = CBQZ::Model::Question->new->load( $event->{question}{question_id} );
-        $question->obj->update({ used => \'used + 1' })
-            if ( $question and $question->is_usable_by( $self->stash('user') ) );
+    if ( $event->{event_data}{form} and $event->{event_data}{form} eq 'question' ) {
+        try {
+            my $question = CBQZ::Model::Question->new->load( $event->{question}{question_id} );
+            $question->obj->update({ used => \'used + 1' })
+                if ( $question and $question->is_usable_by( $self->stash('user') ) );
+        }
+        catch {
+            $self->warn($_);
+        };
     }
-    catch {
-        $self->warn($_);
-    };
 
     try {
         my $program = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
@@ -275,50 +277,25 @@ sub used ($self) {
         CBQZ::Model::Quiz->new->load( $event->{metadata}{quiz_id} )->obj
             ->update({ metadata => $self->cbqz->json->encode( $event->{metadata} ) });
 
-        my $quiz_question = CBQZ::Model::QuizQuestion->new->create({
+        my $quiz_question_data = {
             quiz_id         => $event->{metadata}{quiz_id},
-            question_as     => $event->{question}{as},
-            question_number => $event->{question}{number},
-            team            => $event->{team}{name},
-            quizzer         => $event->{quizzer}{name},
-            result          => $event->{result},
-            ( map { $_ => $event->{question}{$_} } qw(
-                question_id book chapter verse question answer type score
-            ) ),
-        });
+            question_number => $event->{event_data}{number},
+            team            => $event->{event_data}{team},
+            form            => $event->{event_data}{form},
+        };
 
-        return $self->render( json => {
-            success       => 1,
-            quiz_question => $quiz_question->data,
-        } );
-    }
-    catch {
-        $self->warn($_);
-        return $self->render( json => { error => $self->clean_error($_) } );
-    };
-}
+        if ( $event->{event_data}{form} and $event->{event_data}{form} eq 'question' ) {
+            $quiz_question_data->{question_as} = $event->{question}{as};
+            $quiz_question_data->{$_}          = $event->{question}{$_}
+                for ( qw( question_id book chapter verse question answer type score ) );
+        }
 
-sub team_event ($self) {
-    my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
-    my $event      = $self->req_body_json;
+        for ( qw( quizzer result ) ) {
+            $quiz_question_data->{$_} = $event->{event_data}{$_}
+                if ( defined $event->{event_data}{$_} );
+        }
 
-    try {
-        my $program = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
-        E->throw('User does not have access to the quiz referenced') unless (
-            grep { $_->{quiz_id} == $event->{metadata}{quiz_id} } @{
-                CBQZ::Model::Quiz->new->quizzes_for_user( $self->stash('user'), $program )
-            }
-        );
-
-        CBQZ::Model::Quiz->new->load( $event->{metadata}{quiz_id} )->obj
-            ->update({ metadata => $self->cbqz->json->encode( $event->{metadata} ) });
-
-        my $quiz_question = CBQZ::Model::QuizQuestion->new->create({
-            quiz_id         => $event->{metadata}{quiz_id},
-            question_number => $event->{question_number},
-            team            => $event->{team},
-            form            => $event->{form},
-        });
+        my $quiz_question = CBQZ::Model::QuizQuestion->new->create($quiz_question_data);
 
         return $self->render( json => {
             success       => 1,

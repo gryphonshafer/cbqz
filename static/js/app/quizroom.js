@@ -34,38 +34,38 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         cursor_progress : false
     };
 
-    function result_operation_process (input) {
-        input.quiz      = JSON.parse( JSON.stringify( input.vue_obj.metadata.quiz_teams_quizzers ) );
+    function result_operation_process ( vue_obj, input ) {
+        input.quiz      = JSON.parse( JSON.stringify( vue_obj.metadata.quiz_teams_quizzers ) );
         var result_data = result_operation(input);
 
-        for ( var i = 0; i < input.vue_obj.metadata.quiz_teams_quizzers.length; i++ ) {
-            if ( input.team == input.vue_obj.metadata.quiz_teams_quizzers[i].team.name ) {
+        for ( var i = 0; i < vue_obj.metadata.quiz_teams_quizzers.length; i++ ) {
+            if ( input.team == vue_obj.metadata.quiz_teams_quizzers[i].team.name ) {
                 if ( !! result_data.team ) {
-                    if ( ! input.vue_obj.metadata.quiz_teams_quizzers[i].team.events )
-                        input.vue_obj.metadata.quiz_teams_quizzers[i].team.events = {};
+                    if ( ! vue_obj.metadata.quiz_teams_quizzers[i].team.events )
+                        vue_obj.metadata.quiz_teams_quizzers[i].team.events = {};
 
-                    input.vue_obj.metadata.quiz_teams_quizzers[i].team.score += result_data.team;
+                    vue_obj.metadata.quiz_teams_quizzers[i].team.score += result_data.team;
 
-                    input.vue_obj.metadata.quiz_teams_quizzers[i].team.events[
+                    vue_obj.metadata.quiz_teams_quizzers[i].team.events[
                         input.number
-                    ] = input.vue_obj.metadata.quiz_teams_quizzers[i].team.score;
+                    ] = vue_obj.metadata.quiz_teams_quizzers[i].team.score;
                 }
 
-                for ( var j = 0; j < input.vue_obj.metadata.quiz_teams_quizzers[i].quizzers.length; j++ ) {
+                for ( var j = 0; j < vue_obj.metadata.quiz_teams_quizzers[i].quizzers.length; j++ ) {
                     if (
                         input.quizzer ==
-                        input.vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].name
+                        vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].name
                     ) {
                         if ( input.result == "success" )
-                                input.vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].correct++;
+                                vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].correct++;
                         if ( input.result == "failure" )
-                                input.vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].incorrect++;
+                                vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].incorrect++;
 
                         if ( !! result_data.label ) {
-                            if ( ! input.vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].events )
-                                input.vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].events = {};
+                            if ( ! vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].events )
+                                vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].events = {};
 
-                            input.vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].events[
+                            vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].events[
                                 input.number
                             ] = result_data.label;
                         }
@@ -174,114 +174,83 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.timer.value = value;
             },
 
-            result: function (result) {
-                this.set_timer( this.metadata.timer_default );
+            quiz_event: function ( type, team ) {
+                var form = (
+                    type == "success" ||
+                    type == "failure" ||
+                    type == "none"
+                ) ? "question" : type;
+
+                var confirmation = false;
+
+                if ( type == "timeout" ) {
+                    this.set_timer( this.metadata.timeout );
+                    this.timer_click();
+                }
+                else {
+                    this.set_timer( this.metadata.timer_default );
+                }
+
+                if ( type == "challenge" ) {
+                    confirmation = confirm(
+                        "Did you accept the challenge? Click \"OK\".\n" +
+                        "Did you decline the challenge? Click \"Cancel\"."
+                    );
+                }
+
                 this.classes.cursor_progress = true;
 
-                var result_data = result_operation_process( {
-                    vue_obj : this,
-                    number  : this.question.number,
-                    as      : this.question.as,
-                    form    : "question",
-                    result  : result,
-                    quizzer : this.active_quizzer.name,
-                    team    : this.active_team.name
-                } );
+                var event_data = {
+                    team   : ( (team) ? team.name : this.active_team.name ),
+                    form   : form,
+                    number : ( form == "question" )
+                        ? this.question.number
+                        : Date.now().toString().substr( 4, 6 ) +
+                            Math.round( Math.random() * 1000 + 1000 ) +
+                            "|" +
+                            type.substr( 0, 1 ).toUpperCase()
+                };
+                if ( form == "question" ) {
+                    event_data["result"]  = type;
+                    event_data["quizzer"] = this.active_quizzer.name;
+                    event_data["as"]      = this.question.as;
+                }
+                else if ( type == "foul" ) {
+                    event_data["quizzer"] = this.active_quizzer.name;
+                }
+                else if ( type == "challenge" ) {
+                    event_data["result"] = (confirmation) ? "success" : "failure";
+                }
 
-                this.$http.post( cntlr + "/used", {
-                    metadata : this.metadata,
-                    question : this.question,
-                    team     : this.active_team,
-                    quizzer  : this.active_quizzer,
-                    result   : result
+                var result_data = result_operation_process( this, event_data );
+
+                this.$http.post( cntlr + "/quiz_event", {
+                    metadata   : this.metadata,
+                    question   : this.question,
+                    event_data : event_data,
                 } ).then( function (response) {
                     this.active_team    = {};
                     this.active_quizzer = {};
 
-                    this.question.used++;
-                    this.move_question("forward");
+                    if ( form == "question" ) {
+                        this.question.used++;
+                        this.move_question("forward");
 
-                    this.question.as     = result_data.as;
-                    this.question.number = result_data.number;
+                        this.question.as     = result_data.as;
+                        this.question.number = result_data.number;
+                    }
 
                     this.classes.cursor_progress = false;
 
                     if ( ! response.body.success ) {
                         alert(
-                            "There was an error updating the used count for the question.\n" +
+                            "There was an error communicating with the server.\n" +
                             response.body.error + "."
                         );
                     }
                     else {
                         this.quiz_questions.unshift( response.body.quiz_question );
                         if ( !! result_data.message ) alert( result_data.message );
-                    }
-                } );
-            },
-
-            team_event: function ( team_name, event_type ) {
-                var challenge_accepted  = false;
-                var event_symbol        = event_type.substr( 0, 1 ).toUpperCase();
-                var event_symbol_suffix = "";
-
-                if ( event_type == "timeout" ) {
-                    this.set_timer( this.metadata.timer_default * 2 );
-                    this.timer_click();
-                }
-                if ( event_type == "challenge" ) {
-                    challenge_accepted = confirm(
-                        "Did you accept the challenge? Click \"OK\".\n" +
-                        "Did you decline the challenge? Click \"Cancel\"."
-                    );
-                    event_symbol_suffix = (challenge_accepted) ? "+" : "-";
-                }
-
-                this.classes.cursor_progress = true;
-
-                var event_key =
-                    Date.now().toString().substr( 4, 6 ) +
-                    Math.round( Math.random() * 1000 + 1000 ) +
-                    "|" +
-                    event_symbol;
-
-                for ( var i = 0; i < this.metadata.quiz_teams_quizzers.length; i++ ) {
-                    if ( team_name == this.metadata.quiz_teams_quizzers[i].team.name ) {
-                        if ( ! this.metadata.quiz_teams_quizzers[i].team.events )
-                            this.metadata.quiz_teams_quizzers[i].team.events = {};
-
-                        this.metadata.quiz_teams_quizzers[i].team.events[event_key] =
-                            event_symbol + event_symbol_suffix;
-                    }
-                }
-
-                var event_data = {
-                    metadata        : this.metadata,
-                    team            : team_name,
-                    form            : event_type,
-                    question_number : event_key
-                };
-                if ( event_type == "challenge" ) {
-                    event_data["result"] = (challenge_accepted) ? "success" : "failure";
-
-                    // TODO: integration with result_operation_process() needs to be much better...
-                    result_operation_process( {
-                        vue_obj : this,
-                        form    : event_type,
-                        result  : event_data["result"]
-                    } );
-                }
-
-                this.$http.post( cntlr + "/team_event", event_data ).then( function (response) {
-                    this.classes.cursor_progress = false;
-
-                    if ( ! response.body.success ) {
-                        alert(
-                            "There was an error recording the " + event_type + " to the server.\n" +
-                            response.body.error + "."
-                        );
-                    }
-                    else {
-                        this.quiz_questions.unshift( response.body.quiz_question );
                     }
                 } );
             },
@@ -489,7 +458,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                             var as     = this.questions[i].as     = reverse_quiz_questions[i].question_as;
                             var number = this.questions[i].number = reverse_quiz_questions[i].question_number;
 
-                            // TODO: probably need to remove this entirely and clean up
+                            // TODO-END: probably need to remove this entirely and clean up
                             var result_data = result_operation( {
                                 as      : as,
                                 number  : number,

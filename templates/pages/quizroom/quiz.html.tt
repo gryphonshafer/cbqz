@@ -113,11 +113,11 @@
         <div class="manage_group">
             <div id="result">
                 <b>Result</b><br>
-                <button v-on:click="result('success')">Correct</button>
-                <button v-on:click="result('failure')">Error</button>
-                <!-- TODO: implement foul -->
-                <button v-on:click="result('none')">Foul</button>
-                <button v-on:click="result('none')">No Jump</button>
+                <button v-on:click="quiz_event('success')">Correct</button>
+                <button v-on:click="quiz_event('failure')">Error</button>
+                <br>
+                <button v-on:click="quiz_event('foul')">Foul</button>
+                <button v-on:click="quiz_event('none')">No Jump</button>
             </div>
 
             <div id="quiz">
@@ -184,26 +184,35 @@
                     </td>
                     <td v-bind:class="[ 'vertical_text', 'team_' + index + '_bold' ]"><div>
                         <a href="#" title="Timeout"
-                            v-on:click="team_event( team_set.team.name, 'timeout' )">Timeout</a>
+                            v-on:click="quiz_event( 'timeout', team_set.team )">Timeout</a>
                         |
                         <a href="#" title="Challenge"
-                            v-on:click="team_event( team_set.team.name, 'challenge' )">Chall.</a>
+                            v-on:click="quiz_event( 'challenge', team_set.team )">Chall.</a>
                     </div></td>
                 </template>
             </tr>
 
-            <tr v-for="event in quiz_questions">
+            <tr v-for="( event, index ) in quiz_questions">
                 <td class="shaded">
-                    <a href="#"
-                        title="Delete This Quiz Event"
-                        v-on:click="delete_quiz_event( event.question_number )"
-                    >
+                    <template v-if="index == 0">
+                        <a href="#"
+                            title="Delete Quiz Event"
+                            v-on:click="delete_quiz_event( event.question_number )"
+                        >
+                            {{
+                                ( event.question_number.toString().indexOf("|") == -1 )
+                                    ? event.question_number
+                                    : event.question_number.toString().split("|")[1]
+                            }}
+                        </a>
+                    </template>
+                    <template v-else>
                         {{
                             ( event.question_number.toString().indexOf("|") == -1 )
                                 ? event.question_number
                                 : event.question_number.toString().split("|")[1]
                         }}
-                    </a>
+                    </template>
                 </td>
                 <template v-for="( team_set, index ) in metadata.quiz_teams_quizzers">
                     <td v-for="quizzer in team_set.quizzers" v-bind:class=" 'team_' + index + '_mild' ">

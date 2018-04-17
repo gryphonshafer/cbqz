@@ -87,3 +87,7 @@ else {
     output.number = input.number;
     output.as     = input.as;
 }
+
+if ( input.form == "challenge" ) {
+    output.label = ( input.result == "failure" ) ? "C-/" + 100 : "C+";
+}
