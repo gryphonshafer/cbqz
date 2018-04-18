@@ -16,8 +16,13 @@ sub create ( $self, $config ) {
             official  => ( ( $config->{official} ) ? 1 : 0 ),
             questions => $self->json->encode( $self->generate($config) ),
             metadata  => $self->json->encode( {
+                quiz_teams_quizzers => (
+                    ( ref $config->{quiz_teams_quizzers} )
+                        ? $config->{quiz_teams_quizzers}
+                        : $self->parse_quiz_teams_quizzers( $config->{quiz_teams_quizzers} )
+                ),
                 timer_values => [ map { 0 + $_ } grep { /^\d+$/ } split( /\D+/, $config->{timer_values} ) ],
-                map { $_ => $config->{$_} } qw( target_questions timer_default timeout quiz_teams_quizzers )
+                map { $_ => $config->{$_} } qw( target_questions timer_default timeout )
             }),
             map { $_ => $config->{$_} } qw( program_id user_id name quizmaster room scheduled )
         } )->get_from_storage
@@ -309,6 +314,47 @@ sub replace ( $self, $request, $cbqz_prefs ) {
     $self->obj->update({ questions => $self->json->encode($questions) });
 
     return $results;
+}
+
+sub parse_quiz_teams_quizzers ( $self, $quiz_teams_quizzers_string ) {
+    return [
+        map {
+            my @quizzers = split(/\r?\n/);
+            ( my $team = shift @quizzers ) =~ s/^\s+|\s+$//g;
+            E->throw('Team name parsing failed') unless ( $team and $team =~ /\w/ and $team !~ /\n/ );
+            {
+                team => {
+                    name  => $team,
+                    score => 0,
+                },
+                quizzers => [
+                    map {
+                        /^\s*(?<bib>\d+)\D\s*(?<name>\w[\w\s]*)/;
+                        my $quizzer = +{ %+ };
+                        $quizzer->{name} =~ s/^\s+|\s+$//g;
+                        $quizzer->{name} =~ s/\s+/ /g;
+
+                        E->throw('Quizzer name parsing failed') unless (
+                            $quizzer->{name} and
+                            $quizzer->{name} =~ /\w/ and
+                            $quizzer->{name} !~ /\n/
+                        );
+
+                        E->throw('Quizzer bib parsing failed') unless (
+                            $quizzer->{bib} and
+                            $quizzer->{bib} =~ /^\d+$/
+                        );
+
+                        +{
+                            %$quizzer,
+                            correct   => 0,
+                            incorrect => 0,
+                        };
+                    } @quizzers
+                ],
+            };
+        } split( /(?:\r?\n){2,}/, $quiz_teams_quizzers_string )
+    ];
 }
 
 __PACKAGE__->meta->make_immutable;

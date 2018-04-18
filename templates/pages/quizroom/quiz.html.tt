@@ -112,16 +112,20 @@
 
         <div class="manage_group">
             <div id="result">
-                <b>Result</b><br>
+                <b>Results/Events</b><br>
                 <button v-on:click="quiz_event('success')">Correct</button>
                 <button v-on:click="quiz_event('failure')">Error</button>
+                <button v-on:click="reset_quiz_select">Reset</button>
                 <br>
-                <button v-on:click="quiz_event('foul')">Foul</button>
                 <button v-on:click="quiz_event('none')">No Jump</button>
+                <button v-on:click="quiz_event('foul')">Foul</button>
+                <br>
+                <button v-on:click="quiz_event('sub-in')">Sub In</button>
+                <button v-on:click="quiz_event('sub-out')">Sub Out</button>
             </div>
 
             <div id="quiz">
-                <b>Quiz</b><br>
+                <b>Quiz Management</b><br>
                 <button v-on:click="print_quiz">Print</button>
                 <button v-on:click="exit_quiz">Exit</button>
                 <button v-on:click="close_quiz">Close</button>
@@ -130,7 +134,7 @@
 
         <div class="manage_group">
             <div id="replace">
-                <b>Replace</b><br>
+                <b>Replace Question</b><br>
                 <button v-for="type in metadata.types" v-on:click="replace(type)">{{ type }}</button>
             </div>
         </div>
@@ -150,8 +154,8 @@
         <table class="tabular">
             <tr>
                 <td rowspan="2" class="vertical_text shaded"><div>
-                    <!-- TODO: implement rearrange -->
-                    <a href="#" title="Rearrange Quizzer Listing Order">Rearrange Quizzers</a>
+                    <a href="#" title="Rearrange Quizzer Listing Order"
+                        v-on:click="toggle_rearrange_quizzers">Rearrange Quizzers</a>
                 </div></td>
                 <td
                     v-for="( team_set, index ) in metadata.quiz_teams_quizzers"
@@ -234,5 +238,21 @@
                 </template>
             </tr>
         </table>
+    </div>
+
+    <div id="rearrange_quizzers" v-bind:class="{ page_panel: 1, hidden: rearrange_quizzers_hidden }">
+        <div class="page_panel_buttons">
+            <button v-on:click="toggle_rearrange_quizzers(true)">Save</button>
+            <button v-on:click="toggle_rearrange_quizzers(false)">Exit</button>
+        </div>
+
+        <h2>Rearrange Quizzers</h2>
+
+        <form>
+            <fieldset>
+                <legend>Quiz Teams/Quizzers</legend>
+                <textarea name="quiz_teams_quizzers" v-model="rearrange_quizzers_data"></textarea>
+            </fieldset>
+        </form>
     </div>
 </div>

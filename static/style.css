@@ -936,6 +936,17 @@ div#quizroom div#scorekeeping table td.team_5_bold {
     background-color: #f6f6f6;
 }
 
+div#quizroom div#rearrange_quizzers {
+    width: 310px;
+    height: 410px;
+}
+
+div#quizroom div#rearrange_quizzers textarea {
+    width: 285px;
+    height: 330px;
+    resize: none;
+}
+
 /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
 
 @media ( max-width: 1000px ) and ( min-width: 850px ) {

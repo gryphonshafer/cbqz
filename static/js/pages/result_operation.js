@@ -91,3 +91,5 @@ else {
 if ( input.form == "challenge" ) {
     output.label = ( input.result == "failure" ) ? "C-/" + 100 : "C+";
 }
+
+// TODO: flush this out with full event coverage

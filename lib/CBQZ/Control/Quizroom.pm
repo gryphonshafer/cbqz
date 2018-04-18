@@ -47,7 +47,7 @@ sub path ($self) {
     );
     my $quiz_teams_quizzers = join( "\n\n", map {
         $_ . "\n" . join( "\n", map { $_ . '. ' . shift(@quizzer_names) . ' Quizzer' } 1 .. 5 )
-    } map { 'Team ' . $_ } 'A' .. 'C' );
+    } map { 'Team ' . $_ } 'A' .. 'C' ) . "\n";
 
     sub quiz_setup ($self) {
         my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
@@ -104,45 +104,6 @@ sub generate_quiz ($self) {
         E->throw('User is not an official but has set the "official" flag for the quiz')
             if ( $self->req->param('official') and not $self->stash('user')->has_role('Official') );
 
-        my $quiz_teams_quizzers = [
-            map {
-                my @quizzers = split(/\r?\n/);
-                ( my $team = shift @quizzers ) =~ s/^\s+|\s+$//g;
-                E->throw('Team name parsing failed') unless ( $team and $team =~ /\w/ and $team !~ /\n/ );
-                {
-                    team => {
-                        name  => $team,
-                        score => 0,
-                    },
-                    quizzers => [
-                        map {
-                            /^\s*(?<bib>\d+)\D\s*(?<name>\w[\w\s]*)/;
-                            my $quizzer = +{ %+ };
-                            $quizzer->{name} =~ s/^\s+|\s+$//g;
-                            $quizzer->{name} =~ s/\s+/ /g;
-
-                            E->throw('Quizzer name parsing failed') unless (
-                                $quizzer->{name} and
-                                $quizzer->{name} =~ /\w/ and
-                                $quizzer->{name} !~ /\n/
-                            );
-
-                            E->throw('Quizzer bib parsing failed') unless (
-                                $quizzer->{bib} and
-                                $quizzer->{bib} =~ /^\d+$/
-                            );
-
-                            +{
-                                %$quizzer,
-                                correct   => 0,
-                                incorrect => 0,
-                            };
-                        } @quizzers
-                    ],
-                };
-            } split( /(?:\r?\n){2,}/, $self->req->param('quiz_teams_quizzers') )
-        ];
-
         my $set = CBQZ::Model::QuestionSet->new->load( $cbqz_prefs->{question_set_id} );
         E->throw('User does not own requested question set')
             unless ( $set and $set->is_usable_by( $self->stash('user') ) );
@@ -151,7 +112,7 @@ sub generate_quiz ($self) {
             %$cbqz_prefs,
             %{ $self->params },
             user_id             => $self->stash('user')->obj->id,
-            quiz_teams_quizzers => $quiz_teams_quizzers,
+            quiz_teams_quizzers => $self->req->param('quiz_teams_quizzers'),
         });
     }
     catch {
@@ -396,6 +357,70 @@ sub close ($self) {
     };
 
     return $self->redirect_to('/quizroom');
+}
+
+sub rearrange_quizzers ($self) {
+    my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
+    my $request    = $self->req_body_json;
+
+    try {
+        my $program = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
+        E->throw('User does not have access to the quiz referenced by quiz ID') unless (
+            grep { $_->{quiz_id} == $request->{metadata}{quiz_id} } @{
+                CBQZ::Model::Quiz->new->quizzes_for_user( $self->stash('user'), $program )
+            }
+        );
+
+        my $quiz          = CBQZ::Model::Quiz->new->load( $request->{metadata}{quiz_id} );
+        my $quizzers_data = $quiz->parse_quiz_teams_quizzers( $request->{quizzers_data} );
+
+        E->throw('There appears to be a team missing in the submitted lineup.') unless (
+            join( '|', sort map { $_->{team}{name} } @$quizzers_data ) eq
+            join( '|', sort map { $_->{team}{name} } @{ $request->{metadata}{quiz_teams_quizzers} } )
+        );
+
+        E->throw('There appears to be a quizzer missing in the submitted lineup.') unless (
+            join( '|', sort map { map { $_->{name} } @{ $_->{quizzers} } } @$quizzers_data ) eq
+            join( '|', sort map { map { $_->{name} } @{ $_->{quizzers} } }
+                @{ $request->{metadata}{quiz_teams_quizzers} } )
+        );
+
+        for my $team_set (@$quizzers_data) {
+            for my $quizzer ( @{ $team_set->{quizzers} } ) {
+                my ($matched_quizzer) = grep {
+                    $_->{name} eq $quizzer->{name}
+                } map { @{ $_->{quizzers} } } @{ $request->{metadata}{quiz_teams_quizzers} };
+
+                if ($matched_quizzer) {
+                    my $bib = $quizzer->{bib};
+                    $quizzer = $matched_quizzer;
+                    $quizzer->{bib} = $bib;
+                }
+            }
+
+            my ($matched_team) = grep {
+                $_->{team}{name} eq $team_set->{team}{name}
+            } @{ $request->{metadata}{quiz_teams_quizzers} };
+
+            if ($matched_team) {
+                $matched_team->{quizzers} = $team_set->{quizzers};
+                $team_set = $matched_team;
+            }
+        }
+
+        $request->{metadata}{quiz_teams_quizzers} = $quizzers_data;
+        $quiz->obj->update({ metadata => $self->cbqz->json->encode( $request->{metadata} ) });
+
+        return $self->render( json => {
+            success             => 1,
+            quiz_teams_quizzers => $quizzers_data,
+        } );
+    }
+    catch {
+        return $self->render( json => {
+            error => $self->clean_error($_),
+        } );
+    };
 }
 
 1;

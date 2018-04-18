@@ -20,12 +20,14 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         marked   : null,
         score    : null
     };
-    data.quiz_view_hidden = 1;
-    data.position         = 0;
-    data.mean_score       = null;
-    data.active_team      = {};
-    data.active_quizzer   = {};
-    data.timer            = {
+    data.quiz_view_hidden          = 1;
+    data.rearrange_quizzers_hidden = 1;
+    data.rearrange_quizzers_data   = "";
+    data.position                  = 0;
+    data.mean_score                = null;
+    data.active_team               = {};
+    data.active_quizzer            = {};
+    data.timer                     = {
         value : data.metadata.timer_default,
         state : "ready",
         label : "Start Timer",
@@ -128,6 +130,47 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.quiz_view_hidden = ! this.quiz_view_hidden;
             },
 
+            toggle_rearrange_quizzers: function (save) {
+                if ( this.rearrange_quizzers_hidden ) {
+                    var build_string = "";
+
+                    for ( var i = 0; i < this.metadata.quiz_teams_quizzers.length; i++ ) {
+                        if ( build_string.length > 0 ) build_string = build_string + "\n\n";
+                        build_string = build_string + this.metadata.quiz_teams_quizzers[i].team.name;
+
+                        for ( var j = 0; j < this.metadata.quiz_teams_quizzers[i].quizzers.length; j++ ) {
+                            build_string = build_string + "\n" +
+                                this.metadata.quiz_teams_quizzers[i].quizzers[j].bib + ". " +
+                                this.metadata.quiz_teams_quizzers[i].quizzers[j].name;
+                        }
+                    }
+
+                    this.rearrange_quizzers_data = build_string + "\n";
+                }
+                else if (save) {
+                    this.classes.cursor_progress = true;
+
+                    this.$http.post( cntlr + "/rearrange_quizzers", {
+                        metadata      : this.metadata,
+                        quizzers_data : this.rearrange_quizzers_data
+                    } ).then( function (response) {
+                        this.classes.cursor_progress = false;
+
+                        if ( ! response.body.success ) {
+                            alert(
+                                "There was an error processing the rearrange quizzers request.\n" +
+                                response.body.error + "."
+                            );
+                        }
+                        else {
+                            this.metadata.quiz_teams_quizzers = response.body.quiz_teams_quizzers;
+                        }
+                    } );
+                }
+
+                this.rearrange_quizzers_hidden = ! this.rearrange_quizzers_hidden;
+            },
+
             make_beep: function () {
                 beep.play();
             },
@@ -227,7 +270,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.$http.post( cntlr + "/quiz_event", {
                     metadata   : this.metadata,
                     question   : this.question,
-                    event_data : event_data,
+                    event_data : event_data
                 } ).then( function (response) {
                     this.active_team    = {};
                     this.active_quizzer = {};
@@ -424,6 +467,13 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.active_quizzer = quizzer;
 
                 if ( this.timer.state != "running" ) this.timer_click();
+            },
+
+            reset_quiz_select: function () {
+                this.active_team    = {};
+                this.active_quizzer = {};
+
+                this.set_timer( this.metadata.timer_default );
             }
         },
         computed: {
