@@ -36,45 +36,62 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         cursor_progress : false
     };
 
-    function result_operation_process ( vue_obj, input ) {
-        input.quiz      = JSON.parse( JSON.stringify( vue_obj.metadata.quiz_teams_quizzers ) );
-        var result_data = result_operation(input);
+    function result_operation_process ( vue_obj, input, skip_post_processing ) {
+        if ( !! input.team ) {
+            var filtered_teams = vue_obj.metadata.quiz_teams_quizzers.filter( function (value) {
+                return value.team.name == input.team;
+            } )[0];
+            input.team     = filtered_teams.team;
+            input.quizzers = filtered_teams.quizzers;
 
-        for ( var i = 0; i < vue_obj.metadata.quiz_teams_quizzers.length; i++ ) {
-            if ( input.team == vue_obj.metadata.quiz_teams_quizzers[i].team.name ) {
-                if ( !! result_data.team ) {
-                    if ( ! vue_obj.metadata.quiz_teams_quizzers[i].team.events )
-                        vue_obj.metadata.quiz_teams_quizzers[i].team.events = {};
+            if ( !! input.quizzer )
+                input.quizzer = filtered_teams.quizzers.filter( function (value) {
+                    return value.name == input.quizzer;
+                } )[0];
+        }
 
-                    vue_obj.metadata.quiz_teams_quizzers[i].team.score += result_data.team;
+        input.quiz      = vue_obj.metadata.quiz_teams_quizzers;
+        var result_data = result_operation( JSON.parse( JSON.stringify(input) ) );
 
-                    vue_obj.metadata.quiz_teams_quizzers[i].team.events[
-                        input.number
-                    ] = vue_obj.metadata.quiz_teams_quizzers[i].team.score;
-                }
+        if ( ! skip_post_processing ) {
+            for ( var i = 0; i < vue_obj.metadata.quiz_teams_quizzers.length; i++ ) {
+                if ( input.team.name == vue_obj.metadata.quiz_teams_quizzers[i].team.name ) {
+                    if ( !! result_data.team ) {
+                        if ( ! vue_obj.metadata.quiz_teams_quizzers[i].team.events )
+                            vue_obj.metadata.quiz_teams_quizzers[i].team.events = {};
 
-                for ( var j = 0; j < vue_obj.metadata.quiz_teams_quizzers[i].quizzers.length; j++ ) {
-                    if (
-                        input.quizzer ==
-                        vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].name
-                    ) {
-                        if ( input.result == "success" )
-                                vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].correct++;
-                        if ( input.result == "failure" )
-                                vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].incorrect++;
+                        vue_obj.metadata.quiz_teams_quizzers[i].team.score += result_data.team;
 
-                        if ( !! result_data.label ) {
-                            if ( ! vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].events )
-                                vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].events = {};
-
-                            vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].events[
-                                input.number
-                            ] = result_data.label;
-                        }
-                        break;
+                        vue_obj.metadata.quiz_teams_quizzers[i].team.events[
+                            input.number
+                        ] = vue_obj.metadata.quiz_teams_quizzers[i].team.score;
                     }
+
+                    for ( var j = 0; j < vue_obj.metadata.quiz_teams_quizzers[i].quizzers.length; j++ ) {
+                        if (
+                            input.quizzer.name ==
+                            vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].name
+                        ) {
+                            if ( input.form == "question" && ! result_data.skip_counts ) {
+                                if ( input.result == "success" )
+                                        vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].correct++;
+                                if ( input.result == "failure" )
+                                        vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].incorrect++;
+                            }
+
+                            if ( !! result_data.label ) {
+                                if ( ! vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].events )
+                                    vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].events = {};
+
+                                vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].events[
+                                    input.number
+                                ] = result_data.label;
+                            }
+                            break;
+                        }
+                    }
+                    break;
                 }
-                break;
             }
         }
 
@@ -303,7 +320,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     this.classes.cursor_progress = true;
 
                     for ( var i = 0; i < this.metadata.quiz_teams_quizzers.length; i++ ) {
-                        this.metadata.quiz_teams_quizzers[i].team.score = 0;
+                        this.metadata.quiz_teams_quizzers[i].team.score = parseInt( this.metadata.team_bonus );
 
                         if ( !! this.metadata.quiz_teams_quizzers[i].team.events )
                             delete this.metadata.quiz_teams_quizzers[i].team.events;
@@ -319,15 +336,17 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                             this.quiz_questions.splice( i, 1 );
                         }
 
-                        result_operation_process( {
-                            vue_obj : this,
-                            number  : this.quiz_questions[i].question_number,
-                            as      : this.quiz_questions[i].question_as,
-                            form    : this.quiz_questions[i].form,
-                            result  : this.quiz_questions[i].result,
-                            quizzer : this.quiz_questions[i].quizzer,
-                            team    : this.quiz_questions[i].team
-                        } );
+                        result_operation_process(
+                            this,
+                            {
+                                number  : this.quiz_questions[i].question_number,
+                                as      : this.quiz_questions[i].question_as,
+                                form    : this.quiz_questions[i].form,
+                                result  : this.quiz_questions[i].result,
+                                quizzer : this.quiz_questions[i].quizzer,
+                                team    : this.quiz_questions[i].team
+                            }
+                        );
                     }
 
                     this.$http.post( cntlr + "/delete_quiz_event", {
@@ -504,15 +523,18 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     var as     = this.questions[i].as     = reverse_quiz_questions[i].question_as;
                     var number = this.questions[i].number = reverse_quiz_questions[i].question_number;
 
-                    var result_data = result_operation( {
-                        number  : number,
-                        as      : as,
-                        form    : reverse_quiz_questions[i].form,
-                        result  : reverse_quiz_questions[i].result,
-                        quizzer : reverse_quiz_questions[i].quizzer,
-                        team    : reverse_quiz_questions[i].team,
-                        quiz    : JSON.parse( JSON.stringify( this.metadata.quiz_teams_quizzers ) )
-                    } );
+                    var result_data = result_operation_process(
+                        this,
+                        {
+                            number  : number,
+                            as      : as,
+                            form    : reverse_quiz_questions[i].form,
+                            result  : reverse_quiz_questions[i].result,
+                            quizzer : reverse_quiz_questions[i].quizzer,
+                            team    : reverse_quiz_questions[i].team
+                        },
+                        true
+                    );
 
                     this.move_question("forward");
 

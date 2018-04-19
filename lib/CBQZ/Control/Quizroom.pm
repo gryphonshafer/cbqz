@@ -243,7 +243,7 @@ sub quiz_event ($self) {
         my $quiz_question_data = {
             quiz_id         => $event->{metadata}{quiz_id},
             question_number => $event->{event_data}{number},
-            team            => $event->{event_data}{team},
+            team            => $event->{event_data}{team}{name},
             form            => $event->{event_data}{form},
         };
 
@@ -253,16 +253,17 @@ sub quiz_event ($self) {
                 for ( qw( question_id book chapter verse question answer type score ) );
         }
 
-        for ( qw( quizzer result ) ) {
-            $quiz_question_data->{$_} = $event->{event_data}{$_}
-                if ( defined $event->{event_data}{$_} );
-        }
+        $quiz_question_data->{quizzer} = $event->{event_data}{quizzer}{name}
+            if ( defined $event->{event_data}{quizzer}{name} );
+        $quiz_question_data->{result} = $event->{event_data}{result}
+            if ( defined $event->{event_data}{result} );
 
-        my $quiz_question = CBQZ::Model::QuizQuestion->new->create($quiz_question_data);
+        $quiz_question_data = CBQZ::Model::QuizQuestion->new->create($quiz_question_data)->data;
+        delete $quiz_question_data->{question};
 
         return $self->render( json => {
             success       => 1,
-            quiz_question => $quiz_question->data,
+            quiz_question => $quiz_question_data,
         } );
     }
     catch {

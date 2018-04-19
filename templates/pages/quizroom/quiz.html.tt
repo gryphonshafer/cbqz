@@ -113,6 +113,7 @@
         <div class="manage_group">
             <div id="result">
                 <b>Results/Events</b><br>
+                <!-- TODO: deactivate buttons as appropriate to prevent weird bugs -->
                 <button v-on:click="quiz_event('success')">Correct</button>
                 <button v-on:click="quiz_event('failure')">Error</button>
                 <button v-on:click="reset_quiz_select">Reset</button>
@@ -226,7 +227,7 @@
                             (
                                 !! quizzer.events &&
                                 !! event.question_number &&
-                                !! quizzer.events[ event.question_number ]
+                                quizzer.events[ event.question_number ] !== null
                             ) ? quizzer.events[ event.question_number ] : ""
                         }}
                     </td>
@@ -234,7 +235,7 @@
                         (
                             !! team_set.team.events &&
                             !! event.question_number &&
-                            !! team_set.team.events[ event.question_number ]
+                            team_set.team.events[ event.question_number ] !== null
                         ) ? team_set.team.events[ event.question_number ] : ""
                     }}</td>
                 </template>

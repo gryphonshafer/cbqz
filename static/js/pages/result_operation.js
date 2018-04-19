@@ -1,96 +1,122 @@
 // input.
-//     number  : Current question number (i.e. "16", "17A")
-//     as      : Current question "as" value (i.e. "Standard", "Toss-Up", "Bonus")
-//     form    : Type of event
-//               (enum: "question", "foul", "timeout", "sub-in", "sub-out", "challenge", "team_bonus")
-//     result  : Result of current answer (enum: "success", "failure", "none" )
-//     quizzer : Text full name of quizzer
-//     team    : Text full name of team
-//     quiz    : Complex data structure of teams, quizzers, and scores
+//     number   : Current question number (i.e. "16", "17A")
+//     as       : Current question "as" value (i.e. "Standard", "Toss-Up", "Bonus")
+//     form     : Type of event
+//                (enum "question", "foul", "timeout", "sub-in", "sub-out", "challenge", "team_bonus")
+//     result   : Result of current answer (enum "success", "failure", "none" )
+//     quizzer  : Quizzer data object (of quizzer for the event)
+//     quizzers : Array of quizzer data objects (of all quizzers in the team)
+//     team     : Team data object
+//     quiz     : Complex data structure of teams, quizzers, and scores
 
 // output.
-//     number  : Next question number (i.e. "16", "17A")
-//     as      : Next question "as" value (i.e. "Standard", "Toss-Up", "Bonus")
-//     quizzer : Quizzer incremental score value following result
-//     team    : Team incremental score value following result
-//     label   : Text for the quizzer/question cell scoresheet display
-//     message : Optional alert message text (i.e. "Quiz Out")
+//     number      : Next question number (i.e. "16", "17A")
+//     as          : Next question "as" value (i.e. "Standard", "Toss-Up", "Bonus")
+//     quizzer     : Quizzer incremental score value following result
+//     team        : Team incremental score value following result
+//     label       : Text for the quizzer/question cell scoresheet display
+//     skip_counts : Boolean; default false; if true, will skip quizzer counts incrementing
+//     message     : Optional alert message text (i.e. "Quiz Out")
+
+var int_number = parseInt( input.number );
+output.number  = input.number;
+output.as      = input.as;
+
+if ( input.as == "Bonus" ) output.skip_counts = true;
 
 if ( input.form == "question" ) {
     if ( input.result == "success" ) {
         output.as      = "Standard";
-        output.number  = parseInt( input.number ) + 1;
+        output.number  = int_number + 1;
         output.quizzer = 20;
         output.team    = 20;
         output.label   = 20;
+
+        if ( int_number >= 17 && input.as == "Bonus" ) {
+            output.quizzer = 10;
+            output.team    = 10;
+            output.label   = 10;
+        }
+
+        if ( input.as == "Bonus" ) {
+            output.label += "B";
+        }
+        else {
+            var quizzers_with_corrects = input.quizzers.filter( function (value) {
+                return value.correct > 0;
+            } );
+            if ( quizzers_with_corrects.length >= 2 && input.quizzer.correct == 0 ) {
+                output.team  += 10;
+                output.label += "+";
+            }
+        }
     }
     else if ( input.result == "failure" ) {
+        // TODO: verify as good
+
         if ( input.as == "Standard" ) {
             output.as = "Toss-Up";
 
-            if ( input.result == "success" ) {
-                output.quizzer = 20;
-                output.team    = 20;
-                output.label   = 20;
-            }
-            else {
-                output.quizzer = -10;
-                output.team    = -10;
-                output.label   = -10;
-            }
+            output.quizzer = -10;
+            output.team    = -10;
+            output.label   = -10;
         }
         else if ( input.as == "Toss-Up" ) {
-            if ( input.result == "success" ) {
-                output.quizzer = 20;
-                output.team    = 20;
-                output.label   = 20;
-            }
-            else {
-                output.quizzer = -10;
-                output.team    = -10;
-                output.label   = -10;
-            }
-
             output.as = "Bonus";
+
+            output.quizzer = -10;
+            output.team    = -10;
+            output.label   = -10;
         }
         else if ( input.as == "Bonus" ) {
-            if ( input.result == "success" ) {
-                output.quizzer = 20;
-                output.team    = 20;
-                output.label   = "20B";
-            }
-            else {
-                output.label = "BE";
-            }
-
-            output.as = "Standard";
+            output.label = "BE";
+            output.as    = "Standard";
         }
 
-        if ( parseInt( input.number ) < 16 ) {
-            output.number = parseInt( input.number ) + 1;
+        if ( int_number < 16 ) {
+            output.number = int_number + 1;
         }
-        else if ( input.number == parseInt( input.number ) ) {
-            output.number = parseInt( input.number ) + "A";
+        else if ( input.number == int_number ) {
+            output.number = int_number + "A";
         }
-        else if ( input.number == parseInt( input.number ) + "A" ) {
-            output.number = parseInt( input.number ) + "B";
+        else if ( input.number == int_number + "A" ) {
+            output.number = int_number + "B";
         }
-        else if ( input.number == parseInt( input.number ) + "B" ) {
-            output.number = parseInt( input.number ) + 1;
+        else if ( input.number == int_number + "B" ) {
+            output.number = int_number + 1;
         }
     }
     else if ( input.result == "none" ) {
+        // TODO: verify as good
+
         output.as     = "Standard";
-        output.number = parseInt( input.number ) + 1;
+        output.number = int_number + 1;
     }
 }
-else {
-    output.number = input.number;
-    output.as     = input.as;
+
+else if ( input.form == "foul" ) {
+    // TODO: implement
 }
 
-if ( input.form == "challenge" ) {
+else if ( input.form == "timeout" ) {
+    // TODO: implement
+}
+
+else if ( input.form == "sub-in" ) {
+    // TODO: implement
+}
+
+else if ( input.form == "sub-out" ) {
+    // TODO: implement
+}
+
+else if ( input.form == "challenge" ) {
     output.label = ( input.result == "failure" ) ? "C-/" + 100 : "C+";
+    // TODO: implement scoring and other?
 }
 
-// TODO: flush this out with full event coverage
+else if ( input.form == "team_bonus" ) {
+    // TODO: implement
+}
+
+// TODO: 2-team quizzing: initial conditions + OT
