@@ -1,7 +1,8 @@
 // input.
 //     number  : Current question number (i.e. "16", "17A")
 //     as      : Current question "as" value (i.e. "Standard", "Toss-Up", "Bonus")
-//     form    : Type of event (enum: "question", "foul", "timeout", "sub-in", "sub-out", "challenge")
+//     form    : Type of event
+//               (enum: "question", "foul", "timeout", "sub-in", "sub-out", "challenge", "team_bonus")
 //     result  : Result of current answer (enum: "success", "failure", "none" )
 //     quizzer : Text full name of quizzer
 //     team    : Text full name of team

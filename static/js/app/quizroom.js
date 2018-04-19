@@ -495,35 +495,29 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         },
         mounted: function () {
             if ( this.questions.length > 0 ) {
-                if ( this.quiz_questions.length == 0 ) {
-                    this.question        = this.questions[ this.position ];
-                    this.question.number = 1;
-                    this.question.as     = this.metadata.as_default;
-                }
-                else {
-                    var reverse_quiz_questions = this.quiz_questions.slice().reverse();
+                this.question        = this.questions[ this.position ];
+                this.question.number = 1;
+                this.question.as     = this.metadata.as_default;
 
-                    for ( var i = 0; i < reverse_quiz_questions.length; i++ ) {
-                        if ( reverse_quiz_questions[i].form == "question" ) {
-                            var as     = this.questions[i].as     = reverse_quiz_questions[i].question_as;
-                            var number = this.questions[i].number = reverse_quiz_questions[i].question_number;
+                var reverse_quiz_questions = this.quiz_questions.slice().reverse();
+                for ( var i = 0; i < reverse_quiz_questions.length; i++ ) {
+                    var as     = this.questions[i].as     = reverse_quiz_questions[i].question_as;
+                    var number = this.questions[i].number = reverse_quiz_questions[i].question_number;
 
-                            // TODO-END: probably need to remove this entirely and clean up
-                            var result_data = result_operation( {
-                                as      : as,
-                                number  : number,
-                                result  : reverse_quiz_questions[i].result,
-                                quizzer : reverse_quiz_questions[i].quizzer,
-                                team    : reverse_quiz_questions[i].team,
-                                quiz    : JSON.parse( JSON.stringify( this.metadata.quiz_teams_quizzers ) )
-                            } );
+                    var result_data = result_operation( {
+                        number  : number,
+                        as      : as,
+                        form    : reverse_quiz_questions[i].form,
+                        result  : reverse_quiz_questions[i].result,
+                        quizzer : reverse_quiz_questions[i].quizzer,
+                        team    : reverse_quiz_questions[i].team,
+                        quiz    : JSON.parse( JSON.stringify( this.metadata.quiz_teams_quizzers ) )
+                    } );
 
-                            this.move_question("forward");
+                    this.move_question("forward");
 
-                            this.question.as     = result_data.as;
-                            this.question.number = result_data.number;
-                        }
-                    }
+                    this.question.as     = result_data.as;
+                    this.question.number = result_data.number;
                 }
             }
 

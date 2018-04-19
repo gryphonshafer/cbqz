@@ -90,6 +90,7 @@
             <label>Timer Default: <input type="text" name="timer_default" v-model="timer_default"></label>
             <label>Timeout: <input type="text" name="timeout" v-model="timeout"></label>
             <label>Timer Values: <input type="text" name="timer_values" v-model="timer_values"></label>
+            <label>Team Bonus: <input type="text" name="team_bonus" v-model="team_bonus"></label>
         </fieldset>
 
         <h3>{{ question_set.name }}</h3>

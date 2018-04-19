@@ -11,18 +11,23 @@ extends 'CBQZ::Model';
 class_has 'schema_name' => ( isa => 'Str', is => 'ro', default => 'Quiz' );
 
 sub create ( $self, $config ) {
+    my $quiz_teams_quizzers =
+        ( ref $config->{quiz_teams_quizzers} )
+            ? $config->{quiz_teams_quizzers}
+            : $self->parse_quiz_teams_quizzers( $config->{quiz_teams_quizzers} );
+
+    $_->{team}{score} = 0 + $config->{team_bonus} for (@$quiz_teams_quizzers);
+
     $self->obj(
         $self->rs->create({
             official  => ( ( $config->{official} ) ? 1 : 0 ),
             questions => $self->json->encode( $self->generate($config) ),
             metadata  => $self->json->encode( {
-                quiz_teams_quizzers => (
-                    ( ref $config->{quiz_teams_quizzers} )
-                        ? $config->{quiz_teams_quizzers}
-                        : $self->parse_quiz_teams_quizzers( $config->{quiz_teams_quizzers} )
-                ),
-                timer_values => [ map { 0 + $_ } grep { /^\d+$/ } split( /\D+/, $config->{timer_values} ) ],
-                map { $_ => $config->{$_} } qw( target_questions timer_default timeout )
+                quiz_teams_quizzers => $quiz_teams_quizzers,
+                timer_values        => [
+                    map { 0 + $_ } grep { /^\d+$/ } split( /\D+/, $config->{timer_values} )
+                ],
+                map { $_ => $config->{$_} } qw( target_questions timer_default timeout team_bonus )
             }),
             map { $_ => $config->{$_} } qw( program_id user_id name quizmaster room scheduled )
         } )->get_from_storage

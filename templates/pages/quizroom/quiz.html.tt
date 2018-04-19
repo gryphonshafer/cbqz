@@ -165,7 +165,9 @@
                         'team_' + index + '_bold'
                     ]"
                 >
-                    {{ team_set.team.name }}: {{ team_set.team.score }}
+                    {{ team_set.team.name }}:
+                    <a href="#" v-on:click="quiz_event( 'team_bonus', team_set.team.name )"
+                        >{{ team_set.team.score }}</a>
                 </td>
             </tr>
 

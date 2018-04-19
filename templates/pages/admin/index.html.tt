@@ -83,6 +83,7 @@
             <label>Timer Default: <input type="text" name="timer_default" value="[% program.timer_default %]"></label>
             <label>Timeout: <input type="text" name="timeout" value="[% program.timeout %]"></label>
             <label>Timer Values: <input type="text" name="timer_values" value="[% program.timer_values %]"></label>
+            <label>Team Bonus: <input type="text" name="team_bonus" value="[% program.team_bonus %]"></label>
             <label>As Default: <input type="text" name="as_default" value="[% program.as_default %]"></label>
 
             <input type="submit" value="Save Program Configuration">
