@@ -43,7 +43,7 @@ CREATE TABLE quiz_question (
     team VARCHAR(64) NULL,
     quizzer VARCHAR(64) NULL,
     result ENUM( 'success', 'failure', 'none' ) NULL,
-    form ENUM( 'question', 'foul', 'timeout', 'sub-in', 'sub-out', 'challenge', 'team_bonus' ) NOT NULL DEFAULT 'question',
+    form ENUM( 'question', 'foul', 'timeout', 'sub-in', 'sub-out', 'challenge', 'readiness' ) NOT NULL DEFAULT 'question',
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY(quiz_question_id),
 FOREIGN KEY(quiz_id)
@@ -57,4 +57,4 @@ FOREIGN KEY(question_id)
 ) ENGINE=InnoDB CHARSET=utf8;
 
 ALTER TABLE program ADD COLUMN timeout TINYINT NOT NULL DEFAULT 60 AFTER timer_default;
-ALTER TABLE program ADD COLUMN team_bonus TINYINT NOT NULL DEFAULT 20 AFTER timeout;
+ALTER TABLE program ADD COLUMN readiness TINYINT NOT NULL DEFAULT 20 AFTER timeout;

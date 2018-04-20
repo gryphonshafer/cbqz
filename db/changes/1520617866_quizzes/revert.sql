@@ -1,5 +1,5 @@
 ALTER TABLE program DROP COLUMN timeout;
-ALTER TABLE program DROP COLUMN team_bonus;
+ALTER TABLE program DROP COLUMN readiness;
 
 DROP TRIGGER IF EXISTS quiz_before_insert;
 

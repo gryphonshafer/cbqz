@@ -51,24 +51,29 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         }
 
         input.quiz      = vue_obj.metadata.quiz_teams_quizzers;
+        input.history   = vue_obj.quiz_questions;
         var result_data = result_operation( JSON.parse( JSON.stringify(input) ) );
 
         if ( ! skip_post_processing ) {
             for ( var i = 0; i < vue_obj.metadata.quiz_teams_quizzers.length; i++ ) {
                 if ( input.team.name == vue_obj.metadata.quiz_teams_quizzers[i].team.name ) {
-                    if ( !! result_data.team ) {
+                    if ( !! result_data.team || !! result_data.team_label ) {
                         if ( ! vue_obj.metadata.quiz_teams_quizzers[i].team.events )
                             vue_obj.metadata.quiz_teams_quizzers[i].team.events = {};
 
-                        vue_obj.metadata.quiz_teams_quizzers[i].team.score += result_data.team;
+                        if ( !! result_data.team )
+                            vue_obj.metadata.quiz_teams_quizzers[i].team.score += result_data.team;
 
                         vue_obj.metadata.quiz_teams_quizzers[i].team.events[
                             input.number
-                        ] = vue_obj.metadata.quiz_teams_quizzers[i].team.score;
+                        ] = ( !! result_data.team_label )
+                            ? result_data.team_label
+                            : vue_obj.metadata.quiz_teams_quizzers[i].team.score;
                     }
 
                     for ( var j = 0; j < vue_obj.metadata.quiz_teams_quizzers[i].quizzers.length; j++ ) {
                         if (
+                            input.quizzer &&
                             input.quizzer.name ==
                             vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].name
                         ) {
@@ -275,7 +280,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     event_data["quizzer"] = this.active_quizzer.name;
                     event_data["as"]      = this.question.as;
                 }
-                else if ( type == "foul" ) {
+                else if ( type == "foul" || type == "sub-in" || type == "sub-out" ) {
                     event_data["quizzer"] = this.active_quizzer.name;
                 }
                 else if ( type == "challenge" ) {
@@ -320,7 +325,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     this.classes.cursor_progress = true;
 
                     for ( var i = 0; i < this.metadata.quiz_teams_quizzers.length; i++ ) {
-                        this.metadata.quiz_teams_quizzers[i].team.score = parseInt( this.metadata.team_bonus );
+                        this.metadata.quiz_teams_quizzers[i].team.score = parseInt( this.metadata.readiness );
 
                         if ( !! this.metadata.quiz_teams_quizzers[i].team.events )
                             delete this.metadata.quiz_teams_quizzers[i].team.events;
@@ -332,21 +337,25 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     }
 
                     for ( var i = this.quiz_questions.length - 1; i >= 0; i-- ) {
-                        if ( this.quiz_questions[i].question_number == question_number ) {
+                        if (
+                            this.quiz_questions && this.quiz_questions[i] &&
+                            this.quiz_questions[i].question_number == question_number
+                        ) {
                             this.quiz_questions.splice( i, 1 );
                         }
 
-                        result_operation_process(
-                            this,
-                            {
-                                number  : this.quiz_questions[i].question_number,
-                                as      : this.quiz_questions[i].question_as,
-                                form    : this.quiz_questions[i].form,
-                                result  : this.quiz_questions[i].result,
-                                quizzer : this.quiz_questions[i].quizzer,
-                                team    : this.quiz_questions[i].team
-                            }
-                        );
+                        if ( this.quiz_questions && this.quiz_questions[i] )
+                            result_operation_process(
+                                this,
+                                {
+                                    number  : this.quiz_questions[i].question_number,
+                                    as      : this.quiz_questions[i].question_as,
+                                    form    : this.quiz_questions[i].form,
+                                    result  : this.quiz_questions[i].result,
+                                    quizzer : this.quiz_questions[i].quizzer,
+                                    team    : this.quiz_questions[i].team
+                                }
+                            );
                     }
 
                     this.$http.post( cntlr + "/delete_quiz_event", {

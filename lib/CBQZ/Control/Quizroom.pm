@@ -84,7 +84,7 @@ sub path ($self) {
             timer_default       => $program->obj->timer_default,
             timeout             => $program->obj->timeout,
             timer_values        => join( ', ', @{ $self->cbqz->json->decode( $program->obj->timer_values ) } ),
-            team_bonus          => $program->obj->team_bonus,
+            readiness           => $program->obj->readiness,
             question_types      => $program->question_types_as_text,
             saved_quizzes       => [
                 sort { $a->{scheduled} cmp $b->{scheduled} }
@@ -151,7 +151,7 @@ sub data ($self) {
             types         => [],
             timer_default => 0,
             timeout       => 0,
-            team_bonus    => 0,
+            readiness     => 0,
             as_default    => 'Error',
             type_ranges   => [],
         },

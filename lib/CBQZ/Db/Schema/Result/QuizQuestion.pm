@@ -121,7 +121,7 @@ __PACKAGE__->table("quiz_question");
 
   data_type: 'enum'
   default_value: 'question'
-  extra: {list => ["question","foul","timeout","sub-in","sub-out","challenge","team_bonus"]}
+  extra: {list => ["question","foul","timeout","sub-in","sub-out","challenge","readiness"]}
   is_nullable: 0
 
 =head2 created
@@ -200,7 +200,7 @@ __PACKAGE__->add_columns(
         "sub-in",
         "sub-out",
         "challenge",
-        "team_bonus",
+        "readiness",
       ],
     },
     is_nullable => 0,
@@ -269,8 +269,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07048 @ 2018-04-19 09:54:59
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:RNBEvZ5yXkokOxGdGHZZDQ
+# Created by DBIx::Class::Schema::Loader v0.07048 @ 2018-04-20 16:26:14
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:AHR9H5HY2+CxPZVZQL6weA
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

@@ -73,7 +73,7 @@ __PACKAGE__->table("program");
   default_value: 60
   is_nullable: 0
 
-=head2 team_bonus
+=head2 readiness
 
   data_type: 'tinyint'
   default_value: 20
@@ -120,7 +120,7 @@ __PACKAGE__->add_columns(
   { data_type => "tinyint", default_value => 30, is_nullable => 0 },
   "timeout",
   { data_type => "tinyint", default_value => 60, is_nullable => 0 },
-  "team_bonus",
+  "readiness",
   { data_type => "tinyint", default_value => 20, is_nullable => 0 },
   "as_default",
   { data_type => "tinytext", is_nullable => 1 },
@@ -192,8 +192,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07048 @ 2018-04-19 07:13:41
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:FM+tE0wdUru5sWGhK9X+pg
+# Created by DBIx::Class::Schema::Loader v0.07048 @ 2018-04-20 16:26:14
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:iCTZUlfAVOGEYdDub+SHEw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
