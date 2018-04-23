@@ -322,12 +322,12 @@ sub calculate_score ( $self, $material_set, $question = undef ) {
     elsif ( $question->{type} =~ /^F/ ) {
         $score =
             $common_words->( $de_int->($question_text), 'key' ) ** 1.9 +
-            ( $words->($question_text) + $words->($answer_text) ) / 24;
+            ( $words->($question_text) + $words->($answer_text) ) / 28;
     }
     elsif ( $question->{type} =~ /^Q/ ) {
         $score =
             $common_words->( $de_int->($question_text) ) ** 1.5 +
-            ( $words->($question_text) + $words->($answer_text) ) / 16;
+            ( $words->($question_text) + $words->($answer_text) ) / 20;
     }
     elsif ( $question->{type} =~ /CV?R/ ) {
         ( $question_text = $question->{question} )
