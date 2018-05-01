@@ -297,5 +297,21 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         // for Alt+F, F4: Find Text
         if ( ( event.altKey && event.keyCode == 70 ) || event.keyCode == 115 )
             vue_app.$refs.material_search.find();
+        
+        // for Alt+S: Start Timer
+        if ( event.altKey && event.keyCode == 83 )
+            document.getElementById("timer_click").click();
+
+        // for Alt+C: Correct
+        if ( event.altKey && event.keyCode == 67 )
+            document.getElementById("correct").click();
+
+        // for Alt+E: Error
+        if ( event.altKey && event.keyCode == 69 )
+            document.getElementById("error").click();
+
+        // for Alt+N: No Jump
+        if ( event.altKey && event.keyCode == 78 )
+            document.getElementById("no_jump").click();
     } );
 });
