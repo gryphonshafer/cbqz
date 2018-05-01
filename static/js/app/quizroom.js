@@ -56,7 +56,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
         if ( ! skip_post_processing ) {
             for ( var i = 0; i < vue_obj.metadata.quiz_teams_quizzers.length; i++ ) {
-                if ( input.team.name == vue_obj.metadata.quiz_teams_quizzers[i].team.name ) {
+                if ( !! input.team && input.team.name == vue_obj.metadata.quiz_teams_quizzers[i].team.name ) {
                     if ( !! result_data.team || !! result_data.team_label ) {
                         if ( ! vue_obj.metadata.quiz_teams_quizzers[i].team.events )
                             vue_obj.metadata.quiz_teams_quizzers[i].team.events = {};
@@ -275,6 +275,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                             "|" +
                             type.substr( 0, 1 ).toUpperCase()
                 };
+
                 if ( form == "question" ) {
                     event_data["result"]  = type;
                     event_data["quizzer"] = this.active_quizzer.name;
@@ -567,27 +568,22 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             document.getElementById("lookup").click();
 
         // for Alt+T: Prompt for Reference
-        if ( event.altKey && event.keyCode == 84 )
-            vue_app.$refs.material_lookup.enter_reference();
+        if ( event.altKey && event.keyCode == 84 ) vue_app.$refs.material_lookup.enter_reference();
 
         // for Alt+F, F4: Find Text
         if ( ( event.altKey && event.keyCode == 70 ) || event.keyCode == 115 )
             vue_app.$refs.material_search.find();
-        
-        // for Alt+S: Start Timer
-        if ( event.altKey && event.keyCode == 83 )
-            document.getElementById("timer_click").click();
+
+        // for Alt+S: Timer Click
+        if ( event.altKey && event.keyCode == 83 ) document.getElementById("prime_timer_button").click();
 
         // for Alt+C: Correct
-        if ( event.altKey && event.keyCode == 67 )
-            document.getElementById("correct").click();
+        if ( event.altKey && event.keyCode == 67 ) document.getElementById("button_correct").click();
 
         // for Alt+E: Error
-        if ( event.altKey && event.keyCode == 69 )
-            document.getElementById("error").click();
+        if ( event.altKey && event.keyCode == 69 ) document.getElementById("button_error").click();
 
         // for Alt+N: No Jump
-        if ( event.altKey && event.keyCode == 78 )
-            document.getElementById("no_jump").click();
+        if ( event.altKey && event.keyCode == 78 ) document.getElementById("button_no_jump").click();
     } );
 });

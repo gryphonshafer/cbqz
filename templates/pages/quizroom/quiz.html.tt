@@ -105,7 +105,9 @@
                 <div id="timer_display">{{ timer.value }}</div>
                 <button v-for="timer_value in metadata.timer_values"
                     v-on:click="set_timer(timer_value)">{{ timer_value }}</button>
-                <button id="prime_timer_button" v-on:click="timer_click">{{ timer.label }}</button>
+                <button id="prime_timer_button"
+                    v-on:click="timer_click" v-bind:title=" timer.label + ': Alt+S' "
+                >{{ timer.label }}</button>
                 <button v-on:click="make_beep">Beep</button>
             </div>
         </div>
@@ -113,16 +115,45 @@
         <div class="manage_group">
             <div id="result">
                 <b>Results/Events</b><br>
-                <!-- TODO: deactivate buttons as appropriate to prevent weird bugs -->
-                <button v-on:click="quiz_event('success')">Correct</button>
-                <button v-on:click="quiz_event('failure')">Error</button>
-                <button v-on:click="reset_quiz_select">Reset</button>
+
+                <button id="button_correct" title="Correct: Alt+C"
+                    v-on:click="quiz_event('success')"
+                    v-bind:disabled="! this.active_quizzer.name"
+                >Correct</button>
+
+                <button id="button_error" title="Error: Alt+E"
+                    v-on:click="quiz_event('failure')"
+                    v-bind:disabled="! this.active_quizzer.name"
+                >Error</button>
+
+                <button title="Reset"
+                    v-on:click="reset_quiz_select"
+                    v-bind:disabled="! this.active_quizzer.name"
+                >Reset</button>
+
                 <br>
-                <button v-on:click="quiz_event('none')">No Jump</button>
-                <button v-on:click="quiz_event('foul')">Foul</button>
+
+                <button id="button_no_jump" title="No Jump: Alt+N"
+                    v-on:click="quiz_event('none')"
+                    v-bind:disabled="this.active_quizzer.name"
+                >No Jump</button>
+
+                <button title="Foul"
+                    v-on:click="quiz_event('foul')"
+                    v-bind:disabled="! this.active_quizzer.name"
+                >Foul</button>
+
                 <br>
-                <button v-on:click="quiz_event('sub-in')">Sub In</button>
-                <button v-on:click="quiz_event('sub-out')">Sub Out</button>
+                <button title="Sub In"
+                    v-on:click="quiz_event('sub-in')"
+                    v-bind:disabled="! this.active_quizzer.name"
+                >Sub In</button>
+
+                <button title="Sub Out"
+                    v-on:click="quiz_event('sub-out')"
+                    v-bind:disabled="! this.active_quizzer.name"
+                >Sub Out</button>
+
             </div>
 
             <div id="quiz">
