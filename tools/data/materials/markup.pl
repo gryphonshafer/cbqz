@@ -18,6 +18,7 @@ my $data = [ map {
             $_;
         }
         map {
+            s/(\W)'(\w.*?\w)'(\W)/$1$2$3/g;
             s/[^A-Za-z0-9'\-]/ /gi;
             s/(?<!\w)'/ /g;
             s/\-{2,}/ /g;
@@ -120,7 +121,7 @@ markup.pl - Markup a materials data file from extracted output content files
 
 =head1 SYNOPSIS
 
-    fetch.pl OPTIONS
+    markup.pl OPTIONS
         -i|input  INPUT_FILE
         -o|output OUTPUT_FILE
         -h|help
