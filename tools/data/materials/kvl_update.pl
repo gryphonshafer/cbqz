@@ -56,11 +56,11 @@ for my $book ( keys %$kvl ) {
 
 =head1 NAME
 
-kvl_insert.pl - Update key verse list data for a given materials set database
+kvl_update.pl - Update key verse list data for a given materials set database
 
 =head1 SYNOPSIS
 
-    kvl_insert.pl OPTIONS
+    kvl_update.pl OPTIONS
         -k|kvl        KEY_VERSE_LIST_DATA_FILE
         -m|materials  MATERIALS_SET_NAME
         -h|help

@@ -7,7 +7,7 @@ use Encode 'decode_utf8';
 use CBQZ;
 use CBQZ::Util::File 'spurt';
 
-my $settings = options( qw( books|b=s@ directory|d=s ) );
+my $settings = options( qw( books|b=s@ directory|d=s version|v=s ) );
 pod2usage unless ( $settings->{books} );
 
 my $cbqz     = CBQZ->new;
@@ -17,13 +17,17 @@ my $data_dir = join( '/',
     $settings->{directory} // 'html',
 );
 
+$settings->{version} //= 'NIV';
+
 for my $book ( @{ $settings->{books} } ) {
     my $chapter = 1;
     while (1) {
         say $book, ' ', $chapter;
 
         my $result = $cbqz->ua->get(
-            'https://www.biblegateway.com/passage/?version=NIV&search=' . join( ' ', $book, $chapter )
+            'https://www.biblegateway.com/passage/' .
+                '?version=' . uc( $settings->{version} ) .
+                '&search=' . join( ' ', $book, $chapter )
         )->result;
 
         last unless (
@@ -51,6 +55,7 @@ fetch.pl - Fetch materials raw HTML content
     fetch.pl OPTIONS
         -b|books      BOOK_NAMES   (i.e. "1 Corinthians")
         -d|directory  DIRECTORY    (Optional; default: "html")
+        -v|version    VERSION      (Optional; default: "NIV")
         -h|help
         -m|man
 
