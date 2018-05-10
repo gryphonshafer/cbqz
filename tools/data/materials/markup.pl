@@ -14,10 +14,6 @@ my $data = [ map {
 
     $verse->{words} = [
         map {
-            $words->{$_}++;
-            $_;
-        }
-        map {
             s/(\W)'(\w.*?\w)'(\W)/$1$2$3/g;
             s/[^A-Za-z0-9'\-]/ /gi;
             s/(?<!\w)'/ /g;
@@ -28,6 +24,11 @@ my $data = [ map {
         }
         map { $_ } $verse->{text}
     ];
+
+    my $verse_words_dedup;
+    $verse_words_dedup->{$_}++ for ( @{ $verse->{words} } );
+    $verse->{words_dedup} = [ sort keys %$verse_words_dedup ];
+    $words->{$_}++ for ( @{ $verse->{words_dedup} } );
 
     $words_by_chapter->{ $verse->{book} . ' ' . $verse->{chapter} }{$_}++ for ( @{ $verse->{words} } );
 
