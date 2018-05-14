@@ -43,7 +43,9 @@ CREATE TABLE quiz_question (
     team VARCHAR(64) NULL,
     quizzer VARCHAR(64) NULL,
     result ENUM( 'success', 'failure', 'none' ) NULL,
-    form ENUM( 'question', 'foul', 'timeout', 'sub-in', 'sub-out', 'challenge', 'readiness' ) NOT NULL DEFAULT 'question',
+    form ENUM(
+        'question', 'foul', 'timeout', 'sub-in', 'sub-out', 'challenge', 'readiness', 'unsportsmanlike'
+    ) NOT NULL DEFAULT 'question',
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY(quiz_question_id),
 FOREIGN KEY(quiz_id)

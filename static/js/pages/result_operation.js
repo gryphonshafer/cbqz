@@ -167,5 +167,10 @@ else if ( input.form == "readiness" ) {
     output.team       = -20;
 }
 
-// TODO: deliberate question forfeit
-// TODO: 2-team quizzing: initial conditions + OT
+else if ( input.form == "unsportsmanlike" ) {
+    output.team_label = "U-";
+    output.team       = -10;
+}
+
+// TODO: 2-team quizzing: initial conditions
+// TODO: 2-team quizzing: OT

@@ -197,9 +197,7 @@
                         'team_' + index + '_bold'
                     ]"
                 >
-                    {{ team_set.team.name }}:
-                    <a href="#" v-on:click="quiz_event( 'readiness', team_set.team )"
-                        >{{ team_set.team.score }}</a>
+                    {{ team_set.team.name }}: {{ team_set.team.score }}
                 </td>
             </tr>
 
@@ -221,11 +219,17 @@
                         </table>
                     </td>
                     <td v-bind:class="[ 'vertical_text', 'team_' + index + '_bold' ]"><div>
-                        <a href="#" title="Timeout"
-                            v-on:click="quiz_event( 'timeout', team_set.team )">Timeout</a>
-                        |
-                        <a href="#" title="Challenge"
-                            v-on:click="quiz_event( 'challenge', team_set.team )">Chall.</a>
+                        <a href="#" title="Issue Timeout"
+                            v-on:click="quiz_event( 'timeout', team_set.team )">T/O</a>
+
+                        <a href="#" title="Record Challenge"
+                            v-on:click="quiz_event( 'challenge', team_set.team )">Chal.</a>
+
+                        <a href="#" title="Remove Readiness Bonus"
+                            v-on:click="quiz_event( 'readiness', team_set.team )">-R</a>
+
+                        <a href="#" title="Add Unsportsmanlike Penalty"
+                            v-on:click="quiz_event( 'unsportsmanlike', team_set.team )">-U</a>
                     </div></td>
                 </template>
             </tr>

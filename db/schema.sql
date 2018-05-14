@@ -127,7 +127,7 @@ CREATE TABLE quiz_question (
     team varchar(64) DEFAULT NULL,
     quizzer varchar(64) DEFAULT NULL,
     result enum('success','failure','none') DEFAULT NULL,
-    form enum('question','foul','timeout','sub-in','sub-out','challenge','readiness') NOT NULL DEFAULT 'question',
+    form enum('question','foul','timeout','sub-in','sub-out','challenge','readiness','unsportsmanlike') NOT NULL DEFAULT 'question',
     created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (quiz_question_id),
     KEY quiz_id (quiz_id),
