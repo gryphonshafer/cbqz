@@ -830,7 +830,7 @@ div#quizroom div#timer div#timer_display {
 div#quizroom div#scorekeeping {
     display: inline-block;
     vertical-align: top;
-    margin-top: 4px;
+    margin-top: 5px;
     margin-left: 2px;
     width: 525px;
     min-width: 525px;

@@ -37,7 +37,12 @@ if ( input.form == "question" ) {
         output.team    = 20;
         output.label   = 20;
 
-        if ( int_number >= 17 && input.as == "Bonus" ) {
+        if (
+            input.as == "Bonus" && (
+                ( int_number >= 17 && input.sk_type != "2-Team 15-Question Tie-Breaker" ) ||
+                ( int_number >= 13 && input.sk_type == "2-Team 15-Question Tie-Breaker" )
+            )
+        ) {
             output.quizzer = 10;
             output.team    = 10;
             output.label   = 10;
@@ -66,10 +71,13 @@ if ( input.form == "question" ) {
     else if ( input.result == "failure" ) {
         output.label = "E";
 
-        if ( input.as == "Standard" ) {
+        if ( input.as == "Standard" && input.sk_type.substr( 0, 1 ) == "3" ) {
             output.as = "Toss-Up";
         }
-        else if ( input.as == "Toss-Up" ) {
+        else if (
+            input.as == "Toss-Up" ||
+            ( input.as == "Standard" && input.sk_type.substr( 0, 1 ) == "2" )
+        ) {
             output.as = "Bonus";
         }
         else if ( input.as == "Bonus" ) {
@@ -77,13 +85,19 @@ if ( input.form == "question" ) {
             output.as    = "Standard";
         }
 
-        if ( int_number < 16 ) {
+        if (
+            ( int_number < 16 && input.sk_type != "2-Team 15-Question Tie-Breaker" ) ||
+            ( int_number < 12 && input.sk_type == "2-Team 15-Question Tie-Breaker" )
+        ) {
             output.number = int_number + 1;
         }
-        else if ( input.number == int_number ) {
+        else if ( input.number == int_number && input.sk_type != "2-Team 15-Question Tie-Breaker" ) {
             output.number = int_number + "A";
         }
-        else if ( input.number == int_number + "A" ) {
+        else if (
+            input.number == int_number + "A" ||
+            ( input.number == int_number && input.sk_type == "2-Team 15-Question Tie-Breaker" )
+        ) {
             output.number = int_number + "B";
         }
         else if ( input.number == int_number + "B" ) {
@@ -103,6 +117,11 @@ if ( input.form == "question" ) {
         output.as     = "Standard";
         output.number = int_number + 1;
     }
+
+    if (
+        output.as == "Standard" && output.number == 21 &&
+        ( input.sk_type == "3-Team 20-Question" || input.sk_type == "2-Team 20-Question" )
+    ) output.sk_type = "2-Team Overtime";
 }
 
 else if ( input.form == "foul" ) {
@@ -174,11 +193,3 @@ else if ( input.form == "unsportsmanlike" ) {
     output.team_label = "U-";
     output.team       = -10;
 }
-
-// TODO...
-
-// 3-team 20-question DONE
-// 2-team 15-question tie-breaker
-// 2-team 20-question
-// 2-team overtime
-// 3-team overtime
