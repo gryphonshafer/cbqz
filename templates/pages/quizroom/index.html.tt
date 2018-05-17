@@ -1,5 +1,5 @@
 [%
-    page.title = 'Quiz Room';
+    page.title = 'Quiz Setup';
     page.menu  = 'quizroom';
     page.vue   = 1;
 
@@ -7,17 +7,102 @@
 %]
 
 <div id="quiz_setup" v-cloak>
+    <div v-if="saved_quizzes.length > 0">
+        <h2>Previously Generated Quizzes</h2>
+
+        <table class="tabular">
+            <tr>
+                <th>Quiz Name</th>
+                <th>Quizmaster</th>
+                <th>Scheduled</th>
+                <th>Room</th>
+                <th>Type</th>
+                <th>State</th>
+                <th>Created</th>
+                <th>Last Modified</th>
+            </tr>
+            <tr
+                v-for="quiz in saved_quizzes"
+                v-bind:class="{
+                    selected: quiz.official,
+                    selected_extra: ( quiz.state == 'active' ) ? true : false
+                }"
+            >
+                <td><a href="#" v-on:click="start_quiz( quiz.quiz_id )">{{ quiz.name }}</a></td>
+                <td>{{ quiz.quizmaster }}</td>
+                <td class="right">{{ quiz.scheduled }}</td>
+                <td class="right">{{ quiz.room }}</td>
+                <td>{{ ( quiz.official ) ? "Official" : "Practice" }}</td>
+                <td>{{ quiz.state.charAt(0).toUpperCase() + quiz.state.slice(1) }}</td>
+                <td class="right">{{ quiz.created }}</td>
+                <td class="right">{{ quiz.last_modified }}</td>
+            </tr>
+        </table>
+    </div>
+
     <h2>Quiz Generation Configuration Settings</h2>
 
     <p>
         Use the following page form to select and set the configuration settings
-        for quiz generation. <b>Note that changing the question types settings
-        will only change this setting for quizzes generated in this session.</b>
-        Revisiting this settings page and clicking on "Start Quiz" will revert
-        to the program/district/zone default configuration.
+        for quiz generation.
     </p>
 
-    <form>
+    <form method="post" action="[% c.url_for('/quizroom/generate_quiz') %]">
+        <fieldset>
+            <legend>Quiz Metadata</legend>
+
+            <label>Quiz Name: <input type="text" name="name" v-model="name"></label>
+            <label>Quizmaster: <input type="text" name="quizmaster" v-model="quizmaster"></label>
+            <label>Scheduled: <input type="text" name="scheduled" v-model="scheduled"></label>
+
+            <label id="room">
+                Room:
+                <select name="room">
+                    <option v-for="room in 9">{{ room }}</option>
+                </select>
+            </label>
+
+            <div id="checkboxes">
+                <label v-if="user_is_official"><input type="checkbox"
+                    name="official" v-model="official"> Official Quiz</label>
+                <label><input type="checkbox"
+                    name="save_for_later" v-model="save_for_later"> Save for Later</label>
+            </div>
+
+            <button type="submit" v-bind:disabled="! generate_ready"
+                >Generate Quiz and {{ ( this.save_for_later ) ? 'Save for Later' : 'Start Now' }}</button>
+        </fieldset>
+
+        <fieldset>
+            <legend>Question Types</legend>
+            <textarea name="question_types" v-model="question_types"></textarea>
+        </fieldset>
+
+        <fieldset>
+            <legend>Scoring and Teams/Quizzers</legend>
+            <textarea name="quiz_teams_quizzers" v-model="quiz_teams_quizzers"></textarea>
+        </fieldset>
+
+        <fieldset id="questions_and_timers">
+            <legend>Questions and Timers</legend>
+
+            <label>Target Questions: <input type="text" name="target_questions" v-model="target_questions"></label>
+            <label>Timer Default: <input type="text" name="timer_default" v-model="timer_default"></label>
+            <label>Timeout: <input type="text" name="timeout" v-model="timeout"></label>
+            <label>Timer Values: <input type="text" name="timer_values" v-model="timer_values"></label>
+            <label>Readiness Bonus: <input type="text" name="readiness" v-model="readiness"></label>
+
+            <div>
+                Initial Score Type:
+                <br>
+                <select name="score_type">
+                    <option v-for="score_type in score_types">{{ score_type }}</option>
+                </select>
+            </div>
+        </fieldset>
+
+        <h3>{{ question_set.name }}</h3>
+
         <fieldset>
             <legend>Chapter Weighting</legend>
             Weight last
@@ -31,65 +116,54 @@
             <input type="text" size="1" v-model="weight_percent">%
         </fieldset>
 
-        <fieldset>
-            <legend>Question Types</legend>
-            <textarea v-model="question_types"></textarea>
-        </fieldset>
+        <div>
+            <p>
+                Auto-Select Chapters:
+                <button type="button" v-on:click="select_chapters('all')">All</button>
+                <button type="button" v-on:click="select_chapters('none')">None</button>
+            </p>
 
-        <button type="button"
-            v-on:click="start_quiz" v-bind:disabled="! selected_chapters_count">Start Quiz</button>
+            <table class="tabular numeric" v-if="question_set.statistics.length > 0">
+                <tr>
+                    <th></th>
+                    <th>Book</th>
+                    <th>Ch.</th>
+                    <th>Vrs.</th>
+                    <th>Qs.</th>
+                    <th>Qs./V.</th>
+                    <th class="question_type_totals"
+                        v-for="type in question_set.statistics[0].types">{{ type[0] }}</th>
+                    <th>Marked</th>
+                </tr>
+
+                <tr
+                    v-for="chapter in question_set.statistics"
+                    v-on:click="chapter_clicked(chapter)"
+                    v-bind:class="{
+                        selected: chapter.selected,
+                        selected_extra: chapter.weighted
+                    }"
+                >
+                    <td class="center">
+                        <input type="checkbox"
+                            v-bind:value="chapter.book + '|' + chapter.chapter"
+                            v-model="chapter.selected"
+                        >
+                    </td>
+                    <td class="left">{{ chapter.book }}</td>
+                    <td>{{ chapter.chapter }}</td>
+                    <td>{{ chapter.questions }}</td>
+                    <td>{{ chapter.verses }}</td>
+                    <td>{{ ( chapter.questions / chapter.verses ).toFixed(2) }}</td>
+                    <td class="question_type_totals"
+                        v-for="type in chapter.types">{{ type[1] || 0 }}</td>
+                    <td>{{ chapter.marked }}</td>
+                </tr>
+            </table>
+
+            <p v-if="question_set.statistics.length == 0">
+                There are no questions yet written for this question set.
+            </p>
+        </div>
     </form>
-
-    <h3>{{ question_set.name }}</h3>
-
-    <div>
-        <p>
-            Auto-Select Chapters:
-            <button v-on:click="select_chapters('all')">All</button>
-            <button v-on:click="select_chapters('none')">None</button>
-        </p>
-
-        <table class="tabular numeric" v-if="question_set.statistics.length > 0">
-            <tr>
-                <th></th>
-                <th>Book</th>
-                <th>Ch.</th>
-                <th>Vrs.</th>
-                <th>Qs.</th>
-                <th>Qs./V.</th>
-                <th class="question_type_totals"
-                    v-for="type in question_set.statistics[0].types">{{ type[0] }}</th>
-                <th>Marked</th>
-            </tr>
-
-            <tr
-                v-for="chapter in question_set.statistics"
-                v-on:click="chapter_clicked(chapter)"
-                v-bind:class="{
-                    selected: chapter.selected,
-                    selected_extra: chapter.weighted
-                }"
-            >
-                <td class="center">
-                    <input type="checkbox"
-                        name="selected_chapters"
-                        v-bind:value="chapter.book + '|' + chapter.chapter"
-                        v-model="chapter.selected"
-                    >
-                </td>
-                <td class="left">{{ chapter.book }}</td>
-                <td>{{ chapter.chapter }}</td>
-                <td>{{ chapter.questions }}</td>
-                <td>{{ chapter.verses }}</td>
-                <td>{{ ( chapter.questions / chapter.verses ).toFixed(2) }}</td>
-                <td class="question_type_totals"
-                    v-for="type in chapter.types">{{ type[1] || 0 }}</td>
-                <td>{{ chapter.marked }}</td>
-            </tr>
-        </table>
-
-        <p v-if="question_set.statistics.length == 0">
-            There are no questions yet written for this question set.
-        </p>
-    </div>
 </div>

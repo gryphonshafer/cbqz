@@ -1,6 +1,9 @@
 Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
     var data = response.body;
 
+    data.official       = false;
+    data.save_for_later = false;
+
     new Vue({
         el: "#quiz_setup",
         data: data,
@@ -58,8 +61,8 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
                     }
                 }
             },
-            start_quiz: function () {
-                document.location.href = cntlr + "/quiz";
+            start_quiz: function (quiz_id) {
+                document.location.href = cntlr + "/quiz?id=" + quiz_id;
             }
         },
 
@@ -74,6 +77,19 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
 
                 if ( this.weight_chapters > count ) this.weight_chapters = count;
                 return count;
+            },
+            generate_ready: function () {
+                return (
+                    this.name.length > 0 &&
+                    this.quizmaster.length > 0 &&
+                    this.scheduled.length > 0 &&
+                    this.question_types.length > 0 &&
+                    this.quiz_teams_quizzers.length > 0 &&
+                    this.target_questions > 0 &&
+                    this.timer_default > 0 &&
+                    this.timer_values.length > 0 &&
+                    this.selected_chapters_count > 0
+                ) ? true : false;
             }
         },
 

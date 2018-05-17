@@ -1,11 +1,62 @@
 package CBQZ::Model::Quiz;
 
 use Moose;
+use MooseX::ClassAttribute;
 use exact;
 use Try::Tiny;
 use CBQZ::Model::Program;
 
-extends 'CBQZ';
+extends 'CBQZ::Model';
+
+class_has 'schema_name' => ( isa => 'Str', is => 'ro', default => 'Quiz' );
+
+sub create ( $self, $config ) {
+    my $quiz_teams_quizzers =
+        ( ref $config->{quiz_teams_quizzers} )
+            ? $config->{quiz_teams_quizzers}
+            : $self->parse_quiz_teams_quizzers( $config->{quiz_teams_quizzers} );
+
+    $_->{team}{score} = 0 + $config->{readiness} for (@$quiz_teams_quizzers);
+
+    $self->obj(
+        $self->rs->create({
+            official  => ( ( $config->{official} ) ? 1 : 0 ),
+            questions => $self->json->encode( $self->generate($config) ),
+            metadata  => $self->json->encode( {
+                quiz_teams_quizzers => $quiz_teams_quizzers,
+                timer_values        => [
+                    map { 0 + $_ } grep { /^\d+$/ } split( /\D+/, $config->{timer_values} )
+                ],
+                score_types => $self->json->decode(
+                    CBQZ::Model::Program->new->load( $config->{program_id} )->obj->score_types
+                ),
+                map { $_ => $config->{$_} } qw( target_questions timer_default timeout readiness score_type )
+            }),
+            map { $_ => $config->{$_} } qw( program_id user_id name quizmaster room scheduled )
+        } )->get_from_storage
+    );
+
+    return $self;
+}
+
+sub quizzes_for_user ( $self, $user, $program ) {
+    return [
+        map { +{ $_->get_inflated_columns } }
+        $self->rs->search(
+            {
+                user_id    => $user->obj->id,
+                program_id => $program->obj->id,
+                state      => [ qw( pending active ) ],
+            },
+            {
+                order_by => [
+                    { -desc => 'official' },
+                    { -asc  => [ qw( scheduled room ) ] },
+                ],
+            },
+        )->all
+    ];
+}
 
 sub chapter_set ( $self, $cbqz_prefs ) {
     my @chapter_set_prime = map { $_->{book} . ' ' . $_->{chapter} } @{ $cbqz_prefs->{selected_chapters} };
@@ -23,17 +74,11 @@ sub generate ( $self, $cbqz_prefs ) {
     my $chapter_set            = $self->chapter_set($cbqz_prefs);
     my $program                = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
     my $target_questions_count = $program->obj->target_questions;
-    my @question_types         =
-        map {
-            my ( $label, $min, $max, @types ) = split(/\W+/);
-            [ \@types, [ $min, $max ], $label ];
-        }
-        grep { /^\W*\w+\W+\w+\W+\w+\W+\w+/ }
-        split( /\r?\n/, $cbqz_prefs->{question_types} );
+    my @question_types         = @{ $program->question_types_parse( $cbqz_prefs->{question_types} ) };
 
     my ( @questions, $error );
     try {
-        die "No chapters selected from which to build a quiz; select chapters and retry"
+        E->throw('No chapters selected from which to build a quiz; select chapters and retry')
             unless ( length $chapter_set->{prime} or length $chapter_set->{weight} );
 
         # select the minimum questions for each question type
@@ -92,7 +137,7 @@ sub generate ( $self, $cbqz_prefs ) {
                 push( @pending_questions, @$results );
             }
 
-            die 'Unable to meet quiz set minimum requirements' if ( @pending_questions < $min );
+            E->throw('Unable to meet quiz set minimum requirements') if ( @pending_questions < $min );
             push( @questions, @pending_questions );
         }
 
@@ -207,16 +252,20 @@ sub generate ( $self, $cbqz_prefs ) {
             push( @questions, $question );
         }
 
-        die 'Failed to create a question set to target size' if ( @questions < $target_questions_count );
+        E->throw('Failed to create a question set to target size') if ( @questions < $target_questions_count );
     }
     catch {
-        $error = $self->clean_error($_);
+        E->throw($_);
     };
 
-    return {
-        questions => \@questions,
-        error     => $error,
-    };
+    return [
+        map {
+            $_->{number} = undef;
+            $_->{as}     = undef;
+            $_->{marked} = undef;
+            $_;
+        } @questions
+    ];
 }
 
 sub replace ( $self, $request, $cbqz_prefs ) {
@@ -263,7 +312,57 @@ sub replace ( $self, $request, $cbqz_prefs ) {
         })->run( $cbqz_prefs->{question_set_id}, $request->{type} )->all({});
     }
 
+    my $questions = $self->json->decode( $self->obj->questions );
+    my $question  = \%{ $results->[0] };
+
+    $question->{$_}     = $questions->[ $request->{position} ]{$_} for ( qw( number as ) );
+    $question->{marked} = undef;
+
+    $questions->[ $request->{position} ] = $question;
+    $self->obj->update({ questions => $self->json->encode($questions) });
+
     return $results;
+}
+
+sub parse_quiz_teams_quizzers ( $self, $quiz_teams_quizzers_string ) {
+    return [
+        map {
+            my @quizzers = split(/\r?\n/);
+            ( my $team = shift @quizzers ) =~ s/^\s+|\s+$//g;
+            E->throw('Team name parsing failed') unless ( $team and $team =~ /\w/ and $team !~ /\n/ );
+            {
+                team => {
+                    name  => $team,
+                    score => 0,
+                },
+                quizzers => [
+                    map {
+                        /^\s*(?<bib>\d+)\D\s*(?<name>\w[\w\s]*)/;
+                        my $quizzer = +{ %+ };
+                        $quizzer->{name} =~ s/^\s+|\s+$//g;
+                        $quizzer->{name} =~ s/\s+/ /g;
+
+                        E->throw('Quizzer name parsing failed') unless (
+                            $quizzer->{name} and
+                            $quizzer->{name} =~ /\w/ and
+                            $quizzer->{name} !~ /\n/
+                        );
+
+                        E->throw('Quizzer bib parsing failed') unless (
+                            $quizzer->{bib} and
+                            $quizzer->{bib} =~ /^\d+$/
+                        );
+
+                        +{
+                            %$quizzer,
+                            correct   => 0,
+                            incorrect => 0,
+                        };
+                    } @quizzers
+                ],
+            };
+        } split( /(?:\r?\n){2,}/, $quiz_teams_quizzers_string )
+    ];
 }
 
 __PACKAGE__->meta->make_immutable;

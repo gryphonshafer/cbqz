@@ -1,3 +1,5 @@
+# dest.postreq: db/changes/1472568489_create_tables
+
 LOCK TABLES role WRITE;
 
 ALTER TABLE role DROP INDEX user_program_type;

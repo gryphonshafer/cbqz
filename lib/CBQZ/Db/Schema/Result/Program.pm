@@ -67,10 +67,27 @@ __PACKAGE__->table("program");
   default_value: 30
   is_nullable: 0
 
+=head2 timeout
+
+  data_type: 'tinyint'
+  default_value: 60
+  is_nullable: 0
+
+=head2 readiness
+
+  data_type: 'tinyint'
+  default_value: 20
+  is_nullable: 0
+
 =head2 as_default
 
   data_type: 'tinytext'
   is_nullable: 1
+
+=head2 score_types
+
+  data_type: 'mediumtext'
+  is_nullable: 0
 
 =head2 created
 
@@ -106,8 +123,14 @@ __PACKAGE__->add_columns(
   { data_type => "tinytext", is_nullable => 1 },
   "timer_default",
   { data_type => "tinyint", default_value => 30, is_nullable => 0 },
+  "timeout",
+  { data_type => "tinyint", default_value => 60, is_nullable => 0 },
+  "readiness",
+  { data_type => "tinyint", default_value => 20, is_nullable => 0 },
   "as_default",
   { data_type => "tinytext", is_nullable => 1 },
+  "score_types",
+  { data_type => "mediumtext", is_nullable => 0 },
   "created",
   {
     data_type => "timestamp",
@@ -145,6 +168,21 @@ __PACKAGE__->add_unique_constraint("name", ["name"]);
 
 =head1 RELATIONS
 
+=head2 quizzes
+
+Type: has_many
+
+Related object: L<CBQZ::Db::Schema::Result::Quiz>
+
+=cut
+
+__PACKAGE__->has_many(
+  "quizzes",
+  "CBQZ::Db::Schema::Result::Quiz",
+  { "foreign.program_id" => "self.program_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 user_programs
 
 Type: has_many
@@ -161,8 +199,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-01-04 20:42:51
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:B0xWPJ4fjjjfd8qOnJLBOA
+# Created by DBIx::Class::Schema::Loader v0.07048 @ 2018-05-16 15:29:22
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:v9iiywjpRbcA3GorLDN5IA
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

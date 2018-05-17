@@ -108,12 +108,14 @@ table.tabular td {
     padding: 1px 3px 1px 3px;
 }
 
-tr.selected td {
-    background-color: #ccffcc;
+tr.selected td,
+td.selected {
+    background-color: #ccffcc !important;
 }
 
-tr.selected_extra td {
-    background-color: #ffeeaa;
+tr.selected_extra td,
+td.selected_extra {
+    background-color: #ffeeaa !important;
 }
 
 table.numeric td {
@@ -130,6 +132,10 @@ table td.center {
 
 table td.right {
     text-align: right;
+}
+
+table.clear td {
+    background-color: transparent;
 }
 
 table.overflow_active td.overflow_toggle {
@@ -360,7 +366,7 @@ div#header_login input[type="password"]:hover {
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -680,12 +686,52 @@ div#quiz_setup fieldset {
 div#quiz_setup textarea {
     font-family: normal;
     font-size: 13px;
-    width: 240px;
-    height: 50px;
+    width: 200px;
+    height: 138px;
 }
 
 div#quiz_setup button {
     margin-top: 14px;
+}
+
+div#quiz_setup form fieldset label {
+    width: 200px;
+    text-align: right;
+    margin-bottom: 3px;
+}
+
+div#quiz_setup form fieldset label input[type=text] {
+    width: 120px;
+}
+
+div#quiz_setup form fieldset#questions_and_timers input[type=text] {
+    width: 80px;
+}
+
+div#quiz_setup form fieldset label#room {
+    display: inline-block;
+    vertical-align: top;
+    width: auto;
+    margin-left: 43px;
+    text-align: left;
+}
+
+div#quiz_setup div#checkboxes {
+    display: inline-block;
+    vertical-align: top;
+}
+
+div#quiz_setup div#checkboxes label {
+    text-align: left;
+    display: block;
+    width: auto;
+    margin-top: -1px;
+    margin-bottom: -2px;
+}
+
+div#quiz_setup button[type=submit] {
+    display: block;
+    margin-left: auto;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -704,20 +750,22 @@ div#quizroom div#material_lookup {
     display: inline-block;
     vertical-align: top;
     width: calc( 100vw - 635px );
+    margin-top: -3px;
 }
 
 div#quizroom div#material_lookup_display {
-    height: 375px;
+    height: 336px;
 }
 
-div#quizroom div#material_search {
-    display: block;
+div#quizroom div#material_search_wrapper {
+    display: inline-block;
     vertical-align: top;
     margin-top: -25px;
+    width: calc( 100vw - 562px );
 }
 
 div#quizroom div#material_search_display {
-    height: calc( 100vh - 508px );
+    height: calc( 100vh - 469px );
 }
 
 div#quizroom div#manage {
@@ -725,52 +773,193 @@ div#quizroom div#manage {
     width: 130px;
 }
 
+div#quizroom div#manage div#timer {
+    margin-top: 2px;
+}
+
+div#quizroom div#manage div#result,
+div#quizroom div#manage div#quiz,
+div#quizroom div#manage div#replace {
+    margin-top: 5px;
+}
+
+div#quizroom div#manage button {
+    margin: 0px 0px 3px 0px;
+    padding: 0px 2px 0px 2px;
+}
+
+div#quizroom div#manage div#navigation button {
+    width: 30px;
+}
+
+div#quizroom div#manage div#navigation button#toggle_view_button {
+    width: 50px;
+}
+
 div#quizroom div#manage div#timer button {
     width: 35px;
+    margin-right: 3px;
 }
 
 div#quizroom div#manage div#timer button#prime_timer_button {
     width: 89px;
     overflow: hidden;
+    margin-right: -1px;
 }
 
-div#quizroom div#manage div#timer,
-div#quizroom div#manage div#result,
-div#quizroom div#manage div#replace {
-    margin-top: 10px;
+div#quizroom div#manage div#replace button {
+    margin-right: 3px;
 }
 
 div#quizroom div#timer div#timer_display {
     border: 1px solid lightgray;
     background-color: white;
-    padding: 1px 10px 1px 10px;
-    width: 67px;
+    margin: 0px 3px 3px 0px;
+    padding: 0px 0px 0px 0px;
+    width: 87px;
+    height: 61px;
     float: left;
-    margin-right: 4px;
     text-align: center;
     overflow: hidden;
     font-size: 400%;
     font-family: medium;
 }
 
-div#quizroom div#manage div#result button,
-div#quizroom div#manage div#mark button,
-div#quizroom div#manage div#replace button {
-    margin: 1px -1px 1px -1px;
-    padding: 0px 2px 0px 2px;
+/* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
+
+div#quizroom div#scorekeeping {
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 5px;
+    margin-left: 2px;
+    width: 525px;
+    min-width: 525px;
+    height: calc( 100vh - 469px );
+    background: white;
+    border: 1px solid lightgray;
+    overflow: auto;
+    overflow-x: hidden;
 }
 
-div#quizroom div#manage div#mark {
-    margin-top: 12px;
+div#quizroom div#scorekeeping a {
+    text-decoration: none;
+    color: black;
+    margin-right: 2px;
 }
 
-@media ( max-width: 1000px ) {
+div#quizroom div#scorekeeping a:hover {
+    text-decoration: underline;
+    color: #0000cc;
+}
+
+div#quizroom div#scorekeeping table {
+    table-layout: fixed;
+    width: calc( 100% + 2px );
+    margin: -1px !important;
+}
+
+div#quizroom div#scorekeeping table td {
+    text-align: center;
+    padding: 0px 0px 0px 0px;
+}
+
+div#quizroom div#scorekeeping table tr#quizzer_names > td {
+    padding: 0px;
+}
+
+div#quizroom div#scorekeeping table tr#quizzer_names td:hover:not(.selected) table td {
+    background-color: #ffccff;
+    cursor: pointer;
+}
+
+div#quizroom div#scorekeeping table tr td.selected,
+div#quizroom div#scorekeeping table tr td.selected table td {
+    font-family: bold;
+    font-weight: normal;
+}
+
+div#quizroom div#scorekeeping table td.vertical_text {
+    vertical-align: top;
+}
+
+div#quizroom div#scorekeeping table td.vertical_text div {
+    width: 70px;
+    transform: rotate(90deg) translate( 34px, -2px );
+    white-space: nowrap;
+    margin-left: calc( 50% - 37px );
+}
+
+div#quizroom div#scorekeeping table td.quizzer_name {
+    vertical-align: top;
+    text-align: left;
+    height: 82px;
+}
+
+div#quizroom div#scorekeeping table td.quizzer_name div {
+    transform: rotate(90deg) translate( 34px, 0px );
+    width: 75px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+div#quizroom div#scorekeeping table td.shaded {
+    background-color: #f0f0f0;
+}
+
+div#quizroom div#scorekeeping table td.team_0_bold {
+    background-color: #ffe0e0;
+}
+
+div#quizroom div#scorekeeping table td.team_0_mild {
+    background-color: #ffffff;
+}
+
+div#quizroom div#scorekeeping table td.team_1_bold {
+    background-color: #ffffe0;
+}
+
+div#quizroom div#scorekeeping table td.team_1_mild {
+    background-color: #ffffff;
+}
+
+div#quizroom div#scorekeeping table td.team_2_bold {
+    background-color: #f0f0ff;
+}
+
+div#quizroom div#scorekeeping table td.team_2_mild {
+    background-color: #ffffff;
+}
+
+div#quizroom div#scorekeeping table td.team_3_bold,
+div#quizroom div#scorekeeping table td.team_4_bold,
+div#quizroom div#scorekeeping table td.team_5_bold {
+    background-color: #f6f6f6;
+}
+
+div#quizroom div#rearrange_quizzers {
+    width: 310px;
+    height: 510px;
+}
+
+div#quizroom div#rearrange_quizzers textarea {
+    width: 285px;
+    height: 330px;
+    resize: none;
+}
+
+div#quizroom div#rearrange_quizzers fieldset {
+    margin-top: 10px;
+}
+
+/* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
+
+@media ( max-width: 1000px ) and ( min-width: 850px ) {
     div#quizroom div#material_lookup button {
         display: block;
     }
 
     div#quizroom div#material_lookup_display {
-        height: 355px;
+        height: 316px;
     }
 }
 
@@ -778,81 +967,111 @@ div#quizroom div#manage div#mark {
     div#quizroom div#quiz_view {
         width: calc( 100vw - 40px );
     }
-}
 
-@media ( max-width: 850px ) {
-    div#quizroom div#material_lookup {
-        width: auto;
-        margin-top: 5px;
-    }
-
-    div#quizroom div#material_search {
-        margin-top: 0px;
-    }
-
-    div#quizroom div#material_search_display {
-        height: calc( 100vh - 875px );
-    }
-}
-
-@media ( max-width: 850px ) and ( min-width: 639px ) {
-    div#quizroom div#manage {
-        position: absolute;
-        top: 65px;
-        right: 30px;
-    }
-}
-
-@media ( max-width: 638px ) {
-    div#quizroom {
-        display: flex;
-        flex-wrap: wrap;
-    }
-    div#question {
-        order: 1;
-    }
-    div#manage {
-        order: 2;
-    }
-    div#material_lookup {
-        order: 3;
-    }
-    div#material_search {
-        order: 4;
-    }
-
-    div#manage {
-        width: auto !important;
-        margin-left: 0px !important;
-        margin-top: 10px !important;
-        margin-bottom: 10px !important;
-    }
-
-    div#manage > div {
-        width: 130px;
-        margin-right: 10px;
-    }
-
-    div#manage div.manage_group {
-        display: inline-block;
-        vertical-align: top;
-    }
-
-    div#quizroom div#material_search {
-        width: 100%;
+    div#quizroom div#material_search input {
+        width: calc( 100vw - 720px );
     }
 }
 
 @media ( max-width: 850px ) and ( max-height: 966px ) {
     div#quizroom div#material_search_display {
-        height: 130px;
+        height: 91px;
     }
 }
 
-@media ( max-height: 640px ) {
-    div#quizroom div#material_search_display {
-        height: 130px;
+@media ( max-width: 850px ) {
+    div#quizroom {
+        display: flex;
+        flex-wrap: wrap;
     }
+    div#quizroom div#question {
+        order: 1;
+    }
+    div#quizroom div#manage {
+        order: 2;
+    }
+    div#quizroom div#scorekeeping {
+        order: 3;
+        height: 162px !important;
+        margin-left: 0px !important;
+    }
+    div#quizroom div#material_lookup {
+        order: 4;
+        width: auto !important;
+        margin-top: 3px !important;
+    }
+    div#quizroom div#material_search_wrapper {
+        order: 5;
+        margin-top: 0px !important;
+        width: 100% !important;
+    }
+
+    div#quizroom div#material_search_display {
+        height: 316px !important;
+    }
+}
+
+@media ( max-width: 615px ) {
+    div#quizroom div#manage {
+        margin-top: 5px;
+        margin-left: 0px !important;
+        width: auto;
+        min-width: 450px;
+    }
+
+    div#quizroom div.manage_group {
+        width: 130px;
+        display: inline-block;
+        vertical-align: top;
+    }
+
+    div#quizroom div.manage_group div#replace,
+    div#quizroom div.manage_group div#result {
+        margin-top: -3px !important;
+    }
+
+    div#quizroom div.manage_group:first-of-type {
+        margin-right: 20px;
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+
+form#program_config fieldset {
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+form#program_config textarea {
+    font-family: normal;
+    font-size: 13px;
+    width: 200px;
+    height: 137px;
+}
+
+form#program_config fieldset label {
+    width: 250px;
+    text-align: right;
+    margin-bottom: 3px;
+}
+
+form#program_config fieldset label input[type=text] {
+    width: 130px;
+}
+
+form#program_config fieldset#questions_and_timers input[type=text] {
+    width: 80px;
+}
+
+form#program_config input[type=submit] {
+    display: block;
+    margin-left: auto;
+}
+
+form#program_config fieldset#result_operation textarea {
+    width: 476px;
 }
 
 /* -------------------------------------------------------------------------- */

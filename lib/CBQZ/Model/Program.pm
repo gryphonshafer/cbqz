@@ -4,6 +4,7 @@ use Moose;
 use MooseX::ClassAttribute;
 use exact;
 use CBQZ::Model::User;
+use CBQZ::Util::File 'slurp';
 
 extends 'CBQZ::Model';
 
@@ -19,54 +20,26 @@ sub create_default ($self) {
 
     $rs->set_cache([ $rs->create({
         name           => 'Default Quiz Program',
-        question_types => $self->json->encode(
-            [
-                [ ['INT'],                     [ 8, 12 ], 'INT' ],
-                [ [ qw( MA MACR MACVR ) ],     [ 2,  7 ], 'MA'  ],
-                [ [ qw( CR CVR MACR MACVR ) ], [ 3,  5 ], 'Ref' ],
-                [ [ qw( Q Q2V ) ],             [ 1,  2 ], 'Q'   ],
-                [ [ qw( FT FTN FTV F2V ) ],    [ 2,  3 ], 'F'   ],
-                [ ['SIT'],                     [ 0,  4 ], 'SIT' ],
-            ],
+        question_types => $self->json->encode([
+            [ ['INT'],                     [ 8, 12 ], 'INT' ],
+            [ ['MA'],                      [ 2,  7 ], 'MA'  ],
+            [ [ qw( CR CVR MACR MACVR ) ], [ 3,  5 ], 'Ref' ],
+            [ [ qw( Q Q2V ) ],             [ 1,  2 ], 'Q'   ],
+            [ [ qw( FT FTN FTV F2V ) ],    [ 2,  3 ], 'F'   ],
+            [ ['SIT'],                     [ 0,  4 ], 'SIT' ],
+        ]),
+        result_operation => slurp(
+            $self->config->get( qw( config_app root_dir ) ) . '/static/js/pages/result_operation.js'
         ),
-        target_questions => 40,
-        result_operation => q/
-            if ( result == "correct" ) {
-                as     = "Standard";
-                number = parseInt(number) + 1;
-            }
-            else if ( result == "error" ) {
-                if ( as == "Standard" ) {
-                    as = "Toss-Up";
-                }
-                else if ( as == "Toss-Up" ) {
-                    as = "Bonus";
-                }
-                else if ( as == "Bonus" ) {
-                    as = "Standard";
-                }
-
-                if ( parseInt(number) < 16 ) {
-                    number = parseInt(number) + 1;
-                }
-                else if ( number == parseInt(number) ) {
-                    number = parseInt(number) + "A";
-                }
-                else if ( number == parseInt(number) + "A" ) {
-                    number = parseInt(number) + "B";
-                }
-                else if ( number == parseInt(number) + "B" ) {
-                    number = parseInt(number) + 1;
-                }
-            }
-            else if ( result == "no_jump" ) {
-                as     = "Standard";
-                number = parseInt(number) + 1;
-            }
-        /,
-        timer_values  => $self->json->encode([ 5, 30, 60, 90 ]),
-        timer_default => 30,
-        as_default    => 'Standard',
+        timer_values => $self->json->encode([ 5, 30, 60 ]),
+        as_default   => 'Standard',
+        score_types  => $self->json->encode([
+            '3-Team 20-Question',
+            '2-Team 15-Question Tie-Breaker',
+            '2-Team 20-Question',
+            '2-Team Overtime',
+            '3-Team Overtime',
+        ]),
     })->get_from_storage ]);
 
     return $rs;
@@ -109,14 +82,17 @@ sub users ($self) {
     return (wantarray) ? @$users : $users;
 }
 
-sub admin_roles_data ( $self, $user, $roles ) {
+sub admin_data ( $self, $user, $roles ) {
     return [
         map {
             my $program = $_;
 
             +{
                 %{ $program->data },
-                users => [
+                question_types => $program->question_types_as_text,
+                timer_values   => join( ', ', @{ $self->json->decode( $program->obj->timer_values ) } ),
+                score_types    => join( "\n", @{ $self->json->decode( $program->obj->score_types ) } ),
+                users          => [
                     sort { lc $a->{username} cmp lc $b->{username} }
                     map {
                         my $user       = $_;
@@ -150,6 +126,27 @@ sub admin_roles_data ( $self, $user, $roles ) {
                 } @{ $user->programs }
         )
     ];
+}
+
+sub question_types_parse ( $self, $text ) {
+    return [
+        map {
+            my ( $label, $min, $max, @types ) = split(/\W+/);
+            [ \@types, [ $min, $max ], $label ];
+        }
+        grep { /^\W*\w+\W+\w+\W+\w+\W+\w+/ }
+        split( /\r?\n/, $text )
+    ];
+}
+
+sub question_types_as_text ( $self, $json = undef ) {
+    $json //= $self->obj->question_types;
+
+    return join( "\n",
+        map {
+            $_->[2] . ': ' . $_->[1][0] . '-' . $_->[1][1] . ' (' . join( ' ', @{ $_->[0] } ) . ')'
+        } @{ $self->json->decode($json) }
+    );
 }
 
 __PACKAGE__->meta->make_immutable;
