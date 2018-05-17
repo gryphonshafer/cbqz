@@ -58,7 +58,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
         var result_data = result_operation( JSON.parse( JSON.stringify(input) ) );
 
-        if ( !! output.sk_types ) vue_obj.metadata.score_types = output.sk_types;
+        if ( !! result_data.sk_types ) vue_obj.metadata.score_types = result_data.sk_types;
 
         if ( ! skip_post_processing ) {
             for ( var i = 0; i < vue_obj.metadata.quiz_teams_quizzers.length; i++ ) {
@@ -160,7 +160,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
             toggle_rearrange_quizzers: function (save) {
                 if ( this.rearrange_quizzers_hidden ) {
-                    var build_string = "";
+                    var build_string    = "";
+                    this.set_score_type = this.metadata.score_type;
 
                     for ( var i = 0; i < this.metadata.quiz_teams_quizzers.length; i++ ) {
                         if ( build_string.length > 0 ) build_string = build_string + "\n\n";
@@ -177,7 +178,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 }
                 else if (save) {
                     this.classes.cursor_progress = true;
-                    this.metadata.scoretype      = this.set_score_type;
+                    this.metadata.score_type     = this.set_score_type;
 
                     this.$http.post( cntlr + "/rearrange_quizzers", {
                         metadata      : this.metadata,
