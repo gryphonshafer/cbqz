@@ -113,6 +113,20 @@
         </div>
 
         <div class="manage_group">
+            <div id="quiz">
+                <b>Quiz Management</b><br>
+                <button v-on:click="print_quiz">Print</button>
+                <button v-on:click="exit_quiz">Exit</button>
+                <button v-on:click="close_quiz">Close</button>
+            </div>
+
+            <div id="replace">
+                <b>Replace Question</b><br>
+                <button v-for="type in metadata.types" v-on:click="replace(type)">{{ type }}</button>
+            </div>
+        </div>
+
+        <div class="manage_group">
             <div id="result">
                 <b>Results/Events</b><br>
 
@@ -153,21 +167,6 @@
                     v-on:click="quiz_event('sub-out')"
                     v-bind:disabled="! this.active_quizzer.name"
                 >Sub Out</button>
-
-            </div>
-
-            <div id="quiz">
-                <b>Quiz Management</b><br>
-                <button v-on:click="print_quiz">Print</button>
-                <button v-on:click="exit_quiz">Exit</button>
-                <button v-on:click="close_quiz">Close</button>
-            </div>
-        </div>
-
-        <div class="manage_group">
-            <div id="replace">
-                <b>Replace Question</b><br>
-                <button v-for="type in metadata.types" v-on:click="replace(type)">{{ type }}</button>
             </div>
         </div>
     </div>
@@ -185,10 +184,12 @@
     <div id="scorekeeping">
         <table class="tabular">
             <tr>
-                <td rowspan="2" class="vertical_text shaded"><div>
-                    <a href="#" title="Rearrange Quizzer Listing Order"
-                        v-on:click="toggle_rearrange_quizzers">Rearrange Quizzers</a>
-                </div></td>
+                <td rowspan="2" class="vertical_text shaded">
+                    <div>
+                        <a href="#" title="Rearrange Quizzer Listing Order"
+                            v-on:click="toggle_rearrange_quizzers">Rearrange / SK Type</a>
+                    </div>
+                </td>
                 <td
                     v-for="( team_set, index ) in metadata.quiz_teams_quizzers"
                     v-bind:colspan="team_set.quizzers.length + 1"
@@ -284,12 +285,19 @@
             <button v-on:click="toggle_rearrange_quizzers(false)">Exit</button>
         </div>
 
-        <h2>Rearrange Quizzers</h2>
+        <h2>Rearrange Quizzers / Set Score Type</h2>
 
         <form>
             <fieldset>
                 <legend>Quiz Teams/Quizzers</legend>
                 <textarea name="quiz_teams_quizzers" v-model="rearrange_quizzers_data"></textarea>
+            </fieldset>
+
+            <fieldset>
+                <legend>Current Score Type</legend>
+                <select name="score_type" v-model="set_score_type">
+                    <option v-for="score_type in metadata.score_types">{{ score_type }}</option>
+                </select>
             </fieldset>
         </form>
     </div>

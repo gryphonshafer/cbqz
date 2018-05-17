@@ -1,14 +1,16 @@
 // input.
 //     number   : Current question number (i.e. "16", "17A")
 //     as       : Current question "as" value (i.e. "Standard", "Toss-Up", "Bonus")
-//     form     : Type of event
-//                (enum "question", "foul", "timeout", "sub-in", "sub-out", "challenge", "readiness")
-//     result   : Result of current answer (enum "success", "failure", "none" )
+//     form     : Type of event (enum: "question", "foul", "timeout", "sub-in",
+//                "sub-out", "challenge", "readiness", "unsportsmanlike" )
+//     result   : Result of current answer (enum: "success", "failure", "none" )
 //     quizzer  : Quizzer data object (of quizzer for the event)
 //     quizzers : Array of quizzer data objects (of all quizzers in the team)
 //     team     : Team data object
 //     quiz     : Complex data structure of teams, quizzers, and scores
 //     history  : Array of questions and results of the past in the quiz thus far
+//     sk_type  : The current score type in use (as defined on admin page and set in quiz setup)
+//     sk_types : All score types for the current program (as defined on admin page)
 
 // output.
 //     number      : Next question number (i.e. "16", "17A")
@@ -19,6 +21,7 @@
 //     team_label  : Text override for the team cell scoresheet display
 //     skip_counts : Boolean; default false; if true, will skip quizzer counts incrementing
 //     message     : Optional alert message text (i.e. "Quiz Out")
+//     sk_type     : If set, will change the current score type to this value
 
 var int_number = parseInt( input.number );
 output.number  = input.number;
@@ -172,5 +175,10 @@ else if ( input.form == "unsportsmanlike" ) {
     output.team       = -10;
 }
 
-// TODO: 2-team quizzing: initial conditions
-// TODO: 2-team quizzing: OT
+// TODO...
+
+// 3-team 20-question DONE
+// 2-team 15-question tie-breaker
+// 2-team 20-question
+// 2-team overtime
+// 3-team overtime

@@ -45,6 +45,7 @@ CREATE TABLE program (
     timeout tinyint(4) NOT NULL DEFAULT '60',
     readiness tinyint(4) NOT NULL DEFAULT '20',
     as_default tinytext,
+    score_types mediumtext NOT NULL,
     created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (program_id),
     UNIQUE KEY name (name)

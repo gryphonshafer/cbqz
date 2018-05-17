@@ -73,6 +73,10 @@ sub save_program_config ($self) {
             map { 0 + $_ } grep { /^\d+$/ } split( /\D+/, $params->{timer_values} )
         ] );
 
+        $params->{score_types} = $program->json->encode( [
+            map { s/^\s+|\s+$//g; $_ } grep { /\S/ } split( /\r?\n/, $params->{score_types} )
+        ] );
+
         delete $params->{program_id};
         $program->obj->update($params);
 

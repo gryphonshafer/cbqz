@@ -938,13 +938,17 @@ div#quizroom div#scorekeeping table td.team_5_bold {
 
 div#quizroom div#rearrange_quizzers {
     width: 310px;
-    height: 410px;
+    height: 510px;
 }
 
 div#quizroom div#rearrange_quizzers textarea {
     width: 285px;
     height: 330px;
     resize: none;
+}
+
+div#quizroom div#rearrange_quizzers fieldset {
+    margin-top: 10px;
 }
 
 /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */

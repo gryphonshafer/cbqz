@@ -20,21 +20,26 @@ sub create_default ($self) {
 
     $rs->set_cache([ $rs->create({
         name           => 'Default Quiz Program',
-        question_types => $self->json->encode(
-            [
-                [ ['INT'],                     [ 8, 12 ], 'INT' ],
-                [ ['MA'],                      [ 2,  7 ], 'MA'  ],
-                [ [ qw( CR CVR MACR MACVR ) ], [ 3,  5 ], 'Ref' ],
-                [ [ qw( Q Q2V ) ],             [ 1,  2 ], 'Q'   ],
-                [ [ qw( FT FTN FTV F2V ) ],    [ 2,  3 ], 'F'   ],
-                [ ['SIT'],                     [ 0,  4 ], 'SIT' ],
-            ],
-        ),
+        question_types => $self->json->encode([
+            [ ['INT'],                     [ 8, 12 ], 'INT' ],
+            [ ['MA'],                      [ 2,  7 ], 'MA'  ],
+            [ [ qw( CR CVR MACR MACVR ) ], [ 3,  5 ], 'Ref' ],
+            [ [ qw( Q Q2V ) ],             [ 1,  2 ], 'Q'   ],
+            [ [ qw( FT FTN FTV F2V ) ],    [ 2,  3 ], 'F'   ],
+            [ ['SIT'],                     [ 0,  4 ], 'SIT' ],
+        ]),
         result_operation => slurp(
             $self->config->get( qw( config_app root_dir ) ) . '/static/js/pages/result_operation.js'
         ),
-        timer_values  => $self->json->encode([ 5, 30, 60 ]),
-        as_default    => 'Standard',
+        timer_values => $self->json->encode([ 5, 30, 60 ]),
+        as_default   => 'Standard',
+        score_types  => $self->json->encode([
+            '3-Team 20-Question',
+            '2-Team 15-Question Tie-Breaker',
+            '2-Team 20-Question',
+            '2-Team Overtime',
+            '3-Team Overtime',
+        ]),
     })->get_from_storage ]);
 
     return $rs;
@@ -86,6 +91,7 @@ sub admin_data ( $self, $user, $roles ) {
                 %{ $program->data },
                 question_types => $program->question_types_as_text,
                 timer_values   => join( ', ', @{ $self->json->decode( $program->obj->timer_values ) } ),
+                score_types    => join( "\n", @{ $self->json->decode( $program->obj->score_types ) } ),
                 users          => [
                     sort { lc $a->{username} cmp lc $b->{username} }
                     map {

@@ -60,3 +60,8 @@ FOREIGN KEY(question_id)
 
 ALTER TABLE program ADD COLUMN timeout TINYINT NOT NULL DEFAULT 60 AFTER timer_default;
 ALTER TABLE program ADD COLUMN readiness TINYINT NOT NULL DEFAULT 20 AFTER timeout;
+ALTER TABLE program ADD COLUMN score_types MEDIUMTEXT NOT NULL AFTER as_default;
+
+SELECT '["3-Team 20-Question","2-Team 15-Question Tie-Breaker","2-Team 20-Question"' into @score_types;
+SELECT CONCAT( @score_types, ',"2-Team Overtime","3-Team Overtime"]' ) into @score_types;
+UPDATE program SET score_types = @score_types;

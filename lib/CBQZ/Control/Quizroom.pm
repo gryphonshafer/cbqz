@@ -84,6 +84,7 @@ sub path ($self) {
             timer_default       => $program->obj->timer_default,
             timeout             => $program->obj->timeout,
             timer_values        => join( ', ', @{ $self->cbqz->json->decode( $program->obj->timer_values ) } ),
+            score_types         => $self->cbqz->json->decode( $program->obj->score_types ),
             readiness           => $program->obj->readiness,
             question_types      => $program->question_types_as_text,
             saved_quizzes       => [
@@ -331,7 +332,7 @@ sub replace ($self) {
             my $results = CBQZ::Model::Quiz->new->load( $request->{quiz_id} )->replace( $request, $cbqz_prefs );
             return $self->render( json => {
                 question => (@$results) ? $results->[0] : undef,
-                error    => (@$results) ? undef : 'Failed to find question of that type.',
+                error    => (@$results) ? undef : 'Failed to find question of that type',
             } );
         }
     }
@@ -377,12 +378,12 @@ sub rearrange_quizzers ($self) {
         my $quiz          = CBQZ::Model::Quiz->new->load( $request->{metadata}{quiz_id} );
         my $quizzers_data = $quiz->parse_quiz_teams_quizzers( $request->{quizzers_data} );
 
-        E->throw('There appears to be a team missing in the submitted lineup.') unless (
+        E->throw('There appears to be a team missing in the submitted lineup') unless (
             join( '|', sort map { $_->{team}{name} } @$quizzers_data ) eq
             join( '|', sort map { $_->{team}{name} } @{ $request->{metadata}{quiz_teams_quizzers} } )
         );
 
-        E->throw('There appears to be a quizzer missing in the submitted lineup.') unless (
+        E->throw('There appears to be a quizzer missing in the submitted lineup') unless (
             join( '|', sort map { map { $_->{name} } @{ $_->{quizzers} } } @$quizzers_data ) eq
             join( '|', sort map { map { $_->{name} } @{ $_->{quizzers} } }
                 @{ $request->{metadata}{quiz_teams_quizzers} } )

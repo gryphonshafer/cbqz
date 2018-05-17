@@ -84,6 +84,11 @@ __PACKAGE__->table("program");
   data_type: 'tinytext'
   is_nullable: 1
 
+=head2 score_types
+
+  data_type: 'mediumtext'
+  is_nullable: 0
+
 =head2 created
 
   data_type: 'timestamp'
@@ -124,6 +129,8 @@ __PACKAGE__->add_columns(
   { data_type => "tinyint", default_value => 20, is_nullable => 0 },
   "as_default",
   { data_type => "tinytext", is_nullable => 1 },
+  "score_types",
+  { data_type => "mediumtext", is_nullable => 0 },
   "created",
   {
     data_type => "timestamp",
@@ -192,8 +199,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07048 @ 2018-04-20 16:26:14
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:iCTZUlfAVOGEYdDub+SHEw
+# Created by DBIx::Class::Schema::Loader v0.07048 @ 2018-05-16 15:29:22
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:v9iiywjpRbcA3GorLDN5IA
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

@@ -79,7 +79,7 @@
         </fieldset>
 
         <fieldset>
-            <legend>Quiz Teams/Quizzers</legend>
+            <legend>Scoring and Teams/Quizzers</legend>
             <textarea name="quiz_teams_quizzers" v-model="quiz_teams_quizzers"></textarea>
         </fieldset>
 
@@ -91,6 +91,14 @@
             <label>Timeout: <input type="text" name="timeout" v-model="timeout"></label>
             <label>Timer Values: <input type="text" name="timer_values" v-model="timer_values"></label>
             <label>Readiness Bonus: <input type="text" name="readiness" v-model="readiness"></label>
+
+            <div>
+                Initial Score Type:
+                <br>
+                <select name="score_type">
+                    <option v-for="score_type in score_types">{{ score_type }}</option>
+                </select>
+            </div>
         </fieldset>
 
         <h3>{{ question_set.name }}</h3>

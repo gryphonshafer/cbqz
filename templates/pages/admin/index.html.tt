@@ -94,6 +94,11 @@
             <textarea name="question_types">[% program.question_types %]</textarea>
         </fieldset>
 
+        <fieldset>
+            <legend>Score Types</legend>
+            <textarea name="score_types">[% program.score_types %]</textarea>
+        </fieldset>
+
         <br>
 
         <fieldset id="result_operation">

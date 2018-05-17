@@ -23,6 +23,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
     data.quiz_view_hidden          = 1;
     data.rearrange_quizzers_hidden = 1;
     data.rearrange_quizzers_data   = "";
+    data.set_score_type            = "";
     data.position                  = 0;
     data.mean_score                = null;
     data.active_team               = {};
@@ -50,9 +51,14 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 } )[0];
         }
 
-        input.quiz      = vue_obj.metadata.quiz_teams_quizzers;
-        input.history   = vue_obj.quiz_questions;
+        input.quiz     = vue_obj.metadata.quiz_teams_quizzers;
+        input.history  = vue_obj.quiz_questions;
+        input.sk_type  = vue_obj.metadata.score_type;
+        input.sk_types = vue_obj.metadata.score_types;
+
         var result_data = result_operation( JSON.parse( JSON.stringify(input) ) );
+
+        if ( !! output.sk_types ) vue_obj.metadata.score_types = output.sk_types;
 
         if ( ! skip_post_processing ) {
             for ( var i = 0; i < vue_obj.metadata.quiz_teams_quizzers.length; i++ ) {
@@ -171,6 +177,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 }
                 else if (save) {
                     this.classes.cursor_progress = true;
+                    this.metadata.scoretype      = this.set_score_type;
 
                     this.$http.post( cntlr + "/rearrange_quizzers", {
                         metadata      : this.metadata,
