@@ -62,7 +62,7 @@ sub create ( $self, $params ) {
     }
 
     # if there are no user with the "Administrator" role, add the "Administrator" roll to this new user
-    $self->add_role('Administrator') unless (
+    $self->add_role( 'Administrator', $program_id ) unless (
         $self->rs->search(
             {
                 'me.active'  => 1,
