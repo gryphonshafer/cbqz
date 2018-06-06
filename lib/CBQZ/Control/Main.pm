@@ -350,4 +350,29 @@ sub save_set_select_users ($self) {
     return $self->redirect_to('/main/question_sets');
 }
 
+sub export_question_set ($self) {
+    my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
+
+    if ( $set and $set->is_usable_by( $self->stash('user') ) ) {
+        $self->stash(
+            questions => [
+                sort {
+                    $a->{book} cmp $b->{book} or
+                    $a->{chapter} <=> $b->{chapter} or
+                    $a->{verse} <=> $b->{verse} or
+                    $a->{type} cmp $b->{type}
+                } @{ $set->get_questions([]) }
+            ],
+        );
+
+        ( my $filename = $set->obj->name . '.xls' ) =~ s/[\\\/:?"<>|]+/_/g;
+        $self->res->headers->content_type('application/vnd.ms-excel');
+        $self->res->headers->content_disposition(qq{attachment; filename="$filename"});
+    }
+    else {
+        $self->flash( message => 'Your user does not have rights to export the specified question set.' );
+        return $self->redirect_to('/main/question_sets');
+    }
+}
+
 1;

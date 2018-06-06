@@ -38,6 +38,9 @@
         <button type="button"
             onclick="publish_share_set( [% set.question_set_id %], 'Share' )">Set Share To</button>
         <button type="button" onclick="question_set_delete([% set.question_set_id %])">Delete</button>
+        <button type="button"
+            onclick="document.location.href = 'export_question_set?question_set_id=[% set.question_set_id %]'"
+            >Export</button>
     [% END %]
 [% ELSE %]
     <h2>No Question Sets for User: [% user.obj.username %]</h2>

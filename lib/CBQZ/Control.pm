@@ -6,11 +6,12 @@ use Mojo::Loader 'load_class';
 use Mojo::Util 'b64_decode';
 use MojoX::Log::Dispatch::Simple;
 use Try::Tiny;
+use Text::CSV_XS 'csv';
 use CBQZ;
 use CBQZ::Model::User;
 use CBQZ::Util::Format 'log_date';
 use CBQZ::Util::Template 'tt_settings';
-use CBQZ::Util::File 'most_recent_modified';
+use CBQZ::Util::File qw( most_recent_modified slurp );
 
 sub startup ( $self, $app = undef ) {
     my $cbqz   = CBQZ->new;
@@ -95,11 +96,22 @@ sub startup ( $self, $app = undef ) {
         tt_settings( 'web', $config->get('template'), { version => $config->get('version') } ),
     );
 
-    # JSON rendering
-    $self->renderer->add_handler( 'json' => sub { ${ $_[2] } = eval { $cbqz->json->encode( $_[3]{json} ) } } );
-
     # set default rendering handler
     $self->renderer->default_handler('tt');
+
+    # CSV rendering
+    $self->renderer->add_handler( 'csv' => sub {
+        my ( $renderer, $c, $output, $options ) = @_;
+
+        $options->{format} = 'csv';
+
+        if ( my $filename = $c->stash->{filename} ) {
+            $c->res->headers->content_type(qq{text/csv; name="$filename"});
+            $c->res->headers->content_disposition(qq{attachment; filename="$filename"});
+        }
+
+        csv( in => $c->stash->{content}, out => $output );
+    } );
 
     # pre-load controllers
     load_class( 'CBQZ::Control::' . $_ ) for qw( Main Editor Quizroom Admin );

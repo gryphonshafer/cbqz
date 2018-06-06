@@ -2,10 +2,12 @@
     page = {};
 
     DEFAULT
-        page.title = '',
-        page.vue   = 0,
-        page.js    = [],
-        page.links = [];
+        page.title       = '',
+        page.vue         = 0,
+        page.js          = [],
+        page.links       = [],
+        page.skip_layout = 0,
+        page.skip_style  = 0;
 
     version = c.config.get('version') _ '.' _ c.config.get('sub_version');
 
@@ -26,13 +28,20 @@
 
         <link rel="shortcut icon" type="image/x-icon"
             href="[% c.url_for('/favicon.ico').query( version => version ) %]" />
-        <link rel="stylesheet" type="text/css"
-            href="[% c.url_for('/style.css').query( version => version ) %]" />
+
+        [% UNLESS page.skip_style %]
+            <link rel="stylesheet" type="text/css"
+                href="[% c.url_for('/style.css').query( version => version ) %]" />
+        [% END %]
 
         <title>[% page.title %]</title>
     </head>
     <body>
-        [% PROCESS page_layout.html.tt %]
+        [% UNLESS page.skip_layout %]
+            [% PROCESS page_layout.html.tt %]
+        [% ELSE %]
+            [% content %]
+        [% END %]
 
         [% IF page.vue %]
             <script type="text/javascript" src="[%
