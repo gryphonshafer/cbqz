@@ -135,7 +135,7 @@ sub question_types_parse ( $self, $text ) {
             [ \@types, [ $min, $max ], $label ];
         }
         grep { /^\W*\w+\W+\w+\W+\w+\W+\w+/ }
-        split( /\r?\n/, $text )
+        split( /\r?\n/, $text // '' )
     ];
 }
 

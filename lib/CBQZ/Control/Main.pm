@@ -3,6 +3,8 @@ package CBQZ::Control::Main;
 use Mojo::Base 'Mojolicious::Controller';
 use exact;
 use Try::Tiny;
+use Text::Unidecode 'unidecode';
+use Text::CSV_XS 'csv';
 use CBQZ::Model::User;
 use CBQZ::Model::Program;
 use CBQZ::Model::MaterialSet;
@@ -373,6 +375,54 @@ sub export_question_set ($self) {
         $self->flash( message => 'Your user does not have rights to export the specified question set.' );
         return $self->redirect_to('/main/question_sets');
     }
+}
+
+sub import_question_set ($self) {
+    try {
+        my $question_import = $self->req->upload('question_import');
+        E->throw('Failed to retrieve import data')
+            unless ( $question_import->filename and $question_import->size );
+
+        my $csv_data = unidecode( $question_import->slurp ) || '';
+
+        $csv_data =~ s/\r//g;
+        $csv_data =~ s/[\x91\x92]/'/g;
+        $csv_data =~ s/[\x93\x94]/"/g;
+        $csv_data =~ s/\x97/\./g;
+        $csv_data =~ s/\xBB/>/g;
+
+        my $questions = [
+            map {
+                my $question = $_;
+                $question = { map { lc $_ => $question->{$_} } keys %$question };
+                +{ map { $_ => $question->{$_} } qw( book chapter verse type question answer ) };
+            }
+            @{ csv( in => \$csv_data, headers => 'auto' ) }
+        ];
+
+        E->throw('Failed to parse uploaded data') unless (@$questions);
+
+        my $set = CBQZ::Model::QuestionSet->new->create(
+            $self->stash('user'),
+            $self->req->param('question_set_name'),
+        )->import_questions(
+            $questions,
+            CBQZ::Model::MaterialSet->new->load( $self->decode_cookie('cbqz_prefs')->{material_set_id} ),
+        );
+
+        $self->flash( message => {
+            type => 'success',
+            text =>
+                'Import started successfully; Note that a fair amount of post-processing of the imported ' .
+                'data will continue for a time after seeing this message; You can refresh this page and ' .
+                'look at the Questions Count number to monitor progress.',
+        } );
+    }
+    catch {
+        $self->flash( message => 'Import failed; ' . $self->clean_error($_) );
+    };
+
+    return $self->redirect_to('/main/question_sets');
 }
 
 1;

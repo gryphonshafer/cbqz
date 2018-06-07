@@ -5,7 +5,7 @@
 
 [% IF user_question_sets %]
     <h2>Question Sets for User: [% user.obj.username %]</h2>
-    <button type="button" onclick="question_set_create()">Create New Set</button>
+    <p><button type="button" onclick="question_set_create()">Create New Set</button></p>
 
     [% FOR set IN user_question_sets %]
         <h3>[% set.name %]</h3>
@@ -74,3 +74,29 @@
         [% END %]
     </table>
 [% END %]
+
+<h2>Questions Data Import</h2>
+
+<p>
+    To import questions data, you need to create a comma-separated file (CSV)
+    with the first row being a header row and containing the following columns
+    (in any order):
+</p>
+
+<ul>
+    <li>Book</li>
+    <li>Chapter</li>
+    <li>Verse</li>
+    <li>Type</li>
+    <li>Question</li>
+    <li>Answer</li>
+</ul>
+
+<form action="[% c.url_for('/main/import_question_set') %]" method="post" enctype="multipart/form-data">
+    <fieldset>
+        <legend>Upload CSV of Questions Data</legend>
+        <label>New Question Set Name: <input type="text" name="question_set_name"></label>
+        <input type="file" name="question_import">
+        <button>Import</button>
+    </fieldset>
+</form>

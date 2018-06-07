@@ -50,33 +50,6 @@ sub main {
     if ( my $cbqz_prefs = _cbqz_prefs() ) {
         my $quiz;
         lives_ok( sub { $quiz = $obj->generate($cbqz_prefs) }, '$obj->generate' );
-        ok(
-            ref($quiz) eq 'HASH' &&
-                ref( $quiz->{questions} ) eq 'ARRAY' &&
-                @{ $quiz->{questions} } > 0 &&
-                exists $quiz->{error},
-            'generated quiz basic sanity check',
-        );
-
-        my $question;
-        lives_ok(
-            sub {
-                $question = $obj->replace(
-                    {
-                        questions => $quiz->{questions},
-                        type      => $quiz->{questions}[0]{type},
-                    },
-                    $cbqz_prefs,
-                );
-            },
-            '$obj->replace',
-        );
-        ok(
-            ref($question) eq 'ARRAY' &&
-                @$question > 0 &&
-                $question->[0]{type},
-            'replaced question basic sanity check',
-        );
     }
 
     done_testing();

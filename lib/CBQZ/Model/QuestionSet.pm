@@ -12,7 +12,7 @@ has 'statistics' => ( isa => 'ArrayRef[HashRef]', is => 'rw', lazy => 1, default
     return shift->generate_statistics;
 } );
 
-sub create ( $self, $user, $name = undef ){
+sub create ( $self, $user, $name = undef ) {
     $name //= 'Default ' . ucfirst( $user->obj->realname || $user->obj->username ) . ' Set';
 
     $self->obj(
@@ -167,6 +167,36 @@ sub save_set_select_users ( $self, $user, $type, $selected_user_ids ) {
     ) for (@$selected_user_ids);
 
     return;
+}
+
+sub import_questions ( $self, $questions, $material_set ) {
+    $self->fork( sub {
+        for my $question_data (@$questions) {
+            $question_data->{type} = 'MACR'  if ( $question_data->{type} eq 'CRMA'  );
+            $question_data->{type} = 'MACVR' if ( $question_data->{type} eq 'CVRMA' );
+            $question_data->{type} = 'Q'     if ( $question_data->{type} eq 'QT'    );
+
+            $question_data->{verse} =~ s/\D.*$//g;
+
+            $question_data->{question} =~ s/^\s+|\s+$//g;
+            $question_data->{answer}   =~ s/^\s+|\s+$//g;
+
+            $question_data->{question} =~ s/^Q:\s+//i;
+            $question_data->{answer}   =~ s/^A:\s+//i;
+
+            $question_data->{question_set_id} = $self->obj->id;
+
+            my $question_obj = CBQZ::Model::Question->new->create($question_data);
+
+            my $data = $question_obj->auto_text($material_set);
+            $data->{marked} = delete $data->{error} if ( $data->{error} );
+
+            $question_obj->obj->update($data);
+            $question_obj->calculate_score($material_set);
+        }
+    } );
+
+    return $self;
 }
 
 __PACKAGE__->meta->make_immutable;
