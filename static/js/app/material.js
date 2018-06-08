@@ -2,23 +2,22 @@ Vue.http.get( cntlr + "/material_data" ).then( function (response) {
     var vue_app = new Vue({
         el: '#material',
         data: {
-            lookup: {
-                book    : null,
-                chapter : null,
-                verse   : null
-            },
             material: response.body.material
         },
         methods: {
             lookup_reference_change: function ( book, chapter, verse ) {
-                this.lookup.book    = book;
-                this.lookup.chapter = chapter;
-                this.lookup.verse   = verse;
+                this.$refs.material_search.set_selected_ref(
+                    book,
+                    chapter,
+                    verse
+                );
             },
             search_reference_click: function (verse) {
-                this.lookup.book    = verse.book;
-                this.lookup.chapter = verse.chapter;
-                this.lookup.verse   = verse.verse;
+                this.$refs.material_lookup.lookup_reference(
+                    verse.book,
+                    verse.chapter,
+                    verse.verse
+                );
             }
         }
     });

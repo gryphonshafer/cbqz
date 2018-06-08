@@ -2,11 +2,6 @@ var beep = new Audio( cntlr + "/../beep.mp3" );
 
 Vue.http.get( cntlr + "/data" ).then( function (response) {
     var data = response.body;
-    data.lookup = {
-        book    : null,
-        chapter : null,
-        verse   : null
-    };
     data.question = {
         number   : null,
         type     : null,
@@ -119,9 +114,11 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     parseInt( this.question.chapter ) > 0 &&
                     parseInt( this.question.verse ) > 0
                 ) {
-                    this.lookup.book    = this.question.book;
-                    this.lookup.chapter = this.question.chapter;
-                    this.lookup.verse   = this.question.verse;
+                    this.$refs.material_lookup.lookup_reference(
+                        this.question.book,
+                        this.question.chapter,
+                        this.question.verse
+                    );
                 }
                 else {
                     alert("Incomplete reference; lookup not possible.");
@@ -488,15 +485,19 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             },
 
             lookup_reference_change: function ( book, chapter, verse ) {
-                this.lookup.book    = book;
-                this.lookup.chapter = chapter;
-                this.lookup.verse   = verse;
+                this.$refs.material_search.set_selected_ref(
+                    book,
+                    chapter,
+                    verse
+                );
             },
 
             search_reference_click: function (verse) {
-                this.lookup.book    = verse.book;
-                this.lookup.chapter = verse.chapter;
-                this.lookup.verse   = verse.verse;
+                this.$refs.material_lookup.lookup_reference(
+                    verse.book,
+                    verse.chapter,
+                    verse.verse
+                );
             },
 
             select_quizzer: function ( team, quizzer ) {

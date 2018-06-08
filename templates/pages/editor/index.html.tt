@@ -217,7 +217,6 @@
     <material-lookup
         ref="material_lookup"
         v-bind:material="material"
-        v-bind:lookup="lookup"
         clickable="true"
         v-on:reference-change="lookup_reference_change"
         v-on:reference-click="lookup_reference_click"
@@ -226,7 +225,6 @@
     <material-search
         ref="material_search"
         v-bind:material="material"
-        v-bind:lookup="lookup"
         clickable="true"
         v-on:reference-click="search_reference_click"
     ></material-search>

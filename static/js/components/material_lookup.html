@@ -57,7 +57,7 @@
                 book     : null,
                 chapter  : null,
                 verse    : null,
-                auto_set : false,
+                auto_set : false
             };
         },
         props: {
@@ -84,40 +84,27 @@
                         }
                     };
                 }
-            },
-            lookup: {
-                type    : Object,
-                default : function () {
-                    return {
-                        book    : null,
-                        chapter : null,
-                        verse   : null
-                    };
-                }
             }
         },
         mounted: function () {
             this.books = Object.keys( this.material );
             this.book  = this.books[0];
         },
-        computed: {
-            lookup_reference: function () {
-                return this.lookup.book + " " + this.lookup.chapter + ":" + this.lookup.verse
-            }
-        },
         watch: {
             book: function () {
-                this.chapters = Object.keys( this.material[ this.book ] ).sort(
-                    function ( a, b ) {
-                        return a - b;
-                    }
-                );
+                if ( !! this.book ) {
+                    this.chapters = Object.keys( this.material[ this.book ] ).sort(
+                        function ( a, b ) {
+                            return a - b;
+                        }
+                    );
 
-                if ( ! this.auto_set ) {
-                    this.chapter = null;
-                    this.$nextTick( function () {
-                        this.chapter = this.chapters[0];
-                    } );
+                    if ( ! this.auto_set ) {
+                        this.chapter = null;
+                        this.$nextTick( function () {
+                            this.chapter = this.chapters[0];
+                        } );
+                    }
                 }
             },
             chapter: function () {
@@ -127,7 +114,7 @@
                     if ( ! this.auto_set ) {
                         this.verse = null;
                         this.$nextTick( function () {
-                            this.verse  = this.verses[1].verse;
+                            this.verse = this.verses[1].verse;
                         } );
                     }
                 }
@@ -137,28 +124,27 @@
                     window.location.href = "#v" + this.verse;
                     this.$emit( "reference-change", this.book, this.chapter, this.verse );
                 }
-            },
-            lookup_reference: function () {
-                this.reference_lookup();
             }
         },
         methods: {
-            reference_lookup: function ( book, chapter, verse ) {
-                if ( ! book )    book    = this.lookup.book;
-                if ( ! chapter ) chapter = this.lookup.chapter;
-                if ( ! verse )   verse   = this.lookup.verse;
-
-                this.auto_set = true;
-                this.book     = book;
+            lookup_reference: function ( book, chapter, verse ) {
+                this.book    = null;
+                this.chapter = null;
+                this.verse   = null;
 
                 this.$nextTick( function () {
-                    this.chapter = chapter;
+                    this.auto_set = true;
+                    this.book     = book;
 
                     this.$nextTick( function () {
-                        this.verse = verse;
+                        this.chapter = chapter;
 
                         this.$nextTick( function () {
-                            this.auto_set = false;
+                            this.verse = verse;
+
+                            this.$nextTick( function () {
+                                this.auto_set = false;
+                            } );
                         } );
                     } );
                 } );
@@ -186,7 +172,7 @@
                         } )
                         : this.book;
 
-                    this.reference_lookup( book, chapter, verse );
+                    this.lookup_reference( book, chapter, verse );
                 }
             }
         }
