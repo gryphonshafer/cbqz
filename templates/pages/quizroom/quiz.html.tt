@@ -29,9 +29,11 @@
 
         <button id="lookup"
             v-on:click="lookup_reference" v-bind:disabled="verse_incomplete"
+            title="View the question's verse defined by reference in the reference material"
         >Lookup <span class="key_text">Alt+G, F2</span></button>
 
-        <button v-on:click="mark_for_edit" v-bind:disabled="question.marked">Mark for Edit</button>
+        <button v-on:click="mark_for_edit" v-bind:disabled="question.marked"
+            title="Click to enter a comment to mark the question for later edit">Mark for Edit</button>
 
         <br>
 
@@ -51,7 +53,8 @@
     <div id="quiz_view" v-bind:class="{ page_panel: 1, hidden: quiz_view_hidden }">
         <div class="page_panel_buttons">
             Mean Question Score = {{ mean_score }}
-            <button v-on:click="print_quiz">Print Quiz</button>
+            <button v-on:click="print_quiz"
+                title="Open a new tab/window to view/print this quiz's questions">Print Quiz</button>
             <button v-on:click="toggle_quiz_view">Close View</button>
         </div>
 
@@ -72,7 +75,9 @@
                 v-bind:class="{ selected: this_question.question_id == question.question_id }"
                 v-on:click="move_question( index + 1 )"
             >
-                <td><a href="#" v-on:click="move_question( index + 1 )">{{ index + 1 }}</a></td>
+                <td><a href="#" v-on:click="move_question( index + 1 )"
+                    v-bind:title="'Move current view to question index ' + ( index + 1 )"
+                    >{{ index + 1 }}</a></td>
                 <td>{{ this_question.number }}</td>
                 <td class="left">{{
                     this_question.book + " " + this_question.chapter + ":" + this_question.verse
@@ -95,33 +100,39 @@
     <div id="manage">
         <div class="manage_group">
             <div id="navigation">
-                <button v-on:click="move_question('back')">&larr;</button>
-                <button v-on:click="move_question('forward')">&rarr;</button>
-                <button v-on:click="toggle_quiz_view" id="toggle_view_button">View</button>
+                <button v-on:click="move_question('back')" title="View previous question">&larr;</button>
+                <button v-on:click="move_question('forward')" title="View next question">&rarr;</button>
+                <button v-on:click="toggle_quiz_view" id="toggle_view_button"
+                    title="View full set of questions selected for this quiz">View</button>
             </div>
 
             <div id="timer">
                 <div id="timer_display">{{ timer.value }}</div>
                 <button v-for="timer_value in metadata.timer_values"
+                    v-bind:title="'Set timer to: ' + timer_value"
                     v-on:click="set_timer(timer_value)">{{ timer_value }}</button>
                 <button id="prime_timer_button"
                     v-on:click="timer_click" v-bind:title=" timer.label + ': Alt+S' "
                 >{{ timer.label }}</button>
-                <button v-on:click="make_beep">Beep</button>
+                <button v-on:click="make_beep" title="Make a beep sound">Beep</button>
             </div>
         </div>
 
         <div class="manage_group">
             <div id="quiz">
                 <b>Quiz Management</b><br>
-                <button v-on:click="print_quiz">Print</button>
-                <button v-on:click="exit_quiz">Exit</button>
-                <button v-on:click="close_quiz">Close</button>
+                <button v-on:click="print_quiz"
+                    title="Open a new tab/window to view/print this quiz's questions">Print</button>
+                <button v-on:click="exit_quiz"
+                    title="Exit the quiz without closing it; later resume is possible">Exit</button>
+                <button v-on:click="close_quiz" title="Close the quiz, marking it as completed">Close</button>
             </div>
 
             <div id="replace">
                 <b>Replace Question</b><br>
-                <button v-for="type in metadata.types" v-on:click="replace(type)">{{ type }}</button>
+                <button v-for="type in metadata.types" v-on:click="replace(type)"
+                    v-bind:title="'Replace with type: ' + type"
+                    >{{ type }}</button>
             </div>
         </div>
 

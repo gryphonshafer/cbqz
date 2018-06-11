@@ -11,7 +11,9 @@
         <select v-model="verse">
             <option v-for="item in verses">{{ item.verse }}</option>
         </select>
-        <button v-on:click="enter_reference">Enter Reference <span class="key_text">Alt+T</span></button>
+        <button v-on:click="enter_reference"
+            title="Enter a type-written reference or simple expression of a reference"
+            >Enter Reference <span class="key_text">Alt+T</span></button>
 
         <div id="material_lookup_display">
             <a
@@ -26,6 +28,11 @@
                     <b class="material_para_markers" v-if="item.is_new_para">&para;</b>
 
                     <b v-if="clickable" class="clickable_reference" v-on:click="reference_click(item)"
+                        v-bind:title="
+                            'Work with ' +
+                            item.book + ' ' + item.chapter + ':' + item.verse +
+                            ' verse content'
+                        "
                         >{{ item.chapter + ':' + item.verse }}</b>
                     <b v-else>{{ item.chapter + ':' + item.verse }}</b>
 

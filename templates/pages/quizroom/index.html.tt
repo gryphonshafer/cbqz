@@ -10,6 +10,8 @@
     <div v-if="saved_quizzes.length > 0">
         <h2>Previously Generated Quizzes</h2>
 
+        <p>Click on the name of a quiz to resume that quiz.</p>
+
         <table class="tabular">
             <tr>
                 <th>Quiz Name</th>
@@ -28,7 +30,8 @@
                     selected_extra: ( quiz.state == 'active' ) ? true : false
                 }"
             >
-                <td><a href="#" v-on:click="start_quiz( quiz.quiz_id )">{{ quiz.name }}</a></td>
+                <td><a href="#" v-on:click="start_quiz( quiz.quiz_id )"
+                    v-bind:title="'Click to resume quiz: ' + quiz.name">{{ quiz.name }}</a></td>
                 <td>{{ quiz.quizmaster }}</td>
                 <td class="right">{{ quiz.scheduled }}</td>
                 <td class="right">{{ quiz.room }}</td>
@@ -45,15 +48,23 @@
     <p>
         Use the following page form to select and set the configuration settings
         for quiz generation.
+        <b v-if="! generate_ready">
+            Note that to start a quiz or save a quiz you'll need
+            to select at least some questions by chapter below along with reasonable
+            default quiz values.
+        </b>
     </p>
 
     <form method="post" action="[% c.url_for('/quizroom/generate_quiz') %]">
         <fieldset>
             <legend>Quiz Metadata</legend>
 
-            <label>Quiz Name: <input type="text" name="name" v-model="name"></label>
-            <label>Quizmaster: <input type="text" name="quizmaster" v-model="quizmaster"></label>
-            <label>Scheduled: <input type="text" name="scheduled" v-model="scheduled"></label>
+            <label>Quiz Name: <input type="text" name="name" v-model="name"
+                placeholder="Quiz Name" title="Unique name of the quiz"></label>
+            <label>Quizmaster: <input type="text" name="quizmaster" v-model="quizmaster"
+                placeholder="Quizmaster" title="Name of initial quizmaster"></label>
+            <label>Scheduled: <input type="text" name="scheduled" v-model="scheduled"
+                placeholder="Scheduled Start" title="Date and time of the scheduled start of the quiz"></label>
 
             <label id="room">
                 Room:
@@ -63,10 +74,11 @@
             </label>
 
             <div id="checkboxes">
-                <label v-if="user_is_official"><input type="checkbox"
+                <label v-if="user_is_official"
+                    title="Check if quiz is an official quiz of a regulation quiz meet"><input type="checkbox"
                     name="official" v-model="official"> Official Quiz</label>
-                <label><input type="checkbox"
-                    name="save_for_later" v-model="save_for_later"> Save for Later</label>
+                <label title="Check to save the quiz for later instead of start it now"><input
+                    type="checkbox" name="save_for_later" v-model="save_for_later"> Save for Later</label>
             </div>
 
             <button type="submit" v-bind:disabled="! generate_ready"
@@ -75,33 +87,52 @@
 
         <fieldset>
             <legend>Question Types</legend>
-            <textarea name="question_types" v-model="question_types"></textarea>
+            <textarea name="question_types" v-model="question_types"
+                title="List out the question type groups, question selection ranges, and types per group"
+                placeholder="Question Types Listing"></textarea>
         </fieldset>
 
         <fieldset>
             <legend>Scoring and Teams/Quizzers</legend>
-            <textarea name="quiz_teams_quizzers" v-model="quiz_teams_quizzers"></textarea>
+            <textarea name="quiz_teams_quizzers" v-model="quiz_teams_quizzers"
+                title="Team names followed by a quizzer bib number and name for each quizzer for each team"
+                placeholder="Teams and quizzers listing for scorekeeping purposes"></textarea>
         </fieldset>
 
         <fieldset id="questions_and_timers">
             <legend>Questions and Timers</legend>
 
-            <label>Target Questions: <input type="text" name="target_questions" v-model="target_questions"></label>
-            <label>Timer Default: <input type="text" name="timer_default" v-model="timer_default"></label>
-            <label>Timeout: <input type="text" name="timeout" v-model="timeout"></label>
-            <label>Timer Values: <input type="text" name="timer_values" v-model="timer_values"></label>
-            <label>Readiness Bonus: <input type="text" name="readiness" v-model="readiness"></label>
+            <label>Target Questions: <input type="text" name="target_questions" v-model="target_questions"
+                placeholder="Target Questions"
+                title="Total number of questions to select for a quiz's questions pool"></label>
+            <label>Timer Default: <input type="text" name="timer_default" v-model="timer_default"
+                placeholder="Timer Default" title="Default number of seconds per question on timer"></label>
+            <label>Timeout: <input type="text" name="timeout" v-model="timeout"
+                placeholder="Timeout" title="Number of seconds a timeout will last"></label>
+            <label>Timer Values: <input type="text" name="timer_values" v-model="timer_values"
+                placeholder="Timer Values" title="Comma-separated list of timer button values"></label>
+            <label>Readiness Bonus: <input type="text" name="readiness" v-model="readiness"
+                placeholder="Readiness Bonus" title="Points awarded for a team's readiness"></label>
 
             <div>
                 Initial Score Type:
                 <br>
-                <select name="score_type">
+                <select name="score_type" title="Scoring rules to use initially for the quiz">
                     <option v-for="score_type in score_types">{{ score_type }}</option>
                 </select>
             </div>
         </fieldset>
 
         <h3>{{ question_set.name }}</h3>
+
+        <p>
+            <b v-if="! generate_ready">
+                To start a quiz or save a quiz for later, you need to select
+                questions by chapter in the below table.
+            </b>
+            Use the "Chapter Weighting" section to specify an optional weighting
+            of questions from the last chapters.
+        </p>
 
         <fieldset>
             <legend>Chapter Weighting</legend>

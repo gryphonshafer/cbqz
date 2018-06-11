@@ -1186,6 +1186,15 @@ div#printed_questions hr {
 
 /* -------------------------------------------------------------------------- */
 
+textarea#result_operation {
+    font-family: monospace !important;
+    font-size: 12px !important;
+    width: 800px !important;
+    height: 600px !important;
+}
+
+/* -------------------------------------------------------------------------- */
+
 @media print {
     html {
         background-color: white;
