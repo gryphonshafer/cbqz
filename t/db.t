@@ -22,10 +22,6 @@ sub main {
     lives_ok( sub { $db = SUBPACKAGE->connect }, 'CBQZ::Db::Schema->connect 2' );
     is( ref($db), 'CBQZ::Db::Schema', 'connect returns a CBQZ::Db::Schema object' );
 
-    my $enum;
-    lives_ok( sub { $enum = $db->enum( 'event', 'type' ) }, 'enum() call' );
-    is_deeply( $enum, [ qw( create_user login login_fail role_change ) ], 'enum() data' );
-
     done_testing();
     return 0;
 };

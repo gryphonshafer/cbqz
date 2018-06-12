@@ -42,8 +42,7 @@ __PACKAGE__->table("event");
 
 =head2 type
 
-  data_type: 'enum'
-  extra: {list => ["create_user","login","login_fail","role_change"]}
+  data_type: 'tinytext'
   is_nullable: 0
 
 =head2 created
@@ -71,11 +70,7 @@ __PACKAGE__->add_columns(
     is_nullable => 0,
   },
   "type",
-  {
-    data_type => "enum",
-    extra => { list => ["create_user", "login", "login_fail", "role_change"] },
-    is_nullable => 0,
-  },
+  { data_type => "tinytext", is_nullable => 0 },
   "created",
   {
     data_type => "timestamp",
@@ -115,8 +110,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2017-09-10 07:40:07
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:bWG+0mvCMh1CPLfi/d3OCQ
+# Created by DBIx::Class::Schema::Loader v0.07048 @ 2018-06-12 11:28:54
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:vT7stac6Q0/ebQdU871uLw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

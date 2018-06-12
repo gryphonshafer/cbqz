@@ -51,6 +51,7 @@ sub change_passwd ( $self, $passwd, $old_passwd ) {
     E->throw('Password provided does not match stored password')
         if ( defined $old_passwd and $self->obj->passwd ne sha256_hex($old_passwd) );
 
+    $self->event('change_passwd');
     return $self->obj->update({ passwd => $passwd });
 }
 

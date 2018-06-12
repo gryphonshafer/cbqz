@@ -145,6 +145,7 @@ sub question_set_delete ($self) {
     if ( $set and $set->is_owned_by( $self->stash('user') ) ) {
         $set->obj->delete;
 
+        $self->stash('user')->event('question_set_delete');
         $self->flash( message => {
             type => 'success',
             text => 'Question set deleted.',
@@ -161,6 +162,7 @@ sub question_set_reset ($self) {
     my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
     if ( $set and $set->is_owned_by( $self->stash('user') ) ) {
         $set->obj->questions->update({ used => 0 });
+        $self->stash('user')->event('question_set_reset');
 
         $self->flash( message => {
             type => 'success',
@@ -181,6 +183,7 @@ sub clone_question_set ($self) {
             $self->stash('user'),
             $self->req->param('new_set_name'),
         );
+        $self->stash('user')->event('clone_question_set');
 
         $self->flash( message => {
             type => 'success',
@@ -288,6 +291,7 @@ sub edit_user ($self) {
         };
     }
 
+    $self->stash('user')->event('edit_user');
     return $self->redirect_to('/');
 }
 
@@ -356,6 +360,8 @@ sub export_question_set ($self) {
     my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
 
     if ( $set and $set->is_usable_by( $self->stash('user') ) ) {
+        $self->stash('user')->event('export_question_set');
+
         $self->stash(
             questions => [
                 sort {
@@ -409,6 +415,8 @@ sub import_question_set ($self) {
             $questions,
             CBQZ::Model::MaterialSet->new->load( $self->decode_cookie('cbqz_prefs')->{material_set_id} ),
         );
+
+        $self->stash('user')->event('import_question_set');
 
         $self->flash( message => {
             type => 'success',

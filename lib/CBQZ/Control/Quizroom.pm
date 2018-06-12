@@ -122,6 +122,8 @@ sub generate_quiz ($self) {
         return $self->redirect_to('/quizroom');
     };
 
+    $self->stash('user')->event('generate_quiz');
+
     $self->flash( message => {
         type => 'success',
         text => 'Quiz "' . $self->req->param('name') . '" generated and saved for later.',
@@ -351,6 +353,8 @@ sub close ($self) {
         );
 
         CBQZ::Model::Quiz->new->load( $self->req->param('quiz_id') )->obj->update({ state => 'closed' });
+
+        $self->stash('user')->event('close_quiz');
     }
     catch {
         $self->flash( message => $self->clean_error($_) );

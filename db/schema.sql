@@ -1,7 +1,7 @@
 CREATE TABLE event (
     event_id int(10) unsigned NOT NULL,
     user_id int(10) unsigned NOT NULL,
-    type enum('create_user','login','login_fail','role_change') NOT NULL,
+    type tinytext NOT NULL,
     created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (event_id),
     KEY user (user_id),

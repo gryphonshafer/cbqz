@@ -22,6 +22,7 @@ sub create ( $self, $user, $name = undef ) {
         })->get_from_storage
     );
 
+    $user->event('create_question_set');
     return $self;
 }
 
@@ -119,6 +120,8 @@ sub clone ( $self, $user, $new_set_name ) {
         FROM question WHERE question_set_id = ?
     })->run( $new_set->id, $self->obj->id );
 
+    $user->event('clone_question_set');
+
     return $new_set;
 }
 
@@ -165,6 +168,8 @@ sub save_set_select_users ( $self, $user, $type, $selected_user_ids ) {
         $_,
         $type,
     ) for (@$selected_user_ids);
+
+    $user->event('save_set_select_users');
 
     return;
 }

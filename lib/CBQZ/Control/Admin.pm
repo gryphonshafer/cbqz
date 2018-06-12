@@ -45,6 +45,8 @@ sub save_roles_changes ($self) {
         }
     }
 
+    $self->stash('user')->event('save_roles_changes');
+
     $self->flash( message => {
         type => 'success',
         text => ($changes) ? "$changes user roles changes saved." : 'No user roles were changed.',
@@ -79,6 +81,8 @@ sub save_program_config ($self) {
 
         delete $params->{program_id};
         $program->obj->update($params);
+
+        $self->stash('user')->event('save_program_config');
 
         $self->flash( message => {
             type => 'success',
