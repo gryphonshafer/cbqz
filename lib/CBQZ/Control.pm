@@ -169,8 +169,8 @@ sub startup ( $self, $app = undef ) {
     my $admin_user = $authorized_user->under( sub ($self) {
         return 1 if (
             $self->stash('user') and (
-                $self->stash('user')->has_role('Administrator') or
-                $self->stash('user')->has_role('Director')
+                $self->stash('user')->has_role('administrator') or
+                $self->stash('user')->has_role('director')
             )
         );
 

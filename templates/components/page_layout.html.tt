@@ -33,7 +33,7 @@
                 <a [% IF page.menu == 'questions' %]class="selected"[% END %]
                     href="[% c.url_for('/editor/questions') %]">Questions</a>
 
-                [% IF user.has_role('Administrator') OR user.has_role('Director') %]
+                [% IF user.has_role('administrator') OR user.has_role('director') %]
                     <a [% IF page.menu == 'admin' %]class="selected"[% END %]
                         href="[% c.url_for('/admin') %]">Admin</a>
                 [% END %]

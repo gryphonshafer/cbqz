@@ -49,7 +49,7 @@ __PACKAGE__->table("role");
 =head2 type
 
   data_type: 'enum'
-  extra: {list => ["Administrator","Director","Official","User"]}
+  extra: {list => ["administrator","director","official","user"]}
   is_nullable: 0
 
 =head2 created
@@ -81,7 +81,7 @@ __PACKAGE__->add_columns(
   "type",
   {
     data_type => "enum",
-    extra => { list => ["Administrator", "Director", "Official", "User"] },
+    extra => { list => ["administrator", "director", "official", "user"] },
     is_nullable => 0,
   },
   "created",
@@ -141,8 +141,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-02-07 14:14:58
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:LLhMb/ZjAmbasCmaeupHRQ
+# Created by DBIx::Class::Schema::Loader v0.07048 @ 2018-06-12 10:39:01
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:otggy7YewsGkS3Zj538qlA
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

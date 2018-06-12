@@ -43,7 +43,7 @@ __PACKAGE__->table("user_question_set");
 =head2 type
 
   data_type: 'enum'
-  extra: {list => ["Publish","Share"]}
+  extra: {list => ["publish","share"]}
   is_nullable: 0
 
 =cut
@@ -66,7 +66,7 @@ __PACKAGE__->add_columns(
   "type",
   {
     data_type => "enum",
-    extra => { list => ["Publish", "Share"] },
+    extra => { list => ["publish", "share"] },
     is_nullable => 0,
   },
 );
@@ -120,8 +120,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07047 @ 2018-02-20 08:18:40
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:h+mKow54X6LhjtvmcKRUVQ
+# Created by DBIx::Class::Schema::Loader v0.07048 @ 2018-06-12 10:39:01
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:94u4nct0JWrLQaxMUV2jRg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

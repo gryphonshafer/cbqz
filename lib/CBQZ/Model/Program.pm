@@ -119,10 +119,10 @@ sub admin_data ( $self, $user, $roles ) {
         }
         sort { $a->obj->name cmp $b->obj->name }
         (
-            ( $user->has_role('Administrator') )
+            ( $user->has_role('administrator') )
                 ? CBQZ::Model::Program->new->every
                 : grep {
-                    $user->has_role( 'Director', $_->obj->id )
+                    $user->has_role( 'director', $_->obj->id )
                 } @{ $user->programs }
         )
     ];

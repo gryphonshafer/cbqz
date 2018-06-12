@@ -76,7 +76,7 @@
             <div id="checkboxes">
                 <label v-if="user_is_official"
                     title="Check if quiz is an official quiz of a regulation quiz meet"><input type="checkbox"
-                    name="official" v-model="official"> Official Quiz</label>
+                    name="official" v-model="official">Official Quiz</label>
                 <label title="Check to save the quiz for later instead of start it now"><input
                     type="checkbox" name="save_for_later" v-model="save_for_later"> Save for Later</label>
             </div>

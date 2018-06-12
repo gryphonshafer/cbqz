@@ -141,7 +141,7 @@ CREATE TABLE role (
     role_id int(10) unsigned NOT NULL,
     user_id int(10) unsigned NOT NULL,
     program_id int(10) unsigned DEFAULT NULL,
-    type enum('Administrator','Director','Official','User') NOT NULL,
+    type enum('administrator','director','official','user') NOT NULL,
     created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (role_id),
     UNIQUE KEY user_program_type (user_id,program_id,type),
@@ -178,7 +178,7 @@ CREATE TABLE user_program (
 CREATE TABLE user_question_set (
     user_id int(10) unsigned NOT NULL,
     question_set_id int(10) unsigned NOT NULL,
-    type enum('Publish','Share') NOT NULL,
+    type enum('publish','share') NOT NULL,
     PRIMARY KEY (user_id,question_set_id,type),
     KEY question_set_id (question_set_id),
     CONSTRAINT user_question_set_ibfk_1 FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE ON UPDATE CASCADE,

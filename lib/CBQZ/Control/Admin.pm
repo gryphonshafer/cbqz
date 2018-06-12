@@ -7,7 +7,7 @@ use CBQZ::Model::Program;
 use CBQZ::Model::User;
 
 sub index ($self) {
-    my $roles = [ grep { $_ ne 'Administrator' } @{ $self->stash('user')->db->enum( 'role', 'type' ) } ];
+    my $roles = [ grep { $_ ne 'administrator' } @{ $self->stash('user')->db->enum( 'role', 'type' ) } ];
 
     $self->stash(
         roles    => $roles,
@@ -16,7 +16,7 @@ sub index ($self) {
 }
 
 sub save_roles_changes ($self) {
-    my $roles    = [ grep { $_ ne 'Administrator' } @{ $self->stash('user')->db->enum( 'role', 'type' ) } ];
+    my $roles    = [ grep { $_ ne 'administrator' } @{ $self->stash('user')->db->enum( 'role', 'type' ) } ];
     my $programs = CBQZ::Model::Program->new->admin_data( $self->stash('user'), $roles );
 
     my $checks;
@@ -54,7 +54,7 @@ sub save_roles_changes ($self) {
 }
 
 sub save_program_config ($self) {
-    my $roles      = [ grep { $_ ne 'Administrator' } @{ $self->stash('user')->db->enum( 'role', 'type' ) } ];
+    my $roles      = [ grep { $_ ne 'administrator' } @{ $self->stash('user')->db->enum( 'role', 'type' ) } ];
     my $programs   = CBQZ::Model::Program->new->admin_data( $self->stash('user'), $roles );
     my $program_id = $self->req->param('program_id');
 

@@ -75,7 +75,7 @@ sub path ($self) {
             scheduled           => date_time_ansi(),
             name                => date_time_ansi(),
             quizmaster          => $self->stash('user')->obj->realname,
-            user_is_official    => $self->stash('user')->has_role('Official'),
+            user_is_official    => $self->stash('user')->has_role('official'),
             target_questions    => $program->obj->target_questions,
             timer_default       => $program->obj->timer_default,
             timeout             => $program->obj->timeout,
@@ -100,7 +100,7 @@ sub generate_quiz ($self) {
             unless ( $self->stash('user')->has_program_id( $cbqz_prefs->{program_id} ) );
 
         E->throw('User is not an official but has set the "official" flag for the quiz')
-            if ( $self->req->param('official') and not $self->stash('user')->has_role('Official') );
+            if ( $self->req->param('official') and not $self->stash('user')->has_role('official') );
 
         my $set = CBQZ::Model::QuestionSet->new->load( $cbqz_prefs->{question_set_id} );
         E->throw('User does not own requested question set')
