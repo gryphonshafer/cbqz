@@ -149,71 +149,74 @@
             page.js.push( '/main/path.js', '/js/app/main.js', '/js/utilities.js' );
         %]
 
-        <div id="main" v-cloak>
-            <h2>Select Sets</h2>
-            <p>
-                Using the options below, select the sets you want to work with.
-                Changes made are automatically saved.
-            </p>
-
-            <form id="select_sets">
-                <fieldset>
-                    <legend>Quiz Program</legend>
-                    <label v-for="program in programs"><input type="radio" name="program"
-                        v-bind:value="program.program_id" v-model="program_id">{{ program.name }}</label>
-                </fieldset>
-
-                <fieldset>
-                    <legend>Material Set</legend>
-                    <label v-for="set in material_sets"><input type="radio" name="material"
-                        v-bind:value="set.material_set_id" v-model="material_set_id">{{ set.name }}</label>
-                </fieldset>
-
-                <fieldset>
-                    <legend>Questions Set</legend>
-
-                    <label v-for="set in question_sets"><input type="radio" name="questions"
-                        v-bind:value="set.question_set_id" v-model="question_set_id"
-                    >
-                        {{ set.name }}
-                        <b v-if="set.share">[Shared]</b>
-                    </label>
-
-                    <a id="manage_sets_link"
-                        href="[% c.url_for('/main/question_sets') %]">Manage Question Sets</a>
-                </fieldset>
-            </form>
-
-            <div v-if="question_set">
-                <h3>Questions Set: {{ question_set.name }}</h3>
-
-                <table class="tabular numeric" v-if="question_set.statistics.length > 0">
-                    <tr>
-                        <th>Book</th>
-                        <th>Ch.</th>
-                        <th>Vrs.</th>
-                        <th>Qs.</th>
-                        <th>Qs./V.</th>
-                        <th class="question_type_totals"
-                            v-for="type in question_set.statistics[0].types">{{ type[0] }}</th>
-                        <th>Marked</th>
-                    </tr>
-
-                    <tr v-for="chapter in question_set.statistics">
-                        <td class="left">{{ chapter.book }}</td>
-                        <td>{{ chapter.chapter }}</td>
-                        <td>{{ chapter.questions }}</td>
-                        <td>{{ chapter.verses }}</td>
-                        <td>{{ ( chapter.questions / chapter.verses ).toFixed(2) }}</td>
-                        <td class="question_type_totals"
-                            v-for="type in chapter.types">{{ type[1] || 0 }}</td>
-                        <td>{{ chapter.marked }}</td>
-                    </tr>
-                </table>
-
-                <p v-if="question_set.statistics.length == 0">
-                    There are no questions yet written for this question set.
+        <div id="main" >
+            <div v-if="false" class="loading_spinner"></div>
+            <div v-cloak>
+                <h2>Select Sets</h2>
+                <p>
+                    Using the options below, select the sets you want to work with.
+                    Changes made are automatically saved.
                 </p>
+
+                <form id="select_sets">
+                    <fieldset>
+                        <legend>Quiz Program</legend>
+                        <label v-for="program in programs"><input type="radio" name="program"
+                            v-bind:value="program.program_id" v-model="program_id">{{ program.name }}</label>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>Material Set</legend>
+                        <label v-for="set in material_sets"><input type="radio" name="material"
+                            v-bind:value="set.material_set_id" v-model="material_set_id">{{ set.name }}</label>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>Questions Set</legend>
+
+                        <label v-for="set in question_sets"><input type="radio" name="questions"
+                            v-bind:value="set.question_set_id" v-model="question_set_id"
+                        >
+                            {{ set.name }}
+                            <b v-if="set.share">[Shared]</b>
+                        </label>
+
+                        <a id="manage_sets_link"
+                            href="[% c.url_for('/main/question_sets') %]">Manage Question Sets</a>
+                    </fieldset>
+                </form>
+
+                <div v-if="question_set">
+                    <h3>Questions Set: {{ question_set.name }}</h3>
+
+                    <table class="tabular numeric" v-if="question_set.statistics.length > 0">
+                        <tr>
+                            <th>Book</th>
+                            <th>Ch.</th>
+                            <th>Vrs.</th>
+                            <th>Qs.</th>
+                            <th>Qs./V.</th>
+                            <th class="question_type_totals"
+                                v-for="type in question_set.statistics[0].types">{{ type[0] }}</th>
+                            <th>Marked</th>
+                        </tr>
+
+                        <tr v-for="chapter in question_set.statistics">
+                            <td class="left">{{ chapter.book }}</td>
+                            <td>{{ chapter.chapter }}</td>
+                            <td>{{ chapter.questions }}</td>
+                            <td>{{ chapter.verses }}</td>
+                            <td>{{ ( chapter.questions / chapter.verses ).toFixed(2) }}</td>
+                            <td class="question_type_totals"
+                                v-for="type in chapter.types">{{ type[1] || 0 }}</td>
+                            <td>{{ chapter.marked }}</td>
+                        </tr>
+                    </table>
+
+                    <p v-if="question_set.statistics.length == 0">
+                        There are no questions yet written for this question set.
+                    </p>
+                </div>
             </div>
         </div>
     [% END %]

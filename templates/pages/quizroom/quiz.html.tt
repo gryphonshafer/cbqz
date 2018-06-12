@@ -11,303 +11,306 @@
     );
 %]
 
-<div id="quizroom" v-cloak v-bind:class="classes">
-    <div id="question">
-        <span class="label">Question #:</span> <span class="field">{{ question.number }}</span>
-        <span class="label">Type:</span> <span class="field">{{ question.type }}</span>
-        <span class="label">As:</span> <span class="field">{{ question.as }}</span>
-        <span class="label">Score:</span> <span class="field">{{ question.score }}</span>
-        <span class="label">Used:</span> <span class="field">{{ question.used }}</span>
+<div id="quizroom" v-bind:class="classes">
+    <div v-if="false" class="loading_spinner"></div>
+    <div v-cloak>
+        <div id="question">
+            <span class="label">Question #:</span> <span class="field">{{ question.number }}</span>
+            <span class="label">Type:</span> <span class="field">{{ question.type }}</span>
+            <span class="label">As:</span> <span class="field">{{ question.as }}</span>
+            <span class="label">Score:</span> <span class="field">{{ question.score }}</span>
+            <span class="label">Used:</span> <span class="field">{{ question.used }}</span>
 
-        <br>
+            <br>
 
-        <span class="label">Reference:</span> <span class="field">{{
-            ( question.book && question.chapter && question.verse )
-                ? question.book + ' ' + question.chapter + ':' + question.verse
-                : ''
-        }}</span>
+            <span class="label">Reference:</span> <span class="field">{{
+                ( question.book && question.chapter && question.verse )
+                    ? question.book + ' ' + question.chapter + ':' + question.verse
+                    : ''
+            }}</span>
 
-        <button id="lookup"
-            v-on:click="lookup_reference" v-bind:disabled="verse_incomplete"
-            title="View the question's verse defined by reference in the reference material"
-        >Lookup <span class="key_text">Alt+G, F2</span></button>
+            <button id="lookup"
+                v-on:click="lookup_reference" v-bind:disabled="verse_incomplete"
+                title="View the question's verse defined by reference in the reference material"
+            >Lookup <span class="key_text">Alt+G, F2</span></button>
 
-        <button v-on:click="mark_for_edit" v-bind:disabled="question.marked"
-            title="Click to enter a comment to mark the question for later edit">Mark for Edit</button>
+            <button v-on:click="mark_for_edit" v-bind:disabled="question.marked"
+                title="Click to enter a comment to mark the question for later edit">Mark for Edit</button>
 
-        <br>
+            <br>
 
-        <span class="label">Question:</span>
-        <div class="htmlarea question_box" v-html="question.question"></div>
+            <span class="label">Question:</span>
+            <div class="htmlarea question_box" v-html="question.question"></div>
 
-        <span class="label">Answer:</span>
-        <div class="htmlarea answer_box" v-html="question.answer"></div>
-    </div>
-
-    <material-lookup
-        ref="material_lookup"
-        v-bind:material="material"
-        v-on:reference-change="lookup_reference_change"
-    ></material-lookup>
-
-    <div id="quiz_view" v-bind:class="{ page_panel: 1, hidden: quiz_view_hidden }">
-        <div class="page_panel_buttons">
-            Mean Question Score = {{ mean_score }}
-            <button v-on:click="print_quiz"
-                title="Open a new tab/window to view/print this quiz's questions">Print Quiz</button>
-            <button v-on:click="toggle_quiz_view">Close View</button>
+            <span class="label">Answer:</span>
+            <div class="htmlarea answer_box" v-html="question.answer"></div>
         </div>
 
-        <h2>Quiz Questions Pool View</h2>
-
-        <table class="tabular numeric">
-            <tr>
-                <th>Index</th>
-                <th>Q#</th>
-                <th>Reference</th>
-                <th>Type</th>
-                <th>As</th>
-                <th>Score</th>
-                <th>Used</th>
-                <th v-for="type in metadata.type_ranges">{{ type[2] }}#</th>
-            </tr>
-            <tr v-for="( this_question, index ) in questions"
-                v-bind:class="{ selected: this_question.question_id == question.question_id }"
-                v-on:click="move_question( index + 1 )"
-            >
-                <td><a href="#" v-on:click="move_question( index + 1 )"
-                    v-bind:title="'Move current view to question index ' + ( index + 1 )"
-                    >{{ index + 1 }}</a></td>
-                <td>{{ this_question.number }}</td>
-                <td class="left">{{
-                    this_question.book + " " + this_question.chapter + ":" + this_question.verse
-                }}</td>
-                <td class="left">{{ this_question.type }}</td>
-                <td class="left">{{ this_question.as }}</td>
-                <td>{{ this_question.score }}</td>
-                <td>{{ this_question.used }}</td>
-                <td v-for="type in metadata.type_ranges"
-                    v-bind:class="{
-                       below_min : type[3][index] < type[1][0],
-                       in_range  : type[3][index] >= type[1][0] && type[3][index] <= type[1][1],
-                       above_max : type[3][index] > type[1][1]
-                    }"
-                >{{ type[3][index] }}</td>
-            </tr>
-        </table>
-    </div>
-
-    <div id="manage">
-        <div class="manage_group">
-            <div id="navigation">
-                <button v-on:click="move_question('back')" title="View previous question">&larr;</button>
-                <button v-on:click="move_question('forward')" title="View next question">&rarr;</button>
-                <button v-on:click="toggle_quiz_view" id="toggle_view_button"
-                    title="View full set of questions selected for this quiz">View</button>
-            </div>
-
-            <div id="timer">
-                <div id="timer_display">{{ timer.value }}</div>
-                <button v-for="timer_value in metadata.timer_values"
-                    v-bind:title="'Set timer to: ' + timer_value"
-                    v-on:click="set_timer(timer_value)">{{ timer_value }}</button>
-                <button id="prime_timer_button"
-                    v-on:click="timer_click" v-bind:title=" timer.label + ': Alt+S' "
-                >{{ timer.label }}</button>
-                <button v-on:click="make_beep" title="Make a beep sound">Beep</button>
-            </div>
-        </div>
-
-        <div class="manage_group">
-            <div id="quiz">
-                <b>Quiz Management</b><br>
-                <button v-on:click="print_quiz"
-                    title="Open a new tab/window to view/print this quiz's questions">Print</button>
-                <button v-on:click="exit_quiz"
-                    title="Exit the quiz without closing it; later resume is possible">Exit</button>
-                <button v-on:click="close_quiz" title="Close the quiz, marking it as completed">Close</button>
-            </div>
-
-            <div id="replace">
-                <b>Replace Question</b><br>
-                <button v-for="type in metadata.types" v-on:click="replace(type)"
-                    v-bind:title="'Replace with type: ' + type"
-                    >{{ type }}</button>
-            </div>
-        </div>
-
-        <div class="manage_group">
-            <div id="result">
-                <b>Results/Events</b><br>
-
-                <button id="button_correct" title="Correct: Alt+C"
-                    v-on:click="quiz_event('success')"
-                    v-bind:disabled="! this.active_quizzer.name"
-                >Correct</button>
-
-                <button id="button_error" title="Error: Alt+E"
-                    v-on:click="quiz_event('failure')"
-                    v-bind:disabled="! this.active_quizzer.name"
-                >Error</button>
-
-                <button title="Reset"
-                    v-on:click="reset_quiz_select"
-                    v-bind:disabled="! this.active_quizzer.name"
-                >Reset</button>
-
-                <br>
-
-                <button id="button_no_jump" title="No Jump: Alt+N"
-                    v-on:click="quiz_event('none')"
-                    v-bind:disabled="this.active_quizzer.name"
-                >No Jump</button>
-
-                <button title="Foul"
-                    v-on:click="quiz_event('foul')"
-                    v-bind:disabled="! this.active_quizzer.name"
-                >Foul</button>
-
-                <br>
-                <button title="Sub In"
-                    v-on:click="quiz_event('sub-in')"
-                    v-bind:disabled="! this.active_quizzer.name"
-                >Sub In</button>
-
-                <button title="Sub Out"
-                    v-on:click="quiz_event('sub-out')"
-                    v-bind:disabled="! this.active_quizzer.name"
-                >Sub Out</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="material_search_wrapper">
-        <material-search
-            ref="material_search"
+        <material-lookup
+            ref="material_lookup"
             v-bind:material="material"
-            clickable="true"
-            v-on:reference-click="search_reference_click"
-        ></material-search>
-    </div>
+            v-on:reference-change="lookup_reference_change"
+        ></material-lookup>
 
-    <div id="scorekeeping">
-        <table class="tabular">
-            <tr>
-                <td rowspan="2" class="vertical_text shaded">
-                    <div>
-                        <a href="#" title="Rearrange Quizzer Listing Order"
-                            v-on:click="toggle_rearrange_quizzers">Rearrange / SK Type</a>
-                    </div>
-                </td>
-                <td
-                    v-for="( team_set, index ) in metadata.quiz_teams_quizzers"
-                    v-bind:colspan="team_set.quizzers.length + 1"
-                    v-bind:class="[
-                        ( team_set.team.name == active_team.name ) ? 'selected' : '',
-                        'team_' + index + '_bold'
-                    ]"
+        <div id="quiz_view" v-bind:class="{ page_panel: 1, hidden: quiz_view_hidden }">
+            <div class="page_panel_buttons">
+                Mean Question Score = {{ mean_score }}
+                <button v-on:click="print_quiz"
+                    title="Open a new tab/window to view/print this quiz's questions">Print Quiz</button>
+                <button v-on:click="toggle_quiz_view">Close View</button>
+            </div>
+
+            <h2>Quiz Questions Pool View</h2>
+
+            <table class="tabular numeric">
+                <tr>
+                    <th>Index</th>
+                    <th>Q#</th>
+                    <th>Reference</th>
+                    <th>Type</th>
+                    <th>As</th>
+                    <th>Score</th>
+                    <th>Used</th>
+                    <th v-for="type in metadata.type_ranges">{{ type[2] }}#</th>
+                </tr>
+                <tr v-for="( this_question, index ) in questions"
+                    v-bind:class="{ selected: this_question.question_id == question.question_id }"
+                    v-on:click="move_question( index + 1 )"
                 >
-                    {{ team_set.team.name }}: {{ team_set.team.score }}
-                </td>
-            </tr>
+                    <td><a href="#" v-on:click="move_question( index + 1 )"
+                        v-bind:title="'Move current view to question index ' + ( index + 1 )"
+                        >{{ index + 1 }}</a></td>
+                    <td>{{ this_question.number }}</td>
+                    <td class="left">{{
+                        this_question.book + " " + this_question.chapter + ":" + this_question.verse
+                    }}</td>
+                    <td class="left">{{ this_question.type }}</td>
+                    <td class="left">{{ this_question.as }}</td>
+                    <td>{{ this_question.score }}</td>
+                    <td>{{ this_question.used }}</td>
+                    <td v-for="type in metadata.type_ranges"
+                        v-bind:class="{
+                           below_min : type[3][index] < type[1][0],
+                           in_range  : type[3][index] >= type[1][0] && type[3][index] <= type[1][1],
+                           above_max : type[3][index] > type[1][1]
+                        }"
+                    >{{ type[3][index] }}</td>
+                </tr>
+            </table>
+        </div>
 
-            <tr id="quizzer_names">
-                <template v-for="( team_set, index ) in metadata.quiz_teams_quizzers">
+        <div id="manage">
+            <div class="manage_group">
+                <div id="navigation">
+                    <button v-on:click="move_question('back')" title="View previous question">&larr;</button>
+                    <button v-on:click="move_question('forward')" title="View next question">&rarr;</button>
+                    <button v-on:click="toggle_quiz_view" id="toggle_view_button"
+                        title="View full set of questions selected for this quiz">View</button>
+                </div>
+
+                <div id="timer">
+                    <div id="timer_display">{{ timer.value }}</div>
+                    <button v-for="timer_value in metadata.timer_values"
+                        v-bind:title="'Set timer to: ' + timer_value"
+                        v-on:click="set_timer(timer_value)">{{ timer_value }}</button>
+                    <button id="prime_timer_button"
+                        v-on:click="timer_click" v-bind:title=" timer.label + ': Alt+S' "
+                    >{{ timer.label }}</button>
+                    <button v-on:click="make_beep" title="Make a beep sound">Beep</button>
+                </div>
+            </div>
+
+            <div class="manage_group">
+                <div id="quiz">
+                    <b>Quiz Management</b><br>
+                    <button v-on:click="print_quiz"
+                        title="Open a new tab/window to view/print this quiz's questions">Print</button>
+                    <button v-on:click="exit_quiz"
+                        title="Exit the quiz without closing it; later resume is possible">Exit</button>
+                    <button v-on:click="close_quiz" title="Close the quiz, marking it as completed">Close</button>
+                </div>
+
+                <div id="replace">
+                    <b>Replace Question</b><br>
+                    <button v-for="type in metadata.types" v-on:click="replace(type)"
+                        v-bind:title="'Replace with type: ' + type"
+                        >{{ type }}</button>
+                </div>
+            </div>
+
+            <div class="manage_group">
+                <div id="result">
+                    <b>Results/Events</b><br>
+
+                    <button id="button_correct" title="Correct: Alt+C"
+                        v-on:click="quiz_event('success')"
+                        v-bind:disabled="! this.active_quizzer.name"
+                    >Correct</button>
+
+                    <button id="button_error" title="Error: Alt+E"
+                        v-on:click="quiz_event('failure')"
+                        v-bind:disabled="! this.active_quizzer.name"
+                    >Error</button>
+
+                    <button title="Reset"
+                        v-on:click="reset_quiz_select"
+                        v-bind:disabled="! this.active_quizzer.name"
+                    >Reset</button>
+
+                    <br>
+
+                    <button id="button_no_jump" title="No Jump: Alt+N"
+                        v-on:click="quiz_event('none')"
+                        v-bind:disabled="this.active_quizzer.name"
+                    >No Jump</button>
+
+                    <button title="Foul"
+                        v-on:click="quiz_event('foul')"
+                        v-bind:disabled="! this.active_quizzer.name"
+                    >Foul</button>
+
+                    <br>
+                    <button title="Sub In"
+                        v-on:click="quiz_event('sub-in')"
+                        v-bind:disabled="! this.active_quizzer.name"
+                    >Sub In</button>
+
+                    <button title="Sub Out"
+                        v-on:click="quiz_event('sub-out')"
+                        v-bind:disabled="! this.active_quizzer.name"
+                    >Sub Out</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="material_search_wrapper">
+            <material-search
+                ref="material_search"
+                v-bind:material="material"
+                clickable="true"
+                v-on:reference-click="search_reference_click"
+            ></material-search>
+        </div>
+
+        <div id="scorekeeping">
+            <table class="tabular">
+                <tr>
+                    <td rowspan="2" class="vertical_text shaded">
+                        <div>
+                            <a href="#" title="Rearrange Quizzer Listing Order"
+                                v-on:click="toggle_rearrange_quizzers">Rearrange / SK Type</a>
+                        </div>
+                    </td>
                     <td
-                        class="vertical_text quizzer_name"
-                        v-for="quizzer in team_set.quizzers"
-                        v-on:click="select_quizzer( team_set.team, quizzer )"
+                        v-for="( team_set, index ) in metadata.quiz_teams_quizzers"
+                        v-bind:colspan="team_set.quizzers.length + 1"
                         v-bind:class="[
-                            ( quizzer.name == active_quizzer.name ) ? 'selected' : '',
-                            'team_' + index + '_mild'
+                            ( team_set.team.name == active_team.name ) ? 'selected' : '',
+                            'team_' + index + '_bold'
                         ]"
                     >
-                        <table class="tabular clear" v-bind:title="quizzer.name">
-                            <tr><td>{{ quizzer.bib }}</td></tr>
-                            <tr><td class="quizzer_name"><div>{{ quizzer.name }}</div></td></tr>
-                            <tr><td>{{ quizzer.correct }}-{{ quizzer.incorrect }}</td></tr>
-                        </table>
+                        {{ team_set.team.name }}: {{ team_set.team.score }}
                     </td>
-                    <td v-bind:class="[ 'vertical_text', 'team_' + index + '_bold' ]"><div>
-                        <a href="#" title="Issue Timeout"
-                            v-on:click="quiz_event( 'timeout', team_set.team )">T/O</a>
+                </tr>
 
-                        <a href="#" title="Record Challenge"
-                            v-on:click="quiz_event( 'challenge', team_set.team )">Chal.</a>
-
-                        <a href="#" title="Remove Readiness Bonus"
-                            v-on:click="quiz_event( 'readiness', team_set.team )">-R</a>
-
-                        <a href="#" title="Add Unsportsmanlike Penalty"
-                            v-on:click="quiz_event( 'unsportsmanlike', team_set.team )">-U</a>
-                    </div></td>
-                </template>
-            </tr>
-
-            <tr v-for="( event, index ) in quiz_questions">
-                <td class="shaded">
-                    <template v-if="index == 0">
-                        <a href="#"
-                            title="Delete Quiz Event"
-                            v-on:click="delete_quiz_event( event.question_number )"
+                <tr id="quizzer_names">
+                    <template v-for="( team_set, index ) in metadata.quiz_teams_quizzers">
+                        <td
+                            class="vertical_text quizzer_name"
+                            v-for="quizzer in team_set.quizzers"
+                            v-on:click="select_quizzer( team_set.team, quizzer )"
+                            v-bind:class="[
+                                ( quizzer.name == active_quizzer.name ) ? 'selected' : '',
+                                'team_' + index + '_mild'
+                            ]"
                         >
+                            <table class="tabular clear" v-bind:title="quizzer.name">
+                                <tr><td>{{ quizzer.bib }}</td></tr>
+                                <tr><td class="quizzer_name"><div>{{ quizzer.name }}</div></td></tr>
+                                <tr><td>{{ quizzer.correct }}-{{ quizzer.incorrect }}</td></tr>
+                            </table>
+                        </td>
+                        <td v-bind:class="[ 'vertical_text', 'team_' + index + '_bold' ]"><div>
+                            <a href="#" title="Issue Timeout"
+                                v-on:click="quiz_event( 'timeout', team_set.team )">T/O</a>
+
+                            <a href="#" title="Record Challenge"
+                                v-on:click="quiz_event( 'challenge', team_set.team )">Chal.</a>
+
+                            <a href="#" title="Remove Readiness Bonus"
+                                v-on:click="quiz_event( 'readiness', team_set.team )">-R</a>
+
+                            <a href="#" title="Add Unsportsmanlike Penalty"
+                                v-on:click="quiz_event( 'unsportsmanlike', team_set.team )">-U</a>
+                        </div></td>
+                    </template>
+                </tr>
+
+                <tr v-for="( event, index ) in quiz_questions">
+                    <td class="shaded">
+                        <template v-if="index == 0">
+                            <a href="#"
+                                title="Delete Quiz Event"
+                                v-on:click="delete_quiz_event( event.question_number )"
+                            >
+                                {{
+                                    ( event.question_number.toString().indexOf("|") == -1 )
+                                        ? event.question_number
+                                        : event.question_number.toString().split("|")[1]
+                                }}
+                            </a>
+                        </template>
+                        <template v-else>
                             {{
                                 ( event.question_number.toString().indexOf("|") == -1 )
                                     ? event.question_number
                                     : event.question_number.toString().split("|")[1]
                             }}
-                        </a>
-                    </template>
-                    <template v-else>
-                        {{
-                            ( event.question_number.toString().indexOf("|") == -1 )
-                                ? event.question_number
-                                : event.question_number.toString().split("|")[1]
-                        }}
-                    </template>
-                </td>
-                <template v-for="( team_set, index ) in metadata.quiz_teams_quizzers">
-                    <td v-for="quizzer in team_set.quizzers" v-bind:class=" 'team_' + index + '_mild' ">
-                        {{
-                            (
-                                !! quizzer.events &&
-                                !! event.question_number &&
-                                quizzer.events[ event.question_number ] !== null
-                            ) ? quizzer.events[ event.question_number ] : ""
-                        }}
+                        </template>
                     </td>
-                    <td v-bind:class=" 'team_' + index + '_bold' ">{{
-                        (
-                            !! team_set.team.events &&
-                            !! event.question_number &&
-                            team_set.team.events[ event.question_number ] !== null
-                        ) ? team_set.team.events[ event.question_number ] : ""
-                    }}</td>
-                </template>
-            </tr>
-        </table>
-    </div>
-
-    <div id="rearrange_quizzers" v-bind:class="{ page_panel: 1, hidden: rearrange_quizzers_hidden }">
-        <div class="page_panel_buttons">
-            <button v-on:click="toggle_rearrange_quizzers(true)">Save</button>
-            <button v-on:click="toggle_rearrange_quizzers(false)">Exit</button>
+                    <template v-for="( team_set, index ) in metadata.quiz_teams_quizzers">
+                        <td v-for="quizzer in team_set.quizzers" v-bind:class=" 'team_' + index + '_mild' ">
+                            {{
+                                (
+                                    !! quizzer.events &&
+                                    !! event.question_number &&
+                                    quizzer.events[ event.question_number ] !== null
+                                ) ? quizzer.events[ event.question_number ] : ""
+                            }}
+                        </td>
+                        <td v-bind:class=" 'team_' + index + '_bold' ">{{
+                            (
+                                !! team_set.team.events &&
+                                !! event.question_number &&
+                                team_set.team.events[ event.question_number ] !== null
+                            ) ? team_set.team.events[ event.question_number ] : ""
+                        }}</td>
+                    </template>
+                </tr>
+            </table>
         </div>
 
-        <h2>Rearrange Quizzers / Set Score Type</h2>
+        <div id="rearrange_quizzers" v-bind:class="{ page_panel: 1, hidden: rearrange_quizzers_hidden }">
+            <div class="page_panel_buttons">
+                <button v-on:click="toggle_rearrange_quizzers(true)">Save</button>
+                <button v-on:click="toggle_rearrange_quizzers(false)">Exit</button>
+            </div>
 
-        <form>
-            <fieldset>
-                <legend>Quiz Teams/Quizzers</legend>
-                <textarea name="quiz_teams_quizzers" v-model="rearrange_quizzers_data"></textarea>
-            </fieldset>
+            <h2>Rearrange Quizzers / Set Score Type</h2>
 
-            <fieldset>
-                <legend>Current Score Type</legend>
-                <select name="score_type" v-model="set_score_type">
-                    <option v-for="score_type in metadata.score_types">{{ score_type }}</option>
-                </select>
-            </fieldset>
-        </form>
+            <form>
+                <fieldset>
+                    <legend>Quiz Teams/Quizzers</legend>
+                    <textarea name="quiz_teams_quizzers" v-model="rearrange_quizzers_data"></textarea>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Current Score Type</legend>
+                    <select name="score_type" v-model="set_score_type">
+                        <option v-for="score_type in metadata.score_types">{{ score_type }}</option>
+                    </select>
+                </fieldset>
+            </form>
+        </div>
     </div>
 </div>
