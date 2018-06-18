@@ -34,9 +34,9 @@
             )
         ">Clone</button>
         <button type="button"
-            onclick="publish_share_set( [% set.question_set_id %], 'Publish' )">Set Publish To</button>
+            onclick="publish_share_set( [% set.question_set_id %], 'publish' )">Set Publish To</button>
         <button type="button"
-            onclick="publish_share_set( [% set.question_set_id %], 'Share' )">Set Share To</button>
+            onclick="publish_share_set( [% set.question_set_id %], 'share' )">Set Share To</button>
         <button type="button" onclick="question_set_delete([% set.question_set_id %])">Delete</button>
         <button type="button"
             onclick="document.location.href = 'export_question_set?question_set_id=[% set.question_set_id %]'"

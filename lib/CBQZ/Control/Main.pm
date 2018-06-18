@@ -321,7 +321,7 @@ sub question_sets ($self) {
             $_->question_set->get_inflated_columns,
             count => $_->question_set->questions->count,
             used  => $_->question_set->questions->search( { used => { '>', 0 } } )->count,
-        } } $self->stash('user')->obj->user_question_sets->search({ type => 'Publish' })->all ],
+        } } $self->stash('user')->obj->user_question_sets->search({ type => 'publish' })->all ],
     );
 }
 

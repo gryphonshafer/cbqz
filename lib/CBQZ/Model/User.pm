@@ -74,7 +74,7 @@ sub question_sets ($self) {
 
 sub shared_question_sets ($self) {
     my $question_sets = CBQZ::Model::QuestionSet->new->model(
-        map { $_->question_set } $self->obj->user_question_sets->search({ type => 'Share' })->all
+        map { $_->question_set } $self->obj->user_question_sets->search({ type => 'share' })->all
     );
 
     return (wantarray) ? @$question_sets : $question_sets;

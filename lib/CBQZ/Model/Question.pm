@@ -22,7 +22,7 @@ sub is_usable_by ( $self, $user ) {
     return (
         $self->is_owned_by($user) or
         grep { $_->question_set_id == $self->obj->question_set->id }
-            $user->obj->user_question_sets->search({ type => 'Share' })->all
+            $user->obj->user_question_sets->search({ type => 'share' })->all
     ) ? 1 : 0;
 }
 
