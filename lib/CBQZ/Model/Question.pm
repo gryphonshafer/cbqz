@@ -6,6 +6,7 @@ use exact;
 use Mojo::DOM;
 use Time::Out 'timeout';
 use Try::Tiny;
+use CBQZ::Model::QuestionSet;
 
 extends 'CBQZ::Model';
 
@@ -18,12 +19,20 @@ sub is_owned_by ( $self, $user ) {
     ) ? 1 : 0;
 }
 
-sub is_usable_by ( $self, $user ) {
+sub is_shared_to ( $self, $user ) {
     return (
-        $self->is_owned_by($user) or
+        $user->obj->id and $self->obj->question_set->user_id and
         grep { $_->question_set_id == $self->obj->question_set->id }
             $user->obj->user_question_sets->search({ type => 'share' })->all
     ) ? 1 : 0;
+}
+
+sub is_usable_by ( $self, $user ) {
+    return ( $self->is_owned_by($user) or $self->is_shared_to($user) ) ? 1 : 0;
+}
+
+sub is_shared_set ($self) {
+    $self->obj->question_set->user_question_sets->search({ type => 'share' })->count;
 }
 
 {

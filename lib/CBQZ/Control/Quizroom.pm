@@ -300,17 +300,34 @@ sub delete_quiz_event ($self) {
 }
 
 sub mark ($self) {
-    my $json     = $self->req_body_json;
-    my $question = CBQZ::Model::Question->new->load( $self->req_body_json->{question_id} );
+    my $json = $self->req_body_json;
+    my $return_json;
 
-    if ( $question and $question->is_usable_by( $self->stash('user') ) ) {
-        $json->{reason} = $question->obj->marked . ' / ' . $json->{reason} if ( $question->obj->marked );
+    try {
+        my $question = CBQZ::Model::Question->new->load( $json->{question_id} );
+        E->throw('Failed to load question') unless ($question);
+
+        my ( $is_owned_by, $is_shared_to ) = (
+            $question->is_owned_by( $self->stash('user') ),
+            $question->is_shared_to( $self->stash('user') ),
+        );
+        E->throw('User does not have access to the question referenced')
+            unless ( $is_owned_by or $is_shared_to );
+
+        $json->{reason} .= ' [' . join( '',
+            map { uc( substr( $_, 0, 1 ) ) }
+                split( /\s+/, $self->stash('user')->obj->realname )
+        ) . ']' if ( $question->is_shared_set );
+
+        $json->{reason} = $question->obj->marked . '; ' . $json->{reason} if ( $question->obj->marked );
         $question->obj->update({ marked => $json->{reason} });
-        return $self->render( json => { success => 1 } );
+        $return_json = { success => 1 };
     }
-    else {
-        return $self->render( json => { error => 'User does not have access to the question referenced' } );
-    }
+    catch {
+        $return_json = { error => $self->clean_error($_) };
+    };
+
+    return $self->render( json => $return_json );
 }
 
 sub replace ($self) {
