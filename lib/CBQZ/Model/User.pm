@@ -9,9 +9,11 @@ use CBQZ::Model::QuestionSet;
 
 extends 'CBQZ::Model';
 
-with 'CBQZ::Model::User::PreLogin';
-with 'CBQZ::Model::User::Role';
-with 'CBQZ::Model::User::Program';
+with qw(
+    CBQZ::Model::User::PreLogin
+    CBQZ::Model::User::Role
+    CBQZ::Model::User::Program
+);
 
 class_has 'schema_name' => ( isa => 'Str', is => 'ro', default => 'User' );
 

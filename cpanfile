@@ -1,16 +1,16 @@
-requires 'exact';
-requires 'Config::App', '>= 1.04';
+requires 'exact', '>= 1.05';
+requires 'Config::App', '>= 1.06';
 
-requires 'Moose';
-requires 'MooseX::ClassAttribute';
-requires 'MooseX::MarkAsMethods';
-requires 'MooseX::NonMoose';
+requires 'Moose', '>= 2.2011';
+requires 'MooseX::ClassAttribute', '>= 0.29';
+requires 'MooseX::MarkAsMethods', '>= 0.15';
+requires 'MooseX::NonMoose', '>= 0.26';
 
-requires 'Mojolicious', '>= 7.10';
-requires 'Mojolicious::Plugin::AccessLog';
-requires 'Mojolicious::Plugin::ToolkitRenderer', '>= 1.01';
-requires 'Mojolicious::Plugin::RequestBase';
-requires 'MojoX::Log::Dispatch::Simple';
+requires 'Mojolicious', '>= 7.85';
+requires 'Mojolicious::Plugin::AccessLog', '>= 0.010';
+requires 'Mojolicious::Plugin::ToolkitRenderer', '>= 1.08';
+requires 'Mojolicious::Plugin::RequestBase', '>= 0.3';
+requires 'MojoX::Log::Dispatch::Simple', '>= 1.05';
 
 requires 'Carp';
 requires 'Data::Printer';
@@ -50,5 +50,5 @@ feature 'tools', 'Tools and Etc.' => sub {
 };
 
 feature 'deploy', 'Deployment' => sub {
-    requires 'App::Dest', '>= 1.17';
+    requires 'App::Dest', '>= 1.18';
 };
