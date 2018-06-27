@@ -36,6 +36,10 @@ class_has 'mailer' => ( isa => 'Email::Mailer', is => 'ro', lazy => 1, default =
     );
 } );
 
+class_has 'active' => ( isa => 'Bool', is => 'ro', lazy => 1, default => sub ($self) {
+    return $self->config->get( qw( email active ) );
+} );
+
 has subject => ( isa => 'Str', is => 'rw' );
 has html    => ( isa => 'Str', is => 'rw' );
 has type    => ( isa => 'Str', is => 'rw', trigger => sub {
@@ -62,7 +66,7 @@ sub send ( $self, $data ) {
     $data->{subject} = \$self->subject;
     $data->{html}    = \$self->html;
 
-    return $self->mailer->send($data);
+    return ( $self->active ) ? $self->mailer->send($data) : undef;
 }
 
 __PACKAGE__->meta->make_immutable;

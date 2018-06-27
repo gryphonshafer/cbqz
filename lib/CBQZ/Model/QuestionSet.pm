@@ -156,6 +156,16 @@ sub save_set_select_users ( $self, $user, $type, $selected_user_ids ) {
     E->throw('User not authorized to save select users on this set')
         unless ( $self and $self->is_owned_by($user) );
 
+    my @preexisting_user_ids = map { @$_ } @{ 
+        $self->dq->sql('SELECT user_id FROM user_question_set WHERE question_set_id = ? AND type = ?')
+            ->run( $self->obj->id, $type )->all
+    };
+
+    my @new_user_ids = grep { defined } map {
+        my $selected_user_id = $_;
+        ( grep { $_ == $selected_user_id } @preexisting_user_ids ) ? undef : $selected_user_id; 
+    } @$selected_user_ids;
+
     $self->dq->sql('DELETE FROM user_question_set WHERE question_set_id = ? AND type = ?')
         ->run( $self->obj->id, $type );
 
@@ -171,7 +181,7 @@ sub save_set_select_users ( $self, $user, $type, $selected_user_ids ) {
 
     $user->event('save_set_select_users');
 
-    return;
+    return \@new_user_ids;
 }
 
 sub import_questions ( $self, $questions, $material_set ) {

@@ -42,6 +42,7 @@ default:
                 - templates/emails
     email:
         from: CBQZ Application <g@cbqz.org>
+        active: 0
     database:
         database: cbqz
         host: 127.0.0.1
@@ -66,6 +67,8 @@ default:
         logging: ~
     logging:
         filter: ~
+    email:
+        active: 1
     recaptcha:
         public_key: 6LftUTEUAAAAALtbl98u4t4udXIAh9YpVnYRPdoP
         private_key: 6LeGUjEUAAAAAFvCPhrKLU0q5k7hlPS9toYr_Kl3

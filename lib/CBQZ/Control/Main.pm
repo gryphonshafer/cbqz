@@ -9,6 +9,7 @@ use CBQZ::Model::User;
 use CBQZ::Model::Program;
 use CBQZ::Model::MaterialSet;
 use CBQZ::Model::QuestionSet;
+use CBQZ::Model::Email;
 
 sub index ($self) {
     unless ( $self->stash('user') ) {
@@ -337,13 +338,26 @@ sub set_select_users ($self) {
 sub save_set_select_users ($self) {
     my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
 
-    try {
-        $set->save_set_select_users(
-            $self->stash('user'),
-            $self->req->param('type'),
-            $self->req->every_param('selected_users'),
+    try {  
+        my $email = CBQZ::Model::Email->new( type => 'new_shared_set' );
+        $email->send({
+            to   => $_->obj->email,
+            data => {
+                realname => $_->obj->realname,
+                set_name => $set->obj->name,
+                sharer   => $self->stash('user')->obj->realname,
+            },
+        }) for (
+            map { 
+                CBQZ::Model::User->new->load($_)
+            } @{ 
+                $set->save_set_select_users(
+                    $self->stash('user'),
+                    $self->req->param('type'),
+                    $self->req->every_param('selected_users'),
+                ) 
+            }
         );
-
         $self->flash( message => {
             type => 'success',
             text => 'User selection saved.',

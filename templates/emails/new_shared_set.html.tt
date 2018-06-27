@@ -1,0 +1,9 @@
+<title>CBQZ new shared question set: [% set_name %]</title>
+
+<p>A new CBQZ question set has been shared with you by [% sharer %].</p>
+
+<ul>
+    <li>Question Set: <b>[% set_name %]</b></li>
+    <li>Shared By: <b>[% sharer %]</b></li>
+    <li>Shared To: <b>[% realname %]</b></li>
+</ul>
