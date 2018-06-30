@@ -12,7 +12,6 @@ default:
         filter:
             - email
     data: data # location for "data" directory
-    optional_include: runtime/config.yaml
     mojolicious:
         session_cookie_name: cbqz_session
         secrets:
@@ -72,4 +71,4 @@ default:
     recaptcha:
         public_key: 6LftUTEUAAAAALtbl98u4t4udXIAh9YpVnYRPdoP
         private_key: 6LeGUjEUAAAAAFvCPhrKLU0q5k7hlPS9toYr_Kl3
-optional_include: runtime/config_overrides.yaml
+optional_include: runtime/config.yaml
