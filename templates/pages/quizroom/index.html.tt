@@ -50,7 +50,7 @@
         <p>
             Use the following page form to select and set the configuration settings
             for quiz generation.
-            <b v-if="! generate_ready">
+            <b v-if="not_generate_ready">
                 Note that to start a quiz or save a quiz you'll need
                 to select at least some questions by chapter below along with reasonable
                 default quiz values.
@@ -83,7 +83,7 @@
                         type="checkbox" name="save_for_later" v-model="save_for_later"> Save for Later</label>
                 </div>
 
-                <button type="submit" v-bind:disabled="! generate_ready"
+                <button type="submit" v-bind:disabled="not_generate_ready"
                     >Generate Quiz and {{ ( this.save_for_later ) ? 'Save for Later' : 'Start Now' }}</button>
             </fieldset>
 
@@ -92,6 +92,11 @@
                 <textarea name="question_types" v-model="question_types"
                     title="List out the question type groups, question selection ranges, and types per group"
                     placeholder="Question Types Listing"></textarea>
+
+                <div v-if="can_reset_question_types">
+                    <button type="button"
+                        v-on:click="reset_question_types">Reset to Program Default</button>
+                </div>
             </fieldset>
 
             <fieldset>
@@ -128,7 +133,7 @@
             <h3>{{ question_set.name }}</h3>
 
             <p>
-                <b v-if="! generate_ready">
+                <b v-if="not_generate_ready">
                     To start a quiz or save a quiz for later, you need to select
                     questions by chapter in the below table.
                 </b>

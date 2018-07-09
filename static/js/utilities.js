@@ -29,7 +29,7 @@ function set_json_cookie( name, value, days ) {
 }
 
 function get_json_cookie(name) {
-    return JSON.parse( atoa( get_cookie(name) ) );
+    return JSON.parse( atob( get_cookie(name) ) );
 }
 
 // -----------------------------------------------------------------------------

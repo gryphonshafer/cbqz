@@ -4,6 +4,11 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
     data.official       = false;
     data.save_for_later = false;
 
+    var cbqz_prefs = get_json_cookie("cbqz_prefs");
+    data.question_types = ( !! cbqz_prefs && !! cbqz_prefs.question_types )
+        ? cbqz_prefs.question_types
+        : data.program_question_types;
+
     new Vue({
         el: "#quiz_setup",
         data: data,
@@ -63,6 +68,9 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
             },
             start_quiz: function (quiz_id) {
                 document.location.href = cntlr + "/quiz?id=" + quiz_id;
+            },
+            reset_question_types: function () {
+                this.question_types = this.program_question_types;
             }
         },
 
@@ -78,7 +86,7 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
                 if ( this.weight_chapters > count ) this.weight_chapters = count;
                 return count;
             },
-            generate_ready: function () {
+            not_generate_ready: function () {
                 return (
                     this.name.length > 0 &&
                     this.quizmaster.length > 0 &&
@@ -89,8 +97,11 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
                     this.timer_default > 0 &&
                     this.timer_values.length > 0 &&
                     this.selected_chapters_count > 0
-                ) ? true : false;
-            }
+                ) ? false : true;
+            },
+            can_reset_question_types: function () {
+                return ( this.question_types != this.program_question_types ) ? true : false;
+            },
         },
 
         watch: {
