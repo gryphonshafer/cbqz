@@ -3,6 +3,8 @@ use exact;
 use Config::App;
 use Try::Tiny;
 use Util::CommandLine qw( options pod2usage );
+use Progress::Any;
+use Progress::Any::Output;
 use CBQZ;
 use CBQZ::Model::Question;
 use CBQZ::Model::QuestionSet;
@@ -34,6 +36,13 @@ catch {
 };
 
 my $question_model = CBQZ::Model::Question->new;
+
+my $count = $question_set->obj->questions->count;
+say "Processing $count questions...";
+
+my $progress = Progress::Any->get_indicator( task => 'questions', target => $count );
+Progress::Any::Output->set( { task => 'questions' }, 'TermProgressBarColor' );
+
 for my $question ( $question_model->model( $question_set->obj->questions->all ) ) {
     my $data = $question->auto_text($material_set);
 
@@ -47,7 +56,10 @@ for my $question ( $question_model->model( $question_set->obj->questions->all ) 
     }
 
     $question->obj->update($data);
+    $progress->update;
 }
+
+$progress->finish;
 
 =head1 NAME
 

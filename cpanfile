@@ -25,6 +25,8 @@ requires 'IO::All';
 requires 'Log::Dispatch';
 requires 'Log::Dispatch::Email::Mailer';
 requires 'MIME::Base64';
+requires 'Progress::Any';
+requires 'Progress::Any::Output';
 requires 'Term::ANSIColor';
 requires 'Time::Out';
 requires 'Try::Tiny';

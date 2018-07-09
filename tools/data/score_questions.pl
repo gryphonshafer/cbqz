@@ -3,6 +3,8 @@ use exact;
 use Config::App;
 use Util::CommandLine qw( options pod2usage );
 use Try::Tiny;
+use Progress::Any;
+use Progress::Any::Output;
 use CBQZ::Model::Question;
 use CBQZ::Model::QuestionSet;
 use CBQZ::Model::MaterialSet;
@@ -41,20 +43,22 @@ unless ( $settings->{all} or $settings->{id} ) {
     };
 }
 
-$| = 1;
-for my $question (
-    ( $settings->{id} )
-        ? CBQZ::Model::Question->new->load( $settings->{id} )
-        : CBQZ::Model::Question->new->model(
-            ( $settings->{all} )
-                ? CBQZ::Model::Question->new->rs->search->all
-                : $question_set->obj->questions->all
-        )
-) {
+my @questions = ( $settings->{id} )
+    ? CBQZ::Model::Question->new->load( $settings->{id} )
+    : CBQZ::Model::Question->new->model(
+        ( $settings->{all} )
+            ? CBQZ::Model::Question->new->rs->search->all
+            : $question_set->obj->questions->all
+    );
+
+my $progress = Progress::Any->get_indicator( task => 'work', target => scalar(@questions) );
+Progress::Any::Output->set( { task => 'work' }, 'TermProgressBarColor' );
+
+for my $question (@questions) {
     $question->calculate_score($material_set);
-    print '.';
+    $progress->update;
 }
-print "\n";
+$progress->finish;
 
 =head1 NAME
 

@@ -19,11 +19,11 @@ my $data_dir = join( '/',
 
 $settings->{version} //= 'NIV';
 
+say "Saving to: $data_dir";
+
 for my $book ( @{ $settings->{books} } ) {
     my $chapter = 1;
     while (1) {
-        say $book, ' ', $chapter;
-
         my $result = $cbqz->ua->get(
             'https://www.biblegateway.com/passage/' .
                 '?version=' . uc( $settings->{version} ) .
@@ -42,6 +42,8 @@ for my $book ( @{ $settings->{books} } ) {
         $title =~ tr/ /_/;
 
         spurt( $data_dir . '/' . $title . '.html', decode_utf8( $result->body ) );
+
+        say $book, ' ', $chapter, ' => ', $title . '.html';
         $chapter++;
     }
 }
