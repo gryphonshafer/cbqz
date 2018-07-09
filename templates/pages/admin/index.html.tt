@@ -41,7 +41,7 @@
                 <th>Username</th>
                 <th>Real Name</th>
                 [% FOR role IN roles %]
-                    <th>[% role %]</th>
+                    <th>[% role.ucfirst %]</th>
                 [% END %]
             </tr>
             [% FOR this_user IN program.users %]
