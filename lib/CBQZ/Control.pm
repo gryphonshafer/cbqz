@@ -114,7 +114,7 @@ sub startup ( $self, $app = undef ) {
     } );
 
     # pre-load controllers
-    load_class( 'CBQZ::Control::' . $_ ) for qw( Main Editor Quizroom Admin );
+    load_class( 'CBQZ::Control::' . $_ ) for qw( Main Editor Quizroom Admin Stats );
 
     # before dispatch tasks
     $self->hook( 'before_dispatch' => sub ($self) {

@@ -32,6 +32,8 @@
                     href="[% c.url_for('/main/material') %]">Material</a>
                 <a [% IF page.menu == 'questions' %]class="selected"[% END %]
                     href="[% c.url_for('/editor/questions') %]">Questions</a>
+                <a [% IF page.menu == 'stats' %]class="selected"[% END %]
+                    href="[% c.url_for('/stats') %]">Stats</a>
 
                 [% IF user.has_role('administrator') OR user.has_role('director') %]
                     <a [% IF page.menu == 'admin' %]class="selected"[% END %]

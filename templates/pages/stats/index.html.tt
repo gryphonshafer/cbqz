@@ -1,0 +1,29 @@
+[%
+    page.title = 'Quiz Statistics';
+    page.menu  = 'stats';
+%]
+
+[% IF quizzes.size %]
+    <table class="tabular">
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Quizmaster</th>
+            <th>Room</th>
+            <th>Scheduled</th>
+            <th>Created</th>
+            <th>Last Modified</th>
+        </tr>
+        [% FOR quiz IN quizzes %]
+            <tr>
+                <td>[% quiz.name %]</td>
+                <td>[% ( quiz.official ) ? "Official" : "Practice" %]</td>
+                <td>[% quiz.quizmaster %]</td>
+                <td class="right">[% quiz.room %]</td>
+                <td class="right">[% quiz.scheduled %]</td>
+                <td class="right">[% quiz.created %]</td>
+                <td class="right">[% quiz.last_modified %]</td>
+            </tr>
+        [% END %]
+    </table>
+[% END %]

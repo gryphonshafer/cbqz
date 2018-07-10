@@ -57,13 +57,13 @@ sub model ( $self, @names ) {
     return (wantarray) ? @$models : $models;
 }
 
-sub every ( $self, @sets ) {
-    my $every = $self->model( $self->rs(@sets)->all );
+sub every ( $self, @params ) {
+    my $every = $self->model( $self->rs( $self->schema_name, @params )->all );
     return (wantarray) ? @$every : $every;
 }
 
-sub every_data ( $self, @sets ) {
-    my $data = [ map { $_->data } @{ $self->every(@sets) } ];
+sub every_data ( $self, @params ) {
+    my $data = [ map { $_->data } @{ $self->every(@params) } ];
     return (wantarray) ? @$data : $data;
 }
 
@@ -91,8 +91,8 @@ CBQZ::Model
     my $thing_hashref = $new_thing->data;
 
     my @things1     = $thing->model( $thing->db->rs('thing')->all );
-    my @things2     = $thing->every('thing');
-    my @things_data = $thing->every_data('thing');
+    my @things2     = $thing->every;
+    my @things_data = $thing->every_data;
 
 =head1 DESCRIPTION
 
@@ -177,11 +177,11 @@ data and need to use the objects in their model context.
 
 Returns an array or arrayref (depending on context) of loaded model objects.
 
-    my @all_things = $thing->every('thing');
+    my @all_things = $thing->every;
 
 =head2 every_data
 
 Returns an array or arrayref (depending on context) of hashrefs of data of a
 given schema name.
 
-    my @things_data = $thing->every_data('thing');
+    my @things_data = $thing->every_data;
