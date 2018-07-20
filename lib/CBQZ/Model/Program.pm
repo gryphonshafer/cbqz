@@ -10,8 +10,8 @@ extends 'CBQZ::Model';
 
 class_has 'schema_name' => ( isa => 'Str', is => 'ro', default => 'Program' );
 
-sub rs ($self) {
-    my $programs = $self->SUPER::rs;
+sub rs ( $self, @params ) {
+    my $programs = $self->SUPER::rs(@params);
     return ( $programs->count ) ? $programs : $self->create_default;
 }
 
