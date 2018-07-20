@@ -1,5 +1,5 @@
 # dest.prereq: db/changes/1517966309_roles_naming_update
-# dest.prereq: db/changes/1519065946_publish_question_sets/
+# dest.prereq: db/changes/1519065946_publish_question_sets
 
 ALTER TABLE role CHANGE COLUMN type type ENUM(
     'Administrator', 'Director', 'Official', 'User', 'administrator', 'director', 'official', 'user'
