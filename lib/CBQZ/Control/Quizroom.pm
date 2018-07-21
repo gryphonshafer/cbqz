@@ -38,13 +38,6 @@ sub path ($self) {
 }
 
 {
-    my @quizzer_names = qw(
-        Alpha Bravo Charlie Delta Echo Foxtrot Gulf Hotel India Juliet Kilo Lima Mike November Oscar
-    );
-    my $quiz_teams_quizzers = join( "\n\n", map {
-        $_ . "\n" . join( "\n", map { $_ . '. ' . shift(@quizzer_names) . ' Quizzer' } 1 .. 5 )
-    } map { 'Team ' . $_ } 'A' .. 'C' ) . "\n";
-
     sub quiz_setup ($self) {
         my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
 
@@ -71,7 +64,6 @@ sub path ($self) {
             question_set_id     => $cbqz_prefs->{question_set_id} || undef,
             material_set_id     => $cbqz_prefs->{material_set_id} || undef,
             question_set        => $question_set,
-            quiz_teams_quizzers => $quiz_teams_quizzers,
             scheduled           => date_time_ansi(),
             name                => date_time_ansi(),
             quizmaster          => $self->stash('user')->obj->realname,

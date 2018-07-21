@@ -9,6 +9,24 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
         ? cbqz_prefs.question_types
         : data.program_question_types;
 
+    if ( ! data.quiz_teams_quizzers ) {
+        var teams_count   = 3;
+        var team_size     = 4;
+        var quizzer_names = new Array(
+            "Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Gulf", "Hotel", "India", "Juliet",
+            "Kilo", "Lima", "Mike", "November", "Oscar", "Papa", "Quebec", "Romeo", "Sierra", "Tango",
+            "Uniform", "Victor", "Whiskey", "X-ray", "Yankee", "Zulu"
+        );
+        data.quiz_teams_quizzers = "";
+        for ( var code = 65; code < 65 + teams_count; code++ ) {
+            if ( data.quiz_teams_quizzers.length > 0 ) data.quiz_teams_quizzers += "\n\n";
+            data.quiz_teams_quizzers += "Team " + String.fromCharCode(code);
+            for ( var bib = 1; bib <= team_size; bib++ ) {
+                data.quiz_teams_quizzers += "\n" + bib + ". " + quizzer_names.shift() + " Quizzer";
+            }
+        }
+    }
+
     new Vue({
         el: "#quiz_setup",
         data: data,
