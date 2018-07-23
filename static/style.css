@@ -90,6 +90,7 @@ table.tabular td {
     padding: 0px;
     border-spacing: 0px;
     border-collapse: collapse;
+    background-color: darkgray;
 }
 
 table.tabular th {
@@ -122,14 +123,17 @@ table.numeric td {
     text-align: right;
 }
 
+table th.left,
 table td.left {
     text-align: left;
 }
 
+table th.center,
 table td.center {
     text-align: center;
 }
 
+table th.right,
 table td.right {
     text-align: right;
 }
@@ -206,8 +210,14 @@ div#header div#header_login form {
     margin-top: 5px;
 }
 
-div#header a.selected {
+div#header a.selected,
+div.sub_menu a.selected {
     font-family: bold;
+}
+
+div.sub_menu {
+    float: right;
+    margin-top: -10px;
 }
 
 @media ( max-width: 655px ) {
@@ -1045,40 +1055,40 @@ div#quizroom div#rearrange_quizzers fieldset {
 
 /* -------------------------------------------------------------------------- */
 
-form#program_config fieldset {
+form.admin_form fieldset {
     display: inline-block;
     vertical-align: top;
     margin-top: 5px;
     margin-bottom: 5px;
 }
 
-form#program_config textarea {
+form.admin_form textarea {
     font-family: normal;
     font-size: 13px;
     width: 200px;
     height: 137px;
 }
 
-form#program_config fieldset label {
+form.admin_form fieldset label {
     width: 250px;
     text-align: right;
     margin-bottom: 3px;
 }
 
-form#program_config fieldset label input[type=text] {
+form.admin_form fieldset label input[type=text] {
     width: 130px;
 }
 
-form#program_config fieldset#questions_and_timers input[type=text] {
+form.admin_form fieldset#questions_and_timers input[type=text] {
     width: 80px;
 }
 
-form#program_config input[type=submit] {
+form.admin_form input[type=submit] {
     display: block;
     margin-left: auto;
 }
 
-form#program_config fieldset#result_operation textarea {
+form.admin_form fieldset#result_operation textarea {
     width: 476px;
 }
 

@@ -2,6 +2,7 @@
     page.title = 'CBQZ Administration';
     page.menu  = 'admin';
 %]
+[% PROCESS admin/sub_menu.html.tt, sub_page => 'roles' %]
 
 <h2>User Roles</h2>
 
@@ -66,65 +67,3 @@
 
     <input type="submit" value="Save User Roles">
 </form>
-
-<h2>Program Configuration</h2>
-
-[% FOR program IN programs %]
-    <h3>[% program.name %]</h3>
-
-    <form id="program_config" method="post" action="[% c.url_for('/admin/save_program_config') %]">
-        <fieldset>
-            <legend>Default Configuration</legend>
-
-            <input type="hidden" name="program_id" value="[% program.program_id %]"></label>
-
-            <label>Name: <input type="text" name="name" value="[% program.name | html %]"
-                placeholder="Program Name"
-                title="Quiz program name or district name"></label>
-            <label>Target Questions: <input type="text" name="target_questions" value="[% program.target_questions %]"
-                placeholder="Target Questions"
-                title="Total number of questions to select for a quiz's questions pool"></label>
-            <label>Timer Default: <input type="text" name="timer_default" value="[% program.timer_default %]"
-                placeholder="Timer Default"
-                title="Default number of seconds per question on timer"></label>
-            <label>Timeout: <input type="text" name="timeout" value="[% program.timeout %]"
-                placeholder="Timeout"
-                title="Number of seconds a timeout will last"></label>
-            <label>Timer Values: <input type="text" name="timer_values" value="[% program.timer_values %]"
-                placeholder="Timer Values"
-                title="Comma-separated list of timer button values"></label>
-            <label>Readiness Bonus: <input type="text" name="readiness" value="[% program.readiness %]"
-                placeholder="Readiness Bonus"
-                title="Points awarded for a team's readiness"></label>
-            <label>As Default: <input type="text" name="as_default" value="[% program.as_default %]"
-                placeholder="As Default"
-                title="Name of the initial question &quot;as&quot; value"></label>
-
-            <input type="submit" value="Save Program Configuration">
-        </fieldset>
-
-        <fieldset>
-            <legend>Question Types</legend>
-            <textarea name="question_types"
-                title="List out the question type groups, question selection ranges, and types per group"
-                placeholder="Question Types Listing"
-            >[% program.question_types %]</textarea>
-        </fieldset>
-
-        <fieldset>
-            <legend>Score Types</legend>
-            <textarea name="score_types" placeholder="Score Types"
-                title="List of scoring rules to select from for a quiz"
-            >[% program.score_types %]</textarea>
-        </fieldset>
-
-        <br>
-
-        <fieldset id="result_operation">
-            <legend>Result Operation</legend>
-            <textarea name="result_operation" id="result_operation" placeholder="Result Operation Javascript"
-                title="Javascript to handle result operation calculations for scorekeeping"
-                >[% program.result_operation %]</textarea>
-        </fieldset>
-    </form>
-[% END %]

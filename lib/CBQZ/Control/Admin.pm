@@ -5,6 +5,7 @@ use exact;
 use Try::Tiny;
 use CBQZ::Model::Program;
 use CBQZ::Model::User;
+use CBQZ::Model::Meet;
 
 sub index ($self) {
     my $roles = [ grep { $_ ne 'administrator' } @{ $self->stash('user')->db->enum( 'role', 'type' ) } ];
@@ -55,6 +56,14 @@ sub save_roles_changes ($self) {
     return $self->redirect_to('/admin');
 }
 
+sub config ($self) {
+    my $roles = [ grep { $_ ne 'administrator' } @{ $self->stash('user')->db->enum( 'role', 'type' ) } ];
+
+    $self->stash(
+        programs => CBQZ::Model::Program->new->admin_data( $self->stash('user'), $roles ),
+    );
+}
+
 sub save_program_config ($self) {
     my $roles      = [ grep { $_ ne 'administrator' } @{ $self->stash('user')->db->enum( 'role', 'type' ) } ];
     my $programs   = CBQZ::Model::Program->new->admin_data( $self->stash('user'), $roles );
@@ -90,7 +99,22 @@ sub save_program_config ($self) {
         } );
     }
 
-    return $self->redirect_to('/admin');
+    return $self->redirect_to('/admin/config');
+}
+
+sub build_draw ($self) {
+    my $settings = { map { $_ => $self->param($_) } ( qw( rooms quizzes teams ) ) };
+
+    if ( $settings->{rooms} and $settings->{quizzes} and $settings->{teams} ) {
+        try {
+            $settings->{teams} = [ grep { length } split( /\s*\r?\n\s*/, $settings->{teams} ) ];
+            $self->stash( meet => CBQZ::Model::Meet->build_draw($settings) );
+        }
+        catch {
+            $self->notice( 'Build draw error: ' . $self->cbqz->clean_error($_) );
+            $self->stash( message => $self->cbqz->clean_error($_) );
+        };
+    }
 }
 
 1;

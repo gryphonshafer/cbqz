@@ -1,0 +1,60 @@
+[%
+    page.title = 'CBQZ Administration';
+    page.menu  = 'admin';
+%]
+[% PROCESS admin/sub_menu.html.tt, sub_page => 'build_draw' %]
+
+<h2>Build Meet Draw</h2>
+
+<form class="admin_form" method="get" action="[% c.url_for('/admin/build_draw') %]">
+    <fieldset>
+        <legend>Draw Configuration</legend>
+
+        <label>Rooms at Meet: <input type="text"
+            name="rooms"
+            value="[% rooms || c.params.rooms | html %]"
+            placeholder="# of Rooms"
+            title="Number of rooms at quiz meet"></label>
+
+        <label>Quizzes per Team: <input type="text"
+            name="quizzes"
+            value="[% quizzes || c.params.quizzes | html %]"
+            placeholder="# of Quizzes"
+            title="Number of quizzes per team"></label>
+
+        <input type="submit" value="Build Meet Draw">
+    </fieldset>
+    <fieldset>
+        <legend>Team Listing</legend>
+        <textarea name="teams"
+            title="List out the teams, one team name per line"
+            placeholder="Team Listing"
+        >[% teams || c.params.teams | html %]</textarea>
+    </fieldset>
+</form>
+
+[% IF meet.size %]
+    <h3>Generated Draw</h3>
+
+    [% set_count = 0 %]
+    <table class="tabular">
+        <tr>
+            <th>Set</th>
+            [% FOR room IN [ 1 .. meet.0.size ] %]
+                <th colspan="3">Room [% room %]</th>
+            [% END %]
+        </tr>
+        [% FOR set IN meet %]
+            <tr>
+                <th class="right">[% set_count = set_count + 1; set_count %]</th>
+                [% FOR quiz IN set %]
+                    [% FOR team IN quiz %]
+                        <td>
+                            [% team.name %]
+                        </td>
+                    [% END %]
+                [% END %]
+            </tr>
+        [% END %]
+    </table>
+[% END %]

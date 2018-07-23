@@ -1,0 +1,8 @@
+<div class="sub_menu">
+    <a [% IF sub_page == 'roles' %]class="selected"[% END %]
+        href="[% c.url_for('/admin') %]">User Roles</a>
+    <a [% IF sub_page == 'config' %]class="selected"[% END %]
+        href="[% c.url_for('/admin/config') %]">Program Configuration</a>
+    <a [% IF sub_page == 'build_draw' %]class="selected"[% END %]
+        href="[% c.url_for('/admin/build_draw') %]">Build Draw</a>
+</div>
