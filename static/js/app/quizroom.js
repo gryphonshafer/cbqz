@@ -93,6 +93,10 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                                     input.number
                                 ] = result_data.label;
                             }
+
+                            if ( !! result_data.quizzer )
+                                vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].score += result_data.quizzer;
+
                             break;
                         }
                     }
