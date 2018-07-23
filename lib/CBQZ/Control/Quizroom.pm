@@ -11,30 +11,24 @@ use CBQZ::Model::QuizQuestion;
 use CBQZ::Util::Format 'date_time_ansi';
 
 sub path ($self) {
-    my $cbqz_prefs       = $self->decode_cookie('cbqz_prefs');
-    my $path             = $self->url_for('/quizroom');
-    my $result_operation = '';
+    my $path = $self->url_for('/quizroom');
+    my $text = qq/var cntlr = "$path";\n/;
 
-    try {
-        $result_operation = CBQZ::Model::Program->new->load(
-            $cbqz_prefs->{program_id}
-        )->obj->result_operation;
-    }
-    catch {
-        $self->warn($_);
-    };
+    if ( $self->session('quiz_id') ) {
+        my $cbqz_prefs       = $self->decode_cookie('cbqz_prefs');
+        my $result_operation = CBQZ::Model::Quiz->new
+            ->load( $self->session('quiz_id') )->obj->result_operation || '';
 
-    return $self->render(
-        text => qq/
-            var cntlr = "$path";
-
+        $text .= qq/
             function result_operation(input) {
                 var output = {};
                 $result_operation
                 return output;
             }
-        /,
-    );
+        /;
+    }
+
+    return $self->render( text => $text );
 }
 
 {
@@ -98,11 +92,14 @@ sub generate_quiz ($self) {
         E->throw('User does not own requested question set')
             unless ( $set and $set->is_usable_by( $self->stash('user') ) );
 
+        my $program = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
+
         $quiz = CBQZ::Model::Quiz->new->create({
             %$cbqz_prefs,
             %{ $self->params },
             user_id             => $self->stash('user')->obj->id,
             quiz_teams_quizzers => $self->req->param('quiz_teams_quizzers'),
+            result_operation    => $program->obj->result_operation,
         });
     }
     catch {

@@ -95,6 +95,11 @@ __PACKAGE__->table("quiz");
   data_type: 'mediumtext'
   is_nullable: 1
 
+=head2 result_operation
+
+  data_type: 'mediumtext'
+  is_nullable: 1
+
 =head2 last_modified
 
   data_type: 'timestamp'
@@ -162,6 +167,8 @@ __PACKAGE__->add_columns(
   "metadata",
   { data_type => "mediumtext", is_nullable => 1 },
   "questions",
+  { data_type => "mediumtext", is_nullable => 1 },
+  "result_operation",
   { data_type => "mediumtext", is_nullable => 1 },
   "last_modified",
   {
@@ -244,8 +251,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07048 @ 2018-03-19 17:15:18
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:+p1pJrxdWXdEAw/E32Q67Q
+# Created by DBIx::Class::Schema::Loader v0.07048 @ 2018-07-23 10:00:29
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:DqhtZ7PGDFmEwV3lslifJw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
