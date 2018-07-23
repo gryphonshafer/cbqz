@@ -28,6 +28,7 @@ requires 'MIME::Base64';
 requires 'Progress::Any';
 requires 'Progress::Any::Output';
 requires 'Term::ANSIColor';
+requires 'Text::CSV_XS';
 requires 'Time::Out';
 requires 'Try::Tiny';
 
@@ -46,7 +47,6 @@ feature 'tools', 'Tools and Etc.' => sub {
     requires 'Encode';
     requires 'Parse::RecDescent';
     requires 'Term::ReadKey';
-    requires 'Text::CSV_XS';
     requires 'Text::Unidecode';
     requires 'Util::CommandLine';
 };
