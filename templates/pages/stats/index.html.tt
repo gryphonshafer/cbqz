@@ -3,27 +3,41 @@
     page.menu  = 'stats';
 %]
 
-[% IF quizzes.size %]
-    <table class="tabular">
-        <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Quizmaster</th>
-            <th>Room</th>
-            <th>Scheduled</th>
-            <th>Created</th>
-            <th>Last Modified</th>
-        </tr>
-        [% FOR quiz IN quizzes %]
+[% BLOCK quizzes_block %]
+    <h2>[% type.ucfirst %] Quizzes</h2>
+
+    [% IF quizzes.$type.size %]
+        <p>The following are [% type %] quizzes for which you have access to view.</p>
+
+        <table class="tabular">
             <tr>
-                <td>[% quiz.name %]</td>
-                <td>[% ( quiz.official ) ? "Official" : "Practice" %]</td>
-                <td>[% quiz.quizmaster %]</td>
-                <td class="right">[% quiz.room %]</td>
-                <td class="right">[% quiz.scheduled %]</td>
-                <td class="right">[% quiz.created %]</td>
-                <td class="right">[% quiz.last_modified %]</td>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Quizmaster</th>
+                <th>Room</th>
+                <th>Scheduled</th>
+                <th>Created</th>
+                <th>Last Modified</th>
             </tr>
-        [% END %]
-    </table>
+            [% FOR quiz IN quizzes.$type %]
+                <tr>
+                    <td><a
+                        href="[% c.url_for('/stats/quiz').query( id => quiz.quiz_id ) %]"
+                        title="Click to view: [% quiz.name | html_entity %]"
+                        >[% quiz.name %]</a></td>
+                    <td>[% ( quiz.official ) ? "Official" : "Practice" %]</td>
+                    <td>[% quiz.quizmaster %]</td>
+                    <td class="right">[% quiz.room %]</td>
+                    <td class="right">[% quiz.scheduled %]</td>
+                    <td class="right">[% quiz.created %]</td>
+                    <td class="right">[% quiz.last_modified %]</td>
+                </tr>
+            [% END %]
+        </table>
+    [% ELSE %]
+        <p>There are no [% type %] quizzes for which you have access to view.</p>
+    [% END %]
 [% END %]
+
+[% PROCESS quizzes_block, type = 'active' %]
+[% PROCESS quizzes_block, type = 'closed' %]

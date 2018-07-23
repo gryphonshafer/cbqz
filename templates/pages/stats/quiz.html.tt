@@ -1,0 +1,70 @@
+[%
+    page.title = 'Quiz Statistics';
+    page.menu  = 'stats';
+%]
+
+<h2>Quiz: [% quiz.name %]</h2>
+
+<ul>
+    <li>State: [% quiz.state.ucfirst %]</li>
+    <li>Quizmaster: [% quiz.quizmaster %]</li>
+    <li>Room: [% quiz.room %]</li>
+    <li>Type: [% ( quiz.official ) ? "Official" : "Practice" %]</li>
+    <li>Created: [% quiz.created %]</li>
+    <li>Scheduled: [% quiz.scheduled %]</li>
+    <li>Last Modified: [% quiz.last_modified %]</li>
+</ul>
+
+<h3>Team and Individual Scores</h3>
+
+<ul>
+    [% FOREACH team IN quiz.metadata.quiz_teams_quizzers %]
+        <li>[% team.team.name %]: [% team.team.score %]</li>
+        <ul>
+            [% FOREACH quizzer IN team.quizzers %]
+                <li>[% quizzer.bib %]. [% quizzer.name %]: [% quizzer.score %]</li>
+            [% END %]
+        </ul>
+    [% END %]
+</ul>
+
+<h3>Quiz Play-by-Play</h3>
+
+[% IF events.size %]
+    <table class="tabular">
+        <tr>
+            <th>Q#</th>
+            <th>As</th>
+            <th>Type</th>
+            <th>Reference</th>
+            <th>Team</th>
+            <th>Quizzer</th>
+            <th>Form</th>
+            <th>Result</th>
+            <th>Date/Time</th>
+        </tr>
+        [% FOREACH event IN events %]
+            <tr>
+                <td>
+                    [% IF event.question_number.match('^\d+$') %]
+                        [% event.question_number %]
+                    [% END %]
+                </td>
+                <td>[% event.question_as %]</td>
+                <td>[% event.type %]</td>
+                <td>
+                    [% IF event.book AND event.chapter AND event.verse %]
+                        [% event.book %] [% event.chapter %]:[% event.verse %]
+                    [% END %]
+                </td>
+                <td>[% event.team %]</td>
+                <td>[% event.quizzer %]</td>
+                <td>[% event.form.ucfirst %]</td>
+                <td>[% event.result.ucfirst %]</td>
+                <td>[% event.created %]</td>
+            </tr>
+        [% END %]
+    </table>
+[% ELSE %]
+    <p>There doesn't appear to be any play-by-play events for this quiz yet.</p>
+[% END %]
