@@ -37,7 +37,7 @@
     <h3>Generated Draw</h3>
 
     [% set_count = 0 %]
-    <table class="tabular">
+    <table class="tabular background">
         <tr>
             <th>Set</th>
             [% FOR room IN [ 1 .. meet.0.size ] %]

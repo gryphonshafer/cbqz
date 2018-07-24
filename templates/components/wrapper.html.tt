@@ -9,7 +9,7 @@
         page.skip_layout = 0,
         page.skip_style  = 0;
 
-    version = c.config.get('version') _ '.' _ c.config.get('sub_version');
+    version = c.config.get('version') _ '-' _ c.config.get('sub_version');
 
     content = BLOCK;
         PROCESS $template;

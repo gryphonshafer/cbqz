@@ -17,17 +17,17 @@ sub startup ( $self, $app = undef ) {
     my $cbqz   = CBQZ->new;
     my $config = $cbqz->config;
 
-    $config->put( sub_version => sprintf(
-        '%d.%02d.%02d.%02d.%02d',
-        (
-            localtime(
-                most_recent_modified(
-                    map { $config->get( 'config_app', 'root_dir' ) . '/' . $_ }
-                        qw( config db lib static templates )
-                )
+    my @most_recent_modified = (
+        localtime(
+            most_recent_modified(
+                map { $config->get( 'config_app', 'root_dir' ) . '/' . $_ }
+                    qw( config db lib static templates )
             )
-        )[ 5, 4, 3, 2, 1 ]
-    ) );
+        )
+    )[ 5, 4, 3, 2, 1 ];
+    $most_recent_modified[0] += 1900;
+    $most_recent_modified[1] += 1;
+    $config->put( sub_version => sprintf( '%d.%02d.%02d.%02d.%02d', @most_recent_modified ) );
 
     # base URL handling
     $self->plugin('RequestBase');
@@ -114,7 +114,9 @@ sub startup ( $self, $app = undef ) {
     } );
 
     # pre-load controllers
-    load_class( 'CBQZ::Control::' . $_ ) for qw( Main Editor Quizroom Admin Stats );
+    if ( $self->mode eq 'production' ) {
+        load_class( 'CBQZ::Control::' . $_ ) for qw( Main Editor Quizroom Admin Stats );
+    }
 
     # before dispatch tasks
     $self->hook( 'before_dispatch' => sub ($self) {

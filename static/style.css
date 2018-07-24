@@ -90,6 +90,9 @@ table.tabular td {
     padding: 0px;
     border-spacing: 0px;
     border-collapse: collapse;
+}
+
+table.background {
     background-color: darkgray;
 }
 
