@@ -132,11 +132,11 @@ else if ( input.form == "foul" ) {
 
     if ( input.quizzer.events )
         quizzer_fouls = Object.values( input.quizzer.events ).filter( function (value) {
-            return value.indexOf("F") != -1;
+            return value.toString().indexOf("F") != -1;
         } );
     if ( input.quizzers.events )
         team_fouls = Object.values( input.quizzers.events ).filter( function (value) {
-            return value.indexOf("F") != -1;
+            return value.toString().indexOf("F") != -1;
         } );
 
     if ( quizzer_fouls.length >= 3 ) {
@@ -169,7 +169,7 @@ else if ( input.form == "challenge" ) {
         var overruled_challenges = [];
         if ( input.team.events )
             overruled_challenges = Object.values( input.team.events ).filter( function (value) {
-                return value.indexOf("C~") != -1 || value.indexOf("C-") != -1;
+                return value.toString().indexOf("C~") != -1 || value.toString().indexOf("C-") != -1;
             } );
         if ( overruled_challenges.length >= 1 ) {
             output.team_label += "-";
