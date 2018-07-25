@@ -1,6 +1,9 @@
 [%
     page.title = 'CBQZ Administration';
     page.menu  = 'admin';
+
+    page.js.push( '/js/utilities.js', '/js/pages/admin_config.js' );
+    page.inline_js.push( 'var defaults = ' _ defaults );
 %]
 [% PROCESS admin/sub_menu.html.tt, sub_page => 'config' %]
 
@@ -9,7 +12,9 @@
 [% FOR program IN programs %]
     <h3>[% program.name %]</h3>
 
-    <form class="admin_form" method="post" action="[% c.url_for('/admin/save_program_config') %]">
+    <form id="admin_config" class="admin_form" method="post"
+        action="[% c.url_for('/admin/save_program_config') %]"
+    >
         <fieldset>
             <legend>Default Configuration</legend>
 
@@ -38,6 +43,9 @@
                 title="Name of the initial question &quot;as&quot; value"></label>
 
             <input type="submit" value="Save Program Configuration">
+            <button type="button" id="reset_config_to_defaults"
+                style="float: right">Reset Configuration to Defaults</button>
+
         </fieldset>
 
         <fieldset>

@@ -11,7 +11,7 @@ use CBQZ;
 use CBQZ::Model::User;
 use CBQZ::Util::Format 'log_date';
 use CBQZ::Util::Template 'tt_settings';
-use CBQZ::Util::File qw( most_recent_modified slurp );
+use CBQZ::Util::File 'most_recent_modified';
 
 sub startup ( $self, $app = undef ) {
     my $cbqz   = CBQZ->new;

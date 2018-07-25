@@ -57,10 +57,12 @@ sub save_roles_changes ($self) {
 }
 
 sub config ($self) {
-    my $roles = [ grep { $_ ne 'administrator' } @{ $self->stash('user')->db->enum( 'role', 'type' ) } ];
+    my $roles   = [ grep { $_ ne 'administrator' } @{ $self->stash('user')->db->enum( 'role', 'type' ) } ];
+    my $program = CBQZ::Model::Program->new;
 
     $self->stash(
-        programs => CBQZ::Model::Program->new->admin_data( $self->stash('user'), $roles ),
+        programs => $program->admin_data( $self->stash('user'), $roles ),
+        defaults => $program->json->encode( $program->string_defaults ),
     );
 }
 

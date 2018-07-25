@@ -1,6 +1,6 @@
 ---
 default:
-    version: 15.1.1
+    version: 15.2.1
     logging:
         log_dir: runtime
         log_file: app.log
@@ -58,6 +58,8 @@ default:
             debug: 1
             file: runtime/dbic_sql.sql
             profile: console
+    program:
+        force_default_result_operation: 0
 +|+|production:
     database:
         logging: ~

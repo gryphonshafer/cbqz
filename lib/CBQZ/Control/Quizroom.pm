@@ -9,15 +9,18 @@ use CBQZ::Model::MaterialSet;
 use CBQZ::Model::Question;
 use CBQZ::Model::QuizQuestion;
 use CBQZ::Util::Format 'date_time_ansi';
+use CBQZ::Util::File 'slurp';
 
 sub path ($self) {
     my $path = $self->url_for('/quizroom');
     my $text = qq/var cntlr = "$path";\n/;
 
     if ( $self->session('quiz_id') ) {
-        my $cbqz_prefs       = $self->decode_cookie('cbqz_prefs');
-        my $result_operation = CBQZ::Model::Quiz->new
-            ->load( $self->session('quiz_id') )->obj->result_operation || '';
+        my $result_operation = (
+            ( $self->cbqz->config->get( 'program', 'force_default_result_operation' ) )
+                ? CBQZ::Model::Program->new->default('result_operation')
+                : CBQZ::Model::Quiz->new->load( $self->session('quiz_id') )->obj->result_operation
+        ) || '';
 
         $text .= qq/
             function result_operation(input) {
