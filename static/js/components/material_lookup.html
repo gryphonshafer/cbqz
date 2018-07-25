@@ -28,11 +28,8 @@
                     <b class="material_para_markers" v-if="item.is_new_para">&para;</b>
 
                     <b v-if="clickable" class="clickable_reference" v-on:click="reference_click(item)"
-                        v-bind:title="
-                            'Work with ' +
-                            item.book + ' ' + item.chapter + ':' + item.verse +
-                            ' verse content'
-                        "
+                        v-bind:title="'Work with ' +
+                            item.book + ' ' + item.chapter + ':' + item.verse + ' verse content'"
                         >{{ item.chapter + ':' + item.verse }}</b>
                     <b v-else>{{ item.chapter + ':' + item.verse }}</b>
 
