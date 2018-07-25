@@ -3,6 +3,7 @@ package CBQZ::Control::Stats;
 use Mojo::Base 'Mojolicious::Controller';
 use exact;
 use CBQZ::Model::Quiz;
+use CBQZ::Model::QuizQuestion;
 
 sub index ($self) {
     my $get_quiz_data = sub {
@@ -73,6 +74,16 @@ sub quiz ($self) {
             )
         ],
     );
+}
+
+sub delete ($self) {
+    CBQZ::Model::Quiz->new->rs->search({
+        quiz_id  => [ keys %{ $self->params } ],
+        official => 0,
+        user_id  => $self->stash('user')->obj->id,
+    })->delete;
+
+    return $self->redirect_to('/stats');
 }
 
 1;
