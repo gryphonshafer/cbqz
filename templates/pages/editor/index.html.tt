@@ -182,11 +182,9 @@
                     <td>{{ this_q.book + " " + this_q.chapter + ":" + this_q.verse }}</td>
                     <td><a href="#"
                         v-on:click="view_question( this_q.book, this_q.chapter, this_q.question_id )"
-                        v-bind:title="
-                            'View this ' +
+                        v-bind:title="'View this ' +
                             this_q.book + ' ' + this_q.chapter + ':' + this_q.verse + ' ' +
-                            this_q.type + ' question in the editor'
-                        "
+                            this_q.type + ' question in the editor'"
                     >{{ this_q.type }}</a></td>
                     <td class="right">{{ this_q.used }}</td>
                     <td class="right">{{ this_q.score }}</td>
