@@ -97,16 +97,34 @@
         watch: {
             book: function () {
                 if ( !! this.book ) {
-                    this.chapters = Object.keys( this.material[ this.book ] ).sort(
-                        function ( a, b ) {
-                            return a - b;
-                        }
-                    );
+                    if ( !! this.material[ this.book ] ) {
+                        this.chapters = Object.keys( this.material[ this.book ] ).sort(
+                            function ( a, b ) {
+                                return a - b;
+                            }
+                        );
 
-                    if ( ! this.auto_set ) {
-                        this.chapter = null;
+                        if ( ! this.auto_set ) {
+                            this.chapter = null;
+                            this.$nextTick( function () {
+                                this.chapter = this.chapters[0];
+                            } );
+                        }
+                    }
+                    else {
+                        alert(
+                            '"' + this.book + '" not found in reference material.\n' +
+                            'This is possibly due to a mismatch of material\n' +
+                            'to question set defined on the main page.'
+                        );
+
+                        var books = Object.keys( this.material );
+                        this.book = books[0];
                         this.$nextTick( function () {
-                            this.chapter = this.chapters[0];
+                            this.chapter = 1;
+                            this.$nextTick( function () {
+                                this.verse = 1;
+                            } );
                         } );
                     }
                 }
