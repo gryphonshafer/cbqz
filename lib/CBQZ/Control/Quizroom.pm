@@ -84,7 +84,7 @@ sub generate_quiz ($self) {
     my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
     my $quiz;
 
-    try {
+    my $success = try {
         E->throw('User is not a member of program ID set in CBQZ preferences cookie')
             unless ( $self->stash('user')->has_program_id( $cbqz_prefs->{program_id} ) );
 
@@ -109,10 +109,13 @@ sub generate_quiz ($self) {
         $self->warn($_);
         $self->flash( message =>
             'An error occurred while trying to generate quiz data. ' .
-            'This is likely due to invalid quiz configuration settings.'
+            'This is likely due to invalid quiz configuration settings ' .
+            'or insufficient questions to fulfill the settings.'
         );
-        return $self->redirect_to('/quizroom');
+        $self->redirect_to('/quizroom');
+        return undef;
     };
+    return unless ($success);
 
     $self->stash('user')->event('generate_quiz');
 
@@ -252,15 +255,17 @@ sub quiz_event ($self) {
         $quiz_question_data = CBQZ::Model::QuizQuestion->new->create($quiz_question_data)->data;
         delete $quiz_question_data->{question};
 
-        return $self->render( json => {
+        $self->render( json => {
             success       => 1,
             quiz_question => $quiz_question_data,
         } );
     }
     catch {
         $self->warn($_);
-        return $self->render( json => { error => $self->clean_error($_) } );
+        $self->render( json => { error => $self->clean_error($_) } );
     };
+
+    return;
 }
 
 sub delete_quiz_event ($self) {
@@ -283,12 +288,14 @@ sub delete_quiz_event ($self) {
             question_number => $event->{question_number},
         })->obj->delete;
 
-        return $self->render( json => { success => 1 } );
+        $self->render( json => { success => 1 } );
     }
     catch {
         $self->warn($_);
-        return $self->render( json => { error => $self->clean_error($_) } );
+        $self->render( json => { error => $self->clean_error($_) } );
     };
+
+    return;
 }
 
 sub mark ($self) {
@@ -337,17 +344,19 @@ sub replace ($self) {
 
         if ( $set and $set->is_usable_by( $self->stash('user') ) ) {
             my $results = CBQZ::Model::Quiz->new->load( $request->{quiz_id} )->replace( $request, $cbqz_prefs );
-            return $self->render( json => {
+            $self->render( json => {
                 question => (@$results) ? $results->[0] : undef,
                 error    => (@$results) ? undef : 'Failed to find question of that type',
             } );
         }
     }
     catch {
-        return $self->render( json => {
+        $self->render( json => {
             error => $self->clean_error($_),
         } );
     };
+
+    return;
 }
 
 sub close ($self) {
@@ -424,16 +433,18 @@ sub rearrange_quizzers ($self) {
         $request->{metadata}{quiz_teams_quizzers} = $quizzers_data;
         $quiz->obj->update({ metadata => $self->cbqz->json->encode( $request->{metadata} ) });
 
-        return $self->render( json => {
+        $self->render( json => {
             success             => 1,
             quiz_teams_quizzers => $quizzers_data,
         } );
     }
     catch {
-        return $self->render( json => {
+        $self->render( json => {
             error => $self->clean_error($_),
         } );
     };
+
+    return;
 }
 
 1;
