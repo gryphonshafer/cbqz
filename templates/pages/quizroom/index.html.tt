@@ -32,7 +32,8 @@
                         selected_extra: ( quiz.state == 'active' ) ? true : false
                     }"
                 >
-                    <td><a href="#" v-on:click="start_quiz( quiz.quiz_id )"
+                    <td><a
+                        v-bind:href="'/quizroom/quiz?id=' + quiz.quiz_id"
                         v-bind:title="'Click to resume quiz: ' + quiz.name">{{ quiz.name }}</a></td>
                     <td>{{ quiz.quizmaster }}</td>
                     <td class="right">{{ quiz.scheduled }}</td>

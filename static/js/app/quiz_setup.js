@@ -84,9 +84,6 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
                     }
                 }
             },
-            start_quiz: function (quiz_id) {
-                document.location.href = cntlr + "/quiz?id=" + quiz_id;
-            },
             reset_question_types: function () {
                 this.question_types = this.program_question_types;
             }
