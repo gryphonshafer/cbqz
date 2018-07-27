@@ -11,6 +11,10 @@ use CBQZ::Model::QuizQuestion;
 use CBQZ::Util::Format 'date_time_ansi';
 use CBQZ::Util::File 'slurp';
 
+sub index ($self) {
+    return $self->stash( cntlr => $self->url_for('/quizroom') );
+}
+
 sub path ($self) {
     my $path = $self->url_for('/quizroom');
     my $text = qq/var cntlr = "$path";\n/;

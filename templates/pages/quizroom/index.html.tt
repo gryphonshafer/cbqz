@@ -34,7 +34,7 @@
                     }"
                 >
                     <td><a
-                        v-bind:href="'/quizroom/quiz?id=' + quiz.quiz_id"
+                        v-bind:href="'[% cntlr %]/quiz?id=' + quiz.quiz_id"
                         v-bind:title="'Click to resume quiz: ' + quiz.name">{{ quiz.name }}</a></td>
                     <td>{{ quiz.quizmaster }}</td>
                     <td class="right">{{ quiz.scheduled }}</td>
