@@ -99,6 +99,7 @@ CREATE TABLE quiz (
     room tinyint(3) unsigned NOT NULL DEFAULT '1',
     official tinyint(1) NOT NULL DEFAULT '0',
     scheduled datetime DEFAULT NULL,
+    status text,
     metadata mediumtext,
     questions mediumtext,
     result_operation mediumtext,

@@ -77,6 +77,13 @@ sub path ($self) {
             readiness           => $program->obj->readiness,
             saved_quizzes       => [
                 sort { $a->{scheduled} cmp $b->{scheduled} }
+                map {
+                    if ( $_->{state} eq 'active' ) {
+                        my $status = $self->cbqz->json->decode( $_->{status} || '{}' );
+                        $_->{question_number} = $status->{question_number} || 1;
+                    }
+                    $_;
+                }
                 @{ CBQZ::Model::Quiz->new->quizzes_for_user( $self->stash('user'), $program ) },
             ],
             program_question_types => $program->question_types_as_text,
@@ -449,6 +456,34 @@ sub rearrange_quizzers ($self) {
     };
 
     return;
+}
+
+sub status ($self) {
+    my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
+    my $status     = {};
+
+    try {
+        $status     = $self->req_body_json || {};
+        my $quiz_id = delete $status->{quiz_id} || 0;
+
+        my $program = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
+        E->throw('User does not have access to the quiz referenced by quiz ID') unless (
+            grep { $_->{quiz_id} == $quiz_id } @{
+                CBQZ::Model::Quiz->new->quizzes_for_user( $self->stash('user'), $program )
+            }
+        );
+
+        my $quiz = CBQZ::Model::Quiz->new->load($quiz_id);
+
+        if ( keys %$status ) {
+            $quiz->obj->update({ status => $quiz->json->encode($status) });
+        }
+        else {
+            $status = $quiz->json->decode( $quiz->obj->status );
+        }
+    };
+
+    return $self->render( json => { status => $status } );
 }
 
 1;

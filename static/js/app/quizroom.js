@@ -316,6 +316,11 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
                         this.question.as     = result_data.as;
                         this.question.number = result_data.number;
+
+                        this.$http.post( cntlr + "/status", {
+                            quiz_id         : this.metadata.quiz_id,
+                            question_number : this.question.number
+                        } );
                     }
 
                     this.classes.cursor_progress = false;
@@ -484,6 +489,13 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.active_quizzer = quizzer;
 
                 if ( this.timer.state != "running" ) this.timer_click();
+
+                this.$http.post( cntlr + "/status", {
+                    quiz_id         : this.metadata.quiz_id,
+                    question_number : this.question.number,
+                    team            : this.active_team,
+                    quizzer         : this.active_quizzer
+                } );
             },
 
             reset_quiz_select: function () {
@@ -491,6 +503,11 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.active_quizzer = {};
 
                 this.set_timer( this.metadata.timer_default );
+
+                this.$http.post( cntlr + "/status", {
+                    quiz_id         : this.metadata.quiz_id,
+                    question_number : this.question.number
+                } );
             },
 
             quiz_build_up: function (skip_post_processing) {
@@ -518,6 +535,11 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
                     this.question.as     = result_data.as;
                     this.question.number = result_data.number;
+
+                    this.$http.post( cntlr + "/status", {
+                        quiz_id         : this.metadata.quiz_id,
+                        question_number : this.question.number
+                    } );
                 }
             }
         },

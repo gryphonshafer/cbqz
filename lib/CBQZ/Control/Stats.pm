@@ -8,6 +8,13 @@ use CBQZ::Model::QuizQuestion;
 sub index ($self) {
     my $get_quiz_data = sub {
         return [
+            map {
+                if ( $_->{state} eq 'active' ) {
+                    my $status = $self->cbqz->json->decode( $_->{status} || '{}' );
+                    $_->{question_number} = $status->{question_number} || 1;
+                }
+                $_;
+            }
             CBQZ::Model::Quiz->new->every_data(
                 {
                     state => $_[0],

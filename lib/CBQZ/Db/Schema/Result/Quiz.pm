@@ -85,6 +85,11 @@ __PACKAGE__->table("quiz");
   datetime_undef_if_invalid: 1
   is_nullable: 1
 
+=head2 status
+
+  data_type: 'text'
+  is_nullable: 1
+
 =head2 metadata
 
   data_type: 'mediumtext'
@@ -164,6 +169,8 @@ __PACKAGE__->add_columns(
     datetime_undef_if_invalid => 1,
     is_nullable => 1,
   },
+  "status",
+  { data_type => "text", is_nullable => 1 },
   "metadata",
   { data_type => "mediumtext", is_nullable => 1 },
   "questions",
@@ -251,8 +258,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07048 @ 2018-07-23 10:00:29
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:DqhtZ7PGDFmEwV3lslifJw
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-07-27 11:31:50
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:1y9+Z/APF4muhw7mbGmvfw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
