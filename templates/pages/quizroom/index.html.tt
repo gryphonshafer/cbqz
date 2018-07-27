@@ -22,6 +22,7 @@
                     <th>Room</th>
                     <th>Type</th>
                     <th>State</th>
+                    <th>Q#</th>
                     <th>Created</th>
                     <th>Last Modified</th>
                 </tr>
@@ -40,6 +41,7 @@
                     <td class="right">{{ quiz.room }}</td>
                     <td>{{ ( quiz.official ) ? "Official" : "Practice" }}</td>
                     <td>{{ quiz.state.charAt(0).toUpperCase() + quiz.state.slice(1) }}</td>
+                    <td class="right">{{ quiz.question_number }}</td>
                     <td class="right">{{ quiz.created }}</td>
                     <td class="right">{{ quiz.last_modified }}</td>
                 </tr>
