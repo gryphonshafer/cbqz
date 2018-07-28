@@ -32,14 +32,14 @@
         <div id="question_form">
             <div>
                 <span class="label">Ref:</span>
-                <select id="book" tabindex="3" v-model="question.book" title="Book">
+                <select id="book" tabindex="1" v-model="question.book" title="Book">
                     <option v-for="item in metadata.books">{{ item }}</option>
                 </select>
 
-                <input type="text" tabindex="4" size="2" v-model="question.chapter" title="Chapter">:<input
-                    type="text" id="verse" tabindex="5" size="2" v-model="question.verse" title="Verse Number">
+                <input type="text" tabindex="2" size="2" v-model="question.chapter" title="Chapter">:<input
+                    type="text" id="verse" tabindex="3" size="2" v-model="question.verse" title="Verse Number">
 
-                <button tabindex="6" id="copy_verse"
+                <button tabindex="4" id="copy_verse"
                     v-on:click="copy_verse" v-bind:disabled="verse_incomplete"
                     title="Copy the source material by reference into the question and answer fields"
                 >
@@ -47,52 +47,55 @@
                     <span class="key_text">Alt+V</span>
                 </button>
 
-                <span class="label">Type:</span>
-                <select tabindex="7" v-model="question.type" title="Question Type">
-                    <option v-for="item in metadata.types">{{ item }}</option>
-                </select>
+                <button v-on:click="toggle_questions_view"
+                    title="View all questions in this question set in a table">View All Questions List</button>
             </div>
 
             <div>
                 <span class="label">Question:</span>
-                <div tabindex="8" class="htmlarea question_box" contenteditable="true"
+                <div tabindex="5" class="htmlarea question_box" contenteditable="true"
                     ref="question" v-html="question.question"></div>
             </div>
 
             <div>
-                <button tabindex="18" id="format_reset" v-on:click="format('clear')"
+                <button id="format_reset" v-on:click="format('clear')"
                     title="For any selected content, reset the formatting"
                     >Reset <span class="key_text">Alt+Q</span></button>
 
-                <button tabindex="19" id="format_unique_word" v-on:click="format('unique_word')"
+                <button id="format_unique_word" v-on:click="format('unique_word')"
                     title="For any selected content, set the format to unique word"
                     >Global <span class="key_text">Alt+W, Ctrl+B</span></button>
 
-                <button tabindex="20" id="format_unique_chapter" v-on:click="format('unique_chapter')"
+                <button id="format_unique_chapter" v-on:click="format('unique_chapter')"
                     title="For any selected content, set the format to unique-to-chapter"
                     >Chapter <span class="key_text">Alt+E, Ctrl+I</span></button>
 
-                <button tabindex="21" id="format_unique_phrase" v-on:click="format('unique_phrase')"
+                <button id="format_unique_phrase" v-on:click="format('unique_phrase')"
                     title="For any selected content, set the format to unique phrase"
                     >Phrase <span class="key_text">Alt+R, Ctrl+U</span></button>
             </div>
 
             <div>
                 <span class="label">Answer:</span>
-                <div tabindex="9" class="htmlarea answer_box" contenteditable="true"
+                <div tabindex="6" class="htmlarea answer_box" contenteditable="true"
                     ref="answer" v-html="question.answer"></div>
             </div>
 
             <div class="margin_lift">
                 <span class="label">Marked:</span>
-                <input tabindex="15" id="marked_comment" type="text" v-model="question.marked"
+                <input tabindex="13" id="marked_comment" type="text" v-model="question.marked"
                     placeholder="Marked Comment"
                     title="Any content saved here results in a question being considered marked">
             </div>
 
             <div>
+                <span class="label">Type:</span>
+                <select tabindex="7" v-model="question.type" title="Question Type">
+                    <option v-for="item in metadata.types">{{ item }}</option>
+                </select>
+
                 <button
-                    tabindex="10" id="auto_text"
+                    tabindex="8" id="auto_text"
                     v-on:click="auto_text" v-bind:disabled="new_question_incomplete"
                     title="Auto-text attempts to automatically validate and format question and answer content"
                 >
@@ -101,35 +104,32 @@
                 </button>
 
                 <button
-                    tabindex="16" id="lookup"
+                    tabindex="14" id="lookup"
                     v-on:click="lookup_reference" v-bind:disabled="verse_incomplete"
                     title="View the question's verse defined by reference in the reference material"
                 >
                     Lookup Verse
                     <span class="key_text">Alt+G, F2</span>
                 </button>
-
-                <button tabindex="17" v-on:click="toggle_questions_view"
-                    title="View all questions in this question set in a table">View All Questions List</button>
             </div>
 
             <div>
-                <button tabindex="11" id="save_new"
-                    v-on:click="save_new" v-bind:disabled="verse_incomplete"
-                    title="Save the current content as a new question"
-                >Save New <span class="key_text">Alt+A, F8</span></button>
-
-                <button tabindex="12" id="save_changes"
+                <button tabindex="9" id="save_changes"
                     v-on:click="save_changes" v-bind:disabled="no_saved_question"
                     title="Save the current content as an update to the existing question"
                 >Save Changes <span class="key_text">Alt+S, F9</span></button>
 
-                <button tabindex="13" id="delete_question"
+                <button tabindex="10" id="save_new"
+                    v-on:click="save_new" v-bind:disabled="verse_incomplete"
+                    title="Save the current content as a new question"
+                >Save New <span class="key_text">Alt+A, F8</span></button>
+
+                <button tabindex="11" id="delete_question"
                     v-on:click="delete_question" v-bind:disabled="no_saved_question"
                     title="Delete the current question from the set (but don't clear the form)"
                 >Delete <span class="key_text">Alt+X</span></button>
 
-                <button tabindex="14" id="clear_form" v-on:click="clear_form"
+                <button tabindex="12" id="clear_form" v-on:click="clear_form"
                     title="Clear the question form and reset all fields"
                 >Clear <span class="key_text">Alt+C</span></button>
             </div>
