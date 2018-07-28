@@ -433,7 +433,12 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.question.used        = null;
                 this.question.type        = null;
                 this.question.marked      = null;
-            },
+
+                document.getElementById("verse").focus();
+                this.$nextTick( function () {
+                    document.getElementById("verse").select();
+                } );
+                },
 
             search_reference_click: function (verse) {
                 this.$refs.material_lookup.lookup_reference(
@@ -713,5 +718,11 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             ( event.altKey && event.shiftKey && event.keyCode == 70 ) ||
             event.keyCode == 115 && event.shiftKey
         ) vue_app.$refs.material_search.find(true);
+
+        // for Alt+B: Question Text Focus
+        if ( event.altKey && event.keyCode == 66 ) document.getElementById("question_text_box").focus();
+
+        // for Alt+N: Answer Text Focus
+        if ( event.altKey && event.keyCode == 78 ) document.getElementById("answer_text_box").focus();
     } );
 } );

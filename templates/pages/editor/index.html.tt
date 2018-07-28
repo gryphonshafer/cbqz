@@ -52,8 +52,8 @@
             </div>
 
             <div>
-                <span class="label">Question:</span>
-                <div tabindex="5" class="htmlarea question_box" contenteditable="true"
+                <span class="label">Question: <span class="key_text">Alt+B</span></span>
+                <div id="question_text_box" tabindex="5" class="htmlarea question_box" contenteditable="true"
                     ref="question" v-html="question.question"></div>
             </div>
 
@@ -76,8 +76,8 @@
             </div>
 
             <div>
-                <span class="label">Answer:</span>
-                <div tabindex="6" class="htmlarea answer_box" contenteditable="true"
+                <span class="label">Answer: <span class="key_text">Alt+N</span></span>
+                <div id="answer_text_box" tabindex="6" class="htmlarea answer_box" contenteditable="true"
                     ref="answer" v-html="question.answer"></div>
             </div>
 
