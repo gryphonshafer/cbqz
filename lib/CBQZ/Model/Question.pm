@@ -363,8 +363,9 @@ sub calculate_score ( $self, $material_set, $question = undef ) {
             ( $words->($question_text) + $words->($answer_text) ) / 8;
     }
 
+    $score = int( $score * 10 ) / 10;
     $self->obj->update({ score => $score }) if ( $self->obj );
-    return int( $score * 10 ) / 10;
+    return $score;
 }
 
 __PACKAGE__->meta->make_immutable;
