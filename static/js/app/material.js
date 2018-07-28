@@ -27,7 +27,7 @@ Vue.http.get( cntlr + "/material_data" ).then( function (response) {
 
         // for Alt+F, F4: Find Text
         if ( ( event.altKey && event.keyCode == 70 ) || event.keyCode == 115 )
-            vue_app.$refs.material_search.find();
+            vue_app.$refs.material_search.find(true);
 
         // for Alt+T: Prompt for Reference
         if ( event.altKey && event.keyCode == 84 )

@@ -706,6 +706,12 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
         // for Alt+F, F4: Find Text
         if ( ( event.altKey && event.keyCode == 70 ) || event.keyCode == 115 )
-            vue_app.$refs.material_search.find();
+            vue_app.$refs.material_search.find(false);
+
+        // for Shift+Alt+F, Shift+F4: Find Text
+        if (
+            ( event.altKey && event.shiftKey && event.keyCode == 70 ) ||
+            event.keyCode == 115 && event.shiftKey
+        ) vue_app.$refs.material_search.find(true);
     } );
 } );

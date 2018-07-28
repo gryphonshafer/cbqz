@@ -583,7 +583,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
         // for Alt+F, F4: Find Text
         if ( ( event.altKey && event.keyCode == 70 ) || event.keyCode == 115 )
-            vue_app.$refs.material_search.find();
+            vue_app.$refs.material_search.find(true);
 
         // for Alt+S: Timer Click
         if ( event.altKey && event.keyCode == 83 ) document.getElementById("prime_timer_button").click();
