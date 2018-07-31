@@ -47,8 +47,14 @@
                     <span class="key_text">Alt+V</span>
                 </button>
 
-                <button v-on:click="toggle_questions_view"
-                    title="View all questions in this question set in a table">View All Questions List</button>
+                <button
+                    tabindex="14" id="lookup"
+                    v-on:click="lookup_reference" v-bind:disabled="verse_incomplete"
+                    title="View the question's verse defined by reference in the reference material"
+                >
+                    Lookup Verse
+                    <span class="key_text">Alt+G, F2</span>
+                </button>
             </div>
 
             <div>
@@ -103,14 +109,8 @@
                     <span class="key_text">Alt+Z</span>
                 </button>
 
-                <button
-                    tabindex="14" id="lookup"
-                    v-on:click="lookup_reference" v-bind:disabled="verse_incomplete"
-                    title="View the question's verse defined by reference in the reference material"
-                >
-                    Lookup Verse
-                    <span class="key_text">Alt+G, F2</span>
-                </button>
+                <button v-on:click="toggle_questions_view"
+                    title="View all questions in this question set in a table">View All Questions List</button>
             </div>
 
             <div>
