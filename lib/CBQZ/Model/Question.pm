@@ -36,15 +36,19 @@ sub is_shared_set ($self) {
 }
 
 {
-    my $material = [{}];
+    my $material         = [{}];
+    my @lower_case_words = ();
 
-    my $first_5 = sub ($text) {
+    my $words = sub ($text) {
         $text =~ s/<[^>]+>//g;
+        $text =~ s/\W/ /g;
         $text =~ s/\s+/ /g;
         $text =~ s/(^\s+|\s+$)//g;
+        return [ split( /\s/, $text ) ];
+    };
 
-        my @text = split( /\s/, $text );
-
+    my $first_5 = sub ($text) {
+        my @text = @{ $words->($text) };
         return
             join( ' ', @text[ 0 .. 4 ] ),
             join( ' ', @text[ 5 .. @text - 1 ] );
@@ -161,6 +165,11 @@ sub is_shared_set ($self) {
         }
         $data->{question} = $save_back_match->( $data->{question}, $match );
 
+        if ( $skip_casing and $skip_casing eq 'answer_only' ) {
+            my $first_word = lc $words->( $data->{question} )->[0];
+            $data->{question} = lcfirst $data->{question} if ( grep { $first_word eq $_ } @lower_case_words );
+        }
+
         @matches = $search->( @$data{ qw( answer book chapter verse ) }, $range );
         E->throw('Unable to find answer match') if ( @matches == 0 );
 
@@ -252,6 +261,13 @@ sub is_shared_set ($self) {
         catch {
             E->throw('Unable to load material from provided material set');
         };
+
+        my %lower_case_words =
+            map { $_ => 1 }
+            grep { /^[a-z]/ }
+            map { @{ $words->( $_->{text} ) } }
+            @$material;
+        @lower_case_words = sort keys %lower_case_words;
 
         try {
             $question = $type_fork->($question);
