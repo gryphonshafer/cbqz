@@ -124,6 +124,7 @@ sub is_shared_set ($self) {
     my $save_back_match = sub ( $original, $match ) {
         my @brackets;
         push( @brackets, $1 ) while ( $original =~ /\[([^\]]*)\]/g );
+        @brackets = map { s/[.!?]$//; $_ } @brackets;
 
         return join( ' ', grep { defined } map {
             my $text = $prep_text_re->($_);
