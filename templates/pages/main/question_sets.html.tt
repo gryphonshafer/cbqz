@@ -5,7 +5,12 @@
 
 [% IF user_question_sets %]
     <h2>Question Sets for User: [% user.obj.username %]</h2>
-    <p><button type="button" onclick="question_set_create()">Create New Set</button></p>
+    <p>
+        <button type="button" onclick="question_set_create()">Create New Set</button>
+        [% IF user_question_sets.size > 1 %]
+            <button type="button" onclick="merge_sets()">Merge Sets</button>
+        [% END %]
+    </p>
 
     [% FOR set IN user_question_sets %]
         <h3>[% set.name %]</h3>
@@ -38,13 +43,12 @@
         <button type="button"
             onclick="publish_share_set( [% set.question_set_id %], 'share' )">Set Share To</button>
         <button type="button" onclick="question_set_delete([% set.question_set_id %])">Delete</button>
-        <button type="button"
-            onclick="document.location.href = 'export_question_set?question_set_id=[% set.question_set_id %]'"
-            >Export</button>
+        <button type="button" onclick="export_set([% set.question_set_id %])">Export</button>
     [% END %]
 [% ELSE %]
     <h2>No Question Sets for User: [% user.obj.username %]</h2>
     <p>There don't appear to be any question sets for user: [% user.obj.username %].</p>
+    <p><button type="button" onclick="question_set_create()">Create New Set</button></p>
 [% END %]
 
 [% IF published_sets.size %]

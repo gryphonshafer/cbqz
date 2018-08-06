@@ -46,3 +46,11 @@ function question_set_delete (question_set_id) {
         }
     }
 }
+
+function export_set (set_id) {
+    document.location.href = "export_question_set?question_set_id=" + set_id;
+}
+
+function merge_sets () {
+    document.location.href = "merge_question_sets";
+}

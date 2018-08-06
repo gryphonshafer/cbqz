@@ -338,7 +338,7 @@ sub set_select_users ($self) {
 sub save_set_select_users ($self) {
     my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
 
-    try {  
+    try {
         my $email = CBQZ::Model::Email->new( type => 'new_shared_set' );
         $email->send({
             to   => $_->obj->email,
@@ -348,14 +348,14 @@ sub save_set_select_users ($self) {
                 sharer   => $self->stash('user')->obj->realname,
             },
         }) for (
-            map { 
+            map {
                 CBQZ::Model::User->new->load($_)
-            } @{ 
+            } @{
                 $set->save_set_select_users(
                     $self->stash('user'),
                     $self->req->param('type'),
                     $self->req->every_param('selected_users'),
-                ) 
+                )
             }
         );
         $self->flash( message => {
@@ -442,6 +442,50 @@ sub import_question_set ($self) {
     }
     catch {
         $self->flash( message => 'Import failed; ' . $self->clean_error($_) );
+    };
+
+    return $self->redirect_to('/main/question_sets');
+}
+
+sub merge_question_sets ($self) {
+    $self->stash(
+        user_question_sets => [
+            map {
+                +{
+                    %{ $_->data },
+                    count => $_->obj->questions->count,
+                    used  => $_->obj->questions->search( { used => { '>', 0 } } )->count,
+                    users => [
+                        sort { $a->{username} cmp $b->{username} }
+                        map {
+                            +{
+                                username => $_->user->username,
+                                realname => $_->user->realname,
+                                type     => $_->type,
+                            }
+                        }
+                        $_->obj->user_question_sets
+                    ],
+                };
+            } $self->stash('user')->question_sets
+        ],
+    );
+}
+
+sub build_merged_question_set ($self) {
+    try {
+        CBQZ::Model::QuestionSet->new->merge(
+            $self->req->every_param('question_sets'),
+            $self->stash('user'),
+        );
+
+        $self->flash( message => {
+            type => 'success',
+            text => 'Question sets merged successfully.',
+        } );
+    }
+    catch {
+        $self->flash( message => 'An error occurred when trying to merge question sets.' );
     };
 
     return $self->redirect_to('/main/question_sets');

@@ -1,0 +1,40 @@
+[% page.title = 'Merge Question Sets' %]
+
+[% IF user_question_sets %]
+    <p>
+        Select two or more question sets from the list below to merges these
+        sets together. The merging will <b>not delete</b> the source question
+        sets. It will create a new set consisting of the contents of the
+        selected sets. Note that merging will not look for duplicated questions
+        in any way.
+    </p>
+
+    <form method="post" action="[% c.url_for('/main/build_merged_question_set') %]">
+        <table class="tabular">
+            <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Created</th>
+                <th>Last Modified</th>
+                <th>Questions Count</th>
+                <th>Questions Used</th>
+            </tr>
+            [% FOR set IN user_question_sets %]
+                <tr>
+                    <td class="center">
+                        <input type="checkbox" name="question_sets" value="[% set.question_set_id %]">
+                    </td>
+                    <td>[% set.name %]</td>
+                    <td>[% set.created %]</td>
+                    <td>[% set.last_modified %]</td>
+                    <td>[% set.count.commify %]</td>
+                    <td>[% set.used.commify %]</td>
+                </tr>
+            [% END %]
+        </table>
+
+        <input type="submit" value="Merge Selected Question Sets">
+    </form>
+[% ELSE %]
+    <p>There don't appear to be any question sets that you can merge together.</p>
+[% END %]

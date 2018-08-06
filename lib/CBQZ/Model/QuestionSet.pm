@@ -3,6 +3,7 @@ package CBQZ::Model::QuestionSet;
 use Moose;
 use MooseX::ClassAttribute;
 use exact;
+use Try::Tiny;
 
 extends 'CBQZ::Model';
 
@@ -156,14 +157,14 @@ sub save_set_select_users ( $self, $user, $type, $selected_user_ids ) {
     E->throw('User not authorized to save select users on this set')
         unless ( $self and $self->is_owned_by($user) );
 
-    my @preexisting_user_ids = map { @$_ } @{ 
+    my @preexisting_user_ids = map { @$_ } @{
         $self->dq->sql('SELECT user_id FROM user_question_set WHERE question_set_id = ? AND type = ?')
             ->run( $self->obj->id, $type )->all
     };
 
     my @new_user_ids = grep { defined } map {
         my $selected_user_id = $_;
-        ( grep { $_ == $selected_user_id } @preexisting_user_ids ) ? undef : $selected_user_id; 
+        ( grep { $_ == $selected_user_id } @preexisting_user_ids ) ? undef : $selected_user_id;
     } @$selected_user_ids;
 
     $self->dq->sql('DELETE FROM user_question_set WHERE question_set_id = ? AND type = ?')
@@ -212,6 +213,34 @@ sub import_questions ( $self, $questions, $material_set ) {
     } );
 
     return $self;
+}
+
+sub merge ( $self, $question_set_ids, $user = undef ) {
+    E->throw('Did not receive an arrayref of >1 question set IDs to merge')
+        unless ( ref $question_set_ids eq 'ARRAY' and @$question_set_ids > 1 );
+
+    my @question_sets = map { $self->new->load($_) } @$question_set_ids;
+    @question_sets = grep { $_->is_usable_by($user) } @question_sets if ($user);
+
+    my $new_set = $self->rs->create({
+        user_id => $user->obj->id,
+        name    => 'Merged Question Set ' . scalar( localtime() ),
+    });
+
+    $self->dq->sql(q{
+        INSERT INTO question (
+            question_set_id,
+            book, chapter, verse, question, answer, type, used, marked, score
+        )
+        SELECT
+            ?,
+            book, chapter, verse, question, answer, type, used, marked, score
+        FROM question WHERE question_set_id = ?
+    })->run( $new_set->id, $_->obj->id ) for (@question_sets);
+
+    $user->event('merge_question_sets');
+
+    return $new_set;
 }
 
 __PACKAGE__->meta->make_immutable;
