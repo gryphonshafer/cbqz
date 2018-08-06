@@ -141,20 +141,26 @@ sub question_set_rename ($self) {
 }
 
 sub question_set_delete ($self) {
-    my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
+    try {
+        for my $set_id ( map { $_->{id} } @{
+            $self->cbqz->json->decode(
+                $self->req->param('set_data')
+            )
+        } ) {
+            my $set = CBQZ::Model::QuestionSet->new->load($set_id);
+            $set->obj->delete if ( $set and $set->is_owned_by( $self->stash('user') ) );
+        }
 
-    if ( $set and $set->is_owned_by( $self->stash('user') ) ) {
-        $set->obj->delete;
+        $self->stash('user')->event('question_sets_delete');
 
-        $self->stash('user')->event('question_set_delete');
         $self->flash( message => {
             type => 'success',
-            text => 'Question set deleted.',
+            text => 'Question set(s) deleted.',
         } );
     }
-    else {
-        $self->flash( message => 'Failed to delete question set.' );
-    }
+    catch {
+        $self->flash( message => 'Failed to delete question set(s).' );
+    };
 
     return $self->redirect_to('/main/question_sets');
 }

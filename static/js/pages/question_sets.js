@@ -74,7 +74,18 @@ push_onload( function () {
     var checkboxes = document.getElementsByClassName("question_set_checkbox");
 
     for ( var i = 0; i < checkboxes.length; i++ ) {
-        checkboxes[i].onchange = checkbox_check_count_implications;
+        if ( checkboxes[i].checked ) checkboxes[i].parentNode.parentNode.classList.add("selected");
+
+        checkboxes[i].onchange = function () {
+            if ( this.checked ) {
+                this.parentNode.parentNode.classList.add("selected");
+            }
+            else {
+                this.parentNode.parentNode.classList.remove("selected");
+            }
+
+            checkbox_check_count_implications();
+        };
     }
 
     document.getElementById("reset").onclick = function () {
@@ -110,7 +121,7 @@ push_onload( function () {
         if ( confirm("Are you sure you want to delete the selected question set(s)?") ) {
             if ( confirm("STOP! Are you really, really sure? (There's no undo.)") ) {
                 document.location.href = cntlr + "/question_set_delete" +
-                    "?question_set_id=" + checked_sets[0].id;
+                    "?set_data=" + encodeURI( JSON.stringify(checked_sets) );
             }
         }
     };
