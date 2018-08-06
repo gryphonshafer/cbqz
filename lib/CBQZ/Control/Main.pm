@@ -159,18 +159,26 @@ sub question_set_delete ($self) {
     return $self->redirect_to('/main/question_sets');
 }
 
-sub question_set_reset ($self) {
-    my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
-    if ( $set and $set->is_owned_by( $self->stash('user') ) ) {
-        $set->obj->questions->update({ used => 0 });
-        $self->stash('user')->event('question_set_reset');
+sub question_sets_reset ($self) {
+    try {
+        for my $set_id ( map { $_->{id} } @{
+            $self->cbqz->json->decode(
+                $self->req->param('set_data')
+            )
+        } ) {
+            my $set = CBQZ::Model::QuestionSet->new->load($set_id);
+            $set->obj->questions->update({ used => 0 })
+                if ( $set and $set->is_owned_by( $self->stash('user') ) );
+        }
+
+        $self->stash('user')->event('question_sets_reset');
 
         $self->flash( message => {
             type => 'success',
             text => 'Question set use counters reset.',
         } );
     }
-    else {
+    catch {
         $self->flash( message => 'An error occurred; unable to reset set.' );
     };
 
@@ -448,34 +456,15 @@ sub import_question_set ($self) {
 }
 
 sub merge_question_sets ($self) {
-    $self->stash(
-        user_question_sets => [
-            map {
-                +{
-                    %{ $_->data },
-                    count => $_->obj->questions->count,
-                    used  => $_->obj->questions->search( { used => { '>', 0 } } )->count,
-                    users => [
-                        sort { $a->{username} cmp $b->{username} }
-                        map {
-                            +{
-                                username => $_->user->username,
-                                realname => $_->user->realname,
-                                type     => $_->type,
-                            }
-                        }
-                        $_->obj->user_question_sets
-                    ],
-                };
-            } $self->stash('user')->question_sets
-        ],
-    );
-}
-
-sub build_merged_question_set ($self) {
     try {
         CBQZ::Model::QuestionSet->new->merge(
-            $self->req->every_param('question_sets'),
+            [
+                map { $_->{id} } @{
+                    $self->cbqz->json->decode(
+                        $self->req->param('set_data')
+                    )
+                }
+            ],
             $self->stash('user'),
         );
 

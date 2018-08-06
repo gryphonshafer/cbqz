@@ -1,11 +1,58 @@
-function question_set_reset (question_set_id) {
-    if ( confirm(
-        "Are you sure you want to reset this question set?\n" +
-        "This will set all questions to having been asked 0 times.\n" +
-        "There's no undo."
-    ) ) {
-        document.location.href = cntlr + "/question_set_reset?question_set_id=" + question_set_id;
+function question_set_create () {
+    var name = prompt("Please enter a question set name:");
+    if ( !! name ) document.location.href = cntlr + "/question_set_create" + "?name=" + encodeURI(name);
+}
+
+var checked_sets = new Array();
+
+function checkbox_check_count_implications () {
+    var checkboxes = document.getElementsByClassName("question_set_checkbox");
+
+    checked_sets = new Array();
+    for ( var i = 0; i < checkboxes.length; i++ ) {
+        if ( checkboxes[i].checked ) checked_sets.push(
+            {
+                id   : checkboxes[i].value,
+                name : checkboxes[i].parentNode.parentNode.children[1].textContent,
+            }
+        );
     }
+
+    if ( checked_sets.length == 0 ) {
+        document.getElementById("reset").disabled   = true;
+        document.getElementById("rename").disabled  = true;
+        document.getElementById("clone").disabled   = true;
+        document.getElementById("publish").disabled = true;
+        document.getElementById("share").disabled   = true;
+        document.getElementById("delete").disabled  = true;
+        document.getElementById("export").disabled  = true;
+        document.getElementById("merge").disabled   = true;
+    }
+    else if ( checked_sets.length == 1 ) {
+        document.getElementById("reset").disabled   = false;
+        document.getElementById("rename").disabled  = false;
+        document.getElementById("clone").disabled   = false;
+        document.getElementById("publish").disabled = false;
+        document.getElementById("share").disabled   = false;
+        document.getElementById("delete").disabled  = false;
+        document.getElementById("export").disabled  = false;
+        document.getElementById("merge").disabled   = true;
+    }
+    else if ( checked_sets.length > 1 ) {
+        document.getElementById("reset").disabled   = false;
+        document.getElementById("rename").disabled  = true;
+        document.getElementById("clone").disabled   = true;
+        document.getElementById("publish").disabled = true;
+        document.getElementById("share").disabled   = true;
+        document.getElementById("delete").disabled  = false;
+        document.getElementById("export").disabled  = true;
+        document.getElementById("merge").disabled   = false;
+    }
+}
+
+function publish_share_set ( question_set_id, type ) {
+    document.location.href = cntlr + "/set_select_users" +
+        "?question_set_id=" + question_set_id + "&type=" + type;
 }
 
 function clone_question_set ( question_set_id, original_name ) {
@@ -23,34 +70,59 @@ function clone_question_set ( question_set_id, original_name ) {
     }
 }
 
-function publish_share_set ( question_set_id, type ) {
-    document.location.href = cntlr + "/set_select_users" +
-        "?question_set_id=" + question_set_id + "&type=" + type;
-}
+push_onload( function () {
+    var checkboxes = document.getElementsByClassName("question_set_checkbox");
 
-function question_set_create () {
-    var name = prompt("Please enter a question set name:");
-    if ( !! name ) document.location.href = cntlr + "/question_set_create" + "?name=" + encodeURI(name);
-}
-
-function question_set_rename (question_set_id) {
-    var name = prompt("Please enter a question set name:");
-    if ( !! name ) document.location.href = cntlr + "/question_set_rename" +
-        "?question_set_id=" + question_set_id + "&name=" + encodeURI(name);
-}
-
-function question_set_delete (question_set_id) {
-    if ( confirm("Are you sure you want to delete the question set?") ) {
-        if ( confirm("STOP! Are you really, really sure? (There's no undo.)") ) {
-            document.location.href = cntlr + "/question_set_delete" + "?question_set_id=" + question_set_id;
-        }
+    for ( var i = 0; i < checkboxes.length; i++ ) {
+        checkboxes[i].onchange = checkbox_check_count_implications;
     }
-}
 
-function export_set (set_id) {
-    document.location.href = "export_question_set?question_set_id=" + set_id;
-}
+    document.getElementById("reset").onclick = function () {
+        if ( confirm(
+            "Are you sure you want to reset the selected question set(s)?\n" +
+            "This will set all questions to having been asked 0 times.\n" +
+            "There's no undo."
+        ) ) {
+            document.location.href = cntlr + "/question_sets_reset?set_data=" +
+                encodeURI( JSON.stringify(checked_sets) );
+        }
+    };
 
-function merge_sets () {
-    document.location.href = "merge_question_sets";
-}
+    document.getElementById("rename").onclick = function () {
+        var name = prompt("Please enter a question set name:");
+        if ( !! name ) document.location.href = cntlr + "/question_set_rename" +
+            "?question_set_id=" + checked_sets[0].id + "&name=" + encodeURI(name);
+    };
+
+    document.getElementById("clone").onclick = function () {
+        clone_question_set( checked_sets[0].id, checked_sets[0].name );
+    };
+
+    document.getElementById("publish").onclick = function () {
+        publish_share_set( checked_sets[0].id, "publish" );
+    };
+
+    document.getElementById("share").onclick = function () {
+        publish_share_set( checked_sets[0].id, "share" );
+    };
+
+    document.getElementById("delete").onclick = function () {
+        if ( confirm("Are you sure you want to delete the selected question set(s)?") ) {
+            if ( confirm("STOP! Are you really, really sure? (There's no undo.)") ) {
+                document.location.href = cntlr + "/question_set_delete" +
+                    "?question_set_id=" + checked_sets[0].id;
+            }
+        }
+    };
+
+    document.getElementById("export").onclick = function () {
+        document.location.href = cntlr + "/export_question_set?question_set_id=" + checked_sets[0].id;
+    };
+
+    document.getElementById("merge").onclick = function () {
+        document.location.href = cntlr + "/merge_question_sets?set_data=" +
+            encodeURI( JSON.stringify(checked_sets) );
+    };
+
+    checkbox_check_count_implications();
+} );
