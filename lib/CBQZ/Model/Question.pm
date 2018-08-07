@@ -182,7 +182,9 @@ sub is_shared_set ($self) {
     };
 
     my $type_fork = sub ($data) {
-        $data->{$_} =~ s/<[^>]*>//g for ( qw( question answer ) );
+        for ( qw( question answer ) ) {
+            $data->{$_} =~ s/<[^>]*>//g if ( defined $data->{$_} );
+        }
 
         if ( $data->{type} eq 'INT' or $data->{type} eq 'MA' ) {
             $data = $process_question->( $data, 0, 5, 0 );

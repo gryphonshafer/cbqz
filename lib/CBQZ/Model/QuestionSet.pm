@@ -4,6 +4,7 @@ use Moose;
 use MooseX::ClassAttribute;
 use exact;
 use Try::Tiny;
+use CBQZ::Model::Question;
 
 extends 'CBQZ::Model';
 
@@ -241,6 +242,56 @@ sub merge ( $self, $question_set_ids, $user = undef ) {
     $user->event('merge_question_sets');
 
     return $new_set;
+}
+
+sub auto_kvl ( $self, $material_set, $user = undef ) {
+    E->throw('User does not have permission to auto-KVL this set')
+        if ( $user and not $self->is_usable_by($user) );
+
+    $self->fork( sub {
+        my $question_model = CBQZ::Model::Question->new;
+        for my $type (
+            [ qw( Q solo ) ],
+            [ qw( FTV solo ) ],
+            [ qw( Q2V range ) ],
+            [ qw( F2V range ) ],
+        ) {
+            my $verses = $material_set->obj->materials->search(
+                {
+                    key_class => $type->[1],
+                    key_type  => [ undef, $type->[0] ],
+                },
+                {
+                    order_by => [ qw( book chapter verse ) ],
+                },
+            );
+
+            my $in_range = 0;
+            while ( my $verse = $verses->next ) {
+                if ( $type->[1] eq 'range' ) {
+                    if ($in_range) {
+                        $in_range = 0;
+                        next;
+                    }
+                    else {
+                        $in_range = 1;
+                    }
+                }
+
+                my $question = $question_model->new->create({
+                    question_set_id => $self->obj->id,
+                    %{ $question_model->auto_text( $material_set, {
+                        book    => $verse->book,
+                        chapter => $verse->chapter,
+                        verse   => $verse->verse,
+                        type    => $type->[0],
+                    } ) },
+                });
+            }
+        }
+    } );
+
+    return $self;
 }
 
 __PACKAGE__->meta->make_immutable;

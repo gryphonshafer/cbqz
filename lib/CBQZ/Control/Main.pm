@@ -486,4 +486,32 @@ sub merge_question_sets ($self) {
     return $self->redirect_to('/main/question_sets');
 }
 
+sub auto_kvl ($self) {
+    try {
+        CBQZ::Model::QuestionSet->new->load( $_->{id} )->auto_kvl(
+            CBQZ::Model::MaterialSet->new->load(
+                $self->decode_cookie('cbqz_prefs')->{material_set_id}
+            ),
+            $self->stash('user'),
+        ) for ( @{
+            $self->cbqz->json->decode(
+                $self->req->param('set_data')
+            )
+        } );
+
+        $self->flash( message => {
+            type => 'success',
+            text =>
+                'Auto-KVL initiated successfully; The processing of data will continue for a time after ' .
+                'seeing this message; You can refresh this page and look at the Questions Count number ' .
+                'to monitor progress.',
+        } );
+    }
+    catch {
+        $self->flash( message => 'An error occurred when trying to auto-KVL.' );
+    };
+
+    return $self->redirect_to('/main/question_sets');
+}
+
 1;

@@ -19,34 +19,37 @@ function checkbox_check_count_implications () {
     }
 
     if ( checked_sets.length == 0 ) {
-        document.getElementById("reset").disabled   = true;
-        document.getElementById("rename").disabled  = true;
-        document.getElementById("clone").disabled   = true;
-        document.getElementById("publish").disabled = true;
-        document.getElementById("share").disabled   = true;
-        document.getElementById("delete").disabled  = true;
-        document.getElementById("export").disabled  = true;
-        document.getElementById("merge").disabled   = true;
+        document.getElementById("reset").disabled    = true;
+        document.getElementById("rename").disabled   = true;
+        document.getElementById("clone").disabled    = true;
+        document.getElementById("publish").disabled  = true;
+        document.getElementById("share").disabled    = true;
+        document.getElementById("delete").disabled   = true;
+        document.getElementById("export").disabled   = true;
+        document.getElementById("merge").disabled    = true;
+        document.getElementById("auto-kvl").disabled = true;
     }
     else if ( checked_sets.length == 1 ) {
-        document.getElementById("reset").disabled   = false;
-        document.getElementById("rename").disabled  = false;
-        document.getElementById("clone").disabled   = false;
-        document.getElementById("publish").disabled = false;
-        document.getElementById("share").disabled   = false;
-        document.getElementById("delete").disabled  = false;
-        document.getElementById("export").disabled  = false;
-        document.getElementById("merge").disabled   = true;
+        document.getElementById("reset").disabled    = false;
+        document.getElementById("rename").disabled   = false;
+        document.getElementById("clone").disabled    = false;
+        document.getElementById("publish").disabled  = false;
+        document.getElementById("share").disabled    = false;
+        document.getElementById("delete").disabled   = false;
+        document.getElementById("export").disabled   = false;
+        document.getElementById("merge").disabled    = true;
+        document.getElementById("auto-kvl").disabled = false;
     }
     else if ( checked_sets.length > 1 ) {
-        document.getElementById("reset").disabled   = false;
-        document.getElementById("rename").disabled  = true;
-        document.getElementById("clone").disabled   = true;
-        document.getElementById("publish").disabled = true;
-        document.getElementById("share").disabled   = true;
-        document.getElementById("delete").disabled  = false;
-        document.getElementById("export").disabled  = true;
-        document.getElementById("merge").disabled   = false;
+        document.getElementById("reset").disabled    = false;
+        document.getElementById("rename").disabled   = true;
+        document.getElementById("clone").disabled    = true;
+        document.getElementById("publish").disabled  = true;
+        document.getElementById("share").disabled    = true;
+        document.getElementById("delete").disabled   = false;
+        document.getElementById("export").disabled   = true;
+        document.getElementById("merge").disabled    = false;
+        document.getElementById("auto-kvl").disabled = false;
     }
 }
 
@@ -133,6 +136,16 @@ push_onload( function () {
     document.getElementById("merge").onclick = function () {
         document.location.href = cntlr + "/merge_question_sets?set_data=" +
             encodeURI( JSON.stringify(checked_sets) );
+    };
+
+    document.getElementById("auto-kvl").onclick = function () {
+        if ( confirm(
+            "Are you sure you want to automatically write some but not\n" +
+            "all key-verse list type questions into the selected question set(s)?"
+        ) ) {
+            document.location.href = cntlr + "/auto_kvl?set_data=" +
+                encodeURI( JSON.stringify(checked_sets) );
+        }
     };
 
     checkbox_check_count_implications();

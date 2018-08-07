@@ -40,6 +40,7 @@
         <button type="button" disabled="true" id="delete">Delete</button>
         <button type="button" disabled="true" id="export">Export</button>
         <button type="button" disabled="true" id="merge">Merge</button>
+        <button type="button" disabled="true" id="auto-kvl">Auto-KVL</button>
     </div>
 [% ELSE %]
     <h2>No Question Sets for User: [% user.obj.username %]</h2>
