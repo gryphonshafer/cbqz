@@ -74,6 +74,8 @@
         <a href="/">CBQZ Home Page</a>
         |
         <a href="https://github.com/gryphonshafer/cbqz" target="github">GitHub Project</a>
+        |
+        <a href="https://raw.githubusercontent.com/gryphonshafer/cbqz/master/Changes" target="github">Revision History</a>
     </p>
     <p class="right">
         Version [% version %]
