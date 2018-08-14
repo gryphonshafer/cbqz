@@ -488,10 +488,12 @@ sub merge_question_sets ($self) {
 
 sub auto_kvl ($self) {
     try {
+        my $material_set = CBQZ::Model::MaterialSet->new->load(
+            $self->decode_cookie('cbqz_prefs')->{material_set_id}
+        );
+
         CBQZ::Model::QuestionSet->new->load( $_->{id} )->auto_kvl(
-            CBQZ::Model::MaterialSet->new->load(
-                $self->decode_cookie('cbqz_prefs')->{material_set_id}
-            ),
+            $material_set,
             $self->stash('user'),
         ) for ( @{
             $self->cbqz->json->decode(

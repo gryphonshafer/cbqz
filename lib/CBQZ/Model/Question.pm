@@ -50,8 +50,8 @@ sub is_shared_set ($self) {
     my $first_5 = sub ($text) {
         my @text = @{ $words->($text) };
         return
-            join( ' ', @text[ 0 .. 4 ] ),
-            join( ' ', @text[ 5 .. @text - 1 ] );
+            join( ' ', grep { $_ } @text[ 0 .. 4 ] ),
+            join( ' ', grep { $_ } @text[ 5 .. @text - 1 ] );
     };
 
     my $get_2_verses = sub ($data) {
@@ -226,25 +226,36 @@ sub is_shared_set ($self) {
         elsif ( $data->{type} eq 'FTV' or $data->{type} eq 'F2V' ) {
             my @verses = $get_2_verses->($data);
             ( $data->{question}, $data->{answer} ) = $first_5->( $verses[0]->{text} );
+
             $data = $process_question->( $data, 1, 0, 1 );
             return unless ($data);
 
             $data->{question} .= '...' unless ( $data->{question} =~ /\.{3}$/ );
             $data->{answer} = '...' . $data->{answer} unless ( $data->{answer} =~ /^\.{3}/ );
-
             $data->{answer} .= ' ' . $verses[1]->{text} if ( $data->{type} eq 'F2V' );
         }
         elsif ( $data->{type} eq 'FT' or $data->{type} eq 'FTN' ) {
+            my $quote_off  = sub { while ( $_[0] =~ s/(<[^">]*)"([^"]+)"/$1'$2'/g ) {} };
+            my $quote_back = sub { while ( $_[0] =~ s/(<[^'>]*)'([^']+)'/$1"$2"/g ) {} };
+
             my @verses = $get_2_verses->($data);
-            ( $data->{question}, $data->{answer} ) = $first_5->( $data->{question} . ' ' . $data->{answer} );
+
+            $quote_off->( $verses[0]->{text} );
+            $verses[0]->{text} =~ s/^[^"]+"//;
+            $quote_back->( $verses[0]->{text} );
+
+            ( $data->{question}, $data->{answer} ) = $first_5->( $verses[0]->{text} );
 
             $data = $process_question->( $data, 1, 0, 1 );
             return unless ($data);
 
             $data->{question} .= '...' unless ( $data->{question} =~ /\.{3}$/ );
             $data->{answer} = '...' . $data->{answer} unless ( $data->{answer} =~ /^\.{3}/ );
-
             $data->{answer} .= ' ' . $verses[1]->{text} if ( $data->{type} eq 'FTN' );
+
+            $quote_off->( $data->{answer} );
+            $data->{answer} =~ s/".*//;
+            $quote_back->( $data->{answer} );
         }
         else {
             E->throw('Auto-text not supported for question type');
