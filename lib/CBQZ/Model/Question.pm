@@ -88,7 +88,7 @@ sub is_shared_set ($self) {
         $text =~ s/(\w)/$1(?:<[^>]+>)*['-]*(?:<[^>]+>)*/g;
         $text =~ s/(?:^\s+|\s+$)//g;
         $text =~ s/\s/(?:<[^>]+>|\\W)+/g;
-        $text = '(?:<[^>]+>)*\b' . $text . '\b';
+        $text = '(?:[\'\"])?(?:<[^>]+>)*\b' . $text . '\b';
 
         return $text;
     };
@@ -224,7 +224,9 @@ sub is_shared_set ($self) {
                 : join( ' ', map { $_->{text} } @verses );
         }
         elsif ( $data->{type} eq 'FTV' or $data->{type} eq 'F2V' ) {
-            my @verses = $get_2_verses->($data);
+            my @verses        = $get_2_verses->($data);
+            my ($punctuation) = $verses[0]->{text} =~ /([\~\!\(\)\-\:\;\'\"\,\.\?]+)$/;
+
             ( $data->{question}, $data->{answer} ) = $first_5->( $verses[0]->{text} );
 
             $data = $process_question->( $data, 1, 0, 1 );
@@ -232,13 +234,14 @@ sub is_shared_set ($self) {
 
             $data->{question} .= '...' unless ( $data->{question} =~ /\.{3}$/ );
             $data->{answer} = '...' . $data->{answer} unless ( $data->{answer} =~ /^\.{3}/ );
-            $data->{answer} .= ' ' . $verses[1]->{text} if ( $data->{type} eq 'F2V' );
+            $data->{answer} .= ( $punctuation || '' ) . ' ' . $verses[1]->{text} if ( $data->{type} eq 'F2V' );
         }
         elsif ( $data->{type} eq 'FT' or $data->{type} eq 'FTN' ) {
             my $quote_off  = sub { while ( $_[0] =~ s/(<[^">]*)"([^"]+)"/$1'$2'/g ) {} };
             my $quote_back = sub { while ( $_[0] =~ s/(<[^'>]*)'([^']+)'/$1"$2"/g ) {} };
 
-            my @verses = $get_2_verses->($data);
+            my @verses        = $get_2_verses->($data);
+            my ($punctuation) = $verses[0]->{text} =~ /([\~\!\(\)\-\:\;\'\"\,\.\?]+)$/;
 
             $quote_off->( $verses[0]->{text} );
             $verses[0]->{text} =~ s/^[^"]+"//;
@@ -251,7 +254,7 @@ sub is_shared_set ($self) {
 
             $data->{question} .= '...' unless ( $data->{question} =~ /\.{3}$/ );
             $data->{answer} = '...' . $data->{answer} unless ( $data->{answer} =~ /^\.{3}/ );
-            $data->{answer} .= ' ' . $verses[1]->{text} if ( $data->{type} eq 'FTN' );
+            $data->{answer} .= ( $punctuation || '' ) . ' ' . $verses[1]->{text} if ( $data->{type} eq 'FTN' );
 
             $quote_off->( $data->{answer} );
             $data->{answer} =~ s/".*//;
@@ -262,7 +265,8 @@ sub is_shared_set ($self) {
         }
 
         $data->{answer} =~ s/[,:\-]+$//g;
-        $data->{answer} .= '.' unless ( $data->{answer} =~ /[.!?]$/ );
+        $data->{answer} .= '.' unless ( $data->{answer} =~ /[.!?]['"]*$/ );
+
         return $data;
     };
 
