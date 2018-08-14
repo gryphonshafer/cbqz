@@ -593,10 +593,22 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             },
 
             "questions.sort_by": function () {
+                var book    = this.questions.book;
+                var chapter = this.questions.chapter;
+
                 this.questions.book = null;
+
                 this.$nextTick( function () {
                     this.questions.books = Object.keys( this.questions.data ).sort();
-                    if ( this.questions.books[0] ) this.questions.book = this.questions.books[0];
+                    if ( this.questions.books[0] ) {
+                        this.questions.book = book || this.questions.books[0];
+
+                        this.$nextTick( function () {
+                            this.$nextTick( function () {
+                                this.questions.chapter = chapter || this.questions.chapters[0];
+                            } );
+                        } );
+                    }
                 } );
 
                 this.questions.marked_questions = this.grep_marked_questions();
