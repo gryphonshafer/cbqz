@@ -278,7 +278,7 @@ sub auto_kvl ( $self, $material_set, $user = undef ) {
                     }
                 }
 
-                my $question = $question_model->new->create({
+                $question_model->new->create({
                     question_set_id => $self->obj->id,
                     %{ $question_model->auto_text( $material_set, {
                         book    => $verse->book,
@@ -286,7 +286,7 @@ sub auto_kvl ( $self, $material_set, $user = undef ) {
                         verse   => $verse->verse,
                         type    => $type->[0],
                     } ) },
-                });
+                })->calculate_score($material_set);
             }
         }
     } );
