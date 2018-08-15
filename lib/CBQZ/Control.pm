@@ -37,7 +37,7 @@ sub startup ($self) {
 
     # pre-load controllers
     if ( $self->mode eq 'production' ) {
-        load_class( 'CBQZ::Control::' . $_ ) for qw( Main Editor Quizroom Admin Stats );
+        load_class( 'CBQZ::Control::' . $_ ) for qw( Main Editor Quizroom Admin Stats Feed );
     }
 
     # before dispatch tasks
@@ -208,9 +208,9 @@ sub setup_csv ($self) {
     my $sockets;
 
     sub setup_socket ( $self, $cbqz ) {
-        $self->helper( 'socket' => sub ( $self, $command, $name, $thing = undef ) {
-            if ( $command eq 'register' ) {
-                $sockets->{$name}{callback} = $thing;
+        $self->helper( 'socket' => sub ( $self, $command, $name, $transaction = undef, $callback = undef ) {
+            if ( $command eq 'setup' ) {
+                $sockets->{$name}{callback} = $callback;
 
                 $cbqz->dq->sql(q{
                     INSERT INTO socket ( name, counter ) VALUES ( ?, 0 )
@@ -220,14 +220,13 @@ sub setup_csv ($self) {
                 $sockets->{$name}{counter} = $cbqz->dq->sql(q{
                     SELECT counter FROM socket WHERE name = ?
                 })->run($name)->value;
+
+                $sockets->{$name}{transactions}{ sprintf( '%s', $transaction ) } = $transaction;
             }
-            elsif ( $command eq 'add_tx' ) {
-                $sockets->{$name}{transactions}{ sprintf( '%s', $thing ) } = $thing;
+            elsif ( $command eq 'finish' ) {
+                delete $sockets->{$name}{transactions}{ sprintf( '%s', $transaction ) };
             }
-            elsif ( $command eq 'rm_tx' ) {
-                delete $sockets->{$name}{transactions}{ sprintf( '%s', $thing ) };
-            }
-            elsif ( $command eq 'ping' ) {
+            elsif ( $command eq 'message' ) {
                 $cbqz->dq->sql(q{
                     UPDATE socket SET counter = counter + 1 WHERE name = ?
                 })->run($name);
@@ -244,12 +243,14 @@ sub setup_csv ($self) {
         $SIG{URG} = sub {
             for my $socket ( @{ $cbqz->dq->sql('SELECT name, counter FROM socket')->run->all({}) } ) {
                 if ( not $sockets->{ $socket->{name} } ) {
-                    $cbqz->critical( 'Socket ' . $socket->{name} . ' was pinged but not registered' );
+                    $cbqz->critical( 'Socket ' . $socket->{name} . ' was messaged but not set up' );
                 }
                 elsif ( $sockets->{ $socket->{name} }{counter} < $socket->{counter} ) {
                     $sockets->{ $socket->{name} }{counter} = $socket->{counter};
-                    $cbqz->debug( 'Socket ' . $socket->{name} . ' was pinged; ' . $$ . ' responding' );
-                    $sockets->{ $socket->{name} }{callback}->();
+                    $cbqz->debug( 'Socket ' . $socket->{name} . ' was messaged; ' . $$ . ' responding' );
+                    $sockets->{ $socket->{name} }{callback}->(
+                        values %{ $sockets->{ $socket->{name} }{transactions} }
+                    );
                 }
             }
         };
