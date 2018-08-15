@@ -151,6 +151,18 @@ CREATE TABLE role (
     CONSTRAINT role_ibfk_1 FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE socket (
+    socket_id int(10) unsigned NOT NULL,
+    name varchar(64) DEFAULT NULL,
+    counter int(10) unsigned NOT NULL DEFAULT '0',
+    last_modified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created timestamp NOT NULL DEFAULT '1970-01-01 16:00:00',
+    PRIMARY KEY (socket_id),
+    UNIQUE KEY name (name)
+);
+
+CREATE TRIGGER socket_before_insert BEFORE INSERT ON socket FOR EACH ROW SET NEW.created = NOW();
+
 CREATE TABLE user (
     user_id int(10) unsigned NOT NULL,
     username varchar(64) DEFAULT NULL,
