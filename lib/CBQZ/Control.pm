@@ -7,6 +7,7 @@ use Mojo::Util 'b64_decode';
 use MojoX::Log::Dispatch::Simple;
 use Try::Tiny;
 use Text::CSV_XS 'csv';
+use Proc::ProcessTable;
 use CBQZ;
 use CBQZ::Model::User;
 use CBQZ::Util::Format 'log_date';
@@ -32,6 +33,7 @@ sub startup ($self) {
     $self->setup_logging($cbqz);
     $self->setup_templating($config);
     $self->setup_csv;
+    $self->setup_socket($cbqz);
 
     # pre-load controllers
     if ( $self->mode eq 'production' ) {
@@ -200,6 +202,58 @@ sub setup_csv ($self) {
 
         csv( in => $c->stash->{content}, out => $output );
     } );
+}
+
+{
+    my $sockets;
+
+    sub setup_socket ( $self, $cbqz ) {
+        $self->helper( 'socket' => sub ( $self, $command, $name, $thing = undef ) {
+            if ( $command eq 'register' ) {
+                $sockets->{$name}{callback} = $thing;
+
+                $cbqz->dq->sql(q{
+                    INSERT INTO socket ( name, counter ) VALUES ( ?, 0 )
+                        ON DUPLICATE KEY UPDATE name = name;
+                })->run($name);
+
+                $sockets->{$name}{counter} = $cbqz->dq->sql(q{
+                    SELECT counter FROM socket WHERE name = ?
+                })->run($name)->value;
+            }
+            elsif ( $command eq 'add_tx' ) {
+                $sockets->{$name}{transactions}{ sprintf( '%s', $thing ) } = $thing;
+            }
+            elsif ( $command eq 'rm_tx' ) {
+                delete $sockets->{$name}{transactions}{ sprintf( '%s', $thing ) };
+            }
+            elsif ( $command eq 'ping' ) {
+                $cbqz->dq->sql(q{
+                    UPDATE socket SET counter = counter + 1 WHERE name = ?
+                })->run($name);
+
+                my $ppid = getppid();
+                kill( 'URG', $_ )
+                    for ( map { $_->pid } grep { $_->ppid == $ppid } @{ Proc::ProcessTable->new->table } );
+            }
+            else {
+                E->throw(qq{Command $command not understood});
+            }
+        } );
+
+        $SIG{URG} = sub {
+            for my $socket ( @{ $cbqz->dq->sql('SELECT name, counter FROM socket')->run->all({}) } ) {
+                if ( not $sockets->{ $socket->{name} } ) {
+                    $cbqz->critical( 'Socket ' . $socket->{name} . ' was pinged but not registered' );
+                }
+                elsif ( $sockets->{ $socket->{name} }{counter} < $socket->{counter} ) {
+                    $sockets->{ $socket->{name} }{counter} = $socket->{counter};
+                    $cbqz->debug( 'Socket ' . $socket->{name} . ' was pinged; ' . $$ . ' responding' );
+                    $sockets->{ $socket->{name} }{callback}->();
+                }
+            }
+        };
+    }
 }
 
 1;
