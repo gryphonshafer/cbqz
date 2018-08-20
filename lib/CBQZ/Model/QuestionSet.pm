@@ -94,16 +94,22 @@ sub is_owned_by ( $self, $user ) {
 sub is_usable_by ( $self, $user ) {
     return (
         $self->is_owned_by($user) or
-        grep { $_->question_set_id == $self->obj->id }
-            $user->obj->user_question_sets->search({ type => 'share' })->all
+        (
+            grep { $_->question_set_id == $self->obj->id }
+                $user->obj->user_question_sets->search({ type => 'share' })->all
+        ) or
+        $self->obj->user_question_sets->search({ type => 'share', user_id => undef })->count
     ) ? 1 : 0;
 }
 
 sub clone ( $self, $user, $new_set_name ) {
     E->throw('User not authorized to clone this question set') unless (
         $self->is_owned_by($user) or
-        grep { $_->question_set_id == $self->obj->id }
-            $user->obj->user_question_sets->search({ type => 'publish' })->all
+        (
+            grep { $_->question_set_id == $self->obj->id }
+                $user->obj->user_question_sets->search({ type => 'publish' })->all
+        ) or
+        $self->obj->user_question_sets->search({ type => 'publish', user_id => undef })->count
     );
 
     my $new_set = $self->rs->create({
@@ -144,7 +150,6 @@ sub users_to_select ( $self, $user, $type ) {
                     )
                     AND u.user_id != ?
                 GROUP BY 1
-
             })->run(
                 $self->obj->id,
                 $type,

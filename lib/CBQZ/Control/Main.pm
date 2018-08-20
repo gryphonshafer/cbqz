@@ -318,25 +318,29 @@ sub question_sets ($self) {
                     %{ $_->data },
                     count => $_->obj->questions->count,
                     used  => $_->obj->questions->search( { used => { '>', 0 } } )->count,
-                    users => [
-                        sort { $a->{username} cmp $b->{username} }
-                        map {
-                            +{
-                                username => $_->user->username,
-                                realname => $_->user->realname,
-                                type     => $_->type,
-                            }
-                        }
-                        $_->obj->user_question_sets
-                    ],
+
+                    publish_all   => $_->obj->user_question_sets
+                        ->search({ type => 'publish', user_id => \q{ IS NULL }     })->count,
+                    publish_users => $_->obj->user_question_sets
+                        ->search({ type => 'publish', user_id => \q{ IS NOT NULL } })->count,
+                    share_all     => $_->obj->user_question_sets
+                        ->search({ type => 'share',   user_id => \q{ IS NULL }     })->count,
+                    share_users   => $_->obj->user_question_sets
+                        ->search({ type => 'share',   user_id => \q{ IS NOT NULL } })->count,
                 };
             } $self->stash('user')->question_sets
         ],
-        published_sets => [ map { +{
-            $_->question_set->get_inflated_columns,
-            count => $_->question_set->questions->count,
-            used  => $_->question_set->questions->search( { used => { '>', 0 } } )->count,
-        } } $self->stash('user')->obj->user_question_sets->search({ type => 'publish' })->all ],
+        published_sets => [
+            map { +{
+                $_->question_set->get_inflated_columns,
+                count => $_->question_set->questions->count,
+                used  => $_->question_set->questions->search( { used => { '>', 0 } } )->count,
+            } }
+            $self->stash('user')->rs( 'UserQuestionSet', {
+                type    => 'publish',
+                user_id => [ $self->stash('user')->obj->id, undef ],
+            })->all
+        ],
     );
 }
 
@@ -344,8 +348,12 @@ sub set_select_users ($self) {
     my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
 
     $self->stash(
-        set   => $set,
-        users => $set->users_to_select( $self->stash('user'), $self->req->param('type') ),
+        set       => $set,
+        users     => $set->users_to_select( $self->stash('user'), $self->req->param('type') ),
+        all_users => $set->obj->user_question_sets->search({
+            type    => $self->req->param('type'),
+            user_id => undef,
+        })->count,
     );
 }
 
@@ -372,6 +380,13 @@ sub save_set_select_users ($self) {
                 )
             }
         );
+
+        $self->cbqz->dq->sql(
+            ( $self->req->param('all_users') )
+                ? 'INSERT INTO user_question_set ( user_id, question_set_id, type ) VALUES ( NULL, ?, ? )'
+                : 'DELETE FROM user_question_set WHERE user_id IS NULL AND question_set_id = ? AND type = ?'
+        )->run( $set->obj->id, $self->req->param('type') );
+
         $self->flash( message => {
             type => 'success',
             text => 'User selection saved.',

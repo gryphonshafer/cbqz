@@ -1,12 +1,37 @@
-[% page.title = 'Select User(s) for Set ' _ c.req.param('type') %]
+[% page.title = 'Select User(s) for Set ' _ c.req.param('type').ucfirst %]
 
-[% IF users %]
-    <p>
-        Select one or more users from the list below to which CBQZ should
-        <b>[% c.req.param('type').lower %]</b> the "<b>[% set.obj.name %]</b>" question set.
-    </p>
+<form method="post" action="[% c.url_for('/main/save_set_select_users') %]">
 
-    <form method="post" action="[% c.url_for('/main/save_set_select_users') %]">
+    [% IF
+        c.req.param('type').lower == 'publish' OR
+        user.has_role('administrator') OR user.has_role('director') OR user.has_role('official')
+    %]
+        <h2>[% c.req.param('type').ucfirst %] Globally</h2>
+
+        <p>
+            Select the following <b>if and <i>only</i> if</b> you want to
+            [% c.req.param('type').lower %] the "<b>[% set.obj.name %]</b>"
+            question set to <b>all</b> users.
+        </p>
+
+        <label>
+            <input type="checkbox"
+                name="all_users"
+                value="1"
+                [% IF all_users %]checked[% END %]
+            >
+            [% c.req.param('type').ucfirst %] to All Users
+        </label>
+    [% END %]
+
+    [% IF users %]
+        <h2>[% c.req.param('type').ucfirst %] to Specific Users</h2>
+
+        <p>
+            Select one or more users from the list below to which CBQZ should
+            <b>[% c.req.param('type').lower %]</b> the "<b>[% set.obj.name %]</b>" question set.
+        </p>
+
         <table class="tabular">
             <tr>
                 <th></th>
@@ -30,11 +55,12 @@
 
         <input type="hidden" name="question_set_id" value="[% set.obj.id %]">
         <input type="hidden" name="type" value="[% c.req.param('type') %]">
-        <input type="submit" value="Save [% c.req.param('type') %] Selection List">
-    </form>
-[% ELSE %]
-    <p>
-        There don't appear to be any users with whom you can
-        <b>[% c.req.param('type').lower %]</b> the "<b>[% set.obj.name %]</b>" question set.
-    </p>
-[% END %]
+        <input type="submit" value="Save [% c.req.param('type').ucfirst %] Selection List">
+    [% ELSE %]
+        <p>
+            There don't appear to be any users with whom you can
+            <b>[% c.req.param('type').lower %]</b> the "<b>[% set.obj.name %]</b>" question set.
+        </p>
+    [% END %]
+
+</form>

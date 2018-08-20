@@ -13,6 +13,8 @@
             <th>Name</th>
             <th>Questions</th>
             <th>Used</th>
+            <th>Published</th>
+            <th>Shared</th>
             <th>Created</th>
             <th>Last Modified</th>
         </tr>
@@ -25,6 +27,8 @@
                 <td>[% set.name %]</td>
                 <td class="right">[% set.count.commify %]</td>
                 <td class="right">[% set.used.commify %]</td>
+                <td class="right">[% ( set.publish_all ) ? 'All' : set.publish_users %]</td>
+                <td class="right">[% ( set.share_all ) ? 'All' : set.share_users %]</td>
                 <td>[% set.created %]</td>
                 <td>[% set.last_modified %]</td>
             </tr>
