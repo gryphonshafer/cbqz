@@ -1,5 +1,17 @@
 Revision history for CBQZ
 
+15.6.2    Mon Aug 20 13:30:12 PDT 2018
+        - Feature additions
+            - Publish/Share with every district user; closes #171
+            - Auto-KVL makes Q/Q2V for FT/FTNs; closes #169
+            - Auto-KVL adds FT and FTN; closes #168
+            - Question set import more strict and throws better errors; closes #170
+        - Bug fixes
+            - Fixup auto-text punctuation between multi-verse types
+            - KVL syntax fix for John (manually updated in db)
+            - Auto-KVL-generated questions now get scored; closes #167
+            - Change questions sort order does not auto return to chapter 1
+            - Editor save does not deselect question in question list; closes #166
 15.5.1    Tue Aug 7 07:34:42 2018
         - Auto-generate KVL questions
         - Merge question sets
