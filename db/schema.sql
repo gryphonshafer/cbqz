@@ -178,11 +178,13 @@ CREATE TABLE user_program (
 );
 
 CREATE TABLE user_question_set (
-    user_id int(10) unsigned NOT NULL,
+    user_question_set_id int(10) unsigned NOT NULL,
+    user_id int(10) unsigned DEFAULT NULL,
     question_set_id int(10) unsigned NOT NULL,
     type enum('publish','share') NOT NULL,
-    PRIMARY KEY (user_id,question_set_id,type),
+    PRIMARY KEY (user_question_set_id),
     KEY question_set_id (question_set_id),
+    KEY user_id (user_id),
     CONSTRAINT user_question_set_ibfk_1 FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT user_question_set_ibfk_2 FOREIGN KEY (question_set_id) REFERENCES question_set (question_set_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
