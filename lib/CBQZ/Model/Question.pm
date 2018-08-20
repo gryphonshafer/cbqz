@@ -55,7 +55,7 @@ sub is_shared_set ($self) {
     };
 
     my $get_2_verses = sub ($data) {
-        return
+        my @verses =
             sort { $a->{verse} <=> $b->{verse} }
             grep {
                 $_->{book} eq $data->{book} and
@@ -65,6 +65,9 @@ sub is_shared_set ($self) {
                     $_->{verse} == $data->{verse} + 1
                 )
             } @$material;
+
+        E->throw('Unable to lookup material based on reference') unless ( $verses[0]->{text} );
+        return @verses;
     };
 
     my $case = sub ($text) {

@@ -412,29 +412,56 @@ sub export_question_set ($self) {
 }
 
 sub import_question_set ($self) {
+    my $types_list = CBQZ::Model::Program->new->load(
+        $self->decode_cookie('cbqz_prefs')->{program_id}
+    )->types_list;
+
     try {
         my $question_import = $self->req->upload('question_import');
         E->throw('Failed to retrieve import data')
             unless ( $question_import->filename and $question_import->size );
 
-        my $csv_data = unidecode( $question_import->slurp ) || '';
+        my $csv_data = $question_import->slurp ||
+            E->throw('Input unreadable; may be binary instead of CSV text');
 
+        $csv_data //= '';
         $csv_data =~ s/\r//g;
-        $csv_data =~ s/[\x91\x92]/'/g;
-        $csv_data =~ s/[\x93\x94]/"/g;
-        $csv_data =~ s/\x97/\./g;
-        $csv_data =~ s/\xBB/>/g;
+
+        my $csv = csv( in => \$csv_data, headers => 'auto' ) ||
+            E->throw('Input not a valid CSV file as defined by the instructions on the page');
 
         my $questions = [
+            grep {
+                my $type = $_->{type};
+
+                $_->{book} and
+                $_->{chapter} and
+                $_->{verse} and
+                $_->{type} and
+                $_->{question} and
+                $_->{answer} and
+                scalar( grep { $type eq $_ } @$types_list );
+            }
             map {
                 my $question = $_;
-                $question = { map { lc $_ => $question->{$_} } keys %$question };
+                $question = { map { lc( unidecode($_) ) => unidecode( $question->{$_} ) } keys %$question };
+
+                $question->{$_} =~ s/[<>]+//g for ( qw( question answer ) );
+                $question->{$_} =~ s/\s{2,}/ /g for ( qw( book chapter verse type question answer ) );
+                $question->{$_} =~ s/(^\s+|\s+$)//g for ( qw( book chapter verse type question answer ) );
+                $question->{$_} =~ s/[^A-z]+//g for ( qw( book type ) );
+                $question->{$_} =~ s/\D+//g for ( qw( chapter verse ) );
+
                 +{ map { $_ => $question->{$_} } qw( book chapter verse type question answer ) };
             }
-            @{ csv( in => \$csv_data, headers => 'auto' ) }
+            @$csv
         ];
 
-        E->throw('Failed to parse uploaded data') unless (@$questions);
+        E->throw(
+            'Failed to parse uploaded data; Check that you have a CSV text file ' .
+            'with properly named column headers as per the page instructions; ' .
+            'Also check that your question types match the district program question types'
+        ) unless (@$questions);
 
         my $set = CBQZ::Model::QuestionSet->new->create(
             $self->stash('user'),
@@ -449,7 +476,8 @@ sub import_question_set ($self) {
         $self->flash( message => {
             type => 'success',
             text =>
-                'Import started successfully; Note that a fair amount of post-processing of the imported ' .
+                'Import started successfully; Expecting to process ' . @$questions . ' records; ' .
+                'Note that a fair amount of post-processing of the imported ' .
                 'data will continue for a time after seeing this message; You can refresh this page and ' .
                 'look at the Questions Count number to monitor progress.',
         } );
