@@ -251,17 +251,17 @@ sub auto_kvl ( $self, $material_set, $user = undef ) {
     $self->fork( sub {
         my $question_model = CBQZ::Model::Question->new;
         for my $type (
-            [ 'Q', 'solo', 1 ],
-            [ 'FTV', 'solo', 1 ],
-            [ 'Q2V', 'range', 1 ],
-            [ 'F2V', 'range', 1 ],
-            [ 'FT', 'solo', 0 ],
-            [ 'FTN', 'range', 0 ],
+            [ 'Q',   'solo',  [ undef, 'Q', 'FT'    ] ],
+            [ 'FTV', 'solo',  [ undef, 'FTV'        ] ],
+            [ 'Q2V', 'range', [ undef, 'Q2V', 'FTN' ] ],
+            [ 'F2V', 'range', [ undef, 'F2V'        ] ],
+            [ 'FT',  'solo',  'FT'  ],
+            [ 'FTN', 'range', 'FTN' ],
         ) {
             my $verses = $material_set->obj->materials->search(
                 {
                     key_class => $type->[1],
-                    key_type  => ( ( $type->[2] ) ? [ undef, $type->[0] ] : $type->[0] ),
+                    key_type  => $type->[2],
                 },
                 {
                     order_by => [ qw( book chapter verse ) ],
