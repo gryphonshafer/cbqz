@@ -12,6 +12,7 @@ Revision history for CBQZ
             - Auto-KVL-generated questions now get scored; closes #167
             - Change questions sort order does not auto return to chapter 1
             - Editor save does not deselect question in question list; closes #166
+
 15.5.1    Tue Aug 7 07:34:42 2018
         - Auto-generate KVL questions
         - Merge question sets
