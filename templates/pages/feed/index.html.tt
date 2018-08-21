@@ -1,0 +1,23 @@
+[%
+    page.title = 'Feed Spike';
+    page.menu  = 'main';
+%]
+
+<p>This is a feed spike.</p>
+
+<button type="button" onclick="sendChat(42)">Send</button>
+<div id="log"></div>
+
+<script>
+    var ws = new WebSocket("[% c.url_for('/feed/working_morbo_spike').to_abs.scheme('ws') %]");
+
+    ws.onmessage = function (e) {
+        console.log(e);
+        document.getElementById('log').innerHTML += '<p>' + e.data + '</p>';
+    };
+
+    function sendChat(input) {
+        console.log(input);
+        ws.send(input);
+    }
+</script>

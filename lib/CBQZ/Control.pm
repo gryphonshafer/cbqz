@@ -24,10 +24,11 @@ sub startup ($self) {
     $self->plugin('RequestBase');
 
     $self->static->paths->[0] =~ s|/public$|/static|;
-    $self->sessions->cookie_name( $config->get( 'mojolicious', 'session_cookie_name' ) );
+    $self->sessions->cookie_name( $config->get( qw( mojolicious session cookie_name ) ) );
     $self->secrets( $config->get( 'mojolicious', 'secrets' ) );
     $self->config( $config->get( 'mojolicious', 'config' ) );
-    $self->sessions->default_expiration(0);
+    $self->sessions->default_expiration( $config->get( qw( mojolicious session default_expiration ) ) );
+    $self->inactivity_timeout( $config->get( 'mojolicious', 'inactivity_timeout' ) );
 
     $self->setup_general_helpers($cbqz);
     $self->setup_logging($cbqz);
@@ -46,7 +47,7 @@ sub startup ($self) {
         my $last_request_time = $self->session('last_request_time');
         if (
             $last_request_time and
-            $last_request_time < time - $config->get( qw( mojolicious session_duration ) )
+            $last_request_time < time - $config->get( qw( mojolicious session duration ) )
         ) {
             $self->session( expires => 1 );
             $self->redirect_to;

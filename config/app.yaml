@@ -13,7 +13,6 @@ default:
             - email
     data: data # location for "data" directory
     mojolicious:
-        session_cookie_name: cbqz_session
         secrets:
             - acf4631c010fbe6dc0e72b3a8930ebdb
             - 1fb07ba01a3c9f04bf716c28fac3bf15
@@ -24,7 +23,11 @@ default:
                 pid_file: runtime/hypnotoad.pid
                 listen:
                     - http://*:3000
-        session_duration: 14400 # 4 hours
+        session:
+            cookie_name: cbqz_session
+            default_expiration: 0
+            duration: 14400 # 4 hours
+        inactivity_timeout: 14400 # 4 hours
         access_log:
             production: access.log
             development: morbo.log
