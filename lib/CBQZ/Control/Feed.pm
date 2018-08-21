@@ -10,7 +10,7 @@ sub spike ($self) {
     $self->inactivity_timeout(14400); # 4 hours
     $self->socket( setup => 'spike', $self->tx, sub { $_->send( { json => $json } ) for (@_) } );
     $self->on( message => sub { $self->socket( message => 'spike' ) });
-    $self->on( finish  => sub { $self->socket( finish   => 'spike', $self->tx ) } );
+    $self->on( finish  => sub { $self->socket( finish => 'spike', $self->tx ) } );
 }
 
 1;

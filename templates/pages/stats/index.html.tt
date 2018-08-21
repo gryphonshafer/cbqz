@@ -31,7 +31,7 @@
                         <td>[% ( quiz.official ) ? "Official" : "Practice" %]</td>
                         <td>[% quiz.quizmaster %]</td>
                         <td class="right">[% quiz.room %]</td>
-                        [% IF type == 'active' %]<td>[% quiz.question_number %]</td>[% END %]
+                        [% IF type == 'active' %]<td class="right">[% quiz.question_number %]</td>[% END %]
                         <td class="right">[% quiz.scheduled %]</td>
                         <td class="right">[% quiz.created %]</td>
                         <td class="right">[% quiz.last_modified %]</td>
