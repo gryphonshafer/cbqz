@@ -27,7 +27,6 @@ default:
             cookie_name: cbqz_session
             default_expiration: 0
             duration: 14400 # 4 hours
-        inactivity_timeout: 14400 # 4 hours
         access_log:
             production: access.log
             development: morbo.log

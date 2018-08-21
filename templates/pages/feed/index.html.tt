@@ -9,7 +9,7 @@
 <div id="log"></div>
 
 <script>
-    var ws = new WebSocket("[% c.url_for('/feed/working_morbo_spike').to_abs.scheme('ws') %]");
+    var ws = new WebSocket("[% c.url_for('/feed/spike').to_abs.scheme('ws') %]");
 
     ws.onmessage = function (e) {
         console.log(e);

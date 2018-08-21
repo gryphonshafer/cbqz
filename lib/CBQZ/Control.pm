@@ -28,7 +28,6 @@ sub startup ($self) {
     $self->secrets( $config->get( 'mojolicious', 'secrets' ) );
     $self->config( $config->get( 'mojolicious', 'config' ) );
     $self->sessions->default_expiration( $config->get( qw( mojolicious session default_expiration ) ) );
-    $self->inactivity_timeout( $config->get( 'mojolicious', 'inactivity_timeout' ) );
 
     $self->setup_general_helpers($cbqz);
     $self->setup_logging($cbqz);
@@ -224,9 +223,6 @@ sub setup_csv ($self) {
 
                 $sockets->{$name}{transactions}{ sprintf( '%s', $transaction ) } = $transaction;
             }
-            elsif ( $command eq 'finish' ) {
-                delete $sockets->{$name}{transactions}{ sprintf( '%s', $transaction ) };
-            }
             elsif ( $command eq 'message' ) {
                 $cbqz->dq->sql(q{
                     UPDATE socket SET counter = counter + 1 WHERE name = ?
@@ -236,6 +232,9 @@ sub setup_csv ($self) {
                 kill( 'URG', $_ )
                     for ( map { $_->pid } grep { $_->ppid == $ppid } @{ Proc::ProcessTable->new->table } );
             }
+            elsif ( $command eq 'finish' ) {
+                delete $sockets->{$name}{transactions}{ sprintf( '%s', $transaction ) };
+            }
             else {
                 E->throw(qq{Command $command not understood});
             }
@@ -243,10 +242,10 @@ sub setup_csv ($self) {
 
         $SIG{URG} = sub {
             for my $socket ( @{ $cbqz->dq->sql('SELECT name, counter FROM socket')->run->all({}) } ) {
-                if ( not $sockets->{ $socket->{name} } ) {
-                    $cbqz->critical( 'Socket ' . $socket->{name} . ' was messaged but not set up' );
-                }
-                elsif ( $sockets->{ $socket->{name} }{counter} < $socket->{counter} ) {
+                if (
+                    $sockets->{ $socket->{name} } and
+                    $sockets->{ $socket->{name} }{counter} < $socket->{counter}
+                ) {
                     $sockets->{ $socket->{name} }{counter} = $socket->{counter};
                     $cbqz->debug( 'Socket ' . $socket->{name} . ' was messaged; ' . $$ . ' responding' );
                     $sockets->{ $socket->{name} }{callback}->(
