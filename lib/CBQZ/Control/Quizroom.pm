@@ -9,46 +9,36 @@ use CBQZ::Model::MaterialSet;
 use CBQZ::Model::Question;
 use CBQZ::Model::QuizQuestion;
 use CBQZ::Util::Format 'date_time_ansi';
+use CBQZ::Util::File 'slurp';
+
+sub index ($self) {
+    return $self->stash( cntlr => $self->url_for('/quizroom') );
+}
 
 sub path ($self) {
-    my $cbqz_prefs       = $self->decode_cookie('cbqz_prefs');
-    my $path             = $self->url_for('/quizroom');
-    my $result_operation = '';
+    my $path = $self->url_for('/quizroom');
+    my $text = qq/var cntlr = "$path";\n/;
 
-    try {
-        # $result_operation = CBQZ::Model::Program->new->load(
-        #     $cbqz_prefs->{program_id}
-        # )->obj->result_operation;
+    if ( $self->session('quiz_id') ) {
+        my $result_operation = (
+            ( $self->cbqz->config->get( 'program', 'force_default_result_operation' ) )
+                ? CBQZ::Model::Program->new->default('result_operation')
+                : CBQZ::Model::Quiz->new->load( $self->session('quiz_id') )->obj->result_operation
+        ) || '';
 
-        # TODO-END: revert to above code before being "done"
-        use CBQZ::Util::File 'slurp';
-        $result_operation = slurp( $self->config->get( qw( config_app root_dir ) ) . '/static/js/pages/result_operation.js' );
-    }
-    catch {
-        $self->warn($_);
-    };
-
-    return $self->render(
-        text => qq/
-            var cntlr = "$path";
-
+        $text .= qq/
             function result_operation(input) {
                 var output = {};
                 $result_operation
                 return output;
             }
-        /,
-    );
+        /;
+    }
+
+    return $self->render( text => $text );
 }
 
 {
-    my @quizzer_names = qw(
-        Alpha Bravo Charlie Delta Echo Foxtrot Gulf Hotel India Juliet Kilo Lima Mike November Oscar
-    );
-    my $quiz_teams_quizzers = join( "\n\n", map {
-        $_ . "\n" . join( "\n", map { $_ . '. ' . shift(@quizzer_names) . ' Quizzer' } 1 .. 5 )
-    } map { 'Team ' . $_ } 'A' .. 'C' ) . "\n";
-
     sub quiz_setup ($self) {
         my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
 
@@ -75,22 +65,28 @@ sub path ($self) {
             question_set_id     => $cbqz_prefs->{question_set_id} || undef,
             material_set_id     => $cbqz_prefs->{material_set_id} || undef,
             question_set        => $question_set,
-            quiz_teams_quizzers => $quiz_teams_quizzers,
             scheduled           => date_time_ansi(),
             name                => date_time_ansi(),
             quizmaster          => $self->stash('user')->obj->realname,
-            user_is_official    => $self->stash('user')->has_role('Official'),
+            user_is_official    => $self->stash('user')->has_role('official'),
             target_questions    => $program->obj->target_questions,
             timer_default       => $program->obj->timer_default,
             timeout             => $program->obj->timeout,
             timer_values        => join( ', ', @{ $self->cbqz->json->decode( $program->obj->timer_values ) } ),
             score_types         => $self->cbqz->json->decode( $program->obj->score_types ),
             readiness           => $program->obj->readiness,
-            question_types      => $program->question_types_as_text,
             saved_quizzes       => [
                 sort { $a->{scheduled} cmp $b->{scheduled} }
+                map {
+                    if ( $_->{state} eq 'active' ) {
+                        my $status = $self->cbqz->json->decode( $_->{status} || '{}' );
+                        $_->{question_number} = $status->{question_number} || 1;
+                    }
+                    $_;
+                }
                 @{ CBQZ::Model::Quiz->new->quizzes_for_user( $self->stash('user'), $program ) },
             ],
+            program_question_types => $program->question_types_as_text,
         } );
     }
 }
@@ -99,32 +95,40 @@ sub generate_quiz ($self) {
     my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
     my $quiz;
 
-    try {
+    my $success = try {
         E->throw('User is not a member of program ID set in CBQZ preferences cookie')
             unless ( $self->stash('user')->has_program_id( $cbqz_prefs->{program_id} ) );
 
         E->throw('User is not an official but has set the "official" flag for the quiz')
-            if ( $self->req->param('official') and not $self->stash('user')->has_role('Official') );
+            if ( $self->req->param('official') and not $self->stash('user')->has_role('official') );
 
         my $set = CBQZ::Model::QuestionSet->new->load( $cbqz_prefs->{question_set_id} );
         E->throw('User does not own requested question set')
             unless ( $set and $set->is_usable_by( $self->stash('user') ) );
+
+        my $program = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
 
         $quiz = CBQZ::Model::Quiz->new->create({
             %$cbqz_prefs,
             %{ $self->params },
             user_id             => $self->stash('user')->obj->id,
             quiz_teams_quizzers => $self->req->param('quiz_teams_quizzers'),
+            result_operation    => $program->obj->result_operation,
         });
     }
     catch {
         $self->warn($_);
         $self->flash( message =>
             'An error occurred while trying to generate quiz data. ' .
-            'This is likely due to invalid quiz configuration settings.'
+            'This is likely due to invalid quiz configuration settings ' .
+            'or insufficient questions to fulfill the settings.'
         );
-        return $self->redirect_to('/quizroom');
+        $self->redirect_to('/quizroom');
+        return undef;
     };
+    return unless ($success);
+
+    $self->stash('user')->event('generate_quiz');
 
     $self->flash( message => {
         type => 'success',
@@ -262,15 +266,17 @@ sub quiz_event ($self) {
         $quiz_question_data = CBQZ::Model::QuizQuestion->new->create($quiz_question_data)->data;
         delete $quiz_question_data->{question};
 
-        return $self->render( json => {
+        $self->render( json => {
             success       => 1,
             quiz_question => $quiz_question_data,
         } );
     }
     catch {
         $self->warn($_);
-        return $self->render( json => { error => $self->clean_error($_) } );
+        $self->render( json => { error => $self->clean_error($_) } );
     };
+
+    return;
 }
 
 sub delete_quiz_event ($self) {
@@ -293,26 +299,45 @@ sub delete_quiz_event ($self) {
             question_number => $event->{question_number},
         })->obj->delete;
 
-        return $self->render( json => { success => 1 } );
+        $self->render( json => { success => 1 } );
     }
     catch {
         $self->warn($_);
-        return $self->render( json => { error => $self->clean_error($_) } );
+        $self->render( json => { error => $self->clean_error($_) } );
     };
+
+    return;
 }
 
 sub mark ($self) {
-    my $json     = $self->req_body_json;
-    my $question = CBQZ::Model::Question->new->load( $self->req_body_json->{question_id} );
+    my $json = $self->req_body_json;
+    my $return_json;
 
-    if ( $question and $question->is_usable_by( $self->stash('user') ) ) {
-        $json->{reason} = $question->obj->marked . ' / ' . $json->{reason} if ( $question->obj->marked );
+    try {
+        my $question = CBQZ::Model::Question->new->load( $json->{question_id} );
+        E->throw('Failed to load question') unless ($question);
+
+        my ( $is_owned_by, $is_shared_to ) = (
+            $question->is_owned_by( $self->stash('user') ),
+            $question->is_shared_to( $self->stash('user') ),
+        );
+        E->throw('User does not have access to the question referenced')
+            unless ( $is_owned_by or $is_shared_to );
+
+        $json->{reason} .= ' [' . join( '',
+            map { uc( substr( $_, 0, 1 ) ) }
+                split( /\s+/, $self->stash('user')->obj->realname )
+        ) . ']' if ( $question->is_shared_set );
+
+        $json->{reason} = $question->obj->marked . '; ' . $json->{reason} if ( $question->obj->marked );
         $question->obj->update({ marked => $json->{reason} });
-        return $self->render( json => { success => 1 } );
+        $return_json = { success => 1 };
     }
-    else {
-        return $self->render( json => { error => 'User does not have access to the question referenced' } );
-    }
+    catch {
+        $return_json = { error => $self->clean_error($_) };
+    };
+
+    return $self->render( json => $return_json );
 }
 
 sub replace ($self) {
@@ -330,17 +355,19 @@ sub replace ($self) {
 
         if ( $set and $set->is_usable_by( $self->stash('user') ) ) {
             my $results = CBQZ::Model::Quiz->new->load( $request->{quiz_id} )->replace( $request, $cbqz_prefs );
-            return $self->render( json => {
+            $self->render( json => {
                 question => (@$results) ? $results->[0] : undef,
                 error    => (@$results) ? undef : 'Failed to find question of that type',
             } );
         }
     }
     catch {
-        return $self->render( json => {
+        $self->render( json => {
             error => $self->clean_error($_),
         } );
     };
+
+    return;
 }
 
 sub close ($self) {
@@ -355,6 +382,8 @@ sub close ($self) {
         );
 
         CBQZ::Model::Quiz->new->load( $self->req->param('quiz_id') )->obj->update({ state => 'closed' });
+
+        $self->stash('user')->event('close_quiz');
     }
     catch {
         $self->flash( message => $self->clean_error($_) );
@@ -415,16 +444,46 @@ sub rearrange_quizzers ($self) {
         $request->{metadata}{quiz_teams_quizzers} = $quizzers_data;
         $quiz->obj->update({ metadata => $self->cbqz->json->encode( $request->{metadata} ) });
 
-        return $self->render( json => {
+        $self->render( json => {
             success             => 1,
             quiz_teams_quizzers => $quizzers_data,
         } );
     }
     catch {
-        return $self->render( json => {
+        $self->render( json => {
             error => $self->clean_error($_),
         } );
     };
+
+    return;
+}
+
+sub status ($self) {
+    my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
+    my $status     = {};
+
+    try {
+        $status     = $self->req_body_json || {};
+        my $quiz_id = delete $status->{quiz_id} || 0;
+
+        my $program = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
+        E->throw('User does not have access to the quiz referenced by quiz ID') unless (
+            grep { $_->{quiz_id} == $quiz_id } @{
+                CBQZ::Model::Quiz->new->quizzes_for_user( $self->stash('user'), $program )
+            }
+        );
+
+        my $quiz = CBQZ::Model::Quiz->new->load($quiz_id);
+
+        if ( keys %$status ) {
+            $quiz->obj->update({ status => $quiz->json->encode($status) });
+        }
+        else {
+            $status = $quiz->json->decode( $quiz->obj->status );
+        }
+    };
+
+    return $self->render( json => { status => $status } );
 }
 
 1;

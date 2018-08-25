@@ -32,8 +32,10 @@
                     href="[% c.url_for('/main/material') %]">Material</a>
                 <a [% IF page.menu == 'questions' %]class="selected"[% END %]
                     href="[% c.url_for('/editor/questions') %]">Questions</a>
+                <a [% IF page.menu == 'stats' %]class="selected"[% END %]
+                    href="[% c.url_for('/stats') %]">Stats</a>
 
-                [% IF user.has_role('Administrator') OR user.has_role('Director') %]
+                [% IF user.has_role('administrator') OR user.has_role('director') %]
                     <a [% IF page.menu == 'admin' %]class="selected"[% END %]
                         href="[% c.url_for('/admin') %]">Admin</a>
                 [% END %]
@@ -72,6 +74,8 @@
         <a href="/">CBQZ Home Page</a>
         |
         <a href="https://github.com/gryphonshafer/cbqz" target="github">GitHub Project</a>
+        |
+        <a href="https://raw.githubusercontent.com/gryphonshafer/cbqz/master/Changes" target="github">Revision History</a>
     </p>
     <p class="right">
         Version [% version %]

@@ -31,19 +31,20 @@ sub data ($self) {
     };
 
     try {
-        $data->{material} = CBQZ::Model::MaterialSet->new->load(
-            $cbqz_prefs->{material_set_id},
-        )->get_material;
-
-        $data->{metadata} = {
-            types => CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} )->types_list,
-            books => [ sort { $a cmp $b } keys %{ $data->{material} } ],
-        };
-
         my $set = CBQZ::Model::QuestionSet->new->load( $cbqz_prefs->{question_set_id} );
         $data->{questions} = { data => (
             ( $set and $set->is_usable_by( $self->stash('user') ) ) ? $set->get_questions : {},
         ) };
+
+        $data->{material} = CBQZ::Model::MaterialSet->new->load(
+            $cbqz_prefs->{material_set_id},
+        )->get_material;
+
+        my %books = map { $_ => 1 } keys %{ $data->{material} }, keys %{ $data->{questions}{data} };
+        $data->{metadata} = {
+            types => CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} )->types_list,
+            books => [ sort { $a cmp $b } keys %books ],
+        };
     }
     catch {
         $self->warn($_);

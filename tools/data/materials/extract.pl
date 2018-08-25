@@ -20,6 +20,8 @@ my $data_dir = join( '/',
     $settings->{directory} // 'html',
 );
 
+say "Processing from: $data_dir";
+
 my $data = [];
 for my $pattern ( @{ $settings->{files} } ) {
     for my $file ( <"$data_dir/$pattern"> ) {
@@ -75,6 +77,8 @@ for my $pattern ( @{ $settings->{files} } ) {
                 } );
             }
         } );
+
+        say 'Processed: ' . substr( $file, length($data_dir) + 1 );
     }
 }
 

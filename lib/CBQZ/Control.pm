@@ -6,27 +6,18 @@ use Mojo::Loader 'load_class';
 use Mojo::Util 'b64_decode';
 use MojoX::Log::Dispatch::Simple;
 use Try::Tiny;
+use Text::CSV_XS 'csv';
 use CBQZ;
 use CBQZ::Model::User;
 use CBQZ::Util::Format 'log_date';
 use CBQZ::Util::Template 'tt_settings';
 use CBQZ::Util::File 'most_recent_modified';
 
-sub startup ( $self, $app = undef ) {
+sub startup ($self) {
     my $cbqz   = CBQZ->new;
     my $config = $cbqz->config;
 
-    $config->put( sub_version => sprintf(
-        '%d.%02d.%02d.%02d.%02d',
-        (
-            localtime(
-                most_recent_modified(
-                    map { $config->get( 'config_app', 'root_dir' ) . '/' . $_ }
-                        qw( config db lib static templates )
-                )
-            )
-        )[ 5, 4, 3, 2, 1 ]
-    ) );
+    $self->sub_version($config);
 
     # base URL handling
     $self->plugin('RequestBase');
@@ -37,72 +28,15 @@ sub startup ( $self, $app = undef ) {
     $self->config( $config->get( 'mojolicious', 'config' ) );
     $self->sessions->default_expiration(0);
 
-    # setup general helpers
-    for my $command ( qw( clean_error dq config ) ) {
-        $self->helper( $command => sub ( $self, @commands ) {
-            return $cbqz->$command(@commands);
-        } );
-    }
-    $self->helper( 'params' => sub ($self) {
-        return { map { $_ => $self->req->param($_) } @{ $self->req->params->names } };
-    } );
-    $self->helper( 'req_body_json' => sub ($self) {
-        my $data;
-        try {
-            $data = $cbqz->json->decode( $self->req->body );
-        };
-        return $data;
-    } );
-    $self->helper( 'cbqz' => sub { $cbqz } );
-    $self->helper( 'decode_cookie' => sub ( $self, $name ) {
-        my $data = {};
-        try {
-            $data = $cbqz->json->decode( b64_decode( $self->cookie($name) // '' ) );
-        };
-        return $data;
-    } );
-
-    # logging
-    $self->log->level('error'); # temporarily raise log level to skip AccessLog "warn" status
-    $self->plugin(
-        'AccessLog',
-        {
-            'log' => join( '/',
-                $config->get( 'logging', 'log_dir' ),
-                $config->get( 'mojolicious', 'access_log', $self->mode ),
-            )
-        },
-    );
-    $self->log(
-        MojoX::Log::Dispatch::Simple->new(
-            dispatch  => $cbqz->log,
-            level     => $config->get( 'logging', 'log_level', $self->mode ),
-            format_cb => sub { log_date(shift) . ' [' . uc(shift) . '] ' . join( "\n", $cbqz->dp( @_, '' ) ) },
-        )
-    );
-    for my $level ( qw( debug info warn error fatal notice warning critical alert emergency emerg err crit ) ) {
-        $self->helper( $level => sub {
-            shift;
-            $self->log->$level($_) for ( $cbqz->dp(@_) );
-            return;
-        } );
-    }
-
-    # template processing
-    push( @INC, $config->get( 'config_app', 'root_dir' ) );
-    $self->plugin(
-        'ToolkitRenderer',
-        tt_settings( 'web', $config->get('template'), { version => $config->get('version') } ),
-    );
-
-    # JSON rendering
-    $self->renderer->add_handler( 'json' => sub { ${ $_[2] } = eval { $cbqz->json->encode( $_[3]{json} ) } } );
-
-    # set default rendering handler
-    $self->renderer->default_handler('tt');
+    $self->setup_general_helpers($cbqz);
+    $self->setup_logging($cbqz);
+    $self->setup_templating($config);
+    $self->setup_csv;
 
     # pre-load controllers
-    load_class( 'CBQZ::Control::' . $_ ) for qw( Main Editor Quizroom Admin );
+    if ( $self->mode eq 'production' ) {
+        load_class( 'CBQZ::Control::' . $_ ) for qw( Main Editor Quizroom Admin Stats );
+    }
 
     # before dispatch tasks
     $self->hook( 'before_dispatch' => sub ($self) {
@@ -157,8 +91,8 @@ sub startup ( $self, $app = undef ) {
     my $admin_user = $authorized_user->under( sub ($self) {
         return 1 if (
             $self->stash('user') and (
-                $self->stash('user')->has_role('Administrator') or
-                $self->stash('user')->has_role('Director')
+                $self->stash('user')->has_role('administrator') or
+                $self->stash('user')->has_role('director')
             )
         );
 
@@ -174,6 +108,98 @@ sub startup ( $self, $app = undef ) {
     $authorized_user->any('/:controller/:action');
 
     return;
+}
+
+sub sub_version ( $self, $config ) {
+    my @most_recent_modified = (
+        localtime(
+            most_recent_modified(
+                map { $config->get( 'config_app', 'root_dir' ) . '/' . $_ }
+                    qw( config db lib static templates )
+            )
+        )
+    )[ 5, 4, 3, 2, 1 ];
+    $most_recent_modified[0] += 1900;
+    $most_recent_modified[1] += 1;
+    $config->put( sub_version => sprintf( '%d.%02d.%02d.%02d.%02d', @most_recent_modified ) );
+}
+
+sub setup_general_helpers ( $self, $cbqz ) {
+    # setup general helpers
+    for my $command ( qw( clean_error dq config ) ) {
+        $self->helper( $command => sub ( $self, @commands ) {
+            return $cbqz->$command(@commands);
+        } );
+    }
+    $self->helper( 'params' => sub ($self) {
+        return { map { $_ => $self->req->param($_) } @{ $self->req->params->names } };
+    } );
+    $self->helper( 'req_body_json' => sub ($self) {
+        my $data;
+        try {
+            $data = $cbqz->json->decode( $self->req->body );
+        };
+        return $data;
+    } );
+    $self->helper( 'cbqz' => sub { $cbqz } );
+    $self->helper( 'decode_cookie' => sub ( $self, $name ) {
+        my $data = {};
+        try {
+            $data = $cbqz->json->decode( b64_decode( $self->cookie($name) // '' ) );
+        };
+        return $data;
+    } );
+}
+
+sub setup_logging ( $self, $cbqz ) {
+    $self->log->level('error'); # temporarily raise log level to skip AccessLog "warn" status
+    $self->plugin(
+        'AccessLog',
+        {
+            'log' => join( '/',
+                $cbqz->config->get( 'logging', 'log_dir' ),
+                $cbqz->config->get( 'mojolicious', 'access_log', $self->mode ),
+            )
+        },
+    );
+    $self->log(
+        MojoX::Log::Dispatch::Simple->new(
+            dispatch  => $cbqz->log,
+            level     => $cbqz->config->get( 'logging', 'log_level', $self->mode ),
+            format_cb => sub { log_date(shift) . ' [' . uc(shift) . '] ' . join( "\n", $cbqz->dp( @_, '' ) ) },
+        )
+    );
+    for my $level ( qw( debug info warn error fatal notice warning critical alert emergency emerg err crit ) ) {
+        $self->helper( $level => sub {
+            shift;
+            $self->log->$level($_) for ( $cbqz->dp(@_) );
+            return;
+        } );
+    }
+}
+
+sub setup_templating ( $self, $config ) {
+    push( @INC, $config->get( 'config_app', 'root_dir' ) );
+    $self->plugin(
+        'ToolkitRenderer',
+        tt_settings( 'web', $config->get('template'), { version => $config->get('version') } ),
+    );
+    $self->renderer->default_handler('tt');
+}
+
+sub setup_csv ($self) {
+    $self->renderer->add_handler( 'csv' => sub {
+        my ( $renderer, $c, $output, $options ) = @_;
+
+        $options->{format} = 'csv';
+
+        if ( my $filename = $c->stash->{filename} ) {
+            $c->res->headers->content_type(qq{text/csv; name="$filename"});
+            $c->res->headers->content_disposition(qq{attachment; filename="$filename"});
+        }
+
+        csv( in => $c->stash->{content}, out => $output );
+    } );
 }
 
 1;

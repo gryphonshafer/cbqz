@@ -16,7 +16,10 @@ sub create ( $self, $config ) {
             ? $config->{quiz_teams_quizzers}
             : $self->parse_quiz_teams_quizzers( $config->{quiz_teams_quizzers} );
 
-    $_->{team}{score} = 0 + $config->{readiness} for (@$quiz_teams_quizzers);
+    for my $team (@$quiz_teams_quizzers) {
+        $team->{team}{score} = 0 + $config->{readiness};
+        $_->{score} = 0 for ( @{ $team->{quizzers} } );
+    }
 
     $self->obj(
         $self->rs->create({
@@ -32,7 +35,7 @@ sub create ( $self, $config ) {
                 ),
                 map { $_ => $config->{$_} } qw( target_questions timer_default timeout readiness score_type )
             }),
-            map { $_ => $config->{$_} } qw( program_id user_id name quizmaster room scheduled )
+            map { $_ => $config->{$_} } qw( program_id user_id name quizmaster room scheduled result_operation )
         } )->get_from_storage
     );
 

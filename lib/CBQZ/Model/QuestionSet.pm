@@ -3,6 +3,8 @@ package CBQZ::Model::QuestionSet;
 use Moose;
 use MooseX::ClassAttribute;
 use exact;
+use Try::Tiny;
+use CBQZ::Model::Question;
 
 extends 'CBQZ::Model';
 
@@ -12,7 +14,7 @@ has 'statistics' => ( isa => 'ArrayRef[HashRef]', is => 'rw', lazy => 1, default
     return shift->generate_statistics;
 } );
 
-sub create ( $self, $user, $name = undef ){
+sub create ( $self, $user, $name = undef ) {
     $name //= 'Default ' . ucfirst( $user->obj->realname || $user->obj->username ) . ' Set';
 
     $self->obj(
@@ -22,6 +24,7 @@ sub create ( $self, $user, $name = undef ){
         })->get_from_storage
     );
 
+    $user->event('create_question_set');
     return $self;
 }
 
@@ -91,16 +94,22 @@ sub is_owned_by ( $self, $user ) {
 sub is_usable_by ( $self, $user ) {
     return (
         $self->is_owned_by($user) or
-        grep { $_->question_set_id == $self->obj->id }
-            $user->obj->user_question_sets->search({ type => 'Share' })->all
+        (
+            grep { $_->question_set_id == $self->obj->id }
+                $user->obj->user_question_sets->search({ type => 'share' })->all
+        ) or
+        $self->obj->user_question_sets->search({ type => 'share', user_id => undef })->count
     ) ? 1 : 0;
 }
 
 sub clone ( $self, $user, $new_set_name ) {
     E->throw('User not authorized to clone this question set') unless (
         $self->is_owned_by($user) or
-        grep { $_->question_set_id == $self->obj->id }
-            $user->obj->user_question_sets->search({ type => 'Publish' })->all
+        (
+            grep { $_->question_set_id == $self->obj->id }
+                $user->obj->user_question_sets->search({ type => 'publish' })->all
+        ) or
+        $self->obj->user_question_sets->search({ type => 'publish', user_id => undef })->count
     );
 
     my $new_set = $self->rs->create({
@@ -118,6 +127,8 @@ sub clone ( $self, $user, $new_set_name ) {
             book, chapter, verse, question, answer, type, used, marked, score
         FROM question WHERE question_set_id = ?
     })->run( $new_set->id, $self->obj->id );
+
+    $user->event('clone_question_set');
 
     return $new_set;
 }
@@ -139,7 +150,6 @@ sub users_to_select ( $self, $user, $type ) {
                     )
                     AND u.user_id != ?
                 GROUP BY 1
-
             })->run(
                 $self->obj->id,
                 $type,
@@ -152,6 +162,16 @@ sub users_to_select ( $self, $user, $type ) {
 sub save_set_select_users ( $self, $user, $type, $selected_user_ids ) {
     E->throw('User not authorized to save select users on this set')
         unless ( $self and $self->is_owned_by($user) );
+
+    my @preexisting_user_ids = map { @$_ } @{
+        $self->dq->sql('SELECT user_id FROM user_question_set WHERE question_set_id = ? AND type = ?')
+            ->run( $self->obj->id, $type )->all
+    };
+
+    my @new_user_ids = grep { defined } map {
+        my $selected_user_id = $_;
+        ( grep { $_ == $selected_user_id } @preexisting_user_ids ) ? undef : $selected_user_id;
+    } @$selected_user_ids;
 
     $self->dq->sql('DELETE FROM user_question_set WHERE question_set_id = ? AND type = ?')
         ->run( $self->obj->id, $type );
@@ -166,7 +186,119 @@ sub save_set_select_users ( $self, $user, $type, $selected_user_ids ) {
         $type,
     ) for (@$selected_user_ids);
 
-    return;
+    $user->event('save_set_select_users');
+
+    return \@new_user_ids;
+}
+
+sub import_questions ( $self, $questions, $material_set ) {
+    $self->fork( sub {
+        for my $question_data (@$questions) {
+            $question_data->{type} = 'MACR'  if ( $question_data->{type} eq 'CRMA'  );
+            $question_data->{type} = 'MACVR' if ( $question_data->{type} eq 'CVRMA' );
+            $question_data->{type} = 'Q'     if ( $question_data->{type} eq 'QT'    );
+
+            $question_data->{verse} =~ s/\D.*$//g;
+
+            $question_data->{question} =~ s/^\s+|\s+$//g;
+            $question_data->{answer}   =~ s/^\s+|\s+$//g;
+
+            $question_data->{question} =~ s/^Q:\s+//i;
+            $question_data->{answer}   =~ s/^A:\s+//i;
+
+            $question_data->{question_set_id} = $self->obj->id;
+
+            my $question_obj = CBQZ::Model::Question->new->create($question_data);
+
+            my $data = $question_obj->auto_text($material_set);
+            $data->{marked} = delete $data->{error} if ( $data->{error} );
+
+            $question_obj->obj->update($data);
+            $question_obj->calculate_score($material_set);
+        }
+    } );
+
+    return $self;
+}
+
+sub merge ( $self, $question_set_ids, $user = undef ) {
+    E->throw('Did not receive an arrayref of >1 question set IDs to merge')
+        unless ( ref $question_set_ids eq 'ARRAY' and @$question_set_ids > 1 );
+
+    my @question_sets = map { $self->new->load($_) } @$question_set_ids;
+    @question_sets = grep { $_->is_usable_by($user) } @question_sets if ($user);
+
+    my $new_set = $self->rs->create({
+        user_id => $user->obj->id,
+        name    => 'Merged Question Set ' . scalar( localtime() ),
+    });
+
+    $self->dq->sql(q{
+        INSERT INTO question (
+            question_set_id,
+            book, chapter, verse, question, answer, type, used, marked, score
+        )
+        SELECT
+            ?,
+            book, chapter, verse, question, answer, type, used, marked, score
+        FROM question WHERE question_set_id = ?
+    })->run( $new_set->id, $_->obj->id ) for (@question_sets);
+
+    $user->event('merge_question_sets');
+
+    return $new_set;
+}
+
+sub auto_kvl ( $self, $material_set, $user = undef ) {
+    E->throw('User does not have permission to auto-KVL this set')
+        if ( $user and not $self->is_usable_by($user) );
+
+    $self->fork( sub {
+        my $question_model = CBQZ::Model::Question->new;
+        for my $type (
+            [ 'Q',   'solo',  [ undef, 'Q', 'FT'    ] ],
+            [ 'FTV', 'solo',  [ undef, 'FTV'        ] ],
+            [ 'Q2V', 'range', [ undef, 'Q2V', 'FTN' ] ],
+            [ 'F2V', 'range', [ undef, 'F2V'        ] ],
+            [ 'FT',  'solo',  'FT'  ],
+            [ 'FTN', 'range', 'FTN' ],
+        ) {
+            my $verses = $material_set->obj->materials->search(
+                {
+                    key_class => $type->[1],
+                    key_type  => $type->[2],
+                },
+                {
+                    order_by => [ qw( book chapter verse ) ],
+                },
+            );
+
+            my $in_range = 0;
+            while ( my $verse = $verses->next ) {
+                if ( $type->[1] eq 'range' ) {
+                    if ($in_range) {
+                        $in_range = 0;
+                        next;
+                    }
+                    else {
+                        $in_range = 1;
+                    }
+                }
+
+                $question_model->new->create({
+                    question_set_id => $self->obj->id,
+                    %{ $question_model->auto_text( $material_set, {
+                        book    => $verse->book,
+                        chapter => $verse->chapter,
+                        verse   => $verse->verse,
+                        type    => $type->[0],
+                    } ) },
+                })->calculate_score($material_set);
+            }
+        }
+    } );
+
+    return $self;
 }
 
 __PACKAGE__->meta->make_immutable;

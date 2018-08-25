@@ -6,9 +6,6 @@ use CBQZ;
 use CBQZ::Util::File 'slurp';
 
 my $cbqz = CBQZ->new;
-
 $cbqz->config->put( qw( database settings mysql_multi_statements ) => 1 );
-
-try {
-    say $cbqz->dq->prepare( slurp( $ARGV[0] ) )->run->value;
-};
+my $sth = $cbqz->dq->sql( slurp( $ARGV[0] ) )->run;
+try { say $sth->value };

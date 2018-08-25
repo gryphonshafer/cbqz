@@ -1,0 +1,1 @@
+ALTER TABLE quiz DROP COLUMN status;

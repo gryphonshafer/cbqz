@@ -40,14 +40,14 @@ sub create ( $self, $params ) {
                 SELECT DISTINCT email
                 FROM user
                 JOIN role USING (user_id)
-                WHERE role.type = 'Administrator'
+                WHERE role.type = 'administrator'
             )
             UNION
             (
                 SELECT DISTINCT email
                 FROM user
                 JOIN role USING (user_id)
-                WHERE role.type = 'Director' AND role.program_id = ?
+                WHERE role.type = 'director' AND role.program_id = ?
             )
         })->run( $program_id || 0 )->all }
     ) {
@@ -61,12 +61,12 @@ sub create ( $self, $params ) {
         });
     }
 
-    # if there are no user with the "Administrator" role, add the "Administrator" roll to this new user
-    $self->add_role('Administrator') unless (
+    # if there are no user with the "administrator" role, add the "administrator" roll to this new user
+    $self->add_role( 'administrator', $program_id ) unless (
         $self->rs->search(
             {
                 'me.active'  => 1,
-                'roles.type' => 'Administrator',
+                'roles.type' => 'administrator',
             },
             {
                 'join' => 'roles',

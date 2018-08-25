@@ -1,0 +1,173 @@
+Revision history for CBQZ
+
+15.6.2    Mon Aug 20 13:30:12 PDT 2018
+        - Feature additions
+            - Publish/Share with every district user; closes #171
+            - Auto-KVL makes Q/Q2V for FT/FTNs; closes #169
+            - Auto-KVL adds FT and FTN; closes #168
+            - Question set import more strict and throws better errors; closes #170
+        - Bug fixes
+            - Fixup auto-text punctuation between multi-verse types
+            - KVL syntax fix for John (manually updated in db)
+            - Auto-KVL-generated questions now get scored; closes #167
+            - Change questions sort order does not auto return to chapter 1
+            - Editor save does not deselect question in question list; closes #166
+
+15.5.1    Tue Aug 7 07:34:42 2018
+        - Auto-generate KVL questions
+        - Merge question sets
+        - Moving around question set management into a nice table
+        - Additional improvements to question set manage page
+        - Revision history tracked and added to footer
+
+15.4.1    Wed Aug 1 11:46:56 2018
+        - "2019-2020 CMA PNW Hebrews Peter" materials data files
+        - Auto-text with [] block has better grammar
+        - Properly lower-case CVR/CR question start
+        - Swap lookup verse with view all quesitons in editor
+        - Improved rounding of question score
+
+15.3.1    Sat Jul 28 16:21:35 2018
+        - Hotkeys to allow focus on question and answer fields
+        - Moved type to below answer in editor
+        - Save new question rounds score appropriately
+        - Material search hotkeys will not focus in editor
+        - Display current question number up on quiz list pages
+
+15.2.2    Fri Jul 27 07:50:03 2018
+        - Fix quiz links on quiz setup page
+
+15.2.1    Thu Jul 26 21:32:28 2018
+        - Scorekeeping tracking in the quiz room and basic statistics storage
+        - Improvements to how brower-based code builds scorekeeping data
+        - Links to quizzes from quiz setup are pure links now
+        - Properly handle mismatch of material set to question set
+        - Present nice error to user when failing to gen a quiz
+        - Delete a quiz from stats page
+        - Issue a foul to a quizzer who has scored works
+        - Program config reset to defaults option
+        - Really resolve JS unreachable code warning in lookup; really closes #153
+        - Resolve JS unreachable code warning in lookup
+        - Back-porting some SQL update scripts
+        - Various random minor bug fixes
+        - Additional Dockerfile updates
+        - Container build updates
+        - Web UI for prelim generation
+        - Basic stats reporting
+        - Save quizzer score per quizzer in db on quiz event
+        - Save a copy of result_operation JS in db on quiz create
+        - Move "quiz_teams_quizzers" from Perl to JS
+        - Signature update for Model::Program::rs
+        - dest prereq definitions clean-up
+        - Display closed quizzes in a table on a stats page
+        - Ucfirst role names on admin page table
+        - Save "Question Types" settings on quiz setup page
+        - Use Progress::Any for CLI progress
+        - Remove unised optional_include from config
+        - Email notification of set share/publish
+        - CPAN versioning upgrades
+        - Marked comments adds initials
+        - Fix lingering upper-case enum values
+        - Loading page graphic on Vue data pages
+        - Add many more Event types
+        - Make ENUMs all lower case
+        - Title attributes added in many places
+        - Remove lookup ref for lookup component
+        - Questions import
+        - Export question sets
+        - Extend deploy db user create to use any user
+        - Skip reCAPTCHA render and use in dev mode
+        - Fix role add bug on first user create
+        - John 2018-2019 materials v2 improvements
+        - Unique for markup means per verse not universal
+        - Better markup handling of single-quote phrases
+        - Added in keyboard shortcuts scottpeterson
+        - Minor question difficulty scoring weights alter
+        - Silly regex-vs-eq typo fix
+        - URL-version all static file assets
+        - Fix material search displaying HTML bits
+        - Fix all question list view sorting by score
+        - Adjustments and refinements to question difficulty scoring
+        - Fix bug in Control for version calculation
+        - Move JS imports into "links" so components are always loaded before Vue app starts
+        - Initial deployment bug fix corrections
+        - Update admin page explain text
+        - Move off JS link imports to the JS standard lib process
+        - Fix change password bug; attempt to resolve quiz room non-display
+        - Handle UTF8 characters in question imports
+        - Update to 2018 John KVL
+
+14.0.0    Sun Feb 25 18:38:20 2018
+        - Share question set functionality
+        - Add "all" ability for question scoring
+        - Auto-text ignores "[]" blocks
+        - Use pure SQL instead of DBIC to clone
+        - Marked questions list/select view
+        - Reset to default question type on setup page load
+        - Editor questions sort advances
+        - Add better versioning info to footer
+        - User can change question type selection rules
+        - Display marked count by chapter
+        - Patch fix for highlight selected chapters for weighting
+        - Quiz setup JS cleanup and highlight selected chapters for weighting
+        - Lock replace to CBQZ prefs question set
+        - Fix question set publish area display when nothing published
+        - Handle null score display in editor nicely-er
+        - Question difficulty score
+        - Improve quiz generation algorithm
+        - Material search displays count of results
+        - Fix print quiz questions button
+        - Move chapter selection and weight to quiz setup page
+
+13.0.0    Fri Feb 16 15:47:10 2018
+        - Swap "as" and "type" positions in quiz room
+        - Utility to update MySQL DEFINERs
+        - Remove dependency on mysql binary
+        - Stop underlying cause of garbage characters
+        - First click on marked question in editor works
+        - Fix bug in save question with diff marked text
+        - Improve Docker CBQZ container instructions
+        - Back-add support for "user.username" field rename
+        - Switching key type from "QT" to "Q" in KVL data
+        - Patch to fix missing Dq dependency
+        - Add documentation for CBQZ container for CLI tools
+        - 2018 John KVL and materials generation
+        - Unexpected hack to prevent garbage chars on import links
+        - Switch favicon to CBQZ.org site current version
+        - user.name to user.username remaining bugs
+        - Switching input clear to button type to make Chrome style it nicely
+        - Fix missing username string in subject of email
+
+12.0.0    Thu Feb 8 20:33:01 2018
+        - Question set reset button
+        - Change user account info
+        - Role editing via role admin page operational
+        - Fix style of home page user create form
+        - Switching role names to a more canonical/good-er form
+        - Send email to director/admin after user create
+        - Editor questions lists counts
+        - Minor documentation update
+        - Pagination of questions display page
+        - Nginx conf; fix for app path URLs; footer links
+        - Improve CSS to render well on mobile + zoom
+        - Editor UX minor improvements
+        - Auto-text minor improvements
+        - Hotkey assignment to auto-text button
+        - Auto-text per question button in editor
+        - Printing questions from a quiz or all questions in a set
+        - Sort questions by length and alphabetically
+        - Save question as new de-selects marked selector
+        - Copy verse no longer results in a new question
+        - Remember last question sort order
+        - Sort marked questions by "sort by" field
+        - Style tightening mostly in the editor
+        - Move type and marked above question
+        - Data JS rendering defaults in the JS now
+        - Migrate quizroom page lookup and search to Vue components
+        - Migrate editor page lookup and search to Vue components
+        - Fix CR/CVR answers not being ucfirst-ed
+        - Updated 2017 materials CSV
+        - Add 5-second timeout to search material for matches
+        - Markup questions uses clean question/answer text prior to attempt
+        - Material extraction removes space associated with footnote removal
+        - Materials generation and reference building tools working and tested

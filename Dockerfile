@@ -4,7 +4,7 @@ MAINTAINER Gryphon Shafer <g@cbqz.org>
 WORKDIR /cbqz
 COPY cpanfile .
 
-RUN apk --no-cache add perl mariadb-client-libs && \
+RUN apk --no-cache add perl perl-dbd-mysql && \
     apk --no-cache add --virtual .build-dependencies build-base curl wget perl-dev mariadb-dev && \
     curl -sL http://xrl.us/cpanm > cpanm && chmod +x cpanm && \
     ./cpanm -n -f --installdeps . && rm -rf ~/.cpanm && \

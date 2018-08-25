@@ -11,19 +11,20 @@
     );
 %]
 
-<div id="material" v-cloak>
-    <material-search
-        ref="material_search"
-        v-bind:material="material"
-        v-bind:lookup="lookup"
-        clickable="true"
-        v-on:reference-click="search_reference_click"
-    ></material-search>
+<div id="material">
+    <div v-if="false" class="loading_spinner"></div>
+    <div v-cloak>
+        <material-search
+            ref="material_search"
+            v-bind:material="material"
+            clickable="true"
+            v-on:reference-click="search_reference_click"
+        ></material-search>
 
-    <material-lookup
-        ref="material_lookup"
-        v-bind:material="material"
-        v-bind:lookup="lookup"
-        v-on:reference-change="lookup_reference_change"
-    ></material-lookup>
+        <material-lookup
+            ref="material_lookup"
+            v-bind:material="material"
+            v-on:reference-change="lookup_reference_change"
+        ></material-lookup>
+    </div>
 </div>

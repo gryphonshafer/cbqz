@@ -1,7 +1,7 @@
 CREATE TABLE event (
     event_id int(10) unsigned NOT NULL,
     user_id int(10) unsigned NOT NULL,
-    type enum('create_user','login','login_fail','role_change') NOT NULL,
+    type tinytext NOT NULL,
     created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (event_id),
     KEY user (user_id),
@@ -99,8 +99,10 @@ CREATE TABLE quiz (
     room tinyint(3) unsigned NOT NULL DEFAULT '1',
     official tinyint(1) NOT NULL DEFAULT '0',
     scheduled datetime DEFAULT NULL,
+    status text,
     metadata mediumtext,
     questions mediumtext,
+    result_operation mediumtext,
     last_modified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created timestamp NOT NULL DEFAULT '1970-01-01 16:00:00',
     PRIMARY KEY (quiz_id),
@@ -141,7 +143,7 @@ CREATE TABLE role (
     role_id int(10) unsigned NOT NULL,
     user_id int(10) unsigned NOT NULL,
     program_id int(10) unsigned DEFAULT NULL,
-    type enum('Administrator','Director','Official','User') NOT NULL,
+    type enum('administrator','director','official','user') NOT NULL,
     created timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (role_id),
     UNIQUE KEY user_program_type (user_id,program_id,type),
@@ -176,11 +178,13 @@ CREATE TABLE user_program (
 );
 
 CREATE TABLE user_question_set (
-    user_id int(10) unsigned NOT NULL,
+    user_question_set_id int(10) unsigned NOT NULL,
+    user_id int(10) unsigned DEFAULT NULL,
     question_set_id int(10) unsigned NOT NULL,
-    type enum('Publish','Share') NOT NULL,
-    PRIMARY KEY (user_id,question_set_id,type),
+    type enum('publish','share') NOT NULL,
+    PRIMARY KEY (user_question_set_id),
     KEY question_set_id (question_set_id),
+    KEY user_id (user_id),
     CONSTRAINT user_question_set_ibfk_1 FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT user_question_set_ibfk_2 FOREIGN KEY (question_set_id) REFERENCES question_set (question_set_id) ON DELETE CASCADE ON UPDATE CASCADE
 );

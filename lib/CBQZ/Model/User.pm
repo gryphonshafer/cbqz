@@ -9,9 +9,11 @@ use CBQZ::Model::QuestionSet;
 
 extends 'CBQZ::Model';
 
-with 'CBQZ::Model::User::PreLogin';
-with 'CBQZ::Model::User::Role';
-with 'CBQZ::Model::User::Program';
+with qw(
+    CBQZ::Model::User::PreLogin
+    CBQZ::Model::User::Role
+    CBQZ::Model::User::Program
+);
 
 class_has 'schema_name' => ( isa => 'Str', is => 'ro', default => 'User' );
 
@@ -51,6 +53,7 @@ sub change_passwd ( $self, $passwd, $old_passwd ) {
     E->throw('Password provided does not match stored password')
         if ( defined $old_passwd and $self->obj->passwd ne sha256_hex($old_passwd) );
 
+    $self->event('change_passwd');
     return $self->obj->update({ passwd => $passwd });
 }
 
@@ -73,7 +76,7 @@ sub question_sets ($self) {
 
 sub shared_question_sets ($self) {
     my $question_sets = CBQZ::Model::QuestionSet->new->model(
-        map { $_->question_set } $self->obj->user_question_sets->search({ type => 'Share' })->all
+        map { $_->question_set } $self->obj->user_question_sets->search({ type => 'share' })->all
     );
 
     return (wantarray) ? @$question_sets : $question_sets;

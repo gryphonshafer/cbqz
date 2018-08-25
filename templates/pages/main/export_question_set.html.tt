@@ -1,0 +1,47 @@
+[%
+    page.title       = 'Question Set';
+    page.skip_layout = 1;
+    page.skip_style  = 1;
+%]
+
+<style type="text/css">
+    .unique_word {
+        font-weight: bold;
+        color: blue;
+    }
+    .unique_phrase {
+        font-weight: bold;
+        color: green;
+    }
+    .unique_chapter {
+        font-weight: bold;
+        color: red;
+    }
+</style>
+
+<table class="tabular">
+    <tr>
+        <th>Book</th>
+        <th>Chapter</th>
+        <th>Verse</th>
+        <th>Question</th>
+        <th>Answer</th>
+        <th>Type</th>
+        <th>Used</th>
+        <th>Marked</th>
+        <th>Score</th>
+    </tr>
+    [% FOR question IN questions %]
+        <tr>
+            <td>[% question.book %]</td>
+            <td>[% question.chapter %]</td>
+            <td>[% question.verse %]</td>
+            <td>[% question.question %]</td>
+            <td>[% question.answer %]</td>
+            <td>[% question.type %]</td>
+            <td>[% question.used %]</td>
+            <td>[% question.marked %]</td>
+            <td>[% question.score %]</td>
+        </tr>
+    [% END %]
+</table>

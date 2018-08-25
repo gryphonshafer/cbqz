@@ -112,6 +112,7 @@ sub emergency ( $self, @params ) { return $self->log->emergency( $self->dp(@para
 sub emerg     ( $self, @params ) { return $self->log->emerg    ( $self->dp(@params) ) }
 
 sub fork ( $self, $code ) {
+    $SIG{CHLD} = 'IGNORE';
     my $pid = fork();
     if ( defined($pid) and $pid == 0 ) {
         $code->();

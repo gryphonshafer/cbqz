@@ -8,10 +8,51 @@ use CBQZ::Util::File 'slurp';
 
 extends 'CBQZ::Model';
 
-class_has 'schema_name' => ( isa => 'Str', is => 'ro', default => 'Program' );
+class_has 'schema_name' => ( isa => 'Str',     is => 'ro', default => 'Program' );
+class_has 'defaults'    => ( isa => 'HashRef', is => 'ro', default => sub {
+    +{
+        target_questions => 40,
+        timer_default    => 30,
+        timeout          => 60,
+        timer_values     => [ 5, 30, 60 ],
+        readiness        => 20,
+        as_default       => 'Standard',
+        question_types   => [
+            [ ['INT'],                     [ 8, 12 ], 'INT' ],
+            [ ['MA'],                      [ 2,  7 ], 'MA'  ],
+            [ [ qw( CR CVR MACR MACVR ) ], [ 3,  5 ], 'Ref' ],
+            [ [ qw( Q Q2V ) ],             [ 1,  2 ], 'Q'   ],
+            [ [ qw( FT FTN FTV F2V ) ],    [ 2,  3 ], 'F'   ],
+            [ ['SIT'],                     [ 0,  4 ], 'SIT' ],
+        ],
+        score_types      => [
+            '3-Team 20-Question',
+            '2-Team 15-Question Tie-Breaker',
+            '2-Team 20-Question',
+            '2-Team Overtime',
+            '3-Team Overtime',
+        ],
+    }
+} );
 
-sub rs ($self) {
-    my $programs = $self->SUPER::rs;
+sub default ( $self, $name ) {
+    return ( $name eq 'result_operation' )
+        ? slurp( $self->config->get( qw( config_app root_dir ) ) . '/static/js/pages/result_operation.js' )
+        : ( exists $self->defaults->{$name} ) ? $self->defaults->{$name} : undef;
+}
+
+sub string_defaults ($self) {
+    return {
+        question_types   => $self->question_types_as_text( $self->default('question_types') ),
+        timer_values     => join( ', ', @{ $self->default('timer_values') } ),
+        score_types      => join( "\n", @{ $self->default('score_types') } ),
+        result_operation => $self->default('result_operation'),
+        map { $_ => $self->default($_) } qw( target_questions timer_default timeout readiness as_default ),
+    };
+}
+
+sub rs ( $self, @params ) {
+    my $programs = $self->SUPER::rs(@params);
     return ( $programs->count ) ? $programs : $self->create_default;
 }
 
@@ -19,27 +60,12 @@ sub create_default ($self) {
     my $rs = $self->db->resultset( $self->schema_name )->result_source->resultset;
 
     $rs->set_cache([ $rs->create({
-        name           => 'Default Quiz Program',
-        question_types => $self->json->encode([
-            [ ['INT'],                     [ 8, 12 ], 'INT' ],
-            [ ['MA'],                      [ 2,  7 ], 'MA'  ],
-            [ [ qw( CR CVR MACR MACVR ) ], [ 3,  5 ], 'Ref' ],
-            [ [ qw( Q Q2V ) ],             [ 1,  2 ], 'Q'   ],
-            [ [ qw( FT FTN FTV F2V ) ],    [ 2,  3 ], 'F'   ],
-            [ ['SIT'],                     [ 0,  4 ], 'SIT' ],
-        ]),
-        result_operation => slurp(
-            $self->config->get( qw( config_app root_dir ) ) . '/static/js/pages/result_operation.js'
-        ),
-        timer_values => $self->json->encode([ 5, 30, 60 ]),
-        as_default   => 'Standard',
-        score_types  => $self->json->encode([
-            '3-Team 20-Question',
-            '2-Team 15-Question Tie-Breaker',
-            '2-Team 20-Question',
-            '2-Team Overtime',
-            '3-Team Overtime',
-        ]),
+        name             => 'Default Quiz Program',
+        question_types   => $self->json->encode( $self->default('question_types') ),
+        result_operation => $self->default('result_operation'),
+        timer_values     => $self->json->encode( $self->default('timer_values') ),
+        as_default       => $self->default('as_default'),
+        score_types      => $self->json->encode( $self->default('score_types') ),
     })->get_from_storage ]);
 
     return $rs;
@@ -119,10 +145,10 @@ sub admin_data ( $self, $user, $roles ) {
         }
         sort { $a->obj->name cmp $b->obj->name }
         (
-            ( $user->has_role('Administrator') )
+            ( $user->has_role('administrator') )
                 ? CBQZ::Model::Program->new->every
                 : grep {
-                    $user->has_role( 'Director', $_->obj->id )
+                    $user->has_role( 'director', $_->obj->id )
                 } @{ $user->programs }
         )
     ];
@@ -135,17 +161,18 @@ sub question_types_parse ( $self, $text ) {
             [ \@types, [ $min, $max ], $label ];
         }
         grep { /^\W*\w+\W+\w+\W+\w+\W+\w+/ }
-        split( /\r?\n/, $text )
+        split( /\r?\n/, $text // '' )
     ];
 }
 
-sub question_types_as_text ( $self, $json = undef ) {
-    $json //= $self->obj->question_types;
+sub question_types_as_text ( $self, $question_types = undef ) {
+    $question_types //= $self->obj->question_types;
+    $question_types = $self->json->decode($question_types) unless ( ref $question_types );
 
     return join( "\n",
         map {
             $_->[2] . ': ' . $_->[1][0] . '-' . $_->[1][1] . ' (' . join( ' ', @{ $_->[0] } ) . ')'
-        } @{ $self->json->decode($json) }
+        } @$question_types
     );
 }
 

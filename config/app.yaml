@@ -1,6 +1,6 @@
 ---
 default:
-    version: 14
+    version: 15.6.2
     logging:
         log_dir: runtime
         log_file: app.log
@@ -12,7 +12,6 @@ default:
         filter:
             - email
     data: data # location for "data" directory
-    optional_include: runtime/config.yaml
     mojolicious:
         session_cookie_name: cbqz_session
         secrets:
@@ -42,6 +41,7 @@ default:
                 - templates/emails
     email:
         from: CBQZ Application <g@cbqz.org>
+        active: 0
     database:
         database: cbqz
         host: 127.0.0.1
@@ -58,15 +58,15 @@ default:
             debug: 1
             file: runtime/dbic_sql.sql
             profile: console
-    recaptcha:
-        public_key: 6LeGUjEUAAAAAHGfypaiPnD3r32I8sp7a8QeqYQg
-        private_key: 6LftUTEUAAAAAKk9ZR886rf0l-3CuFzV_hTkt8gq
+    program:
+        force_default_result_operation: 0
 +|+|production:
     database:
         logging: ~
     logging:
         filter: ~
+    email:
+        active: 1
     recaptcha:
         public_key: 6LftUTEUAAAAALtbl98u4t4udXIAh9YpVnYRPdoP
-        private_key: 6LeGUjEUAAAAAFvCPhrKLU0q5k7hlPS9toYr_Kl3
-optional_include: runtime/config_overrides.yaml
+optional_include: runtime/config.yaml

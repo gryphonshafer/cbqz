@@ -6,6 +6,7 @@ use exact;
 use Mojo::DOM;
 use Time::Out 'timeout';
 use Try::Tiny;
+use CBQZ::Model::QuestionSet;
 
 extends 'CBQZ::Model';
 
@@ -18,31 +19,43 @@ sub is_owned_by ( $self, $user ) {
     ) ? 1 : 0;
 }
 
-sub is_usable_by ( $self, $user ) {
+sub is_shared_to ( $self, $user ) {
     return (
-        $self->is_owned_by($user) or
+        $user->obj->id and $self->obj->question_set->user_id and
         grep { $_->question_set_id == $self->obj->question_set->id }
-            $user->obj->user_question_sets->search({ type => 'Share' })->all
+            $user->obj->user_question_sets->search({ type => 'share' })->all
     ) ? 1 : 0;
 }
 
-{
-    my $material = [{}];
+sub is_usable_by ( $self, $user ) {
+    return ( $self->is_owned_by($user) or $self->is_shared_to($user) ) ? 1 : 0;
+}
 
-    my $first_5 = sub ($text) {
+sub is_shared_set ($self) {
+    $self->obj->question_set->user_question_sets->search({ type => 'share' })->count;
+}
+
+{
+    my $material         = [{}];
+    my @lower_case_words = ();
+
+    my $words = sub ($text) {
         $text =~ s/<[^>]+>//g;
+        $text =~ s/\W/ /g;
         $text =~ s/\s+/ /g;
         $text =~ s/(^\s+|\s+$)//g;
+        return [ split( /\s/, $text ) ];
+    };
 
-        my @text = split( /\s/, $text );
-
+    my $first_5 = sub ($text) {
+        my @text = @{ $words->($text) };
         return
-            join( ' ', @text[ 0 .. 4 ] ),
-            join( ' ', @text[ 5 .. @text - 1 ] );
+            join( ' ', grep { $_ } @text[ 0 .. 4 ] ),
+            join( ' ', grep { $_ } @text[ 5 .. @text - 1 ] );
     };
 
     my $get_2_verses = sub ($data) {
-        return
+        my @verses =
             sort { $a->{verse} <=> $b->{verse} }
             grep {
                 $_->{book} eq $data->{book} and
@@ -52,6 +65,9 @@ sub is_usable_by ( $self, $user ) {
                     $_->{verse} == $data->{verse} + 1
                 )
             } @$material;
+
+        E->throw('Unable to lookup material based on reference') unless ( $verses[0]->{text} );
+        return @verses;
     };
 
     my $case = sub ($text) {
@@ -75,7 +91,7 @@ sub is_usable_by ( $self, $user ) {
         $text =~ s/(\w)/$1(?:<[^>]+>)*['-]*(?:<[^>]+>)*/g;
         $text =~ s/(?:^\s+|\s+$)//g;
         $text =~ s/\s/(?:<[^>]+>|\\W)+/g;
-        $text = '(?:<[^>]+>)*\b' . $text . '\b';
+        $text = '(?:[\'\"])?(?:<[^>]+>)*\b' . $text . '\b';
 
         return $text;
     };
@@ -111,6 +127,7 @@ sub is_usable_by ( $self, $user ) {
     my $save_back_match = sub ( $original, $match ) {
         my @brackets;
         push( @brackets, $1 ) while ( $original =~ /\[([^\]]*)\]/g );
+        @brackets = map { s/[.!?]$//; $_ } @brackets;
 
         return join( ' ', grep { defined } map {
             my $text = $prep_text_re->($_);
@@ -152,6 +169,11 @@ sub is_usable_by ( $self, $user ) {
         }
         $data->{question} = $save_back_match->( $data->{question}, $match );
 
+        if ( $skip_casing and $skip_casing eq 'answer_only' ) {
+            my $first_word = lc $words->( $data->{question} )->[0];
+            $data->{question} = lcfirst $data->{question} if ( grep { $first_word eq $_ } @lower_case_words );
+        }
+
         @matches = $search->( @$data{ qw( answer book chapter verse ) }, $range );
         E->throw('Unable to find answer match') if ( @matches == 0 );
 
@@ -163,7 +185,9 @@ sub is_usable_by ( $self, $user ) {
     };
 
     my $type_fork = sub ($data) {
-        $data->{$_} =~ s/<[^>]*>//g for ( qw( question answer ) );
+        for ( qw( question answer ) ) {
+            $data->{$_} =~ s/<[^>]*>//g if ( defined $data->{$_} );
+        }
 
         if ( $data->{type} eq 'INT' or $data->{type} eq 'MA' ) {
             $data = $process_question->( $data, 0, 5, 0 );
@@ -203,34 +227,49 @@ sub is_usable_by ( $self, $user ) {
                 : join( ' ', map { $_->{text} } @verses );
         }
         elsif ( $data->{type} eq 'FTV' or $data->{type} eq 'F2V' ) {
-            my @verses = $get_2_verses->($data);
+            my @verses        = $get_2_verses->($data);
+            my ($punctuation) = $verses[0]->{text} =~ /([\~\!\(\)\-\:\;\'\"\,\.\?]+)$/;
+
             ( $data->{question}, $data->{answer} ) = $first_5->( $verses[0]->{text} );
+
             $data = $process_question->( $data, 1, 0, 1 );
             return unless ($data);
 
             $data->{question} .= '...' unless ( $data->{question} =~ /\.{3}$/ );
             $data->{answer} = '...' . $data->{answer} unless ( $data->{answer} =~ /^\.{3}/ );
-
-            $data->{answer} .= ' ' . $verses[1]->{text} if ( $data->{type} eq 'F2V' );
+            $data->{answer} .= ( $punctuation || '' ) . ' ' . $verses[1]->{text} if ( $data->{type} eq 'F2V' );
         }
         elsif ( $data->{type} eq 'FT' or $data->{type} eq 'FTN' ) {
-            my @verses = $get_2_verses->($data);
-            ( $data->{question}, $data->{answer} ) = $first_5->( $data->{question} . ' ' . $data->{answer} );
+            my $quote_off  = sub { while ( $_[0] =~ s/(<[^">]*)"([^"]+)"/$1'$2'/g ) {} };
+            my $quote_back = sub { while ( $_[0] =~ s/(<[^'>]*)'([^']+)'/$1"$2"/g ) {} };
+
+            my @verses        = $get_2_verses->($data);
+            my ($punctuation) = $verses[0]->{text} =~ /([\~\!\(\)\-\:\;\'\"\,\.\?]+)$/;
+
+            $quote_off->( $verses[0]->{text} );
+            $verses[0]->{text} =~ s/^[^"]+"//;
+            $quote_back->( $verses[0]->{text} );
+
+            ( $data->{question}, $data->{answer} ) = $first_5->( $verses[0]->{text} );
 
             $data = $process_question->( $data, 1, 0, 1 );
             return unless ($data);
 
             $data->{question} .= '...' unless ( $data->{question} =~ /\.{3}$/ );
             $data->{answer} = '...' . $data->{answer} unless ( $data->{answer} =~ /^\.{3}/ );
+            $data->{answer} .= ( $punctuation || '' ) . ' ' . $verses[1]->{text} if ( $data->{type} eq 'FTN' );
 
-            $data->{answer} .= ' ' . $verses[1]->{text} if ( $data->{type} eq 'FTN' );
+            $quote_off->( $data->{answer} );
+            $data->{answer} =~ s/".*//;
+            $quote_back->( $data->{answer} );
         }
         else {
             E->throw('Auto-text not supported for question type');
         }
 
         $data->{answer} =~ s/[,:\-]+$//g;
-        $data->{answer} .= '.' unless ( $data->{answer} =~ /[.!?]$/ );
+        $data->{answer} .= '.' unless ( $data->{answer} =~ /[.!?]['"]*$/ );
+
         return $data;
     };
 
@@ -243,6 +282,13 @@ sub is_usable_by ( $self, $user ) {
         catch {
             E->throw('Unable to load material from provided material set');
         };
+
+        my %lower_case_words =
+            map { $_ => 1 }
+            grep { /^[a-z]/ }
+            map { @{ $words->( $_->{text} ) } }
+            @$material;
+        @lower_case_words = sort keys %lower_case_words;
 
         try {
             $question = $type_fork->($question);
@@ -354,8 +400,9 @@ sub calculate_score ( $self, $material_set, $question = undef ) {
             ( $words->($question_text) + $words->($answer_text) ) / 8;
     }
 
+    $score = sprintf( '%3.1f', $score );
     $self->obj->update({ score => $score }) if ( $self->obj );
-    return int( $score * 10 ) / 10;
+    return $score;
 }
 
 __PACKAGE__->meta->make_immutable;

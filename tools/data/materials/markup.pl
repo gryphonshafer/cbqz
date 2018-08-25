@@ -3,6 +3,8 @@ use exact;
 use Config::App;
 use Util::CommandLine qw( options pod2usage );
 use Text::CSV_XS 'csv';
+use Progress::Any;
+use Progress::Any::Output;
 
 my $settings = options( qw( input|i=s output|o=s ) );
 pod2usage unless ( $settings->{input} and $settings->{output} );
@@ -69,7 +71,11 @@ my $unique_phrases = [
 my $x   = qr![^A-Za-z0-9'\-]!;
 my $not = qr!$x+|$x*\-{2}$x*!;
 
-$| = 1;
+my $progress = Progress::Any->get_indicator( task => 'data', target => scalar(@$data) );
+Progress::Any::Output->set( { task => 'data' }, 'TermProgressBarColor' );
+
+say 'Processing ', scalar(@$data), ' verses...';
+
 for my $verse (@$data) {
     for (@$unique_phrases) {
         my ( $word_a, $word_b ) = @$_;
@@ -110,9 +116,10 @@ for my $verse (@$data) {
     $verse->{text} =~ s!\+!<span class="unique_chapter">!g;
     $verse->{text} =~ s!\^!<span class="unique_phrase">!g;
 
-    print '.';
+    $progress->update;
 }
-print "\n";
+
+$progress->finish;
 
 csv( in => [ map { [ @$_{ qw( is_para book chapter verse text ) } ] } @$data ], out => $settings->{output} );
 

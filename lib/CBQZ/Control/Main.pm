@@ -3,10 +3,13 @@ package CBQZ::Control::Main;
 use Mojo::Base 'Mojolicious::Controller';
 use exact;
 use Try::Tiny;
+use Text::Unidecode 'unidecode';
+use Text::CSV_XS 'csv';
 use CBQZ::Model::User;
 use CBQZ::Model::Program;
 use CBQZ::Model::MaterialSet;
 use CBQZ::Model::QuestionSet;
+use CBQZ::Model::Email;
 
 sub index ($self) {
     unless ( $self->stash('user') ) {
@@ -138,34 +141,50 @@ sub question_set_rename ($self) {
 }
 
 sub question_set_delete ($self) {
-    my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
+    try {
+        for my $set_id ( map { $_->{id} } @{
+            $self->cbqz->json->decode(
+                $self->req->param('set_data')
+            )
+        } ) {
+            my $set = CBQZ::Model::QuestionSet->new->load($set_id);
+            $set->obj->delete if ( $set and $set->is_owned_by( $self->stash('user') ) );
+        }
 
-    if ( $set and $set->is_owned_by( $self->stash('user') ) ) {
-        $set->obj->delete;
+        $self->stash('user')->event('question_sets_delete');
 
         $self->flash( message => {
             type => 'success',
-            text => 'Question set deleted.',
+            text => 'Question set(s) deleted.',
         } );
     }
-    else {
-        $self->flash( message => 'Failed to delete question set.' );
-    }
+    catch {
+        $self->flash( message => 'Failed to delete question set(s).' );
+    };
 
     return $self->redirect_to('/main/question_sets');
 }
 
-sub question_set_reset ($self) {
-    my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
-    if ( $set and $set->is_owned_by( $self->stash('user') ) ) {
-        $set->obj->questions->update({ used => 0 });
+sub question_sets_reset ($self) {
+    try {
+        for my $set_id ( map { $_->{id} } @{
+            $self->cbqz->json->decode(
+                $self->req->param('set_data')
+            )
+        } ) {
+            my $set = CBQZ::Model::QuestionSet->new->load($set_id);
+            $set->obj->questions->update({ used => 0 })
+                if ( $set and $set->is_owned_by( $self->stash('user') ) );
+        }
+
+        $self->stash('user')->event('question_sets_reset');
 
         $self->flash( message => {
             type => 'success',
             text => 'Question set use counters reset.',
         } );
     }
-    else {
+    catch {
         $self->flash( message => 'An error occurred; unable to reset set.' );
     };
 
@@ -179,6 +198,7 @@ sub clone_question_set ($self) {
             $self->stash('user'),
             $self->req->param('new_set_name'),
         );
+        $self->stash('user')->event('clone_question_set');
 
         $self->flash( message => {
             type => 'success',
@@ -286,6 +306,7 @@ sub edit_user ($self) {
         };
     }
 
+    $self->stash('user')->event('edit_user');
     return $self->redirect_to('/');
 }
 
@@ -297,25 +318,29 @@ sub question_sets ($self) {
                     %{ $_->data },
                     count => $_->obj->questions->count,
                     used  => $_->obj->questions->search( { used => { '>', 0 } } )->count,
-                    users => [
-                        sort { $a->{username} cmp $b->{username} }
-                        map {
-                            +{
-                                username => $_->user->username,
-                                realname => $_->user->realname,
-                                type     => $_->type,
-                            }
-                        }
-                        $_->obj->user_question_sets
-                    ],
+
+                    publish_all   => $_->obj->user_question_sets
+                        ->search({ type => 'publish', user_id => \q{ IS NULL }     })->count,
+                    publish_users => $_->obj->user_question_sets
+                        ->search({ type => 'publish', user_id => \q{ IS NOT NULL } })->count,
+                    share_all     => $_->obj->user_question_sets
+                        ->search({ type => 'share',   user_id => \q{ IS NULL }     })->count,
+                    share_users   => $_->obj->user_question_sets
+                        ->search({ type => 'share',   user_id => \q{ IS NOT NULL } })->count,
                 };
             } $self->stash('user')->question_sets
         ],
-        published_sets => [ map { +{
-            $_->question_set->get_inflated_columns,
-            count => $_->question_set->questions->count,
-            used  => $_->question_set->questions->search( { used => { '>', 0 } } )->count,
-        } } $self->stash('user')->obj->user_question_sets->search({ type => 'Publish' })->all ],
+        published_sets => [
+            map { +{
+                $_->question_set->get_inflated_columns,
+                count => $_->question_set->questions->count,
+                used  => $_->question_set->questions->search( { used => { '>', 0 } } )->count,
+            } }
+            $self->stash('user')->rs( 'UserQuestionSet', {
+                type    => 'publish',
+                user_id => [ $self->stash('user')->obj->id, undef ],
+            })->all
+        ],
     );
 }
 
@@ -323,8 +348,12 @@ sub set_select_users ($self) {
     my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
 
     $self->stash(
-        set   => $set,
-        users => $set->users_to_select( $self->stash('user'), $self->req->param('type') ),
+        set       => $set,
+        users     => $set->users_to_select( $self->stash('user'), $self->req->param('type') ),
+        all_users => $set->obj->user_question_sets->search({
+            type    => $self->req->param('type'),
+            user_id => undef,
+        })->count,
     );
 }
 
@@ -332,11 +361,31 @@ sub save_set_select_users ($self) {
     my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
 
     try {
-        $set->save_set_select_users(
-            $self->stash('user'),
-            $self->req->param('type'),
-            $self->req->every_param('selected_users'),
+        my $email = CBQZ::Model::Email->new( type => 'new_shared_set' );
+        $email->send({
+            to   => $_->obj->email,
+            data => {
+                realname => $_->obj->realname,
+                set_name => $set->obj->name,
+                sharer   => $self->stash('user')->obj->realname,
+            },
+        }) for (
+            map {
+                CBQZ::Model::User->new->load($_)
+            } @{
+                $set->save_set_select_users(
+                    $self->stash('user'),
+                    $self->req->param('type'),
+                    $self->req->every_param('selected_users'),
+                )
+            }
         );
+
+        $self->cbqz->dq->sql(
+            ( $self->req->param('all_users') )
+                ? 'INSERT INTO user_question_set ( user_id, question_set_id, type ) VALUES ( NULL, ?, ? )'
+                : 'DELETE FROM user_question_set WHERE user_id IS NULL AND question_set_id = ? AND type = ?'
+        )->run( $set->obj->id, $self->req->param('type') );
 
         $self->flash( message => {
             type => 'success',
@@ -345,6 +394,166 @@ sub save_set_select_users ($self) {
     }
     catch {
         $self->flash( message => 'An error occurred; failed to save user selection.' );
+    };
+
+    return $self->redirect_to('/main/question_sets');
+}
+
+sub export_question_set ($self) {
+    my $set = CBQZ::Model::QuestionSet->new->load( $self->req->param('question_set_id') );
+
+    if ( $set and $set->is_usable_by( $self->stash('user') ) ) {
+        $self->stash('user')->event('export_question_set');
+
+        $self->stash(
+            questions => [
+                sort {
+                    $a->{book} cmp $b->{book} or
+                    $a->{chapter} <=> $b->{chapter} or
+                    $a->{verse} <=> $b->{verse} or
+                    $a->{type} cmp $b->{type}
+                } @{ $set->get_questions([]) }
+            ],
+        );
+
+        ( my $filename = $set->obj->name . '.xls' ) =~ s/[\\\/:?"<>|]+/_/g;
+        $self->res->headers->content_type('application/vnd.ms-excel');
+        $self->res->headers->content_disposition(qq{attachment; filename="$filename"});
+    }
+    else {
+        $self->flash( message => 'Your user does not have rights to export the specified question set.' );
+        return $self->redirect_to('/main/question_sets');
+    }
+}
+
+sub import_question_set ($self) {
+    my $types_list = CBQZ::Model::Program->new->load(
+        $self->decode_cookie('cbqz_prefs')->{program_id}
+    )->types_list;
+
+    try {
+        my $question_import = $self->req->upload('question_import');
+        E->throw('Failed to retrieve import data')
+            unless ( $question_import->filename and $question_import->size );
+
+        my $csv_data = $question_import->slurp ||
+            E->throw('Input unreadable; may be binary instead of CSV text');
+
+        $csv_data //= '';
+        $csv_data =~ s/\r//g;
+
+        my $csv = csv( in => \$csv_data, headers => 'auto' ) ||
+            E->throw('Input not a valid CSV file as defined by the instructions on the page');
+
+        my $questions = [
+            grep {
+                my $type = $_->{type};
+
+                $_->{book} and
+                $_->{chapter} and
+                $_->{verse} and
+                $_->{type} and
+                $_->{question} and
+                $_->{answer} and
+                scalar( grep { $type eq $_ } @$types_list );
+            }
+            map {
+                my $question = $_;
+                $question = { map { lc( unidecode($_) ) => unidecode( $question->{$_} ) } keys %$question };
+
+                $question->{$_} =~ s/[<>]+//g for ( qw( question answer ) );
+                $question->{$_} =~ s/\s{2,}/ /g for ( qw( book chapter verse type question answer ) );
+                $question->{$_} =~ s/(^\s+|\s+$)//g for ( qw( book chapter verse type question answer ) );
+                $question->{$_} =~ s/[^A-z]+//g for ( qw( book type ) );
+                $question->{$_} =~ s/\D+//g for ( qw( chapter verse ) );
+
+                +{ map { $_ => $question->{$_} } qw( book chapter verse type question answer ) };
+            }
+            @$csv
+        ];
+
+        E->throw(
+            'Failed to parse uploaded data; Check that you have a CSV text file ' .
+            'with properly named column headers as per the page instructions; ' .
+            'Also check that your question types match the district program question types'
+        ) unless (@$questions);
+
+        my $set = CBQZ::Model::QuestionSet->new->create(
+            $self->stash('user'),
+            $self->req->param('question_set_name'),
+        )->import_questions(
+            $questions,
+            CBQZ::Model::MaterialSet->new->load( $self->decode_cookie('cbqz_prefs')->{material_set_id} ),
+        );
+
+        $self->stash('user')->event('import_question_set');
+
+        $self->flash( message => {
+            type => 'success',
+            text =>
+                'Import started successfully; Expecting to process ' . @$questions . ' records; ' .
+                'Note that a fair amount of post-processing of the imported ' .
+                'data will continue for a time after seeing this message; You can refresh this page and ' .
+                'look at the Questions Count number to monitor progress.',
+        } );
+    }
+    catch {
+        $self->flash( message => 'Import failed; ' . $self->clean_error($_) );
+    };
+
+    return $self->redirect_to('/main/question_sets');
+}
+
+sub merge_question_sets ($self) {
+    try {
+        CBQZ::Model::QuestionSet->new->merge(
+            [
+                map { $_->{id} } @{
+                    $self->cbqz->json->decode(
+                        $self->req->param('set_data')
+                    )
+                }
+            ],
+            $self->stash('user'),
+        );
+
+        $self->flash( message => {
+            type => 'success',
+            text => 'Question sets merged successfully.',
+        } );
+    }
+    catch {
+        $self->flash( message => 'An error occurred when trying to merge question sets.' );
+    };
+
+    return $self->redirect_to('/main/question_sets');
+}
+
+sub auto_kvl ($self) {
+    try {
+        my $material_set = CBQZ::Model::MaterialSet->new->load(
+            $self->decode_cookie('cbqz_prefs')->{material_set_id}
+        );
+
+        CBQZ::Model::QuestionSet->new->load( $_->{id} )->auto_kvl(
+            $material_set,
+            $self->stash('user'),
+        ) for ( @{
+            $self->cbqz->json->decode(
+                $self->req->param('set_data')
+            )
+        } );
+
+        $self->flash( message => {
+            type => 'success',
+            text =>
+                'Auto-KVL initiated successfully; The processing of data will continue for a time after ' .
+                'seeing this message; You can refresh this page and look at the Questions Count number ' .
+                'to monitor progress.',
+        } );
+    }
+    catch {
+        $self->flash( message => 'An error occurred when trying to auto-KVL.' );
     };
 
     return $self->redirect_to('/main/question_sets');

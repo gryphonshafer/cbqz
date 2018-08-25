@@ -1,0 +1,74 @@
+[%
+    page.title = 'Quiz Statistics';
+    page.menu  = 'stats';
+
+    page.js.push( '/js/utilities.js', '/js/pages/stats.js' );
+%]
+
+[% has_checkbox = 0 %]
+[% BLOCK quizzes_block %]
+    <h2>[% type.ucfirst %] Quizzes</h2>
+
+    [% IF quizzes.$type.size %]
+        <p>The following are [% type %] quizzes for which you have access to view.</p>
+
+        <table class="tabular">
+            <tbody>
+                [% FOR quiz IN quizzes.$type %]
+                    <tr class="quiz_table_row">
+                        [% IF type == 'closed' AND ( has_checkbox OR NOT quiz.official ) %]
+                            <td>
+                                [% UNLESS quiz.official %]
+                                    [% has_checkbox = 1 %]
+                                    <input type="checkbox" name="[% quiz.quiz_id %]">
+                                [% END %]
+                            </td>
+                        [% END %]
+                        <td><a
+                            href="[% c.url_for('/stats/quiz').query( id => quiz.quiz_id ) %]"
+                            title="Click to view: [% quiz.name | html_entity %]"
+                            >[% quiz.name %]</a></td>
+                        <td>[% ( quiz.official ) ? "Official" : "Practice" %]</td>
+                        <td>[% quiz.quizmaster %]</td>
+                        <td class="right">[% quiz.room %]</td>
+                        [% IF type == 'active' %]<td>[% quiz.question_number %]</td>[% END %]
+                        <td class="right">[% quiz.scheduled %]</td>
+                        <td class="right">[% quiz.created %]</td>
+                        <td class="right">[% quiz.last_modified %]</td>
+                    </tr>
+                [% END %]
+            </tbody>
+            <thead>
+                <tr>
+                    [% IF type == 'closed' AND has_checkbox %]<th></th>[% END %]
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Quizmaster</th>
+                    <th>Room</th>
+                    [% IF type == 'active' %]<th>Q#</th>[% END %]
+                    <th>Scheduled</th>
+                    <th>Created</th>
+                    <th>Last Modified</th>
+                </tr>
+            </thead>
+        </table>
+    [% ELSE %]
+        <p>There are no [% type %] quizzes for which you have access to view.</p>
+    [% END %]
+[% END %]
+
+[%
+    PROCESS quizzes_block, type = 'active';
+    closed_quizzes_block = BLOCK;
+        PROCESS quizzes_block, type = 'closed';
+    END;
+%]
+
+[% IF has_checkbox %]
+    <form method="post" action="[% c.url_for('/stats/delete') %]">
+        [% closed_quizzes_block %]
+        <input id="delete_button" type="submit" value="Delete Selected Closed Practice Quizzes" disabled="true">
+    </form>
+[% ELSE %]
+    [% closed_quizzes_block %]
+[% END %]

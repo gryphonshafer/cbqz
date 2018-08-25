@@ -1,9 +1,13 @@
 <script type="text/x-template" id="material-search-template">
     <div id="material_search">
         <div class="margin_lift">
-            <input type="text" ref="search_text_input" v-model="search_text" placeholder="Search Text" size="30">
-            <button v-on:click="go">Go</button>
-            <button v-on:click="find">Find <span class="key_text">Alt+F, F4</span></button>
+            <input type="text" ref="search_text_input" v-model="search_text" placeholder="Search Text"
+                size="30" title="Enter search text; search will run after 3 characters or click Gi">
+            <button v-on:click="go"
+                title="Run search now manually">Go</button>
+            <button v-on:click="find"
+                title="Run search based on any highlighted text"
+                >Find <span class="key_text">Alt+F, F4</span></button>
 
             <span id="material_serach_match_count" v-if="matched_verses && matched_verses.length">
                 {{ matched_verses.length }}
@@ -16,13 +20,17 @@
                 v-bind:name="'material_search_display_' + item.verse"
                 v-bind:class="{
                     htmlarea: true,
-                    selected: lookup.book == item.book && lookup.chapter == item.chapter && lookup.verse == item.verse
+                    selected:
+                        selected_ref.book == item.book &&
+                        selected_ref.chapter == item.chapter &&
+                        selected_ref.verse == item.verse
                 }"
             >
                 <span class="outdent">
                     <b class="material_para_markers" v-if="item.is_new_para">&para;</b>
 
                     <b v-if="clickable" class="clickable_reference" v-on:click="reference_click(item)"
+                        title="Display this verse in the reference material view"
                         >{{ item.book + ' ' + item.chapter + ':' + item.verse }}</b>
                     <b v-else>{{ item.book + ' ' + item.chapter + ':' + item.verse }}</b>
 
@@ -49,7 +57,12 @@
         data: function () {
             return {
                 search_text    : null,
-                matched_verses : null
+                matched_verses : null,
+                selected_ref   : {
+                    book    : null,
+                    chapter : null,
+                    verse   : null
+                }
             };
         },
         props: {
@@ -76,23 +89,13 @@
                         }
                     };
                 }
-            },
-            lookup: {
-                type    : Object,
-                default : function () {
-                    return {
-                        book    : null,
-                        chapter : null,
-                        verse   : null
-                    };
-                }
             }
         },
         methods: {
             go: function () {
                 this.search();
             },
-            find: function () {
+            find: function (moveFocus) {
                 var selection = document.getSelection();
                 if ( selection.rangeCount > 0 && selection.isCollapsed == 0 ) {
                     var search_text = "";
@@ -102,7 +105,7 @@
 
                     this.search_text = search_text;
                 }
-                this.$refs.search_text_input.focus();
+                if (moveFocus) this.$refs.search_text_input.focus();
             },
             search: function () {
                 this.matched_verses = [];
@@ -165,6 +168,11 @@
                         }
                     }
                 }
+            },
+            set_selected_ref: function ( book, chapter, verse ) {
+                this.selected_ref.book    = book;
+                this.selected_ref.chapter = chapter;
+                this.selected_ref.verse   = verse;
             },
             reference_click: function (verse) {
                 this.$emit( "reference-click", verse );

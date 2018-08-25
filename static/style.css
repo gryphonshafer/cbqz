@@ -92,6 +92,10 @@ table.tabular td {
     border-collapse: collapse;
 }
 
+table.background {
+    background-color: darkgray;
+}
+
 table.tabular th {
     background-color: lightgray;
     color: black;
@@ -122,14 +126,17 @@ table.numeric td {
     text-align: right;
 }
 
+table th.left,
 table td.left {
     text-align: left;
 }
 
+table th.center,
 table td.center {
     text-align: center;
 }
 
+table th.right,
 table td.right {
     text-align: right;
 }
@@ -206,8 +213,14 @@ div#header div#header_login form {
     margin-top: 5px;
 }
 
-div#header a.selected {
+div#header a.selected,
+div.sub_menu a.selected {
     font-family: bold;
+}
+
+div.sub_menu {
+    float: right;
+    margin-top: -10px;
 }
 
 @media ( max-width: 655px ) {
@@ -363,6 +376,14 @@ div#header_login input[type="password"]:hover {
 
 [v-cloak] {
     display: none;
+}
+
+.loading_spinner {
+    display: block;
+    content: " ";
+    width: 16px;
+    height: 16px;
+    background-image: url('data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==');
 }
 
 .hidden {
@@ -1037,40 +1058,40 @@ div#quizroom div#rearrange_quizzers fieldset {
 
 /* -------------------------------------------------------------------------- */
 
-form#program_config fieldset {
+form.admin_form fieldset {
     display: inline-block;
     vertical-align: top;
     margin-top: 5px;
     margin-bottom: 5px;
 }
 
-form#program_config textarea {
+form.admin_form textarea {
     font-family: normal;
     font-size: 13px;
     width: 200px;
     height: 137px;
 }
 
-form#program_config fieldset label {
+form.admin_form fieldset label {
     width: 250px;
     text-align: right;
     margin-bottom: 3px;
 }
 
-form#program_config fieldset label input[type=text] {
+form.admin_form fieldset label input[type=text] {
     width: 130px;
 }
 
-form#program_config fieldset#questions_and_timers input[type=text] {
+form.admin_form fieldset#questions_and_timers input[type=text] {
     width: 80px;
 }
 
-form#program_config input[type=submit] {
+form.admin_form input[type=submit] {
     display: block;
     margin-left: auto;
 }
 
-form#program_config fieldset#result_operation textarea {
+form.admin_form fieldset#result_operation textarea {
     width: 476px;
 }
 
@@ -1182,6 +1203,15 @@ div#printed_questions hr {
     border-top: 1px dashed lightgray;
     border-bottom: none;
     margin: 15px 0px 15px 0px;
+}
+
+/* -------------------------------------------------------------------------- */
+
+textarea#result_operation {
+    font-family: monospace !important;
+    font-size: 12px !important;
+    width: 800px !important;
+    height: 600px !important;
 }
 
 /* -------------------------------------------------------------------------- */

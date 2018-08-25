@@ -26,208 +26,233 @@
     </select>
 [% END %]
 
-<div id="editor" v-cloak v-bind:class="classes">
-    <div id="question_form">
-        <div>
-            <span class="label">Ref:</span>
-            <select id="book" tabindex="3" v-model="question.book">
-                <option v-for="item in metadata.books">{{ item }}</option>
-            </select>
+<div id="editor" v-bind:class="classes">
+    <div v-if="false" class="loading_spinner"></div>
+    <div v-cloak>
+        <div id="question_form">
+            <div>
+                <span class="label">Ref:</span>
+                <select id="book" tabindex="1" v-model="question.book" title="Book">
+                    <option v-for="item in metadata.books">{{ item }}</option>
+                </select>
 
-            <input type="text" tabindex="4" size="2" v-model="question.chapter">:<input
-                type="text" id="verse" tabindex="5" size="2" v-model="question.verse">
+                <input type="text" tabindex="2" size="2" v-model="question.chapter" title="Chapter">:<input
+                    type="text" id="verse" tabindex="3" size="2" v-model="question.verse" title="Verse Number">
 
-            <button tabindex="6" id="copy_verse" v-on:click="copy_verse" v-bind:disabled="verse_incomplete">
-                Copy Verse
-                <span class="key_text">Alt+V</span>
-            </button>
+                <button tabindex="4" id="copy_verse"
+                    v-on:click="copy_verse" v-bind:disabled="verse_incomplete"
+                    title="Copy the source material by reference into the question and answer fields"
+                >
+                    Copy Verse
+                    <span class="key_text">Alt+V</span>
+                </button>
 
-            <span class="label">Type:</span>
-            <select tabindex="7" v-model="question.type">
-                <option v-for="item in metadata.types">{{ item }}</option>
-            </select>
+                <button
+                    tabindex="14" id="lookup"
+                    v-on:click="lookup_reference" v-bind:disabled="verse_incomplete"
+                    title="View the question's verse defined by reference in the reference material"
+                >
+                    Lookup Verse
+                    <span class="key_text">Alt+G, F2</span>
+                </button>
+            </div>
+
+            <div>
+                <span class="label">Question: <span class="key_text">Alt+B</span></span>
+                <div id="question_text_box" tabindex="5" class="htmlarea question_box" contenteditable="true"
+                    ref="question" v-html="question.question"></div>
+            </div>
+
+            <div>
+                <button id="format_reset" v-on:click="format('clear')"
+                    title="For any selected content, reset the formatting"
+                    >Reset <span class="key_text">Alt+Q</span></button>
+
+                <button id="format_unique_word" v-on:click="format('unique_word')"
+                    title="For any selected content, set the format to unique word"
+                    >Global <span class="key_text">Alt+W, Ctrl+B</span></button>
+
+                <button id="format_unique_chapter" v-on:click="format('unique_chapter')"
+                    title="For any selected content, set the format to unique-to-chapter"
+                    >Chapter <span class="key_text">Alt+E, Ctrl+I</span></button>
+
+                <button id="format_unique_phrase" v-on:click="format('unique_phrase')"
+                    title="For any selected content, set the format to unique phrase"
+                    >Phrase <span class="key_text">Alt+R, Ctrl+U</span></button>
+            </div>
+
+            <div>
+                <span class="label">Answer: <span class="key_text">Alt+N</span></span>
+                <div id="answer_text_box" tabindex="6" class="htmlarea answer_box" contenteditable="true"
+                    ref="answer" v-html="question.answer"></div>
+            </div>
+
+            <div class="margin_lift">
+                <span class="label">Marked:</span>
+                <input tabindex="13" id="marked_comment" type="text" v-model="question.marked"
+                    placeholder="Marked Comment"
+                    title="Any content saved here results in a question being considered marked">
+            </div>
+
+            <div>
+                <span class="label">Type:</span>
+                <select tabindex="7" v-model="question.type" title="Question Type">
+                    <option v-for="item in metadata.types">{{ item }}</option>
+                </select>
+
+                <button
+                    tabindex="8" id="auto_text"
+                    v-on:click="auto_text" v-bind:disabled="new_question_incomplete"
+                    title="Auto-text attempts to automatically validate and format question and answer content"
+                >
+                    Auto-Text Magic
+                    <span class="key_text">Alt+Z</span>
+                </button>
+
+                <button v-on:click="toggle_questions_view"
+                    title="View all questions in this question set in a table">View All Questions List</button>
+            </div>
+
+            <div>
+                <button tabindex="9" id="save_changes"
+                    v-on:click="save_changes" v-bind:disabled="no_saved_question"
+                    title="Save the current content as an update to the existing question"
+                >Save Changes <span class="key_text">Alt+S, F9</span></button>
+
+                <button tabindex="10" id="save_new"
+                    v-on:click="save_new" v-bind:disabled="verse_incomplete"
+                    title="Save the current content as a new question"
+                >Save New <span class="key_text">Alt+A, F8</span></button>
+
+                <button tabindex="11" id="delete_question"
+                    v-on:click="delete_question" v-bind:disabled="no_saved_question"
+                    title="Delete the current question from the set (but don't clear the form)"
+                >Delete <span class="key_text">Alt+X</span></button>
+
+                <button tabindex="12" id="clear_form" v-on:click="clear_form"
+                    title="Clear the question form and reset all fields"
+                >Clear <span class="key_text">Alt+C</span></button>
+            </div>
         </div>
 
-        <div>
-            <span class="label">Question:</span>
-            <div tabindex="8" class="htmlarea question_box" contenteditable="true"
-                ref="question" v-html="question.question"></div>
-        </div>
+        <div id="questions_view" v-bind:class="{
+            page_panel: 1,
+            page_panel_full: 1,
+            hidden: questions_view_hidden
+        }">
+            <div class="page_panel_buttons">
+                <span class="label">Page:</span>
+                <input type="text" v-model="questions_view_page" size="2">
 
-        <div>
-            <button tabindex="18" id="format_reset" v-on:click="format('clear')"
-            >Reset <span class="key_text">Alt+Q</span></button>
+                <button v-on:click="questions_view_page--"
+                    title="View previous page">&larr;</button>
+                <button v-on:click="questions_view_page++"
+                    title="View next page">&rarr;</button>
 
-            <button tabindex="19" id="format_unique_word" v-on:click="format('unique_word')"
-            >Global <span class="key_text">Alt+W, Ctrl+B</span></button>
+                <span class="label">Size:</span>
+                <input type="text" v-model="questions_view_size" size="2">
 
-            <button tabindex="20" id="format_unique_chapter" v-on:click="format('unique_chapter')"
-            >Chapter <span class="key_text">Alt+E, Ctrl+I</span></button>
+                [% sort_select %]
 
-            <button tabindex="21" id="format_unique_phrase" v-on:click="format('unique_phrase')"
-            >Phrase <span class="key_text">Alt+R, Ctrl+U</span></button>
-        </div>
+                <span class="label">Compact:</span>
+                <input type="checkbox" v-model="overflow_active">
 
-        <div>
-            <span class="label">Answer:</span>
-            <div tabindex="9" class="htmlarea answer_box" contenteditable="true"
-                ref="answer" v-html="question.answer"></div>
-        </div>
+                <button v-on:click="toggle_questions_view">Close View</button>
+            </div>
 
-        <div class="margin_lift">
-            <span class="label">Marked:</span>
-            <input tabindex="15" id="marked_comment" type="text" v-model="question.marked">
-        </div>
+            <h2>All Questions List View</h2>
 
-        <div>
-            <button
-                tabindex="10" id="auto_text"
-                v-on:click="auto_text" v-bind:disabled="new_question_incomplete"
+            <table
+                v-if="all_questions.length > 0"
+                v-bind:class="{
+                    tabular: 1,
+                    overflow_active: overflow_active
+                }"
             >
-                Auto-Text Magic
-                <span class="key_text">Alt+Z</span>
-            </button>
+                <tr>
+                    <th>Reference</th>
+                    <th>Type</th>
+                    <th>Used</th>
+                    <th>Score</th>
+                    <th>Marked</th>
+                    <th>Question</th>
+                    <th>Answer</th>
+                </tr>
+                <tr v-for="this_q in all_questions">
+                    <td>{{ this_q.book + " " + this_q.chapter + ":" + this_q.verse }}</td>
+                    <td><a href="#"
+                        v-on:click="view_question( this_q.book, this_q.chapter, this_q.question_id )"
+                        v-bind:title="'View this ' +
+                            this_q.book + ' ' + this_q.chapter + ':' + this_q.verse + ' ' +
+                            this_q.type + ' question in the editor'"
+                    >{{ this_q.type }}</a></td>
+                    <td class="right">{{ this_q.used }}</td>
+                    <td class="right">{{ this_q.score }}</td>
+                    <td class="overflow_toggle">{{ this_q.marked }}</td>
+                    <td class="overflow_toggle" v-html="this_q.question"></td>
+                    <td class="overflow_toggle" v-html="this_q.answer"></td>
+                </tr>
+            </table>
 
-            <button tabindex="16" id="lookup" v-on:click="lookup_reference" v-bind:disabled="verse_incomplete">
-                Lookup Verse
-                <span class="key_text">Alt+G, F2</span>
-            </button>
-
-            <button tabindex="17" v-on:click="toggle_questions_view">View All Questions List</button>
+            <p v-if="all_questions.length == 0">
+                There is no data to display.
+            </p>
         </div>
 
-        <div>
-            <button tabindex="11" id="save_new"
-                v-on:click="save_new" v-bind:disabled="verse_incomplete"
-            >Save New <span class="key_text">Alt+A, F8</span></button>
+        <div id="questions_list">
+            <span class="label">Saved Questions ({{ this.total_questions }}):</span>
 
-            <button tabindex="12" id="save_changes"
-                v-on:click="save_changes" v-bind:disabled="no_saved_question"
-            >Save Changes <span class="key_text">Alt+S, F9</span></button>
+            <div>
+                <select v-model="questions.book">
+                    <option v-for="item in questions.books">{{ item }}</option>
+                </select>
+                <select v-model="questions.chapter">
+                    <option v-for="item in questions.chapters">{{ item }}</option>
+                </select>
+            </div>
 
-            <button tabindex="13" id="delete_question"
-                v-on:click="delete_question" v-bind:disabled="no_saved_question"
-            >Delete <span class="key_text">Alt+X</span></button>
+            <div class="margin_lift">
+                [% sort_select %]
+            </div>
 
-            <button tabindex="14" id="clear_form" v-on:click="clear_form"
-            >Clear <span class="key_text">Alt+C</span></button>
+            <div id="questions_list_prime_list" class="margin_lift">
+                <select tabindex="1" class="questions_list_list" v-model="questions.question_id" size="14">
+                    <option v-for="item in questions.questions" v-bind:value="item.question_id">{{
+                        item.verse + ' ' +
+                        ( ( !! item.type ) ? item.type : '[No Type]' ) + ' ' +
+                        '(' + item.used + ')' +
+                        ( ( !! item.score ) ? ' [' + item.score + ']' : '' ) +
+                        ( ( item.marked ) ? ' *' : '' )
+                    }}</option>
+                </select>
+            </div>
+
+            <span class="label">Marked Questions ({{ this.questions.marked_questions.length }}):</span>
+            <div>
+                <select tabindex="2" class="questions_list_list" v-model="questions.marked_question_id" size="6">
+                    <option v-for="item in this.questions.marked_questions" v-bind:value="item.question_id">{{
+                        item.book.replace( ' ', '' ).substr( 0, 2 ) + ' ' +
+                        item.chapter + ':' +
+                        item.verse + ' ' +
+                        ( ( !! item.type ) ? item.type : '[No Type]' )
+                    }}</option>
+                </select>
+            </div>
         </div>
+
+        <material-lookup
+            ref="material_lookup"
+            v-bind:material="material"
+            clickable="true"
+            v-on:reference-change="lookup_reference_change"
+            v-on:reference-click="lookup_reference_click"
+        ></material-lookup>
+
+        <material-search
+            ref="material_search"
+            v-bind:material="material"
+            clickable="true"
+            v-on:reference-click="search_reference_click"
+        ></material-search>
     </div>
-
-    <div id="questions_view" v-bind:class="{
-        page_panel: 1,
-        page_panel_full: 1,
-        hidden: questions_view_hidden
-    }">
-        <div class="page_panel_buttons">
-            <span class="label">Page:</span>
-            <input type="text" v-model="questions_view_page" size="2">
-
-            <button v-on:click="questions_view_page--">&larr;</button>
-            <button v-on:click="questions_view_page++">&rarr;</button>
-
-            <span class="label">Size:</span>
-            <input type="text" v-model="questions_view_size" size="2">
-
-            [% sort_select %]
-
-            <span class="label">Compact:</span>
-            <input type="checkbox" v-model="overflow_active">
-
-            <button v-on:click="toggle_questions_view">Close View</button>
-        </div>
-
-        <h2>All Questions List View</h2>
-
-        <table
-            v-if="all_questions.length > 0"
-            v-bind:class="{
-                tabular: 1,
-                overflow_active: overflow_active
-            }"
-        >
-            <tr>
-                <th>Reference</th>
-                <th>Type</th>
-                <th>Used</th>
-                <th>Score</th>
-                <th>Marked</th>
-                <th>Question</th>
-                <th>Answer</th>
-            </tr>
-            <tr v-for="this_q in all_questions">
-                <td>{{ this_q.book + " " + this_q.chapter + ":" + this_q.verse }}</td>
-                <td><a href="#"
-                    v-on:click="view_question( this_q.book, this_q.chapter, this_q.question_id )"
-                >{{ this_q.type }}</a></td>
-                <td class="right">{{ this_q.used }}</td>
-                <td class="right">{{ this_q.score }}</td>
-                <td class="overflow_toggle">{{ this_q.marked }}</td>
-                <td class="overflow_toggle" v-html="this_q.question"></td>
-                <td class="overflow_toggle" v-html="this_q.answer"></td>
-            </tr>
-        </table>
-
-        <p v-if="all_questions.length == 0">
-            There is no data to display.
-        </p>
-    </div>
-
-    <div id="questions_list">
-        <span class="label">Saved Questions ({{ this.total_questions }}):</span>
-
-        <div>
-            <select v-model="questions.book">
-                <option v-for="item in questions.books">{{ item }}</option>
-            </select>
-            <select v-model="questions.chapter">
-                <option v-for="item in questions.chapters">{{ item }}</option>
-            </select>
-        </div>
-
-        <div class="margin_lift">
-            [% sort_select %]
-        </div>
-
-        <div id="questions_list_prime_list" class="margin_lift">
-            <select tabindex="1" class="questions_list_list" v-model="questions.question_id" size="14">
-                <option v-for="item in questions.questions" v-bind:value="item.question_id">{{
-                    item.verse + ' ' +
-                    ( ( !! item.type ) ? item.type : '[No Type]' ) + ' ' +
-                    '(' + item.used + ')' +
-                    ( ( !! item.score ) ? ' [' + item.score + ']' : '' ) +
-                    ( ( item.marked ) ? ' *' : '' )
-                }}</option>
-            </select>
-        </div>
-
-        <span class="label">Marked Questions ({{ this.questions.marked_questions.length }}):</span>
-        <div>
-            <select tabindex="2" class="questions_list_list" v-model="questions.marked_question_id" size="6">
-                <option v-for="item in this.questions.marked_questions" v-bind:value="item.question_id">{{
-                    item.book.replace( ' ', '' ).substr( 0, 2 ) + ' ' +
-                    item.chapter + ':' +
-                    item.verse + ' ' +
-                    ( ( !! item.type ) ? item.type : '[No Type]' )
-                }}</option>
-            </select>
-        </div>
-    </div>
-
-    <material-lookup
-        ref="material_lookup"
-        v-bind:material="material"
-        v-bind:lookup="lookup"
-        clickable="true"
-        v-on:reference-change="lookup_reference_change"
-        v-on:reference-click="lookup_reference_click"
-    ></material-lookup>
-
-    <material-search
-        ref="material_search"
-        v-bind:material="material"
-        v-bind:lookup="lookup"
-        clickable="true"
-        v-on:reference-click="search_reference_click"
-    ></material-search>
 </div>

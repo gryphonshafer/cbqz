@@ -1,59 +1,72 @@
 [%
     page.title = 'Manage Question Sets';
-    page.js.push( '/main/path.js', '/js/pages/question_sets.js' );
+    page.js.push( '/main/path.js', '/js/utilities.js', '/js/pages/question_sets.js' );
 %]
 
 [% IF user_question_sets %]
     <h2>Question Sets for User: [% user.obj.username %]</h2>
-    <button type="button" onclick="question_set_create()">Create New Set</button>
+    <p><button type="button" onclick="question_set_create()">Create New Set</button></p>
 
-    [% FOR set IN user_question_sets %]
-        <h3>[% set.name %]</h3>
-        <ul>
-            <li>Created: <b>[% set.created %]</b></li>
-            <li>Last Modified: <b>[% set.last_modified %]</b></li>
-            <li>Questions Count: <b>[% set.count.commify %]</b></li>
-            <li>Questions Used: <b>[% set.used.commify %]</b></li>
-        </ul>
-
-        [% IF set.users.size %]
-            <p>You have published or shared this question set to the following users:</p>
-            <ul>
-                [% FOR this_user IN set.users %]
-                    <li>[% this_user.username %] ([% this_user.type %])</li>
-                [% END %]
-            </ul>
+    <table class="tabular">
+        <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Questions</th>
+            <th>Used</th>
+            <th>Published</th>
+            <th>Shared</th>
+            <th>Created</th>
+            <th>Last Modified</th>
+        </tr>
+        [% FOR set IN user_question_sets %]
+            <tr>
+                <td class="center">
+                    <input type="checkbox" class="question_set_checkbox"
+                        name="question_sets" value="[% set.question_set_id %]">
+                </td>
+                <td>[% set.name %]</td>
+                <td class="right">[% set.count.commify %]</td>
+                <td class="right">[% set.used.commify %]</td>
+                <td class="right">[% ( set.publish_all ) ? 'All' : set.publish_users %]</td>
+                <td class="right">[% ( set.share_all ) ? 'All' : set.share_users %]</td>
+                <td>[% set.created %]</td>
+                <td>[% set.last_modified %]</td>
+            </tr>
         [% END %]
+    </table>
 
-        <button type="button" onclick="question_set_reset([% set.question_set_id %])">Reset</button>
-        <button type="button" onclick="question_set_rename([% set.question_set_id %])">Rename</button>
-        <button type="button" onclick="
-            clone_question_set(
-                [% set.question_set_id %],
-                '[% set.name.replace( '\'', '\\\'' ) %]'
-            )
-        ">Clone</button>
-        <button type="button"
-            onclick="publish_share_set( [% set.question_set_id %], 'Publish' )">Set Publish To</button>
-        <button type="button"
-            onclick="publish_share_set( [% set.question_set_id %], 'Share' )">Set Share To</button>
-        <button type="button" onclick="question_set_delete([% set.question_set_id %])">Delete</button>
-    [% END %]
+    <div>
+        <button type="button" disabled="true" id="reset">Reset</button>
+        <button type="button" disabled="true" id="rename">Rename</button>
+        <button type="button" disabled="true" id="clone">Clone</button>
+        <button type="button" disabled="true" id="publish">Set Publish To</button>
+        <button type="button" disabled="true" id="share">Set Share To</button>
+        <button type="button" disabled="true" id="delete">Delete</button>
+        <button type="button" disabled="true" id="export">Export</button>
+        <button type="button" disabled="true" id="merge">Merge</button>
+        <button type="button" disabled="true" id="auto-kvl">Auto-KVL</button>
+    </div>
 [% ELSE %]
     <h2>No Question Sets for User: [% user.obj.username %]</h2>
     <p>There don't appear to be any question sets for user: [% user.obj.username %].</p>
+    <p><button type="button" onclick="question_set_create()">Create New Set</button></p>
 [% END %]
 
 [% IF published_sets.size %]
     <h2>Published Question Sets from Other Users</h2>
+    <p>
+        The following are question sets published from other users. If you click
+        on a name in this list, the set will be cloned to your list of question
+        sets.
+    </p>
 
     <table class="tabular">
         <tr>
             <th>Name</th>
-            <th>Created</th>
-            <th>Last Modified</th>
             <th>Questions</th>
             <th>Used</th>
+            <th>Created</th>
+            <th>Last Modified</th>
         </tr>
         [% FOR set IN published_sets %]
             <tr>
@@ -63,11 +76,30 @@
                         '[% set.name.replace( '\'', '\\\'' ) %]'
                     )
                 ">[% set.name %]</a></td>
-                <td>[% set.created %]</td>
-                <td>[% set.last_modified %]</td>
                 <td class="right">[% set.count.commify %]</td>
                 <td class="right">[% set.used.commify %]</td>
+                <td>[% set.created %]</td>
+                <td>[% set.last_modified %]</td>
             </tr>
         [% END %]
     </table>
 [% END %]
+
+<h2>Questions Data Import</h2>
+
+<p>
+    To import questions data, you need to create a comma-separated file (CSV)
+    with the first row being a header row and containing the following columns
+    (in any order):
+    <br>
+    Book, Chapter, Verse, Type, Question, Answer
+</p>
+
+<form action="[% c.url_for('/main/import_question_set') %]" method="post" enctype="multipart/form-data">
+    <fieldset>
+        <legend>Upload CSV of Questions Data</legend>
+        <label>New Question Set Name: <input type="text" name="question_set_name"></label>
+        <input type="file" name="question_import">
+        <button>Import</button>
+    </fieldset>
+</form>

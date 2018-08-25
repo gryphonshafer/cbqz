@@ -4,6 +4,29 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
     data.official       = false;
     data.save_for_later = false;
 
+    var cbqz_prefs = get_json_cookie("cbqz_prefs");
+    data.question_types = ( !! cbqz_prefs && !! cbqz_prefs.question_types )
+        ? cbqz_prefs.question_types
+        : data.program_question_types;
+
+    if ( ! data.quiz_teams_quizzers ) {
+        var teams_count   = 3;
+        var team_size     = 4;
+        var quizzer_names = new Array(
+            "Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Gulf", "Hotel", "India", "Juliet",
+            "Kilo", "Lima", "Mike", "November", "Oscar", "Papa", "Quebec", "Romeo", "Sierra", "Tango",
+            "Uniform", "Victor", "Whiskey", "X-ray", "Yankee", "Zulu"
+        );
+        data.quiz_teams_quizzers = "";
+        for ( var code = 65; code < 65 + teams_count; code++ ) {
+            if ( data.quiz_teams_quizzers.length > 0 ) data.quiz_teams_quizzers += "\n\n";
+            data.quiz_teams_quizzers += "Team " + String.fromCharCode(code);
+            for ( var bib = 1; bib <= team_size; bib++ ) {
+                data.quiz_teams_quizzers += "\n" + bib + ". " + quizzer_names.shift() + " Quizzer";
+            }
+        }
+    }
+
     new Vue({
         el: "#quiz_setup",
         data: data,
@@ -61,8 +84,8 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
                     }
                 }
             },
-            start_quiz: function (quiz_id) {
-                document.location.href = cntlr + "/quiz?id=" + quiz_id;
+            reset_question_types: function () {
+                this.question_types = this.program_question_types;
             }
         },
 
@@ -78,7 +101,7 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
                 if ( this.weight_chapters > count ) this.weight_chapters = count;
                 return count;
             },
-            generate_ready: function () {
+            not_generate_ready: function () {
                 return (
                     this.name.length > 0 &&
                     this.quizmaster.length > 0 &&
@@ -89,8 +112,11 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
                     this.timer_default > 0 &&
                     this.timer_values.length > 0 &&
                     this.selected_chapters_count > 0
-                ) ? true : false;
-            }
+                ) ? false : true;
+            },
+            can_reset_question_types: function () {
+                return ( this.question_types != this.program_question_types ) ? true : false;
+            },
         },
 
         watch: {

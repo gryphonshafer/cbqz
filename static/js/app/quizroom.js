@@ -2,11 +2,6 @@ var beep = new Audio( cntlr + "/../beep.mp3" );
 
 Vue.http.get( cntlr + "/data" ).then( function (response) {
     var data = response.body;
-    data.lookup = {
-        book    : null,
-        chapter : null,
-        verse   : null
-    };
     data.question = {
         number   : null,
         type     : null,
@@ -36,6 +31,9 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
     data.classes = {
         cursor_progress : false
     };
+    if ( ! data.metadata.quiz_teams_quizzers_original )
+        data.metadata.quiz_teams_quizzers_original =
+        JSON.parse( JSON.stringify( data.metadata.quiz_teams_quizzers ) );
 
     function result_operation_process ( vue_obj, input, skip_post_processing ) {
         if ( !! input.team ) {
@@ -58,7 +56,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
         var result_data = result_operation( JSON.parse( JSON.stringify(input) ) );
 
-        if ( !! result_data.sk_types ) vue_obj.metadata.score_types = result_data.sk_types;
+        if ( !! result_data.sk_type ) vue_obj.metadata.score_type = result_data.sk_type;
 
         if ( ! skip_post_processing ) {
             for ( var i = 0; i < vue_obj.metadata.quiz_teams_quizzers.length; i++ ) {
@@ -98,6 +96,10 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                                     input.number
                                 ] = result_data.label;
                             }
+
+                            if ( !! result_data.quizzer )
+                                vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].score += result_data.quizzer;
+
                             break;
                         }
                     }
@@ -119,9 +121,11 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     parseInt( this.question.chapter ) > 0 &&
                     parseInt( this.question.verse ) > 0
                 ) {
-                    this.lookup.book    = this.question.book;
-                    this.lookup.chapter = this.question.chapter;
-                    this.lookup.verse   = this.question.verse;
+                    this.$refs.material_lookup.lookup_reference(
+                        this.question.book,
+                        this.question.chapter,
+                        this.question.verse
+                    );
                 }
                 else {
                     alert("Incomplete reference; lookup not possible.");
@@ -312,6 +316,11 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
                         this.question.as     = result_data.as;
                         this.question.number = result_data.number;
+
+                        this.$http.post( cntlr + "/status", {
+                            quiz_id         : this.metadata.quiz_id,
+                            question_number : this.question.number
+                        } );
                     }
 
                     this.classes.cursor_progress = false;
@@ -333,39 +342,11 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 if ( confirm("Are you sure you want to delete this quiz event?") ) {
                     this.classes.cursor_progress = true;
 
-                    for ( var i = 0; i < this.metadata.quiz_teams_quizzers.length; i++ ) {
-                        this.metadata.quiz_teams_quizzers[i].team.score = parseInt( this.metadata.readiness );
+                    this.metadata.quiz_teams_quizzers =
+                        JSON.parse( JSON.stringify( this.metadata.quiz_teams_quizzers_original ) );
 
-                        if ( !! this.metadata.quiz_teams_quizzers[i].team.events )
-                            delete this.metadata.quiz_teams_quizzers[i].team.events;
-
-                        for ( var j = 0; j < this.metadata.quiz_teams_quizzers[i].quizzers.length; j++ ) {
-                            if ( !! this.metadata.quiz_teams_quizzers[i].quizzers[j].events )
-                                delete this.metadata.quiz_teams_quizzers[i].quizzers[j].events;
-                        }
-                    }
-
-                    for ( var i = this.quiz_questions.length - 1; i >= 0; i-- ) {
-                        if (
-                            this.quiz_questions && this.quiz_questions[i] &&
-                            this.quiz_questions[i].question_number == question_number
-                        ) {
-                            this.quiz_questions.splice( i, 1 );
-                        }
-
-                        if ( this.quiz_questions && this.quiz_questions[i] )
-                            result_operation_process(
-                                this,
-                                {
-                                    number  : this.quiz_questions[i].question_number,
-                                    as      : this.quiz_questions[i].question_as,
-                                    form    : this.quiz_questions[i].form,
-                                    result  : this.quiz_questions[i].result,
-                                    quizzer : this.quiz_questions[i].quizzer,
-                                    team    : this.quiz_questions[i].team
-                                }
-                            );
-                    }
+                    this.quiz_questions.shift();
+                    this.quiz_build_up();
 
                     this.$http.post( cntlr + "/delete_quiz_event", {
                         metadata        : this.metadata,
@@ -488,15 +469,19 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             },
 
             lookup_reference_change: function ( book, chapter, verse ) {
-                this.lookup.book    = book;
-                this.lookup.chapter = chapter;
-                this.lookup.verse   = verse;
+                this.$refs.material_search.set_selected_ref(
+                    book,
+                    chapter,
+                    verse
+                );
             },
 
             search_reference_click: function (verse) {
-                this.lookup.book    = verse.book;
-                this.lookup.chapter = verse.chapter;
-                this.lookup.verse   = verse.verse;
+                this.$refs.material_lookup.lookup_reference(
+                    verse.book,
+                    verse.chapter,
+                    verse.verse
+                );
             },
 
             select_quizzer: function ( team, quizzer ) {
@@ -504,6 +489,13 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.active_quizzer = quizzer;
 
                 if ( this.timer.state != "running" ) this.timer_click();
+
+                this.$http.post( cntlr + "/status", {
+                    quiz_id         : this.metadata.quiz_id,
+                    question_number : this.question.number,
+                    team            : this.active_team,
+                    quizzer         : this.active_quizzer
+                } );
             },
 
             reset_quiz_select: function () {
@@ -511,6 +503,44 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.active_quizzer = {};
 
                 this.set_timer( this.metadata.timer_default );
+
+                this.$http.post( cntlr + "/status", {
+                    quiz_id         : this.metadata.quiz_id,
+                    question_number : this.question.number
+                } );
+            },
+
+            quiz_build_up: function (skip_post_processing) {
+                this.position        = 0;
+                this.question        = this.questions[0];
+                this.question.number = 1;
+                this.question.as     = this.metadata.as_default;
+
+                var reverse_quiz_questions = this.quiz_questions.slice().reverse();
+                for ( var i = 0; i < reverse_quiz_questions.length; i++ ) {
+                    var result_data = result_operation_process(
+                        this,
+                        {
+                            number  : this.question.number,
+                            as      : this.question.as,
+                            form    : reverse_quiz_questions[i].form,
+                            result  : reverse_quiz_questions[i].result,
+                            quizzer : reverse_quiz_questions[i].quizzer,
+                            team    : reverse_quiz_questions[i].team
+                        },
+                        skip_post_processing
+                    );
+
+                    this.move_question("forward");
+
+                    this.question.as     = result_data.as;
+                    this.question.number = result_data.number;
+
+                    this.$http.post( cntlr + "/status", {
+                        quiz_id         : this.metadata.quiz_id,
+                        question_number : this.question.number
+                    } );
+                }
             }
         },
         computed: {
@@ -531,39 +561,12 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             this.set_type_counts();
         },
         mounted: function () {
-            if ( this.questions.length > 0 ) {
-                this.question        = this.questions[ this.position ];
-                this.question.number = 1;
-                this.question.as     = this.metadata.as_default;
-
-                var reverse_quiz_questions = this.quiz_questions.slice().reverse();
-                for ( var i = 0; i < reverse_quiz_questions.length; i++ ) {
-                    var as     = this.questions[i].as     = reverse_quiz_questions[i].question_as;
-                    var number = this.questions[i].number = reverse_quiz_questions[i].question_number;
-
-                    var result_data = result_operation_process(
-                        this,
-                        {
-                            number  : number,
-                            as      : as,
-                            form    : reverse_quiz_questions[i].form,
-                            result  : reverse_quiz_questions[i].result,
-                            quizzer : reverse_quiz_questions[i].quizzer,
-                            team    : reverse_quiz_questions[i].team
-                        },
-                        true
-                    );
-
-                    this.move_question("forward");
-
-                    this.question.as     = result_data.as;
-                    this.question.number = result_data.number;
-                }
+            if ( ! this.error ) {
+                this.quiz_build_up(true);
             }
-
-            if ( this.error ) {
-                this.question.question = '<span class="unique_chapter">' + this.error + '.</span>';
-                this.question.answer   = '<span class="unique_chapter">' + this.error + '.</span>';
+            else {
+                this.question.question = '<span class="unique_chapter">' + this.error + '</span>';
+                this.question.answer   = '<span class="unique_chapter">' + this.error + '</span>';
             }
         }
     });
@@ -580,7 +583,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
         // for Alt+F, F4: Find Text
         if ( ( event.altKey && event.keyCode == 70 ) || event.keyCode == 115 )
-            vue_app.$refs.material_search.find();
+            vue_app.$refs.material_search.find(true);
 
         // for Alt+S: Timer Click
         if ( event.altKey && event.keyCode == 83 ) document.getElementById("prime_timer_button").click();
