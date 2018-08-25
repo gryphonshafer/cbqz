@@ -149,7 +149,7 @@
             page.js.push( '/main/path.js', '/js/app/main.js', '/js/utilities.js' );
         %]
 
-        <div id="main" >
+        <div id="main">
             <div v-if="false" class="loading_spinner"></div>
             <div v-cloak>
                 <h2>Select Sets</h2>
@@ -204,8 +204,8 @@
                         <tr v-for="chapter in question_set.statistics">
                             <td class="left">{{ chapter.book }}</td>
                             <td>{{ chapter.chapter }}</td>
-                            <td>{{ chapter.questions }}</td>
                             <td>{{ chapter.verses }}</td>
+                            <td>{{ chapter.questions }}</td>
                             <td>{{ ( chapter.questions / chapter.verses ).toFixed(2) }}</td>
                             <td class="question_type_totals"
                                 v-for="type in chapter.types">{{ type[1] || 0 }}</td>
