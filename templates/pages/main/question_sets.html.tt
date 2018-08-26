@@ -85,6 +85,25 @@
     </table>
 [% END %]
 
+<p>
+    Reset: Resets all the questions used counts to 0.
+    Rename: Renames the question set.
+    Clone: Clones/duplicates the question set.
+    Set Publish To: Gives access to another user, 
+    but does not allow them to edit it. 
+    They are free to clone and edit the clone, 
+    but not the original/source that you have Published to them.
+    Set Share To: Completely shares your question set with another user. 
+    The other user can add questions, delete questions, rename the set, 
+    clone the set, reset the set, delete the set, anything you can do.
+    Delete: Deletes the question set.
+    Export: Exports the question set to a .csv file.
+    Merge: Combines two question sets. Duplicates are not checked for.
+    Auto-KVL: Generates Finish and Quote questions 
+    based on your program’s key verse configuration file. 
+    If you do this more than once on the same question set, you will have duplicates.
+</p>
+
 <h2>Questions Data Import</h2>
 
 <p>
