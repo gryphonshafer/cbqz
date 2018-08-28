@@ -46,6 +46,51 @@
         <button type="button" disabled="true" id="merge">Merge</button>
         <button type="button" disabled="true" id="auto-kvl">Auto-KVL</button>
     </div>
+
+    <dl>
+        <dt>Reset</dt>
+        <dd>
+            Resets all the questions used counts to 0.
+        </dd>
+        <dt>Rename</dt>
+        <dd>
+            Renames the question set.
+        </dd>
+        <dt>Clone</dt>
+        <dd>
+            Clones/duplicates the question set.
+        </dd>
+        <dt>Set Publish To</dt>
+        <dd>
+            Gives access to another user, but does not allow them to edit it.
+            They are free to clone and edit the clone,
+            but not the original/source that you have Published to them.
+        </dd>
+        <dt>Set Share To</dt>
+        <dd>
+            Completely shares your question set with another user.
+            The other user can add questions, delete questions, rename the set,
+            clone the set, reset the set, delete the set, anything you can do.
+        </dd>
+        <dt>Delete</dt>
+        <dd>
+            Deletes the question set.
+        </dd>
+        <dt>Export</dt>
+        <dd>
+            Exports the question set to a .csv file.
+        </dd>
+        <dt>Merge</dt>
+        <dd>
+            Combines two question sets. Duplicates are not checked for.
+        </dd>
+        <dt>Auto-KVL</dt>
+        <dd>
+            Generates Finish and Quote questions
+            based on your program’s key verse configuration file.
+            If you do this more than once on the same question set, you will have duplicates.
+        </dd>
+    </dl>
 [% ELSE %]
     <h2>No Question Sets for User: [% user.obj.username %]</h2>
     <p>There don't appear to be any question sets for user: [% user.obj.username %].</p>
@@ -84,25 +129,6 @@
         [% END %]
     </table>
 [% END %]
-
-<p>
-    Reset: Resets all the questions used counts to 0.
-    Rename: Renames the question set.
-    Clone: Clones/duplicates the question set.
-    Set Publish To: Gives access to another user, 
-    but does not allow them to edit it. 
-    They are free to clone and edit the clone, 
-    but not the original/source that you have Published to them.
-    Set Share To: Completely shares your question set with another user. 
-    The other user can add questions, delete questions, rename the set, 
-    clone the set, reset the set, delete the set, anything you can do.
-    Delete: Deletes the question set.
-    Export: Exports the question set to a .csv file.
-    Merge: Combines two question sets. Duplicates are not checked for.
-    Auto-KVL: Generates Finish and Quote questions 
-    based on your program’s key verse configuration file. 
-    If you do this more than once on the same question set, you will have duplicates.
-</p>
 
 <h2>Questions Data Import</h2>
 

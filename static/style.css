@@ -35,6 +35,11 @@ h3 {
     font-size: 16px;
 }
 
+dl dt {
+    font-family: bold;
+    font-weight: normal;
+}
+
 .htmlarea {
     font-size: 14px;
     line-height: 18px;
