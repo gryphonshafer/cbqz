@@ -5,19 +5,20 @@
 
 <p>This is a feed spike.</p>
 
-<button type="button" onclick="sendChat(42)">Send</button>
-<div id="log"></div>
+<form onsubmit="sendChat( this.input.value ); return false">
+    <input type="text" name="input">
+</form>
+
+<div id="data"></div>
 
 <script>
     var ws = new WebSocket("[% c.url_for('/feed/spike').to_abs.scheme('ws') %]");
 
     ws.onmessage = function (e) {
-        console.log(e);
-        document.getElementById('log').innerHTML += '<p>' + e.data + '</p>';
+        document.getElementById('data').innerHTML += '<p>' + JSON.parse( e.data ).data + '</p>';
     };
 
     function sendChat(input) {
-        console.log(input);
         ws.send(input);
     }
 </script>

@@ -208,9 +208,9 @@ sub setup_csv ($self) {
     my $sockets;
 
     sub setup_socket ( $self, $cbqz ) {
-        $self->helper( 'socket' => sub ( $self, $command, $name, $transaction = undef, $callback = undef ) {
+        $self->helper( 'socket' => sub ( $self, $command, $name, $params = {} ) {
             if ( $command eq 'setup' ) {
-                $sockets->{$name}{callback} = $callback;
+                $sockets->{$name}{callback} = $params->{cb};
 
                 $cbqz->dq->sql(q{
                     INSERT INTO socket ( name, counter ) VALUES ( ?, 0 )
@@ -221,19 +221,19 @@ sub setup_csv ($self) {
                     SELECT counter FROM socket WHERE name = ?
                 })->run($name)->value;
 
-                $sockets->{$name}{transactions}{ sprintf( '%s', $transaction ) } = $transaction;
+                $sockets->{$name}{transactions}{ sprintf( '%s', $params->{tx} ) } = $params->{tx};
             }
             elsif ( $command eq 'message' ) {
                 $cbqz->dq->sql(q{
-                    UPDATE socket SET counter = counter + 1 WHERE name = ?
-                })->run($name);
+                    UPDATE socket SET counter = counter + 1, data = ? WHERE name = ?
+                })->run( $params->{data}, $name );
 
                 my $ppid = getppid();
                 kill( 'URG', $_ )
                     for ( map { $_->pid } grep { $_->ppid == $ppid } @{ Proc::ProcessTable->new->table } );
             }
             elsif ( $command eq 'finish' ) {
-                delete $sockets->{$name}{transactions}{ sprintf( '%s', $transaction ) };
+                delete $sockets->{$name}{transactions}{ sprintf( '%s', $params->{tx} ) };
             }
             else {
                 E->throw(qq{Command $command not understood});
@@ -241,14 +241,14 @@ sub setup_csv ($self) {
         } );
 
         $SIG{URG} = sub {
-            for my $socket ( @{ $cbqz->dq->sql('SELECT name, counter FROM socket')->run->all({}) } ) {
+            for my $socket ( @{ $cbqz->dq->sql('SELECT name, counter, data FROM socket')->run->all({}) } ) {
                 if (
                     $sockets->{ $socket->{name} } and
                     $sockets->{ $socket->{name} }{counter} < $socket->{counter}
                 ) {
                     $sockets->{ $socket->{name} }{counter} = $socket->{counter};
                     $cbqz->debug( 'Socket ' . $socket->{name} . ' was messaged; ' . $$ . ' responding' );
-                    $sockets->{ $socket->{name} }{callback}->(
+                    $sockets->{ $socket->{name} }{callback}->( $_, $socket->{data} ) for (
                         values %{ $sockets->{ $socket->{name} }{transactions} }
                     );
                 }

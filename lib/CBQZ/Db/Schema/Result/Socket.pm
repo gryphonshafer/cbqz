@@ -46,6 +46,11 @@ __PACKAGE__->table("socket");
   extra: {unsigned => 1}
   is_nullable: 0
 
+=head2 data
+
+  data_type: 'mediumtext'
+  is_nullable: 1
+
 =head2 last_modified
 
   data_type: 'timestamp'
@@ -79,6 +84,8 @@ __PACKAGE__->add_columns(
     extra => { unsigned => 1 },
     is_nullable => 0,
   },
+  "data",
+  { data_type => "mediumtext", is_nullable => 1 },
   "last_modified",
   {
     data_type => "timestamp",
@@ -122,8 +129,8 @@ __PACKAGE__->set_primary_key("socket_id");
 __PACKAGE__->add_unique_constraint("name", ["name"]);
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-08-15 14:10:22
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:5Pjnay30+EaU/pvht7W8UQ
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-09-05 19:34:59
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:+I5La/fA4qBU6KVBcPsMng
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

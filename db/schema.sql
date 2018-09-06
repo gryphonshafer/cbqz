@@ -155,6 +155,7 @@ CREATE TABLE socket (
     socket_id int(10) unsigned NOT NULL,
     name varchar(64) DEFAULT NULL,
     counter int(10) unsigned NOT NULL DEFAULT '0',
+    data mediumtext,
     last_modified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created timestamp NOT NULL DEFAULT '1970-01-01 16:00:00',
     PRIMARY KEY (socket_id),
