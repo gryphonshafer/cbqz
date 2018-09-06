@@ -1,0 +1,36 @@
+[%
+    page.title = 'Live Scoresheet';
+    page.menu  = 'stats';
+%]
+
+<h2>Room [% room %]</h2>
+<p>Answer: [% answer %]</p>
+
+<h2>WebSocket Spike</h2>
+
+<form onsubmit="sendChat( this.input.value ); return false">
+    <input type="text" name="input">
+</form>
+
+<div id="data"></div>
+
+[% ws_js_code = BLOCK %]
+    var live_scoresheet_ws;
+    function start_live_scoresheet_ws() {
+        live_scoresheet_ws = new WebSocket("[% c.url_for('/stats/live_scoresheet').to_abs.scheme('ws') %]");
+
+        live_scoresheet_ws.onmessage = function (e) {
+            document.getElementById('data').innerHTML += '<p>' + JSON.parse( e.data ).data + '</p>';
+        };
+
+        live_scoresheet_ws.onclose = function (e) {
+            start_live_scoresheet_ws();
+        };
+    }
+    start_live_scoresheet_ws();
+
+    function sendChat(input) {
+        live_scoresheet_ws.send(input);
+    }
+[% END %]
+[% page.inline_js.push(ws_js_code) %]

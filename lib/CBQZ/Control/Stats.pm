@@ -93,4 +93,27 @@ sub delete ($self) {
     return $self->redirect_to('/stats');
 }
 
+sub room ($self) {
+    $self->stash( answer => 42 );
+}
+
+sub live_scoresheet ($self) {
+    $self->render( json => { answer => 42 } );
+
+    $self->inactivity_timeout(14400); # 4 hours
+
+    $self->socket( setup => 'live_scoresheet', {
+        tx => $self->tx,
+        cb => sub ( $tx, $data ) {
+            $tx->send( { json => { data => $data } } );
+        },
+    });
+
+    $self->on( message => sub ( $self, $message ) {
+        $self->socket( message => 'live_scoresheet', { data => $message } );
+    } );
+
+    $self->on( finish => sub { $self->socket( finish => 'live_scoresheet', { tx => $self->tx } ) } );
+}
+
 1;

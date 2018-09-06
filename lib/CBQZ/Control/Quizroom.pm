@@ -266,6 +266,11 @@ sub quiz_event ($self) {
         $quiz_question_data = CBQZ::Model::QuizQuestion->new->create($quiz_question_data)->data;
         delete $quiz_question_data->{question};
 
+        $self->socket(
+            message => 'live_scoresheet',
+            { data => $self->cbqz->json->encode( $quiz_question_data ) },
+        );
+
         $self->render( json => {
             success       => 1,
             quiz_question => $quiz_question_data,

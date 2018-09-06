@@ -37,7 +37,7 @@ sub startup ($self) {
 
     # pre-load controllers
     if ( $self->mode eq 'production' ) {
-        load_class( 'CBQZ::Control::' . $_ ) for qw( Main Editor Quizroom Admin Stats Feed );
+        load_class( 'CBQZ::Control::' . $_ ) for qw( Main Editor Quizroom Admin Stats );
     }
 
     # before dispatch tasks
@@ -105,6 +105,9 @@ sub startup ($self) {
 
     $admin_user->any('/admin')->to( controller => 'admin', action => 'index' );
     $admin_user->any('/admin/:action')->to( controller => 'admin' );
+
+    $authorized_user->any('/stats/room/:room')->to( controller => 'stats', action => 'room' );
+    $authorized_user->any('/stats/room')->to( cb => sub ($self) { $self->redirect_to('/stats') } );
 
     $authorized_user->any('/:controller')->to( action => 'index' );
     $authorized_user->any('/:controller/:action');
