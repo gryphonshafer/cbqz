@@ -192,7 +192,7 @@
             ></material-search>
         </div>
 
-        <div id="scorekeeping">
+        <div id="scoresheet">
             <table class="tabular">
                 <tr>
                     <td rowspan="2" class="vertical_text shaded">

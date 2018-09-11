@@ -7,6 +7,7 @@ use Mojo::Util 'b64_decode';
 use MojoX::Log::Dispatch::Simple;
 use Try::Tiny;
 use Text::CSV_XS 'csv';
+use Proc::ProcessTable;
 use CBQZ;
 use CBQZ::Model::User;
 use CBQZ::Util::Format 'log_date';
@@ -23,15 +24,16 @@ sub startup ($self) {
     $self->plugin('RequestBase');
 
     $self->static->paths->[0] =~ s|/public$|/static|;
-    $self->sessions->cookie_name( $config->get( 'mojolicious', 'session_cookie_name' ) );
+    $self->sessions->cookie_name( $config->get( qw( mojolicious session cookie_name ) ) );
     $self->secrets( $config->get( 'mojolicious', 'secrets' ) );
     $self->config( $config->get( 'mojolicious', 'config' ) );
-    $self->sessions->default_expiration(0);
+    $self->sessions->default_expiration( $config->get( qw( mojolicious session default_expiration ) ) );
 
     $self->setup_general_helpers($cbqz);
     $self->setup_logging($cbqz);
     $self->setup_templating($config);
     $self->setup_csv;
+    $self->setup_socket($cbqz);
 
     # pre-load controllers
     if ( $self->mode eq 'production' ) {
@@ -44,7 +46,7 @@ sub startup ($self) {
         my $last_request_time = $self->session('last_request_time');
         if (
             $last_request_time and
-            $last_request_time < time - $config->get( qw( mojolicious session_duration ) )
+            $last_request_time < time - $config->get( qw( mojolicious session duration ) )
         ) {
             $self->session( expires => 1 );
             $self->redirect_to;
@@ -103,6 +105,9 @@ sub startup ($self) {
 
     $admin_user->any('/admin')->to( controller => 'admin', action => 'index' );
     $admin_user->any('/admin/:action')->to( controller => 'admin' );
+
+    $authorized_user->any('/stats/room/:room')->to( controller => 'stats', action => 'room' );
+    $authorized_user->any('/stats/room')->to( cb => sub ($self) { $self->redirect_to('/stats') } );
 
     $authorized_user->any('/:controller')->to( action => 'index' );
     $authorized_user->any('/:controller/:action');
@@ -200,6 +205,59 @@ sub setup_csv ($self) {
 
         csv( in => $c->stash->{content}, out => $output );
     } );
+}
+
+{
+    my $sockets;
+
+    sub setup_socket ( $self, $cbqz ) {
+        $self->helper( 'socket' => sub ( $self, $command, $name, $params = {} ) {
+            if ( $command eq 'setup' ) {
+                $sockets->{$name}{callback} = $params->{cb};
+
+                $cbqz->dq->sql(q{
+                    INSERT INTO socket ( name, counter ) VALUES ( ?, 0 )
+                        ON DUPLICATE KEY UPDATE name = name
+                })->run($name);
+
+                $sockets->{$name}{counter} = $cbqz->dq->sql(q{
+                    SELECT counter FROM socket WHERE name = ?
+                })->run($name)->value;
+
+                $sockets->{$name}{transactions}{ sprintf( '%s', $params->{tx} ) } = $params->{tx};
+            }
+            elsif ( $command eq 'message' ) {
+                $cbqz->dq->sql(q{
+                    UPDATE socket SET counter = counter + 1, data = ? WHERE name = ?
+                })->run( $params->{data}, $name );
+
+                my $ppid = getppid();
+                kill( 'URG', $_ )
+                    for ( map { $_->pid } grep { $_->ppid == $ppid } @{ Proc::ProcessTable->new->table } );
+            }
+            elsif ( $command eq 'finish' ) {
+                delete $sockets->{$name}{transactions}{ sprintf( '%s', $params->{tx} ) };
+            }
+            else {
+                E->throw(qq{Command $command not understood});
+            }
+        } );
+
+        $SIG{URG} = sub {
+            for my $socket ( @{ $cbqz->dq->sql('SELECT name, counter, data FROM socket')->run->all({}) } ) {
+                if (
+                    $sockets->{ $socket->{name} } and
+                    $sockets->{ $socket->{name} }{counter} < $socket->{counter}
+                ) {
+                    $sockets->{ $socket->{name} }{counter} = $socket->{counter};
+                    $cbqz->debug( 'Socket ' . $socket->{name} . ' was messaged; ' . $$ . ' responding' );
+                    $sockets->{ $socket->{name} }{callback}->( $_, $socket->{data} ) for (
+                        values %{ $sockets->{ $socket->{name} }{transactions} }
+                    );
+                }
+            }
+        };
+    }
 }
 
 1;

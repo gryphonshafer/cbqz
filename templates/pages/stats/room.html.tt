@@ -1,0 +1,104 @@
+[%
+    page.title       = 'Live Scoreboard Room ' _ room;
+    page.menu        = 'stats';
+    page.vue         = 1;
+    page.skip_layout = 1;
+
+    page.links.push(
+        '/stats/path.js',
+        '/js/app/stats_room.js',
+    );
+    page.pre_inline_js.push(
+        'var stats_room_websocket_url = "' _
+        c.url_for('/stats/live_scoresheet').query( room => room ).to_abs.scheme('ws')
+        _ '";'
+    );
+%]
+
+<div id="live_scoresheet">
+    <h1>CBQZ [% page.title %]</h1>
+
+    <template v-if="quiz">
+        <ul>
+            <li>Quiz Name: <b>{{ quiz.name }}</b></li>
+            <li>Quiz State: <b>{{ quiz.state | ucfirst }}</b></li>
+            <li>Quizmaster: <b>{{ quiz.quizmaster }}</b></li>
+        </ul>
+
+        <h2>Question Number: {{ quiz.status.question_number }}</h2>
+
+        <div id="scoresheet">
+            <table class="tabular">
+                <tr>
+                    <td rowspan="2" class="vertical_text shaded"></td>
+                    <td
+                        v-for="( team_set, index ) in quiz.metadata.quiz_teams_quizzers"
+                        v-bind:colspan="team_set.quizzers.length + 1"
+                        v-bind:class="[
+                            ( quiz.status.team && team_set.team.name == quiz.status.team.name ) ? 'selected' : '',
+                            'team_' + index + '_bold'
+                        ]"
+                    >
+                        {{ team_set.team.name }}: {{ team_set.team.score }}
+                    </td>
+                </tr>
+
+                <tr id="quizzer_names">
+                    <template v-for="( team_set, index ) in quiz.metadata.quiz_teams_quizzers">
+                        <td
+                            class="vertical_text quizzer_name"
+                            v-for="quizzer in team_set.quizzers"
+                            v-bind:class="[
+                                ( quiz.status.quizzer && quizzer.name == quiz.status.quizzer.name ) ? 'selected' : '',
+                                'team_' + index + '_mild'
+                            ]"
+                        >
+                            <table class="tabular clear" v-bind:title="quizzer.name">
+                                <tr><td>{{ quizzer.bib }}</td></tr>
+                                <tr><td class="quizzer_name"><div>{{ quizzer.name }}</div></td></tr>
+                                <tr><td>{{ quizzer.correct }}-{{ quizzer.incorrect }}</td></tr>
+                            </table>
+                        </td>
+                        <td v-bind:class="[ 'vertical_text', 'team_' + index + '_bold' ]"></td>
+                    </template>
+                </tr>
+
+                <tr v-for="( event, index ) in quiz.quiz_questions">
+                    <td class="shaded">
+                        {{
+                            ( event.question_number.toString().indexOf("|") == -1 )
+                                ? event.question_number
+                                : event.question_number.toString().split("|")[1]
+                        }}
+                    </td>
+                    <template v-for="( team_set, index ) in quiz.metadata.quiz_teams_quizzers">
+                        <td v-for="quizzer in team_set.quizzers" v-bind:class=" 'team_' + index + '_mild' ">
+                            {{
+                                (
+                                    !! quizzer.events &&
+                                    !! event.question_number &&
+                                    quizzer.events[ event.question_number ] !== null
+                                ) ? quizzer.events[ event.question_number ] : ""
+                            }}
+                        </td>
+                        <td v-bind:class=" 'team_' + index + '_bold' ">{{
+                            (
+                                !! team_set.team.events &&
+                                !! event.question_number &&
+                                team_set.team.events[ event.question_number ] !== null
+                            ) ? team_set.team.events[ event.question_number ] : ""
+                        }}</td>
+                    </template>
+                </tr>
+            </table>
+        </div>
+    </template>
+    <template v-else>
+        <p>
+            This page will display a live scoresheet (simplified) for quiz room [% room %] once there is
+            some activity (since loading this page) in room [% room %]. To force this page to display quiz
+            data, you can just reload the quiz room page. <i>Note that only <b>official</b> quizzes for quiz
+            room [% room %] will display here.
+        </p>
+    </template>
+</div>

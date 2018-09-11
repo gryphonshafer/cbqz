@@ -5,6 +5,10 @@ use exact;
 use CBQZ::Model::Quiz;
 use CBQZ::Model::QuizQuestion;
 
+sub path ($self) {
+    return $self->render( text => 'var cntlr = "' . $self->url_for('/stats') . '";' );
+}
+
 sub index ($self) {
     my $get_quiz_data = sub {
         return [
@@ -91,6 +95,26 @@ sub delete ($self) {
     })->delete;
 
     return $self->redirect_to('/stats');
+}
+
+sub live_scoresheet ($self) {
+    return $self->redirect_to('/stats') unless ( $self->tx->is_websocket );
+    $self->inactivity_timeout( $self->cbqz->config->get( qw( session duration ) ) );
+
+    my $socket_name = join( '|',
+        'live_scoresheet',
+        $self->param('room'),
+        $self->decode_cookie('cbqz_prefs')->{program_id},
+    );
+
+    $self->socket( setup => $socket_name, {
+        tx => $self->tx,
+        cb => sub ( $tx, $data ) {
+            $tx->send( { json => $self->cbqz->json->decode($data) } );
+        },
+    });
+
+    $self->on( finish => sub { $self->socket( finish => $socket_name, { tx => $self->tx } ) } );
 }
 
 1;

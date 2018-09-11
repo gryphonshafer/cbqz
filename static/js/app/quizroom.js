@@ -535,12 +535,12 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
                     this.question.as     = result_data.as;
                     this.question.number = result_data.number;
-
-                    this.$http.post( cntlr + "/status", {
-                        quiz_id         : this.metadata.quiz_id,
-                        question_number : this.question.number
-                    } );
                 }
+
+                this.$http.post( cntlr + "/status", {
+                    quiz_id         : this.metadata.quiz_id,
+                    question_number : this.question.number
+                } );
             }
         },
         computed: {

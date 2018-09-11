@@ -5,7 +5,18 @@
     page.js.push( '/js/utilities.js', '/js/pages/stats.js' );
 %]
 
-[% has_checkbox = 0 %]
+<h2>Live Scoreboard</h2>
+
+<p>
+    Select a room from the list to follow a live scoreboard for that room.
+    This is operational only for official quizzes.
+</p>
+
+[% FOR room IN [ 1 .. 9 ] %]
+    <a href="[% c.url_for( '/stats/room/' _ room ) %]" target="live_scoresheet">Room [% room %]</a>
+    [% UNLESS loop.last %]|[% END %]
+[% END %]
+
 [% BLOCK quizzes_block %]
     <h2>[% type.ucfirst %] Quizzes</h2>
 
@@ -14,12 +25,21 @@
 
         <table class="tabular">
             <tbody>
+                [%
+                    has_checkbox = 0;
+                    IF type == 'closed';
+                        FOR quiz IN quizzes.$type;
+                            IF quiz.official;
+                                has_checkbox = 1;
+                            END;
+                        END;
+                    END;
+                %]
                 [% FOR quiz IN quizzes.$type %]
                     <tr class="quiz_table_row">
-                        [% IF type == 'closed' AND ( has_checkbox OR NOT quiz.official ) %]
+                        [% IF has_checkbox %]
                             <td>
                                 [% UNLESS quiz.official %]
-                                    [% has_checkbox = 1 %]
                                     <input type="checkbox" name="[% quiz.quiz_id %]">
                                 [% END %]
                             </td>
@@ -31,7 +51,7 @@
                         <td>[% ( quiz.official ) ? "Official" : "Practice" %]</td>
                         <td>[% quiz.quizmaster %]</td>
                         <td class="right">[% quiz.room %]</td>
-                        [% IF type == 'active' %]<td>[% quiz.question_number %]</td>[% END %]
+                        [% IF type == 'active' %]<td class="right">[% quiz.question_number %]</td>[% END %]
                         <td class="right">[% quiz.scheduled %]</td>
                         <td class="right">[% quiz.created %]</td>
                         <td class="right">[% quiz.last_modified %]</td>
@@ -40,7 +60,7 @@
             </tbody>
             <thead>
                 <tr>
-                    [% IF type == 'closed' AND has_checkbox %]<th></th>[% END %]
+                    [% IF has_checkbox %]<th></th>[% END %]
                     <th>Name</th>
                     <th>Type</th>
                     <th>Quizmaster</th>

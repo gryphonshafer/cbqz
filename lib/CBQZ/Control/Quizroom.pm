@@ -219,6 +219,17 @@ sub data ($self) {
     return $self->render( json => $data );
 }
 
+my $live_scoresheet = sub ( $self, $quiz, $cbqz_prefs ) {
+    $self->socket(
+        message => join( '|',
+            'live_scoresheet',
+            $quiz->obj->room,
+            $cbqz_prefs->{program_id},
+        ),
+        { data => $self->cbqz->json->encode( $quiz->data_deep ) },
+    ) if ( $quiz->obj->official );
+};
+
 sub quiz_event ($self) {
     my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
     my $event      = $self->req_body_json;
@@ -242,8 +253,8 @@ sub quiz_event ($self) {
             }
         );
 
-        CBQZ::Model::Quiz->new->load( $event->{metadata}{quiz_id} )->obj
-            ->update({ metadata => $self->cbqz->json->encode( $event->{metadata} ) });
+        my $quiz = CBQZ::Model::Quiz->new->load( $event->{metadata}{quiz_id} );
+        $quiz->obj->update({ metadata => $self->cbqz->json->encode( $event->{metadata} ) });
 
         my $quiz_question_data = {
             quiz_id         => $event->{metadata}{quiz_id},
@@ -265,6 +276,8 @@ sub quiz_event ($self) {
 
         $quiz_question_data = CBQZ::Model::QuizQuestion->new->create($quiz_question_data)->data;
         delete $quiz_question_data->{question};
+
+        $live_scoresheet->( $self, $quiz, $cbqz_prefs );
 
         $self->render( json => {
             success       => 1,
@@ -291,13 +304,15 @@ sub delete_quiz_event ($self) {
             }
         );
 
-        CBQZ::Model::Quiz->new->load( $event->{metadata}{quiz_id} )->obj
-            ->update({ metadata => $self->cbqz->json->encode( $event->{metadata} ) });
+        my $quiz = CBQZ::Model::Quiz->new->load( $event->{metadata}{quiz_id} );
+        $quiz->obj->update({ metadata => $self->cbqz->json->encode( $event->{metadata} ) });
 
         CBQZ::Model::QuizQuestion->new->load({
             quiz_id         => $event->{metadata}{quiz_id},
             question_number => $event->{question_number},
         })->obj->delete;
+
+        $live_scoresheet->( $self, $quiz, $cbqz_prefs );
 
         $self->render( json => { success => 1 } );
     }
@@ -381,7 +396,10 @@ sub close ($self) {
             }
         );
 
-        CBQZ::Model::Quiz->new->load( $self->req->param('quiz_id') )->obj->update({ state => 'closed' });
+        my $quiz = CBQZ::Model::Quiz->new->load( $self->req->param('quiz_id') );
+        $quiz->obj->update({ state => 'closed' });
+
+        $live_scoresheet->( $self, $quiz, $cbqz_prefs );
 
         $self->stash('user')->event('close_quiz');
     }
@@ -444,6 +462,8 @@ sub rearrange_quizzers ($self) {
         $request->{metadata}{quiz_teams_quizzers} = $quizzers_data;
         $quiz->obj->update({ metadata => $self->cbqz->json->encode( $request->{metadata} ) });
 
+        $live_scoresheet->( $self, $quiz, $cbqz_prefs );
+
         $self->render( json => {
             success             => 1,
             quiz_teams_quizzers => $quizzers_data,
@@ -477,6 +497,7 @@ sub status ($self) {
 
         if ( keys %$status ) {
             $quiz->obj->update({ status => $quiz->json->encode($status) });
+            $live_scoresheet->( $self, $quiz, $cbqz_prefs );
         }
         else {
             $status = $quiz->json->decode( $quiz->obj->status );

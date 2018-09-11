@@ -853,7 +853,7 @@ div#quizroom div#timer div#timer_display {
 
 /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
 
-div#quizroom div#scorekeeping {
+div#scoresheet {
     display: inline-block;
     vertical-align: top;
     margin-top: 5px;
@@ -867,100 +867,102 @@ div#quizroom div#scorekeeping {
     overflow-x: hidden;
 }
 
-div#quizroom div#scorekeeping a {
+div#scoresheet a {
     text-decoration: none;
     color: black;
     margin-right: 2px;
 }
 
-div#quizroom div#scorekeeping a:hover {
+div#scoresheet a:hover {
     text-decoration: underline;
     color: #0000cc;
 }
 
-div#quizroom div#scorekeeping table {
+div#scoresheet table {
     table-layout: fixed;
     width: calc( 100% + 2px );
     margin: -1px !important;
 }
 
-div#quizroom div#scorekeeping table td {
+div#scoresheet table td {
     text-align: center;
     padding: 0px 0px 0px 0px;
 }
 
-div#quizroom div#scorekeeping table tr#quizzer_names > td {
+div#scoresheet table tr#quizzer_names > td {
     padding: 0px;
 }
 
-div#quizroom div#scorekeeping table tr#quizzer_names td:hover:not(.selected) table td {
+div#scoresheet table tr#quizzer_names td:hover:not(.selected) table td {
     background-color: #ffccff;
     cursor: pointer;
 }
 
-div#quizroom div#scorekeeping table tr td.selected,
-div#quizroom div#scorekeeping table tr td.selected table td {
+div#scoresheet table tr td.selected,
+div#scoresheet table tr td.selected table td {
     font-family: bold;
     font-weight: normal;
 }
 
-div#quizroom div#scorekeeping table td.vertical_text {
+div#scoresheet table td.vertical_text {
     vertical-align: top;
 }
 
-div#quizroom div#scorekeeping table td.vertical_text div {
+div#scoresheet table td.vertical_text div {
     width: 70px;
     transform: rotate(90deg) translate( 34px, -2px );
     white-space: nowrap;
     margin-left: calc( 50% - 37px );
 }
 
-div#quizroom div#scorekeeping table td.quizzer_name {
+div#scoresheet table td.quizzer_name {
     vertical-align: top;
     text-align: left;
     height: 82px;
 }
 
-div#quizroom div#scorekeeping table td.quizzer_name div {
+div#scoresheet table td.quizzer_name div {
     transform: rotate(90deg) translate( 34px, 0px );
     width: 75px;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-div#quizroom div#scorekeeping table td.shaded {
+div#scoresheet table td.shaded {
     background-color: #f0f0f0;
 }
 
-div#quizroom div#scorekeeping table td.team_0_bold {
+div#scoresheet table td.team_0_bold {
     background-color: #ffe0e0;
 }
 
-div#quizroom div#scorekeeping table td.team_0_mild {
+div#scoresheet table td.team_0_mild {
     background-color: #ffffff;
 }
 
-div#quizroom div#scorekeeping table td.team_1_bold {
+div#scoresheet table td.team_1_bold {
     background-color: #ffffe0;
 }
 
-div#quizroom div#scorekeeping table td.team_1_mild {
+div#scoresheet table td.team_1_mild {
     background-color: #ffffff;
 }
 
-div#quizroom div#scorekeeping table td.team_2_bold {
+div#scoresheet table td.team_2_bold {
     background-color: #f0f0ff;
 }
 
-div#quizroom div#scorekeeping table td.team_2_mild {
+div#scoresheet table td.team_2_mild {
     background-color: #ffffff;
 }
 
-div#quizroom div#scorekeeping table td.team_3_bold,
-div#quizroom div#scorekeeping table td.team_4_bold,
-div#quizroom div#scorekeeping table td.team_5_bold {
+div#scoresheet table td.team_3_bold,
+div#scoresheet table td.team_4_bold,
+div#scoresheet table td.team_5_bold {
     background-color: #f6f6f6;
 }
+
+/* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
 
 div#quizroom div#rearrange_quizzers {
     width: 310px;
@@ -1016,7 +1018,7 @@ div#quizroom div#rearrange_quizzers fieldset {
     div#quizroom div#manage {
         order: 2;
     }
-    div#quizroom div#scorekeeping {
+    div#quizroom div#scoresheet {
         order: 3;
         height: 162px !important;
         margin-left: 0px !important;
@@ -1059,6 +1061,18 @@ div#quizroom div#rearrange_quizzers fieldset {
     div#quizroom div.manage_group:first-of-type {
         margin-right: 20px;
     }
+}
+
+/* -------------------------------------------------------------------------- */
+
+div#live_scoresheet {
+    margin-top: -60px;
+    margin-bottom: -25px;
+}
+
+div#live_scoresheet div#scoresheet table tr#quizzer_names td:hover:not(.selected) table td {
+    background-color: transparent;
+    cursor: default;
 }
 
 /* -------------------------------------------------------------------------- */
