@@ -1,5 +1,18 @@
 Revision history for CBQZ
 
+15.7.3    Tue Sep 11 12:44:12 PDT 2018
+        - Feature additions
+            - Live scoreboard per room tracker page
+            - Convert question set docs into definition list
+            - Add publish and share question set help text
+            - Update CPAN modules to latest versions
+        - Bug fixes
+            - Displaying all quizzes in stats instead of just for program in stats area
+            - Multi-programs and role changes in admin area
+            - Warning for "All" share/publish on question set page
+            - Checkboxes/delete button display in admin area
+            - Log file formatting
+
 15.6.2    Mon Aug 20 13:30:12 PDT 2018
         - Feature additions
             - Publish/Share with every district user; closes #171
