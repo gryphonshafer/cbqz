@@ -21,7 +21,8 @@ sub save_roles_changes ($self) {
     my $programs = CBQZ::Model::Program->new->admin_data( $self->stash('user'), $roles );
 
     my $checks;
-    $checks->{ $_->[0] }{ $_->[1] } = $_->[2] for ( map { [ split(/\|/) ] } keys %{ $self->params } );
+    $checks->{ $_->[0] }{ $_->[1] }{ $_->[2] } = $_->[3]
+        for ( map { [ split(/\|/) ] } keys %{ $self->params } );
 
     my $changes = 0;
     for my $program (@$programs) {
@@ -30,7 +31,7 @@ sub save_roles_changes ($self) {
 
             for my $role ( @{ $user->{roles} } ) {
                 my $check = undef;
-                try { $check = $checks->{ $user->{user_id} }{ $role->{name} } };
+                try { $check = $checks->{ $program->{program_id} }{ $user->{user_id} }{ $role->{name} } };
 
                 if ( defined $check and $check == 0 ) {
                     $user_model ||= CBQZ::Model::User->new->load( $user->{user_id} );

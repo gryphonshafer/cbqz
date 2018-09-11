@@ -54,6 +54,7 @@
                             <input type="checkbox"
                                 [% IF role.active %]checked[% END %]
                                 name="[%
+                                    program.program_id _ '|' _
                                     this_user.user_id _ '|' _
                                     role.name _ '|' _
                                     role.active
