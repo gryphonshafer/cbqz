@@ -1,5 +1,8 @@
 Revision history for CBQZ
 
+15.7.4    Tue Sep 11 14:12:24 PDT 2018
+        - Fix to Dockerfile build process to resolve process library compiling bug
+
 15.7.3    Tue Sep 11 12:44:12 PDT 2018
         - Feature additions
             - Live scoreboard per room tracker page
