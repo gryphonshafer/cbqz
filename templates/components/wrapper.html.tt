@@ -9,7 +9,8 @@
         page.inline_js     = [],
         page.links         = [],
         page.skip_layout   = 0,
-        page.skip_style    = 0;
+        page.skip_style    = 0,
+        page.html_class    = '';
 
     version = c.config.get('version') _ '-' _ c.config.get('sub_version');
 
@@ -23,7 +24,7 @@
     page.alt_title = 'CBQZ';
 -%]
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="[% page.html_class %]">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=0.9">

@@ -3,6 +3,7 @@
     page.menu        = 'stats';
     page.vue         = 1;
     page.skip_layout = 1;
+    page.html_class  = 'live_scoresheet';
 
     page.links.push(
         '/stats/path.js',
@@ -19,13 +20,13 @@
     <h1>CBQZ [% page.title %]</h1>
 
     <template v-if="quiz">
-        <ul>
+        <ul id="metadata">
             <li>Quiz Name: <b>{{ quiz.name }}</b></li>
             <li>Quiz State: <b>{{ quiz.state | ucfirst }}</b></li>
             <li>Quizmaster: <b>{{ quiz.quizmaster }}</b></li>
         </ul>
 
-        <h2>Question Number: {{ quiz.status.question_number }}</h2>
+        <p id="question_number">Question Number: <b>{{ quiz.status.question_number }}</b></p>
 
         <div id="scoresheet">
             <table class="tabular">
