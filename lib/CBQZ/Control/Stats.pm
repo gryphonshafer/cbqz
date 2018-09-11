@@ -21,15 +21,11 @@ sub index ($self) {
             }
             CBQZ::Model::Quiz->new->every_data(
                 {
-                    state => $_[0],
-                    -or   => [
-                        user_id => $self->stash('user')->obj->id,
-                        -and    => [
-                            official   => 1,
-                            program_id => [
-                                map { $_->program->id } $self->stash('user')->obj->user_programs->all
-                            ],
-                        ],
+                    state      => $_[0],
+                    program_id => $self->decode_cookie('cbqz_prefs')->{program_id},
+                    -or        => [
+                        user_id  => $self->stash('user')->obj->id,
+                        official => 1,
                     ],
                 },
                 {
