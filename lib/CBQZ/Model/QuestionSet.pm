@@ -170,7 +170,7 @@ sub save_set_select_users ( $self, $user, $type, $selected_user_ids ) {
 
     my @new_user_ids = grep { defined } map {
         my $selected_user_id = $_;
-        ( grep { $_ == $selected_user_id } @preexisting_user_ids ) ? undef : $selected_user_id;
+        ( grep { $_ and $_ == $selected_user_id } @preexisting_user_ids ) ? undef : $selected_user_id;
     } @$selected_user_ids;
 
     $self->dq->sql('DELETE FROM user_question_set WHERE question_set_id = ? AND type = ?')
