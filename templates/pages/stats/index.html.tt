@@ -5,15 +5,15 @@
     page.js.push( '/js/utilities.js', '/js/pages/stats.js' );
 %]
 
-<h2>Live Scoresheet</h2>
+<h2>Live Scoreboard</h2>
 
 <p>
-    Select a room from the list to follow a live scoresheet for that room.
+    Select a room from the list to follow a live scoreboard for that room.
     This is operational only for official quizzes.
 </p>
 
 [% FOR room IN [ 1 .. 9 ] %]
-    <a href="[% c.url_for( '/stats/room/' _ room ) %]">Room [% room %]</a>
+    <a href="[% c.url_for( '/stats/room/' _ room ) %]" target="live_scoresheet">Room [% room %]</a>
     [% UNLESS loop.last %]|[% END %]
 [% END %]
 

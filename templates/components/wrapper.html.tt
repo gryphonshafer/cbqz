@@ -2,13 +2,14 @@
     page = {};
 
     DEFAULT
-        page.title       = '',
-        page.vue         = 0,
-        page.js          = [],
-        page.inline_js   = [],
-        page.links       = [],
-        page.skip_layout = 0,
-        page.skip_style  = 0;
+        page.title         = '',
+        page.vue           = 0,
+        page.js            = [],
+        page.pre_inline_js = [],
+        page.inline_js     = [],
+        page.links         = [],
+        page.skip_layout   = 0,
+        page.skip_style    = 0;
 
     version = c.config.get('version') _ '-' _ c.config.get('sub_version');
 
@@ -42,6 +43,10 @@
             [% PROCESS page_layout.html.tt %]
         [% ELSE %]
             [% content %]
+        [% END %]
+
+        [% FOREACH code IN page.pre_inline_js %]
+            <script type="text/javascript">[% code %]</script>
         [% END %]
 
         [% IF page.vue %]

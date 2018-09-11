@@ -368,6 +368,22 @@ sub parse_quiz_teams_quizzers ( $self, $quiz_teams_quizzers_string ) {
     ];
 }
 
+sub data_deep ($self) {
+    my $data = $self->data;
+    $data->{$_} = $self->json->decode( $data->{$_} ) for ( qw( status metadata questions ) );
+    delete $data->{result_operation};
+
+    $data->{quiz_questions} = [
+        map {
+            my $question = +{ $_->get_inflated_columns };
+            delete $question->{question};
+            $question;
+        } $self->obj->quiz_questions->search( {}, { order_by => { -desc => 'created' } } )->all
+    ];
+
+    return $data;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;

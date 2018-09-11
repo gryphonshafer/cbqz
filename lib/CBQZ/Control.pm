@@ -217,7 +217,7 @@ sub setup_csv ($self) {
 
                 $cbqz->dq->sql(q{
                     INSERT INTO socket ( name, counter ) VALUES ( ?, 0 )
-                        ON DUPLICATE KEY UPDATE name = name;
+                        ON DUPLICATE KEY UPDATE name = name
                 })->run($name);
 
                 $sockets->{$name}{counter} = $cbqz->dq->sql(q{
