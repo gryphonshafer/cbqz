@@ -29,7 +29,7 @@
                     has_checkbox = 0;
                     IF type == 'closed';
                         FOR quiz IN quizzes.$type;
-                            IF quiz.official;
+                            IF NOT quiz.official;
                                 has_checkbox = 1;
                             END;
                         END;
