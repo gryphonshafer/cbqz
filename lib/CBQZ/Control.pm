@@ -7,7 +7,6 @@ use Mojo::Util 'b64_decode';
 use MojoX::Log::Dispatch::Simple;
 use Try::Tiny;
 use Text::CSV_XS 'csv';
-use Proc::ProcessTable;
 use CBQZ;
 use CBQZ::Model::User;
 use CBQZ::Util::Format 'log_date';
@@ -232,8 +231,16 @@ sub setup_csv ($self) {
                 })->run( $params->{data}, $name );
 
                 my $ppid = getppid();
-                kill( 'URG', $_ )
-                    for ( map { $_->pid } grep { $_->ppid == $ppid } @{ Proc::ProcessTable->new->table } );
+                kill( 'URG', $_ ) for (
+                    map { $_->[0] }
+                    grep { $_->[1] == $ppid }
+                    map {
+                        /(\d+)\D+(\d+)/;
+                        [ $1, $2 ];
+                    }
+                    grep { index( $_, $ppid ) != -1 }
+                    `/bin/ps xao pid,ppid`
+                );
             }
             elsif ( $command eq 'finish' ) {
                 delete $sockets->{$name}{transactions}{ sprintf( '%s', $params->{tx} ) };
