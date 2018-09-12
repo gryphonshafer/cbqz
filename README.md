@@ -235,3 +235,23 @@ CBQZ service.
 The `nginx:alpine` image is a very small Nginx image based on Alpine Linux. To
 debug any configuration problems, it may be useful to temporarily switch to the
 `nginx:latest` image.
+
+## Database Backups and Restores
+
+To obtain a command-line interface to the database:
+
+    sudo docker run -it --rm --net host mysql sh -c 'exec mysql -h127.0.0.1 -uroot -p'
+
+To backup the database running from within a Docker container:
+
+    set +o history
+    sudo docker run -it --rm --net host mysql sh -c 'exec mysqldump -h127.0.0.1 -uroot -pPASSWORD cbqz' | gzip > cbqz.sql.gz
+    set -o history
+
+To restore the database from Docker container backup to local database:
+
+    zcat cbqz.sql.gz | egrep -v '^mysqldump:' | sed -e 's/172.17.0.1/127.0.0.1/' | mysql cbqz
+
+To backup the database from a local database:
+
+    mysqldump cbqz | gzip > cbqz.sql.gz
