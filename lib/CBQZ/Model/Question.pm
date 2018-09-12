@@ -141,11 +141,11 @@ sub is_shared_set ($self) {
 
         my $int;
         unless ($skip_interogative) {
-            if ( $data->{question} =~ s/(\W*\b(?:who|what|when|where|why|how|whom|whose)\b\W*)$//i ) {
+            if ( $data->{question} =~ s/(\W*\b(?:who|what|when|where|why|how|whom|whose|which)\b\W*)$//i ) {
                 $int->{phrase} = lc $1;
                 $int->{pos}    = 'aft';
             }
-            elsif ( $data->{question} =~ s/^(\W*\b(?:who|what|when|where|why|how|whose)\b\W*)//i ) {
+            elsif ( $data->{question} =~ s/^(\W*\b(?:who|what|when|where|why|how|whom|whose|which)\b\W*)//i ) {
                 $int->{phrase} = lc $1;
                 $int->{phrase} = ucfirst $1 unless ($skip_casing);
                 $int->{pos}    = 'fore';
@@ -322,8 +322,8 @@ sub calculate_score ( $self, $material_set, $question = undef ) {
 
     my $de_int = sub {
         my ($text) = @_;
-        $text =~ s/\s+(who|what|when|where|why|how|whom|whose)$// or
-            $text =~ s/^(who|what|when|where|why|how|whom|whose)\s+//;
+        $text =~ s/\s+(who|what|when|where|why|how|whom|whose|which)$// or
+            $text =~ s/^(who|what|when|where|why|how|whom|whose|which)\s+//;
         return $text;
     };
 
