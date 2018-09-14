@@ -1,5 +1,13 @@
 Revision history for CBQZ
 
+15.8.6    Fri Sep 14 16:07:51 PDT 2018
+        - Feature additions
+            - Forgot password functionality; closes #176
+            - README updated with database backup/restore info
+        - Bug fixes
+            - Fouls in scorekeeping now work right; closes #175
+            - Correct and unify interrogatives list
+
 15.7.5    Tue Sep 11 16:17:12 PDT 2018
         - Feature additions
             - Live scoreboard per room tracker page
