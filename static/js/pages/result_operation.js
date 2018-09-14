@@ -134,17 +134,23 @@ else if ( input.form == "foul" ) {
         quizzer_fouls = Object.values( input.quizzer.events ).filter( function (value) {
             return value.toString().indexOf("F") != -1;
         } );
-    if ( input.quizzers.events )
-        team_fouls = Object.values( input.quizzers.events ).filter( function (value) {
-            return value.toString().indexOf("F") != -1;
-        } );
 
-    if ( quizzer_fouls.length >= 3 ) {
+    for ( var i = 0; i < input.quizzers.length; i++ ) {
+        if ( input.quizzers[i].events ) {
+            team_fouls.push(
+                Object.values( input.quizzers[i].events ).filter( function (value) {
+                    return value.toString().indexOf("F") != -1;
+                } )
+            );
+        }
+    }
+
+    if ( quizzer_fouls.length >= 2 ) {
         output.quizzer = -10;
         output.team    = -10;
         output.label   += "--";
     }
-    else if ( team_fouls.length >= 4 ) {
+    else if ( team_fouls.length >= 3 ) {
         output.team  = -10;
         output.label += "-";
     }
