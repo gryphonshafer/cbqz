@@ -48,7 +48,7 @@ sub change_name ( $self, $username, $underscore_ok = 0 ) {
     return $self->obj;
 }
 
-sub change_passwd ( $self, $passwd, $old_passwd ) {
+sub change_passwd ( $self, $passwd, $old_passwd = undef ) {
     E->throw('Password complexity not met') unless ( $passwd and $self->password_quality($passwd) );
     E->throw('Password provided does not match stored password')
         if ( defined $old_passwd and $self->obj->passwd ne sha256_hex($old_passwd) );

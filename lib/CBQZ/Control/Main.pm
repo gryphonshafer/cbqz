@@ -559,4 +559,59 @@ sub auto_kvl ($self) {
     return $self->redirect_to('/main/question_sets');
 }
 
+sub reset_password_start ($self) {
+    my $user;
+
+    try {
+        $user = CBQZ::Model::User->new->load({ username => $self->param('username') })->obj;
+    }
+    catch {
+        $self->flash( message => 'Unable to find that particular user in the system.' );
+    };
+
+    if ($user) {
+        CBQZ::Model::Email->new( type => 'reset_password' )->send({
+            to   => $user->email,
+            data => {
+                realname => $user->realname,
+                username => $user->username,
+                url      => $self->url_for('/reset_password')->query(
+                    user => $user->username,
+                    key => substr( $user->passwd, 0, 7 ),
+                )->to_abs->to_string,
+            },
+        });
+
+        $self->flash( message => {
+            type => 'success',
+            text =>
+                'The password reset process has started. Look to your email for ' .
+                'a message with instructions and the next step in the process.',
+        } );
+    }
+
+    return $self->redirect_to('/');
+}
+
+sub reset_password_save ($self) {
+    try {
+        my $user = CBQZ::Model::User->new->load({ username => $self->param('user') });
+
+        E->throw('Username/password incorrect in reset password save')
+            unless ( substr( $user->obj->passwd, 0, 7 ) eq $self->param('key') );
+
+        $user->change_passwd( $self->param('passwd') );
+
+        $self->flash( message => {
+            type => 'success',
+            text => 'User account password changed.',
+        } );
+    }
+    catch {
+        $self->flash( message => 'Unable to change passsword for user.' );
+    };
+
+    return $self->redirect_to('/');
+}
+
 1;

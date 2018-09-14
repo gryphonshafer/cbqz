@@ -397,6 +397,22 @@ div#header_login input[type="password"]:hover {
 
 /* -------------------------------------------------------------------------- */
 
+div.two_column {
+    display: inline-block;
+    width: calc( 50vw - 15px );
+    vertical-align: top;
+}
+
+@media ( max-width: 740px ) {
+    div.two_column {
+        display: inherit;
+        width: inherit;
+        vertical-align: inherit;
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+
 .htmlarea {
     display: block;
     background-color: white;

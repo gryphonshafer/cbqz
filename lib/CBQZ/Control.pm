@@ -74,8 +74,10 @@ sub startup ($self) {
     my $anyone = $self->routes;
 
     $anyone->any('/')->to('main#index');
-    $anyone->any( '/' . $_ )->to( controller => 'main', action => $_ ) for ( qw( login logout create_user ) );
-    $anyone->any('/create-user')->to( controller => 'main', action => 'create_user' );
+    $anyone->any( '/' . $_ )->to( controller => 'main', action => $_ ) for ( qw(
+        login logout create_user
+        reset_password_start reset_password reset_password_save
+    ) );
 
     my $authorized_user = $anyone->under( sub ($self) {
         return 1 if (

@@ -66,7 +66,9 @@ sub send ( $self, $data ) {
     $data->{subject} = \$self->subject;
     $data->{html}    = \$self->html;
 
-    return ( $self->active ) ? $self->mailer->send($data) : undef;
+    return undef unless ( $self->active );
+    $self->info( 'Sent email: ' . $self->type );
+    return $self->mailer->send($data);
 }
 
 __PACKAGE__->meta->make_immutable;
