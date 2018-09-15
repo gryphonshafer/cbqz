@@ -2,6 +2,7 @@ package CBQZ::Control::Main;
 
 use Mojo::Base 'Mojolicious::Controller';
 use exact;
+use Mojo::IOLoop;
 use Try::Tiny;
 use Text::Unidecode 'unidecode';
 use Text::CSV_XS 'csv';
@@ -531,18 +532,23 @@ sub merge_question_sets ($self) {
 
 sub auto_kvl ($self) {
     try {
+        my $set_data     = $self->cbqz->json->decode( $self->req->param('set_data') );
         my $material_set = CBQZ::Model::MaterialSet->new->load(
             $self->decode_cookie('cbqz_prefs')->{material_set_id}
         );
 
-        CBQZ::Model::QuestionSet->new->load( $_->{id} )->auto_kvl(
-            $material_set,
-            $self->stash('user'),
-        ) for ( @{
-            $self->cbqz->json->decode(
-                $self->req->param('set_data')
-            )
-        } );
+        Mojo::IOLoop->subprocess(
+            sub {
+                CBQZ::Model::QuestionSet->new->load( $_->{id} )->auto_kvl(
+                    $material_set,
+                    $self->stash('user'),
+                ) for (@$set_data);
+            },
+            sub {
+                my ( $subprocess, $error, @results ) = @_;
+                $self->error($error) if ($error);
+            },
+        );
 
         $self->flash( message => {
             type => 'success',

@@ -140,8 +140,8 @@ push_onload( function () {
 
     document.getElementById("auto-kvl").onclick = function () {
         if ( confirm(
-            "Are you sure you want to automatically write some but not\n" +
-            "all key-verse list type questions into the selected question set(s)?"
+            "Are you sure you want to automatically replace all key-verse list type questions\n" +
+            "with auto-written key-verse list type questions into the selected question set(s)?"
         ) ) {
             document.location.href = cntlr + "/auto_kvl?set_data=" +
                 encodeURI( JSON.stringify(checked_sets) );

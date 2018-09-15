@@ -253,50 +253,55 @@ sub auto_kvl ( $self, $material_set, $user = undef ) {
     E->throw('User does not have permission to auto-KVL this set')
         if ( $user and not $self->is_usable_by($user) );
 
-    $self->fork( sub {
-        my $question_model = CBQZ::Model::Question->new;
-        for my $type (
-            [ 'Q',   'solo',  [ undef, 'Q', 'FT'    ] ],
-            [ 'FTV', 'solo',  [ undef, 'FTV'        ] ],
-            [ 'Q2V', 'range', [ undef, 'Q2V', 'FTN' ] ],
-            [ 'F2V', 'range', [ undef, 'F2V'        ] ],
-            [ 'FT',  'solo',  'FT'  ],
-            [ 'FTN', 'range', 'FTN' ],
-        ) {
-            my $verses = $material_set->obj->materials->search(
-                {
-                    key_class => $type->[1],
-                    key_type  => $type->[2],
-                },
-                {
-                    order_by => [ qw( book chapter verse ) ],
-                },
-            );
+    my $question_model = CBQZ::Model::Question->new;
+    my @type_matrix    = (
+        [ 'Q',   'solo',  [ undef, 'Q', 'FT'    ] ],
+        [ 'FTV', 'solo',  [ undef, 'FTV'        ] ],
+        [ 'Q2V', 'range', [ undef, 'Q2V', 'FTN' ] ],
+        [ 'F2V', 'range', [ undef, 'F2V'        ] ],
+        [ 'FT',  'solo',  'FT'  ],
+        [ 'FTN', 'range', 'FTN' ],
+    );
 
-            my $in_range = 0;
-            while ( my $verse = $verses->next ) {
-                if ( $type->[1] eq 'range' ) {
-                    if ($in_range) {
-                        $in_range = 0;
-                        next;
-                    }
-                    else {
-                        $in_range = 1;
-                    }
+    $question_model->rs->search({
+        question_set_id => $self->obj->id,
+        type            => $_->[0],
+    })->delete for (@type_matrix);
+
+    for my $type (@type_matrix) {
+        my $verses = $material_set->obj->materials->search(
+            {
+                key_class => $type->[1],
+                key_type  => $type->[2],
+            },
+            {
+                order_by => [ qw( book chapter verse ) ],
+            },
+        );
+
+        my $in_range = 0;
+        while ( my $verse = $verses->next ) {
+            if ( $type->[1] eq 'range' ) {
+                if ($in_range) {
+                    $in_range = 0;
+                    next;
                 }
-
-                $question_model->new->create({
-                    question_set_id => $self->obj->id,
-                    %{ $question_model->auto_text( $material_set, {
-                        book    => $verse->book,
-                        chapter => $verse->chapter,
-                        verse   => $verse->verse,
-                        type    => $type->[0],
-                    } ) },
-                })->calculate_score($material_set);
+                else {
+                    $in_range = 1;
+                }
             }
+
+            $question_model->new->create({
+                question_set_id => $self->obj->id,
+                %{ $question_model->auto_text( $material_set, {
+                    book    => $verse->book,
+                    chapter => $verse->chapter,
+                    verse   => $verse->verse,
+                    type    => $type->[0],
+                } ) },
+            })->calculate_score($material_set);
         }
-    } );
+    }
 
     return $self;
 }
