@@ -1,5 +1,8 @@
 Revision history for CBQZ
 
+15.8.7    Fri Sep 14 19:50:18 PDT 2018
+        - Switch auto-KVL web generation to more standard IO loop mechanism
+
 15.8.6    Fri Sep 14 16:07:51 PDT 2018
         - Feature additions
             - Forgot password functionality; closes #176
