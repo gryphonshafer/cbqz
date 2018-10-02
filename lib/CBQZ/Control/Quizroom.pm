@@ -76,7 +76,6 @@ sub path ($self) {
             score_types         => $self->cbqz->json->decode( $program->obj->score_types ),
             readiness           => $program->obj->readiness,
             saved_quizzes       => [
-                sort { $a->{scheduled} cmp $b->{scheduled} }
                 map {
                     if ( $_->{state} eq 'active' ) {
                         my $status = $self->cbqz->json->decode( $_->{status} || '{}' );

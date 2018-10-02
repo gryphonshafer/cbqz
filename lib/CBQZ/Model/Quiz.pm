@@ -47,9 +47,20 @@ sub quizzes_for_user ( $self, $user, $program ) {
         map { +{ $_->get_inflated_columns } }
         $self->rs->search(
             {
-                user_id    => $user->obj->id,
                 program_id => $program->obj->id,
                 state      => [ qw( pending active ) ],
+                (
+                    ( $user->has_role('official') )
+                        ? (
+                            -or => [
+                                user_id  => $user->obj->id,
+                                official => 1,
+                            ],
+                        )
+                        : (
+                            user_id  => $user->obj->id,
+                        )
+                ),
             },
             {
                 order_by => [
