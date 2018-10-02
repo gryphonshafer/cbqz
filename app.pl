@@ -2,7 +2,7 @@
 use exact;
 
 BEGIN {
-    $ENV{CONFIGAPPENV} = $ENV{MOJO_MODE} || $ENV{PLACK_ENV} || 'development';
+    $ENV{CONFIGAPPENV} //= $ENV{MOJO_MODE} || $ENV{PLACK_ENV} || 'development';
 }
 
 use Config::App;
