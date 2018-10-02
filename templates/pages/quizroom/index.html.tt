@@ -34,6 +34,7 @@
                     }"
                 >
                     <td><a
+                        v-on:click="quiz_link_click( quiz, $event )"
                         v-bind:href="'[% cntlr %]/quiz?id=' + quiz.quiz_id"
                         v-bind:title="'Click to resume quiz: ' + quiz.name">{{ quiz.name }}</a></td>
                     <td>{{ quiz.quizmaster }}</td>

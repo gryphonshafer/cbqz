@@ -86,6 +86,14 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
             },
             reset_question_types: function () {
                 this.question_types = this.program_question_types;
+            },
+            quiz_link_click: function ( quiz, event ) {
+                if ( this.quizmaster != quiz.quizmaster ) {
+                    if ( ! confirm(
+                        "It appears you are not the quizmaster scheduled to run this quiz.\n" +
+                        "Are you sure you want to take over running this quiz?"
+                    ) ) event.preventDefault();
+                }
             }
         },
 
