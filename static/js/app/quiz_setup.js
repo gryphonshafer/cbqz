@@ -31,10 +31,6 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
         el: "#quiz_setup",
         data: data,
         methods: {
-            chapter_clicked: function (chapter) {
-                chapter.selected = ! chapter.selected;
-                this.save_settings();
-            },
             select_chapters: function (type) {
                 var chapters = this.question_set.statistics;
                 var state    = ( type == "all" ) ? true : false;
