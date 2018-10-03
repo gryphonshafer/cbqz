@@ -346,8 +346,10 @@ sub parse_quiz_teams_quizzers ( $self, $quiz_teams_quizzers_string ) {
             E->throw('Team name parsing failed') unless ( $team and $team =~ /\w/ and $team !~ /\n/ );
             {
                 team => {
-                    name  => $team,
-                    score => 0,
+                    name      => $team,
+                    score     => 0,
+                    correct   => 0,
+                    incorrect => 0,
                 },
                 quizzers => [
                     map {
