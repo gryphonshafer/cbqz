@@ -10,7 +10,7 @@ use CBQZ::Model::Question;
 use CBQZ::Model::QuestionSet;
 use CBQZ::Model::MaterialSet;
 
-my $settings = options( qw( user|u=s questions|q=s materials|m=s ) );
+my $settings = options( qw( user|u=s questions|q=s materials|m=s reset|r ) );
 pod2usage unless ( $settings->{user} and $settings->{questions} and $settings->{materials} );
 
 my ( $question_set, $material_set );
@@ -45,6 +45,7 @@ Progress::Any::Output->set( { task => 'questions' }, 'TermProgressBarColor' );
 
 for my $question ( $question_model->model( $question_set->obj->questions->all ) ) {
     my $data = $question->auto_text($material_set);
+    $data->{marked} = undef if ( $settings->{reset} );
 
     if ( $data->{error} ) {
         warn sprintf(
@@ -71,6 +72,7 @@ markup_questions.pl - Add color markup to a plain-text questions set
         -u|user       USERNAME
         -q|questions  QUESTIONS_SET_NAME
         -m|materials  MATERIAL_SET_NAME
+        -r|reset      # reset any marked questions before processing
         -h|help
         -m|man
 

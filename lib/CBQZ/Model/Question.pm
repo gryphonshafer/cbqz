@@ -41,7 +41,8 @@ sub is_shared_set ($self) {
 
     my $words = sub ($text) {
         $text =~ s/<[^>]+>//g;
-        $text =~ s/\W/ /g;
+        $text =~ s/[^A-z0-9_\-']/ /g;
+        $text =~ s/'(?![A-z])/ /g;
         $text =~ s/\s+/ /g;
         $text =~ s/(^\s+|\s+$)//g;
         return [ split( /\s/, $text ) ];
@@ -88,10 +89,10 @@ sub is_shared_set ($self) {
         $text =~ s/\[[^\]]*\]//g;
         $text =~ s/\s+/ /g;
         $text =~ s/[^\w\s]+//g;
-        $text =~ s/(\w)/$1(?:<[^>]+>)*['-]*(?:<[^>]+>)*/g;
         $text =~ s/(?:^\s+|\s+$)//g;
+        $text =~ s/(\w)(?=.)/$1(?:<[^>]+>)*['-]*(?:<[^>]+>)*/g;
         $text =~ s/\s/(?:<[^>]+>|\\W)+/g;
-        $text = '(?:[\'\"])?(?:<[^>]+>)*\b' . $text . '\b';
+        $text = q{(?:['"])?(?:<[^>]+>)*\b} . $text . '\b' . q{(?!'[A-z])};
 
         return $text;
     };
