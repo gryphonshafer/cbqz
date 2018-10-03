@@ -82,10 +82,14 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                             vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].name
                         ) {
                             if ( input.form == "question" && ! result_data.skip_counts ) {
-                                if ( input.result == "success" )
-                                        vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].correct++;
-                                if ( input.result == "failure" )
-                                        vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].incorrect++;
+                                if ( input.result == "success" ) {
+                                    vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].correct++;
+                                    vue_obj.metadata.quiz_teams_quizzers[i].team.correct++;
+                                }
+                                if ( input.result == "failure" ) {
+                                    vue_obj.metadata.quiz_teams_quizzers[i].quizzers[j].incorrect++;
+                                    vue_obj.metadata.quiz_teams_quizzers[i].team.incorrect++;
+                                }
                             }
 
                             if ( !! result_data.label ) {

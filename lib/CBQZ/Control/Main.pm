@@ -479,12 +479,25 @@ sub import_question_set ($self) {
             'Also check that your question types match the district program question types'
         ) unless (@$questions);
 
-        my $set = CBQZ::Model::QuestionSet->new->create(
+        my $question_set = CBQZ::Model::QuestionSet->new->create(
             $self->stash('user'),
             $self->req->param('question_set_name'),
-        )->import_questions(
-            $questions,
-            CBQZ::Model::MaterialSet->new->load( $self->decode_cookie('cbqz_prefs')->{material_set_id} ),
+        );
+        my $material_set = CBQZ::Model::MaterialSet->new->load(
+            $self->decode_cookie('cbqz_prefs')->{material_set_id},
+        );
+
+        Mojo::IOLoop->subprocess(
+            sub {
+                $question_set->import_questions(
+                    $questions,
+                    $material_set,
+                );
+            },
+            sub {
+                my ( $subprocess, $error, @results ) = @_;
+                $self->error($error) if ($error);
+            },
         );
 
         $self->stash('user')->event('import_question_set');

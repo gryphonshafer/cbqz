@@ -47,9 +47,20 @@ sub quizzes_for_user ( $self, $user, $program ) {
         map { +{ $_->get_inflated_columns } }
         $self->rs->search(
             {
-                user_id    => $user->obj->id,
                 program_id => $program->obj->id,
                 state      => [ qw( pending active ) ],
+                (
+                    ( $user->has_role('official') )
+                        ? (
+                            -or => [
+                                user_id  => $user->obj->id,
+                                official => 1,
+                            ],
+                        )
+                        : (
+                            user_id  => $user->obj->id,
+                        )
+                ),
             },
             {
                 order_by => [
@@ -335,8 +346,10 @@ sub parse_quiz_teams_quizzers ( $self, $quiz_teams_quizzers_string ) {
             E->throw('Team name parsing failed') unless ( $team and $team =~ /\w/ and $team !~ /\n/ );
             {
                 team => {
-                    name  => $team,
-                    score => 0,
+                    name      => $team,
+                    score     => 0,
+                    correct   => 0,
+                    incorrect => 0,
                 },
                 quizzers => [
                     map {

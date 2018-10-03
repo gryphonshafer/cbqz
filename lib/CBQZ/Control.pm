@@ -241,7 +241,7 @@ sub setup_csv ($self) {
                         [ $1, $2 ];
                     }
                     grep { index( $_, $ppid ) != -1 }
-                    `/bin/ps xao pid,ppid`
+                    `/bin/ps xa -o pid,ppid`
                 );
             }
             elsif ( $command eq 'finish' ) {

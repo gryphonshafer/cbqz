@@ -13,4 +13,5 @@ RUN apk --no-cache add perl perl-dbd-mysql && \
 VOLUME /cbqz
 EXPOSE 3000
 
+CMD rm runtime/hypnotoad.pid
 CMD hypnotoad -f app.pl

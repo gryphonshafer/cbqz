@@ -76,7 +76,6 @@ sub path ($self) {
             score_types         => $self->cbqz->json->decode( $program->obj->score_types ),
             readiness           => $program->obj->readiness,
             saved_quizzes       => [
-                sort { $a->{scheduled} cmp $b->{scheduled} }
                 map {
                     if ( $_->{state} eq 'active' ) {
                         my $status = $self->cbqz->json->decode( $_->{status} || '{}' );
@@ -208,6 +207,8 @@ sub data ($self) {
         )->get_material;
 
         $quiz->obj->update({ state => 'active' });
+        $quiz->obj->update({ quizmaster => $self->stash('user')->obj->realname })
+            if ( $quiz->obj->quizmaster ne $self->stash('user')->obj->realname );
     }
     catch {
         $self->warn($_);
@@ -255,6 +256,8 @@ sub quiz_event ($self) {
 
         my $quiz = CBQZ::Model::Quiz->new->load( $event->{metadata}{quiz_id} );
         $quiz->obj->update({ metadata => $self->cbqz->json->encode( $event->{metadata} ) });
+        $quiz->obj->update({ quizmaster => $self->stash('user')->obj->realname })
+            if ( $quiz->obj->quizmaster ne $self->stash('user')->obj->realname );
 
         my $quiz_question_data = {
             quiz_id         => $event->{metadata}{quiz_id},

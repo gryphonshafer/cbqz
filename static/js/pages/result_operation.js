@@ -61,10 +61,10 @@ if ( input.form == "question" ) {
             }
         }
 
-        if ( input.quizzer.correct == 3 ) {
+        if ( input.quizzer.correct == 3 && input.quizzer.incorrect == 0 ) {
             output.team    += 10;
             output.quizzer += 10;
-            output.label   += "+";
+            output.label   += "++";
             output.message = "Quiz Out: " + input.quizzer.name;
         }
     }
@@ -104,10 +104,16 @@ if ( input.form == "question" ) {
             output.number = int_number + 1;
         }
 
-        if ( input.quizzer.incorrect >= 1 || input.team.incorrect >= 2 ) {
-            output.quizzer = -10;
-            output.team    = -10;
-            output.label   += "-";
+        if ( input.as != "Bonus" ) {
+            if ( input.quizzer.incorrect >= 1 || input.team.incorrect >= 2 ) {
+                output.quizzer = -10;
+                output.team    = -10;
+                output.label   += "--";
+            }
+            else if ( int_number >= 17 ) {
+                output.team  = -10;
+                output.label += "-";
+            }
         }
 
         if ( input.quizzer.incorrect == 2 )

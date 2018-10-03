@@ -192,31 +192,29 @@ sub save_set_select_users ( $self, $user, $type, $selected_user_ids ) {
 }
 
 sub import_questions ( $self, $questions, $material_set ) {
-    $self->fork( sub {
-        for my $question_data (@$questions) {
-            $question_data->{type} = 'MACR'  if ( $question_data->{type} eq 'CRMA'  );
-            $question_data->{type} = 'MACVR' if ( $question_data->{type} eq 'CVRMA' );
-            $question_data->{type} = 'Q'     if ( $question_data->{type} eq 'QT'    );
+    for my $question_data (@$questions) {
+        $question_data->{type} = 'MACR'  if ( $question_data->{type} eq 'CRMA'  );
+        $question_data->{type} = 'MACVR' if ( $question_data->{type} eq 'CVRMA' );
+        $question_data->{type} = 'Q'     if ( $question_data->{type} eq 'QT'    );
 
-            $question_data->{verse} =~ s/\D.*$//g;
+        $question_data->{verse} =~ s/\D.*$//g;
 
-            $question_data->{question} =~ s/^\s+|\s+$//g;
-            $question_data->{answer}   =~ s/^\s+|\s+$//g;
+        $question_data->{question} =~ s/^\s+|\s+$//g;
+        $question_data->{answer}   =~ s/^\s+|\s+$//g;
 
-            $question_data->{question} =~ s/^Q:\s+//i;
-            $question_data->{answer}   =~ s/^A:\s+//i;
+        $question_data->{question} =~ s/^Q:\s+//i;
+        $question_data->{answer}   =~ s/^A:\s+//i;
 
-            $question_data->{question_set_id} = $self->obj->id;
+        $question_data->{question_set_id} = $self->obj->id;
 
-            my $question_obj = CBQZ::Model::Question->new->create($question_data);
+        my $question_obj = CBQZ::Model::Question->new->create($question_data);
 
-            my $data = $question_obj->auto_text($material_set);
-            $data->{marked} = delete $data->{error} if ( $data->{error} );
+        my $data = $question_obj->auto_text($material_set);
+        $data->{marked} = delete $data->{error} if ( $data->{error} );
 
-            $question_obj->obj->update($data);
-            $question_obj->calculate_score($material_set);
-        }
-    } );
+        $question_obj->obj->update($data);
+        $question_obj->calculate_score($material_set);
+    }
 
     return $self;
 }

@@ -595,6 +595,10 @@ div#material_search_display span.outdent {
     cursor: pointer;
 }
 
+div#material_search input#material_search_input {
+    width: 230px;
+}
+
 /* -------------------------------------------------------------------------- */
 
 div#editor {

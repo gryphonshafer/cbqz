@@ -34,6 +34,7 @@
                     }"
                 >
                     <td><a
+                        v-on:click="quiz_link_click( quiz, $event )"
                         v-bind:href="'[% cntlr %]/quiz?id=' + quiz.quiz_id"
                         v-bind:title="'Click to resume quiz: ' + quiz.name">{{ quiz.name }}</a></td>
                     <td>{{ quiz.quizmaster }}</td>
@@ -83,7 +84,7 @@
                         title="Check if quiz is an official quiz of a regulation quiz meet"><input type="checkbox"
                         name="official" v-model="official">Official Quiz</label>
                     <label title="Check to save the quiz for later instead of start it now"><input
-                        type="checkbox" name="save_for_later" v-model="save_for_later"> Save for Later</label>
+                        type="checkbox" name="save_for_later" v-model="save_for_later">Save for Later</label>
                 </div>
 
                 <button type="submit" v-bind:disabled="not_generate_ready"
@@ -179,7 +180,6 @@
 
                     <tr
                         v-for="chapter in question_set.statistics"
-                        v-on:click="chapter_clicked(chapter)"
                         v-bind:class="{
                             selected: chapter.selected,
                             selected_extra: chapter.weighted

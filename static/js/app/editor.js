@@ -172,7 +172,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         count_questions(vue_obj);
     }
 
-    function create_question ( vue_obj, question, clear_form ) {
+    function create_question ( vue_obj, question, clear_form, callback ) {
         if ( ! vue_obj.questions.data[ question.book ] )
             vue_obj.questions.data[ question.book ] = {};
         if ( ! vue_obj.questions.data[ question.book ][ question.chapter ] )
@@ -200,6 +200,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 vue_obj.$nextTick( function () {
                     vue_obj.questions.chapter          = question.chapter;
                     vue_obj.questions.marked_questions = vue_obj.grep_marked_questions();
+                    if (callback) callback(vue_obj);
                 } );
             } );
         } );
@@ -337,9 +338,25 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                         ( !! this.question.marked ) ? this.question.marked : null;
 
                     this.$http.post( cntlr + "/save", this.question ).then( function (response) {
+                        var select = document.getElementById("marked_questions_list");
+                        var index  = select.selectedIndex;
+
                         delete_question(this);
                         this.$nextTick( function () {
-                            create_question( this, response.body.question );
+                            create_question(
+                                this,
+                                response.body.question,
+                                false,
+                                function (vue_obj) {
+                                    if ( index > -1 && select.options.length > 0 ) {
+                                        vue_obj.questions.marked_question_id = vue_obj.questions.marked_questions[
+                                            ( select.options.length - 1 > index )
+                                                ? index
+                                                : select.options.length - 1
+                                        ].question_id;
+                                    }
+                                }
+                            );
                             this.classes.cursor_progress = false;
                         } );
                     } );
@@ -359,8 +376,21 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     ).then( function (response) {
                         this.classes.cursor_progress = false;
                         if ( response.body.success ) {
+                            var select = document.getElementById("marked_questions_list");
+                            var index  = select.selectedIndex;
+
                             delete_question(this);
                             this.questions.marked_questions = this.grep_marked_questions();
+
+                            this.$nextTick( function () {
+                                if ( index > -1 && select.options.length > 0 ) {
+                                    this.questions.marked_question_id = this.questions.marked_questions[
+                                        ( select.options.length - 1 > index )
+                                            ? index
+                                            : select.options.length - 1
+                                    ].question_id;
+                                }
+                            } );
                         }
                         else {
                             alert("There was an error deleting the question.");
