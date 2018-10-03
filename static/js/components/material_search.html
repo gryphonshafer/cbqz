@@ -2,7 +2,8 @@
     <div id="material_search">
         <div class="margin_lift">
             <input type="text" ref="search_text_input" v-model="search_text" placeholder="Search Text"
-                size="30" title="Enter search text; search will run after 3 characters or click Gi">
+                id="material_search_input"
+                v-bind:title="search_input_title">
             <button v-on:click="go"
                 title="Run search now manually">Go</button>
             <button v-on:click="find"
@@ -62,7 +63,13 @@
                     book    : null,
                     chapter : null,
                     verse   : null
-                }
+                },
+                search_input_title :
+                    "Enter search text. " +
+                    "Search will automatically run on anything larger than 3 characters, " +
+                    "or click the \"Go\" button to force a run. " +
+                    "Spaces at start and end of the input text will limit the search " +
+                    "to word boundaries at the start and/or end."
             };
         },
         props: {
@@ -121,7 +128,7 @@
                         return match + "(<[^>]+>)*['-]*(<[^>]+>)*";
                     } )
                     .replace( /\\ /g, " " )
-                    .replace( /(^\s+|\s+$)/g, "\\s" )
+                    .replace( /(^\s+|\s+$)/g, "\\b" )
                     .replace( /\s/g, "(<[^>]+>|\\W)+" );
 
                 search_regex += '(?![^<]*>)';
