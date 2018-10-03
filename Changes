@@ -1,5 +1,21 @@
 Revision history for CBQZ
 
+15.9.1    Wed Oct  3 16:33:06 PDT 2018
+        - Feature additions
+            - Material search uses spaces for word boundaries; closes #191
+            - Maintain place on marked save or delete; closes #178
+            - Overwrite QM on quiz if diff; warn in UI if diff
+        - Bug fixes
+            - Auto-text improvements for apostrophies; closes #180
+            - Remove row-click for chapter select; closes #184
+            - Error deduction for team errors works now; closes #189
+            - 10 point bonus for quizout only if no errors; closes #188
+            - Error points access in questions >= 17; closes #187
+            - Adjust ps command to return for Alpine; closes #190
+            - Quiz list shares official quizzes; closes #185
+            - Replace questions import fork with IOLoop structure; closes #192
+            - Alter how app.pl sets up config env var
+
 15.8.7    Fri Sep 14 19:50:18 PDT 2018
         - Switch auto-KVL web generation to more standard IO loop mechanism
 
