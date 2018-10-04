@@ -1,5 +1,8 @@
 Revision history for CBQZ
 
+15.9.2    Wed Oct  3 19:30:06 PDT 2018
+        - Fix chapter selection bug throwing quiz gen errors
+
 15.9.1    Wed Oct  3 16:33:06 PDT 2018
         - Feature additions
             - Material search uses spaces for word boundaries; closes #191
