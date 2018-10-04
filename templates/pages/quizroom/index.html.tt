@@ -189,6 +189,7 @@
                             <input type="checkbox"
                                 v-bind:value="chapter.book + '|' + chapter.chapter"
                                 v-model="chapter.selected"
+                                v-on:change="save_settings"
                             >
                         </td>
                         <td class="left">{{ chapter.book }}</td>
