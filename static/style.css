@@ -305,6 +305,12 @@ div#footer p.right {
     float: right;
 }
 
+@media ( max-width: 650px ) {
+    div#footer p.right {
+        display: none;
+    }
+}
+
 /* -------------------------------------------------------------------------- */
 
 form fieldset {
@@ -654,7 +660,7 @@ div#editor input#marked_comment {
 }
 
 @media ( min-width: 1031px ) {
-    div#material_lookup button {
+    div#editor div#material_lookup button {
         margin-top: 0px;
     }
 }
@@ -709,10 +715,6 @@ div#editor input#marked_comment {
 
     div#questions_list_prime_list select.questions_list_list {
         height: 185px;
-    }
-
-    div#footer p.right {
-        display: none;
     }
 }
 
@@ -1033,13 +1035,19 @@ div#quizroom div#rearrange_quizzers fieldset {
 
 /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
 
+@media ( min-width: 1001px ) {
+    div#quizroom div#material_lookup button {
+        margin-top: 0px;
+    }
+}
+
 @media ( max-width: 1000px ) and ( min-width: 850px ) {
     div#quizroom div#material_lookup button {
         display: block;
     }
 
     div#quizroom div#material_lookup_display {
-        height: 316px;
+        height: 314px;
     }
 }
 
