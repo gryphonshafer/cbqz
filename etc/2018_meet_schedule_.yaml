@@ -1,0 +1,53 @@
+---
+default:    
+    churches: 9
+    teams: 2
+    prelims: 6
+    rooms: 4
+    quizzers: 100
+    min: 8
+    max: 14
+    stats: Lilly Peterson, (working remotely)
+    lunch: No
+    mtg: No
+    mtg_room: TBD & TBA
+    meet_director: Scott Peterson
+    twitter: '@PNWQuizzing'
+    tw_pod: '@InsideQuizzing'
+    email_pod: 'iq@cbqz.org'
+    insta: '@pnw_biblequizzing'
+    note1: All score sheets should be brought by the winning team to Quiz Room 1 and placed on the printer.
+    note2: >
+        All Program Leaders and Quizmasters should meet in Room 4 
+        (just off the sanctuary) Saturday morning for a quick leadership meeting.
+        Please meet right as worship ends and before devotions begins.
+1:
+    date: Friday, October 12 - Saturday, October 13, 2018
+    meet: 'District Meet #1'
+    location: Eastridge Baptist Church
+    address: 12520 SE 240th St, Kent, WA 98031
+2:
+    date: Friday, November 16 - Saturday, November 17, 2018
+    meet: 'District Meet #2'
+    location: Alliance Bible Church
+    address: 19999 SE 240th St, Covington, WA 98031
+3:
+    date: Friday, November 16 - Saturday, November 17, 2018
+    meet: 'District Meet #3'
+    location: Alliance Bible Church
+    address: 19999 SE 240th St, Covington, WA 98031
+4:
+    date: Friday, November 16 - Saturday, November 17, 2018
+    meet: 'District Meet #4'
+    location: Alliance Bible Church
+    address: 19999 SE 240th St, Covington, WA 98031
+5:
+    date: Friday, November 16 - Saturday, November 17, 2018
+    meet: 'District Meet #5'
+    location: Alliance Bible Church
+    address: 19999 SE 240th St, Covington, WA 98031
+DC:
+    date: Friday, November 16 - Saturday, November 17, 2018
+    meet: District Championships
+    location: Alliance Bible Church
+    address: 19999 SE 240th St, Covington, WA 98031
