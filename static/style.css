@@ -647,6 +647,12 @@ div#editor input#marked_comment {
     width: 405px;
 }
 
+@media ( min-width: 1031px ) {
+    div#material_lookup button {
+        margin-top: 0px;
+    }
+}
+
 @media ( max-width: 1030px ) {
     div#editor div#material_lookup button {
         display: block;
