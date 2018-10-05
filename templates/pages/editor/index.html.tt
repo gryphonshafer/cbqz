@@ -230,7 +230,7 @@
             <span class="label">Marked Questions ({{ this.questions.marked_questions.length }}):</span>
             <div>
                 <select id="marked_questions_list"
-                    tabindex="2" class="questions_list_list" v-model="questions.marked_question_id" size="6">
+                    tabindex="2" class="questions_list_list" v-model="questions.marked_question_id" size="8">
                     <option v-for="item in this.questions.marked_questions" v-bind:value="item.question_id">{{
                         item.book.replace( ' ', '' ).substr( 0, 2 ) + ' ' +
                         item.chapter + ':' +

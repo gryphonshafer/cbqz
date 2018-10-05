@@ -361,6 +361,11 @@ input[type="reset"]:disabled {
     background-color: lightgray;
 }
 
+select[size] option {
+    margin: 0px;
+    padding: 0px 0px 0px 2px;
+}
+
 /* -------------------------------------------------------------------------- */
 
 div#header_login {
