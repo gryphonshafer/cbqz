@@ -626,11 +626,11 @@ div#editor div#questions_list select.questions_list_list {
 div#editor div#material_lookup {
     display: inline-block;
     vertical-align: top;
-    width: calc( 100vw - 665px );
+    width: calc( 100vw - 655px );
 }
 
 div#editor div#material_lookup_display {
-    height: 404px;
+    height: 399px;
 }
 
 div#editor div#material_search {
