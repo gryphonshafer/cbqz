@@ -216,7 +216,7 @@
             </div>
 
             <div id="questions_list_prime_list" class="margin_lift">
-                <select tabindex="1" class="questions_list_list" v-model="questions.question_id" size="14">
+                <select tabindex="1" class="questions_list_list" v-model="questions.question_id" size="13">
                     <option v-for="item in questions.questions" v-bind:value="item.question_id">{{
                         item.verse + ' ' +
                         ( ( !! item.type ) ? item.type : '[No Type]' ) + ' ' +
@@ -230,7 +230,7 @@
             <span class="label">Marked Questions ({{ this.questions.marked_questions.length }}):</span>
             <div>
                 <select id="marked_questions_list"
-                    tabindex="2" class="questions_list_list" v-model="questions.marked_question_id" size="8">
+                    tabindex="2" class="questions_list_list" v-model="questions.marked_question_id" size="7">
                     <option v-for="item in this.questions.marked_questions" v-bind:value="item.question_id">{{
                         item.book.replace( ' ', '' ).substr( 0, 2 ) + ' ' +
                         item.chapter + ':' +
