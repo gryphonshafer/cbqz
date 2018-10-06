@@ -63,13 +63,16 @@ Below is all the information you could ever want for the upcoming quiz meet.
 
 #LUNCH INFORMATION
 [% IF lunch == 'No' %] + There will be no lunch provided at the church.
-[% ELSE %] + There will be lunch provided at the church. [% END %]
+[% ELSE %] + There will be lunch provided at the church. [%- END -%]
+
 #LEADERSHIP MEETING
 [% IF mtg == 'No' %] + There will be no leadership meeting during lunch.
-[% ELSE %] + There will be a leadership meting during lunch in [% mtg_room %]. [% END %]
+[% ELSE %] + There will be a leadership meting during lunch in [% mtg_room %]. [%- END -%]
+
 #MISCELLANEOUS INFORMATION
 [% note1 %]
-[% note2 %]
+[%- note2 -%]
+
 #QUIZ MEET COMPETITION INFORMATION
 + There are [% churches %] churches participating in [% meet %]
 + There are [% teams %] teams participating in [% meet %].
