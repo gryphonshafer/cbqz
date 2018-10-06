@@ -648,18 +648,18 @@ div#editor div#material_lookup_display {
 div#editor div#material_search {
     display: block;
     vertical-align: top;
-    margin-top: -20px;
+    margin-top: -18px;
 }
 
 div#editor div#material_search_display {
-    height: calc( 100vh - 530px );
+    height: calc( 100vh - 534px );
 }
 
 div#editor input#marked_comment {
     width: 405px;
 }
 
-@media ( min-width: 1031px ) {
+@media ( min-width: 1030px ) {
     div#editor div#material_lookup button {
         margin-top: 0px;
     }
@@ -736,11 +736,11 @@ div#editor input#marked_comment {
 
 @media ( max-width: 655px ) and ( min-height: 976px ) {
     div#editor div#material_lookup_display {
-        height: calc( 50vh - 378px );
+        height: calc( 50vh - 379px );
     }
 
     div#editor div#material_search_display {
-        height: calc( 50vh - 378px );
+        height: calc( 50vh - 379px );
     }
 }
 
@@ -843,12 +843,12 @@ div#quizroom div#material_lookup_display {
 div#quizroom div#material_search_wrapper {
     display: inline-block;
     vertical-align: top;
-    margin-top: -25px;
-    width: calc( 100vw - 555px );
+    margin-top: -24px;
+    width: calc( 100vw - 560px );
 }
 
 div#quizroom div#material_search_display {
-    height: calc( 100vh - 460px );
+    height: calc( 100vh - 464px );
 }
 
 div#quizroom div#manage {
@@ -917,7 +917,7 @@ div#scoresheet {
     margin-left: 2px;
     width: 525px;
     min-width: 525px;
-    height: calc( 100vh - 461px );
+    height: calc( 100vh - 464px );
     background: white;
     border: 1px solid lightgray;
     overflow: auto;
