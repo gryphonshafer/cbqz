@@ -910,18 +910,21 @@ div#quizroom div#timer div#timer_display {
 
 /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
 
+div#quizroom div#scoresheet {
+    width: 525px;
+    min-width: 525px;
+}
+
 div#scoresheet {
     display: inline-block;
     vertical-align: top;
-    margin-top: 4px;
     margin-left: 2px;
-    width: 525px;
-    min-width: 525px;
-    height: calc( 100vh - 464px );
     background: white;
     border: 1px solid lightgray;
     overflow: auto;
     overflow-x: hidden;
+    height: calc( 100vh - 464px );
+    margin-top: 4px;
 }
 
 div#scoresheet a {
@@ -1170,42 +1173,38 @@ div#quizroom div#rearrange_quizzers fieldset {
 div#live_scoresheet {
     margin-top: -60px;
     margin-bottom: -25px;
-    font-size: 32px;
-}
-
-div#live_scoresheet h1 {
-    font-size: 32px;
-    margin-bottom: 0px;
 }
 
 div#live_scoresheet p#question_number {
-    font-size: 32px;
-    margin-top: 22px;
+    margin-top: -20px;
     margin-bottom: 0px;
 }
+
 div#live_scoresheet ul#metadata {
     position: absolute;
     top: 8px;
     right: 10px;
-    font-size: 24px;
     margin-top: 0px;
 }
 
 div#live_scoresheet div#scoresheet {
-    width: inherit;
+    position: absolute;
+    top: 60px;
+    left: 5px;
+    width: calc( 100vw - 16px );
+    height: calc( 100vh - 75px );
     overflow-y: auto;
-    height: calc( 100vh - 120px );
     background-color: #f0f0f0;
 }
 
 div#live_scoresheet div#scoresheet table td.quizzer_name {
-    height: 240px;
+    height: 105px;
 }
 
 div#live_scoresheet div#scoresheet table td.quizzer_name div {
-    transform: rotate(90deg) translate( 100px, 0px );
-    width: 220px;
-    margin-left: calc( 50% - 110px );
+    transform: rotate(90deg) translate( 45px, 0px );
+    width: 100px;
+    margin-left: calc( 50% - 50px );
 }
 
 div#live_scoresheet div#scoresheet table tr#quizzer_names td:hover:not(.selected) table td {
@@ -1215,6 +1214,84 @@ div#live_scoresheet div#scoresheet table tr#quizzer_names td:hover:not(.selected
 
 html.live_scoresheet {
     overflow-y: hidden;
+}
+
+@media ( max-width: 550px ) {
+    div#live_scoresheet div#scoresheet {
+        font-size: 10px;
+    }
+
+    div#live_scoresheet div#scoresheet table td.quizzer_name {
+        height: 84px;
+    }
+
+    div#live_scoresheet div#scoresheet table td.quizzer_name div {
+        transform: rotate(90deg) translate( 35px, 0px );
+        width: 78px;
+        margin-left: calc( 50% - 38px );
+    }
+}
+
+@media ( max-width: 640px ) {
+    div#live_scoresheet h1 {
+        font-size: 15px;
+    }
+
+    div#live_scoresheet p#question_number {
+        margin-top: -10px;
+    }
+}
+
+@media ( min-width: 700px ) {
+    div#live_scoresheet {
+        font-size: 20px;
+    }
+
+    div#live_scoresheet p#question_number,
+    div#live_scoresheet ul#metadata {
+        font-size: 16px;
+    }
+
+    div#live_scoresheet div#scoresheet {
+        top: 70px;
+        height: calc( 100vh - 85px );
+    }
+
+    div#live_scoresheet div#scoresheet table td.quizzer_name {
+        height: 158px;
+    }
+
+    div#live_scoresheet div#scoresheet table td.quizzer_name div {
+        transform: rotate(90deg) translate( 66px, 0px );
+        width: 145px;
+        margin-left: calc( 50% - 72px );
+    }
+}
+
+@media ( min-width: 980px ) {
+    div#live_scoresheet {
+        font-size: 30px;
+    }
+
+    div#live_scoresheet p#question_number,
+    div#live_scoresheet ul#metadata {
+        font-size: 20px;
+    }
+
+    div#live_scoresheet div#scoresheet {
+        top: 85px;
+        height: calc( 100vh - 100px );
+    }
+
+    div#live_scoresheet div#scoresheet table td.quizzer_name {
+        height: 240px;
+    }
+
+    div#live_scoresheet div#scoresheet table td.quizzer_name div {
+        transform: rotate(90deg) translate( 100px, 0px );
+        width: 220px;
+        margin-left: calc( 50% - 110px );
+    }
 }
 
 /* -------------------------------------------------------------------------- */
