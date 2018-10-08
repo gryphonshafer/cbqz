@@ -113,4 +113,23 @@ sub live_scoresheet ($self) {
     $self->on( finish => sub { $self->socket( finish => $socket_name, { tx => $self->tx } ) } );
 }
 
+sub meet_status ($self) {
+    return $self->redirect_to('/stats') unless ( $self->tx->is_websocket );
+    $self->inactivity_timeout( $self->cbqz->config->get( qw( session duration ) ) );
+
+    my $socket_name = join( '|',
+        'meet_status',
+        $self->decode_cookie('cbqz_prefs')->{program_id},
+    );
+
+    $self->socket( setup => $socket_name, {
+        tx => $self->tx,
+        cb => sub ( $tx, $data ) {
+            $tx->send( { json => $self->cbqz->json->decode($data) } );
+        },
+    });
+
+    $self->on( finish => sub { $self->socket( finish => $socket_name, { tx => $self->tx } ) } );
+}
+
 1;

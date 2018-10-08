@@ -1,0 +1,41 @@
+[%
+    page.title = 'Quiz Meet Status';
+    page.menu  = 'stats';
+    page.vue   = 1;
+
+    page.links.push(
+        '/stats/path.js',
+        '/js/app/meet_status.js',
+    );
+    page.pre_inline_js.push(
+        'var meet_status_websocket_url = "' _
+        c.url_for('/stats/meet_status').to_abs.scheme('ws')
+        _ '";'
+    );
+%]
+
+<div id="meet_status">
+    <!-- TODO: display all summary status data and make it look nice -->
+
+    <template v-if="quizzes">
+        <ul v-for="( quiz, index ) in quizzes">
+            <li>Quiz: <b>{{ quiz.name }}</b></li>
+            <li>State: <b>{{ quiz.state.ucfirst }}</b></li>
+            <li>Quizmaster: <b>{{ quiz.quizmaster }}</b></li>
+            <li>Room: <b>{{ quiz.room }}</b></li>
+            <li>Type: <b>{{ ( quiz.official ) ? "Official" : "Practice" }}</b></li>
+            <li>Created: <b>{{ quiz.created }}</b></li>
+            <li>Scheduled: <b>{{ quiz.scheduled }}</b></li>
+            <li>Last Modified: <b>{{ quiz.last_modified }}</b></li>
+        </ul>
+    </template>
+    <template v-else>
+        <p>
+            This page will display a live quiz meet status once there is some
+            activity (since loading this page) in any official quiz room. To
+            force this page to display quiz data, you can just reload the quiz
+            room page. <i>Note that only <b>official</b> quizzes for the quiz
+            meet will display here.
+        </p>
+    </template>
+</div>

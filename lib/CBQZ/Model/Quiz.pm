@@ -397,6 +397,23 @@ sub data_deep ($self) {
     return $data;
 }
 
+sub meet_status_quizzes ( $self, $program_id ) {
+    # TODO: query and return official quiz room data
+
+    return [
+        map { +{ $_->get_inflated_columns } }
+        $self->rs->search(
+            {
+                program_id => $program_id,
+                official   => 1,
+            },
+            {
+                order_by => 'room',
+            },
+        )->all
+    ];
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
