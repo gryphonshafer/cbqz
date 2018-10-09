@@ -1389,6 +1389,43 @@ div#material div#material_search div.margin_lift {
 
 /* -------------------------------------------------------------------------- */
 
+div#meet_status div#meet_status_quiz_wrapper {
+    text-align: center;
+}
+
+div#meet_status div#meet_status_quiz_wrapper div {
+    text-align: left;
+    border: 1px solid silver;
+    background-color: white;
+    display: inline-block;
+    margin: 10px;
+    padding: 10px;
+}
+
+div#meet_status div#meet_status_quiz_wrapper div h2 {
+    margin-top: 0px;
+    margin-bottom: 10px;
+}
+
+div#meet_status div#meet_status_quiz_wrapper div.pending {
+    background-color: #ccffcc;
+}
+
+div#meet_status div#meet_status_quiz_wrapper div.active {
+    background-color: #ffeeaa;
+}
+
+div#meet_status div#meet_status_quiz_wrapper div.closed {
+    background-color: lightgrey;
+}
+
+div#meet_status div#meet_status_quiz_wrapper div ul {
+    padding-left: 20px;
+    margin: 0px;
+}
+
+/* -------------------------------------------------------------------------- */
+
 div.page_panel {
     position: absolute;
     margin: 0 auto 0 auto;

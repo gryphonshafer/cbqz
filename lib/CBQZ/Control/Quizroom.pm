@@ -236,7 +236,7 @@ my $quiz_data_ws = sub ( $self, $quiz, $cbqz_prefs ) {
                 'meet_status',
                 $cbqz_prefs->{program_id},
             ),
-            { data => $self->cbqz->json->encode( { quizzes => $meet_status_quizzes } ) },
+            { data => $self->cbqz->json->encode($meet_status_quizzes) },
         );
     }
 };

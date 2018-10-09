@@ -114,22 +114,30 @@ sub live_scoresheet ($self) {
 }
 
 sub meet_status ($self) {
-    return $self->redirect_to('/stats') unless ( $self->tx->is_websocket );
-    $self->inactivity_timeout( $self->cbqz->config->get( qw( session duration ) ) );
+    unless ( $self->tx->is_websocket ) {
+        $self->render( json =>
+            CBQZ::Model::Quiz->new->meet_status_quizzes(
+                $self->decode_cookie('cbqz_prefs')->{program_id},
+            ),
+        );
+    }
+    else {
+        $self->inactivity_timeout( $self->cbqz->config->get( qw( session duration ) ) );
 
-    my $socket_name = join( '|',
-        'meet_status',
-        $self->decode_cookie('cbqz_prefs')->{program_id},
-    );
+        my $socket_name = join( '|',
+            'meet_status',
+            $self->decode_cookie('cbqz_prefs')->{program_id},
+        );
 
-    $self->socket( setup => $socket_name, {
-        tx => $self->tx,
-        cb => sub ( $tx, $data ) {
-            $tx->send( { json => $self->cbqz->json->decode($data) } );
-        },
-    });
+        $self->socket( setup => $socket_name, {
+            tx => $self->tx,
+            cb => sub ( $tx, $data ) {
+                $tx->send( { json => $self->cbqz->json->decode($data) } );
+            },
+        });
 
-    $self->on( finish => sub { $self->socket( finish => $socket_name, { tx => $self->tx } ) } );
+        $self->on( finish => sub { $self->socket( finish => $socket_name, { tx => $self->tx } ) } );
+    }
 }
 
 1;
