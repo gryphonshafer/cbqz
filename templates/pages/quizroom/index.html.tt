@@ -194,8 +194,8 @@
                         </td>
                         <td class="left">{{ chapter.book }}</td>
                         <td>{{ chapter.chapter }}</td>
-                        <td>{{ chapter.questions }}</td>
                         <td>{{ chapter.verses }}</td>
+                        <td>{{ chapter.questions }}</td>
                         <td>{{ ( chapter.questions / chapter.verses ).toFixed(2) }}</td>
                         <td class="question_type_totals"
                             v-for="type in chapter.types">{{ type[1] || 0 }}</td>
