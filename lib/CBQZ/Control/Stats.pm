@@ -83,12 +83,21 @@ sub quiz ($self) {
     );
 }
 
-sub delete ($self) {
+sub delete_practice_quiz ($self) {
     CBQZ::Model::Quiz->new->rs->search({
         quiz_id  => [ keys %{ $self->params } ],
         official => 0,
         user_id  => $self->stash('user')->obj->id,
     })->delete;
+
+    return $self->redirect_to('/stats');
+}
+
+sub delete_official_quiz ($self) {
+    CBQZ::Model::Quiz->new->rs->search({
+        quiz_id    => $self->param('quiz_id'),
+        program_id => $self->decode_cookie('cbqz_prefs')->{program_id},
+    })->delete if ( $self->stash('user')->has_role('director') );
 
     return $self->redirect_to('/stats');
 }
