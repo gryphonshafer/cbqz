@@ -256,10 +256,12 @@ sub setup_csv ($self) {
             for my $socket ( @{ $cbqz->dq->sql('SELECT name, counter, data FROM socket')->run->all({}) } ) {
                 if (
                     $sockets->{ $socket->{name} } and
+                    $sockets->{ $socket->{name} }{counter} and $socket->{counter} and
                     $sockets->{ $socket->{name} }{counter} < $socket->{counter}
                 ) {
                     $sockets->{ $socket->{name} }{counter} = $socket->{counter};
                     $cbqz->debug( 'Socket ' . $socket->{name} . ' was messaged; ' . $$ . ' responding' );
+
                     $sockets->{ $socket->{name} }{callback}->( $_, $socket->{data} ) for (
                         values %{ $sockets->{ $socket->{name} }{transactions} }
                     );

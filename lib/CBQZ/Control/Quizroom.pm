@@ -220,7 +220,7 @@ sub data ($self) {
     return $self->render( json => $data );
 }
 
-my $live_scoresheet = sub ( $self, $quiz, $cbqz_prefs ) {
+my $quiz_data_ws = sub ( $self, $quiz, $cbqz_prefs ) {
     $self->socket(
         message => join( '|',
             'live_scoresheet',
@@ -229,6 +229,16 @@ my $live_scoresheet = sub ( $self, $quiz, $cbqz_prefs ) {
         ),
         { data => $self->cbqz->json->encode( $quiz->data_deep ) },
     ) if ( $quiz->obj->official );
+
+    if ( my $meet_status_quizzes = $quiz->meet_status_quizzes( $cbqz_prefs->{program_id} ) ) {
+        $self->socket(
+            message => join( '|',
+                'meet_status',
+                $cbqz_prefs->{program_id},
+            ),
+            { data => $self->cbqz->json->encode($meet_status_quizzes) },
+        );
+    }
 };
 
 sub quiz_event ($self) {
@@ -280,7 +290,7 @@ sub quiz_event ($self) {
         $quiz_question_data = CBQZ::Model::QuizQuestion->new->create($quiz_question_data)->data;
         delete $quiz_question_data->{question};
 
-        $live_scoresheet->( $self, $quiz, $cbqz_prefs );
+        $quiz_data_ws->( $self, $quiz, $cbqz_prefs );
 
         $self->render( json => {
             success       => 1,
@@ -315,7 +325,7 @@ sub delete_quiz_event ($self) {
             question_number => $event->{question_number},
         })->obj->delete;
 
-        $live_scoresheet->( $self, $quiz, $cbqz_prefs );
+        $quiz_data_ws->( $self, $quiz, $cbqz_prefs );
 
         $self->render( json => { success => 1 } );
     }
@@ -402,7 +412,7 @@ sub close ($self) {
         my $quiz = CBQZ::Model::Quiz->new->load( $self->req->param('quiz_id') );
         $quiz->obj->update({ state => 'closed' });
 
-        $live_scoresheet->( $self, $quiz, $cbqz_prefs );
+        $quiz_data_ws->( $self, $quiz, $cbqz_prefs );
 
         $self->stash('user')->event('close_quiz');
     }
@@ -465,7 +475,7 @@ sub rearrange_quizzers ($self) {
         $request->{metadata}{quiz_teams_quizzers} = $quizzers_data;
         $quiz->obj->update({ metadata => $self->cbqz->json->encode( $request->{metadata} ) });
 
-        $live_scoresheet->( $self, $quiz, $cbqz_prefs );
+        $quiz_data_ws->( $self, $quiz, $cbqz_prefs );
 
         $self->render( json => {
             success             => 1,
@@ -500,7 +510,7 @@ sub status ($self) {
 
         if ( keys %$status ) {
             $quiz->obj->update({ status => $quiz->json->encode($status) });
-            $live_scoresheet->( $self, $quiz, $cbqz_prefs );
+            $quiz_data_ws->( $self, $quiz, $cbqz_prefs );
         }
         else {
             $status = $quiz->json->decode( $quiz->obj->status );

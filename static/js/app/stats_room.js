@@ -17,8 +17,7 @@ function start_live_scoresheet_ws() {
     live_scoresheet_ws = new WebSocket(stats_room_websocket_url);
 
     live_scoresheet_ws.onmessage = function (e) {
-        var data = JSON.parse( e.data );
-        vue_app.$data.quiz = data;
+        vue_app.$data.quiz = JSON.parse( e.data );
     };
 
     live_scoresheet_ws.onclose = function (e) {

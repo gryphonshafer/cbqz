@@ -198,6 +198,7 @@ div#header {
     background-color: lightgray;
     border-bottom: 1px solid gray;
     z-index: 10;
+    min-width: 400px;
 }
 
 div#header h1 {
@@ -304,6 +305,12 @@ div#footer p.right {
     float: right;
 }
 
+@media ( max-width: 650px ) {
+    div#footer p.right {
+        display: none;
+    }
+}
+
 /* -------------------------------------------------------------------------- */
 
 form fieldset {
@@ -359,6 +366,11 @@ button:disabled,
 input[type="submit"]:disabled,
 input[type="reset"]:disabled {
     background-color: lightgray;
+}
+
+select[size] option {
+    margin: 0px;
+    padding: 0px 0px 0px 2px;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -626,34 +638,42 @@ div#editor div#questions_list select.questions_list_list {
 div#editor div#material_lookup {
     display: inline-block;
     vertical-align: top;
-    width: calc( 100vw - 665px );
+    width: calc( 100vw - 655px );
 }
 
 div#editor div#material_lookup_display {
-    height: 404px;
+    height: 399px;
 }
 
 div#editor div#material_search {
     display: block;
     vertical-align: top;
-    margin-top: -20px;
+    margin-top: -18px;
 }
 
 div#editor div#material_search_display {
-    height: calc( 100vh - 540px );
+    height: calc( 100vh - 534px );
 }
 
 div#editor input#marked_comment {
     width: 405px;
 }
 
-@media ( max-width: 1030px ) {
+@media ( min-width: 1030px ) {
+    div#editor div#material_lookup button {
+        margin-top: 0px;
+    }
+}
+
+@media ( max-width: 1030px ) and ( min-width: 980px ) {
     div#editor div#material_lookup button {
         display: block;
     }
+}
 
+@media ( max-width: 1030px ) {
     div#editor div#material_lookup_display {
-        height: 382px;
+        height: 377px;
     }
 }
 
@@ -664,7 +684,7 @@ div#editor input#marked_comment {
     }
 
     div#editor div#material_lookup_display {
-        height: 166px;
+        height: calc( 50vh - 279px );
     }
 
     div#editor div#material_search {
@@ -672,7 +692,7 @@ div#editor input#marked_comment {
     }
 
     div#editor div#material_search_display {
-        height: calc( 100vh - 779px );
+        height: calc( 50vh - 279px );
     }
 }
 
@@ -696,27 +716,41 @@ div#editor input#marked_comment {
     div#questions_list_prime_list select.questions_list_list {
         height: 185px;
     }
+}
 
+@media ( max-width: 1030px ) and ( max-height: 640px ) {
     div#editor div#material_search_display {
-        height: calc( 100vh - 965px );
+        height: 110px;
     }
 }
 
-@media ( max-width: 870px ) and ( max-height: 980px ) {
+@media ( max-width: 870px ) and ( max-height: 779px ) {
+    div#editor div#material_lookup_display {
+        height: 110px;
+    }
+
     div#editor div#material_search_display {
-        height: 100px;
+        height: 110px;
     }
 }
 
-@media ( max-width: 644px ) and ( max-height: 1150px ) {
+@media ( max-width: 655px ) and ( min-height: 976px ) {
+    div#editor div#material_lookup_display {
+        height: calc( 50vh - 379px );
+    }
+
     div#editor div#material_search_display {
-        height: 100px;
+        height: calc( 50vh - 379px );
     }
 }
 
-@media ( max-height: 640px ) {
+@media ( max-width: 655px ) and ( max-height: 976px ) {
+    div#editor div#material_lookup_display {
+        height: 110px;
+    }
+
     div#editor div#material_search_display {
-        height: 100px;
+        height: 110px;
     }
 }
 
@@ -782,6 +816,10 @@ div#quiz_setup button[type=submit] {
 
 /* -------------------------------------------------------------------------- */
 
+div#quizroom {
+    min-width: 550px;
+}
+
 div#quizroom div#question {
     display: inline-block;
     vertical-align: top;
@@ -796,7 +834,6 @@ div#quizroom div#material_lookup {
     display: inline-block;
     vertical-align: top;
     width: calc( 100vw - 635px );
-    margin-top: -3px;
 }
 
 div#quizroom div#material_lookup_display {
@@ -806,12 +843,12 @@ div#quizroom div#material_lookup_display {
 div#quizroom div#material_search_wrapper {
     display: inline-block;
     vertical-align: top;
-    margin-top: -25px;
-    width: calc( 100vw - 562px );
+    margin-top: -24px;
+    width: calc( 100vw - 560px );
 }
 
 div#quizroom div#material_search_display {
-    height: calc( 100vh - 469px );
+    height: calc( 100vh - 464px );
 }
 
 div#quizroom div#manage {
@@ -873,18 +910,21 @@ div#quizroom div#timer div#timer_display {
 
 /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
 
+div#quizroom div#scoresheet {
+    width: 525px;
+    min-width: 525px;
+}
+
 div#scoresheet {
     display: inline-block;
     vertical-align: top;
-    margin-top: 4px;
     margin-left: 2px;
-    width: 525px;
-    min-width: 525px;
-    height: calc( 100vh - 470px );
     background: white;
     border: 1px solid lightgray;
     overflow: auto;
     overflow-x: hidden;
+    height: calc( 100vh - 464px );
+    margin-top: 4px;
 }
 
 div#scoresheet a {
@@ -1001,13 +1041,19 @@ div#quizroom div#rearrange_quizzers fieldset {
 
 /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
 
+@media ( min-width: 1001px ) {
+    div#quizroom div#material_lookup button {
+        margin-top: 0px;
+    }
+}
+
 @media ( max-width: 1000px ) and ( min-width: 850px ) {
     div#quizroom div#material_lookup button {
         display: block;
     }
 
     div#quizroom div#material_lookup_display {
-        height: 316px;
+        height: 314px;
     }
 }
 
@@ -1028,7 +1074,7 @@ div#quizroom div#rearrange_quizzers fieldset {
 }
 
 @media ( max-width: 850px ) {
-    div#quizroom {
+    div#quizroom > div {
         display: flex;
         flex-wrap: wrap;
     }
@@ -1054,8 +1100,26 @@ div#quizroom div#rearrange_quizzers fieldset {
         width: 100% !important;
     }
 
+    div#quizroom div#material_search input {
+        width: 225px;
+    }
+
+    div#quizroom div#material_lookup_display {
+        height: calc( 50vh - 327px );
+    }
+
     div#quizroom div#material_search_display {
-        height: 316px !important;
+        height: calc( 50vh - 327px );
+    }
+}
+
+@media ( max-width: 850px ) and ( max-height: 875px ) {
+    div#quizroom div#material_lookup_display {
+        height: 110px;
+    }
+
+    div#quizroom div#material_search_display {
+        height: 110px;
     }
 }
 
@@ -1081,6 +1145,27 @@ div#quizroom div#rearrange_quizzers fieldset {
     div#quizroom div.manage_group:first-of-type {
         margin-right: 20px;
     }
+    div#quizroom div.manage_group:nth-of-type(2) {
+        margin-top: -8px;
+    }
+
+    div#quizroom div#material_lookup_display {
+        height: calc( 50vh - 392px );
+    }
+
+    div#quizroom div#material_search_display {
+        height: calc( 50vh - 392px );
+    }
+}
+
+@media ( max-width: 615px ) and ( max-height: 1005px ) {
+    div#quizroom div#material_lookup_display {
+        height: 110px;
+    }
+
+    div#quizroom div#material_search_display {
+        height: 110px;
+    }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -1088,42 +1173,38 @@ div#quizroom div#rearrange_quizzers fieldset {
 div#live_scoresheet {
     margin-top: -60px;
     margin-bottom: -25px;
-    font-size: 32px;
-}
-
-div#live_scoresheet h1 {
-    font-size: 32px;
-    margin-bottom: 0px;
 }
 
 div#live_scoresheet p#question_number {
-    font-size: 32px;
-    margin-top: 22px;
+    margin-top: -20px;
     margin-bottom: 0px;
 }
+
 div#live_scoresheet ul#metadata {
     position: absolute;
     top: 8px;
     right: 10px;
-    font-size: 24px;
     margin-top: 0px;
 }
 
 div#live_scoresheet div#scoresheet {
-    width: inherit;
+    position: absolute;
+    top: 60px;
+    left: 5px;
+    width: calc( 100vw - 16px );
+    height: calc( 100vh - 75px );
     overflow-y: auto;
-    height: calc( 100vh - 120px );
     background-color: #f0f0f0;
 }
 
 div#live_scoresheet div#scoresheet table td.quizzer_name {
-    height: 240px;
+    height: 105px;
 }
 
 div#live_scoresheet div#scoresheet table td.quizzer_name div {
-    transform: rotate(90deg) translate( 100px, 0px );
-    width: 220px;
-    margin-left: calc( 50% - 110px );
+    transform: rotate(90deg) translate( 45px, 0px );
+    width: 100px;
+    margin-left: calc( 50% - 50px );
 }
 
 div#live_scoresheet div#scoresheet table tr#quizzer_names td:hover:not(.selected) table td {
@@ -1133,6 +1214,84 @@ div#live_scoresheet div#scoresheet table tr#quizzer_names td:hover:not(.selected
 
 html.live_scoresheet {
     overflow-y: hidden;
+}
+
+@media ( max-width: 550px ) {
+    div#live_scoresheet div#scoresheet {
+        font-size: 10px;
+    }
+
+    div#live_scoresheet div#scoresheet table td.quizzer_name {
+        height: 84px;
+    }
+
+    div#live_scoresheet div#scoresheet table td.quizzer_name div {
+        transform: rotate(90deg) translate( 35px, 0px );
+        width: 78px;
+        margin-left: calc( 50% - 38px );
+    }
+}
+
+@media ( max-width: 640px ) {
+    div#live_scoresheet h1 {
+        font-size: 15px;
+    }
+
+    div#live_scoresheet p#question_number {
+        margin-top: -10px;
+    }
+}
+
+@media ( min-width: 700px ) {
+    div#live_scoresheet {
+        font-size: 20px;
+    }
+
+    div#live_scoresheet p#question_number,
+    div#live_scoresheet ul#metadata {
+        font-size: 16px;
+    }
+
+    div#live_scoresheet div#scoresheet {
+        top: 70px;
+        height: calc( 100vh - 85px );
+    }
+
+    div#live_scoresheet div#scoresheet table td.quizzer_name {
+        height: 158px;
+    }
+
+    div#live_scoresheet div#scoresheet table td.quizzer_name div {
+        transform: rotate(90deg) translate( 66px, 0px );
+        width: 145px;
+        margin-left: calc( 50% - 72px );
+    }
+}
+
+@media ( min-width: 980px ) {
+    div#live_scoresheet {
+        font-size: 30px;
+    }
+
+    div#live_scoresheet p#question_number,
+    div#live_scoresheet ul#metadata {
+        font-size: 20px;
+    }
+
+    div#live_scoresheet div#scoresheet {
+        top: 85px;
+        height: calc( 100vh - 100px );
+    }
+
+    div#live_scoresheet div#scoresheet table td.quizzer_name {
+        height: 240px;
+    }
+
+    div#live_scoresheet div#scoresheet table td.quizzer_name div {
+        transform: rotate(90deg) translate( 100px, 0px );
+        width: 220px;
+        margin-left: calc( 50% - 110px );
+    }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -1226,6 +1385,43 @@ div#material div#material_search div.margin_lift {
     div#material div#material_lookup_display {
         height: calc( 50vh - 100px );
     }
+}
+
+/* -------------------------------------------------------------------------- */
+
+div#meet_status div#meet_status_quiz_wrapper {
+    text-align: center;
+}
+
+div#meet_status div#meet_status_quiz_wrapper div {
+    text-align: left;
+    border: 1px solid silver;
+    background-color: white;
+    display: inline-block;
+    margin: 10px;
+    padding: 10px;
+}
+
+div#meet_status div#meet_status_quiz_wrapper div h2 {
+    margin-top: 0px;
+    margin-bottom: 10px;
+}
+
+div#meet_status div#meet_status_quiz_wrapper div.pending {
+    background-color: #ccffcc;
+}
+
+div#meet_status div#meet_status_quiz_wrapper div.active {
+    background-color: #ffeeaa;
+}
+
+div#meet_status div#meet_status_quiz_wrapper div.closed {
+    background-color: lightgrey;
+}
+
+div#meet_status div#meet_status_quiz_wrapper div ul {
+    padding-left: 20px;
+    margin: 0px;
 }
 
 /* -------------------------------------------------------------------------- */
