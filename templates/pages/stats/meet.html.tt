@@ -12,6 +12,8 @@
         c.url_for('/stats/meet_status').to_abs.scheme('ws')
         _ '";'
     );
+
+    cntlr = c.url_for('/stats');
 %]
 
 <div id="meet_status">
@@ -21,7 +23,12 @@
                 <h2>Room {{ quiz.room }}</h2>
 
                 <ul>
-                    <li>Quiz: <b>{{ quiz.name }}</b></li>
+                    <li>
+                        Quiz:
+                        <a
+                            v-bind:href="'[% cntlr %]/quiz?id=' + quiz.quiz_id"
+                        ><b>{{ quiz.name }}</b></a>
+                    </li>
                     <li>Question: <b>{{ ( quiz.status ) ? quiz.status.question_number : 1 }}</b></li>
                     <li>State: <b>{{ quiz.state | ucfirst }}</b></li>
                     <li>QM: <b>{{ quiz.quizmaster }}</b></li>
