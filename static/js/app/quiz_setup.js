@@ -9,6 +9,8 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
         ? cbqz_prefs.question_types
         : data.program_question_types;
 
+    data.room = cbqz_prefs.room || 1;
+
     if ( ! data.quiz_teams_quizzers ) {
         var teams_count   = 3;
         var team_size     = 4;
@@ -64,7 +66,8 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
                         material_set_id: this.material_set_id,
                         weight_chapters: this.weight_chapters,
                         weight_percent: this.weight_percent,
-                        question_types: this.question_types
+                        question_types: this.question_types,
+                        room: this.room
                     },
                     65535
                 );
@@ -126,7 +129,8 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
         watch: {
             weight_chapters: function () { this.save_settings() },
             weight_percent:  function () { this.save_settings() },
-            question_types:  function () { this.save_settings() }
+            question_types:  function () { this.save_settings() },
+            room:            function () { this.save_settings() }
         },
 
         created: function () {
