@@ -5,17 +5,23 @@
     page.js.push( '/js/utilities.js', '/js/pages/stats.js' );
 %]
 
-<h2>Live Scoreboard</h2>
+<h2>Live Scoreboards and Meet Status</h2>
 
 <p>
     Select a room from the list to follow a live scoreboard for that room.
-    This is operational only for official quizzes.
+    Select the meet status link to see a summary live status page for a quiz meet.
+    These are operational only for official quizzes.
 </p>
 
-[% FOR room IN [ 1 .. 9 ] %]
-    <a href="[% c.url_for( '/stats/room/' _ room ) %]" target="live_scoresheet">Room [% room %]</a>
-    [% UNLESS loop.last %]|[% END %]
-[% END %]
+<ul>
+    <li><a href="[% c.url_for('/stats/meet') %]">Meet Status</a></li>
+    <li>
+        [% FOR room IN [ 1 .. 9 ] %]
+            <a href="[% c.url_for( '/stats/room/' _ room ) %]" target="live_scoresheet">Room [% room %]</a>
+            [% UNLESS loop.last %]|[% END %]
+        [% END %]
+    </li>
+</ul>
 
 [% BLOCK quizzes_block %]
     <h2>[% type.ucfirst %] Quizzes</h2>

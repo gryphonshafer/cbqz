@@ -397,6 +397,51 @@ sub data_deep ($self) {
     return $data;
 }
 
+sub meet_status_quizzes ( $self, $program_id ) {
+    return [
+        map {
+            my $data = $self->dq->sql(q{
+                SELECT
+                    name,
+                    state,
+                    quizmaster,
+                    room,
+                    scheduled,
+                    last_modified,
+                    status,
+                    metadata
+                FROM quiz
+                WHERE
+                    program_id = ? AND
+                    official = 1 AND
+                    last_modified >= NOW() - INTERVAL ? DAY AND
+                    room = ?
+                ORDER BY last_modified DESC
+                LIMIT 1
+            })->run( $program_id, 1, $_->[0] )->next->data;
+
+            for ( qw( status metadata ) ) {
+                try {
+                    $data->{$_} = $self->json->decode( $data->{$_} );
+                }
+                catch {
+                    delete $data->{$_};
+                };
+            }
+
+            $data;
+        } @{ $self->dq->sql(q{
+            SELECT DISTINCT room
+            FROM quiz
+            WHERE
+                program_id = ? AND
+                official = 1 AND
+                last_modified >= NOW() - INTERVAL ? DAY
+            ORDER BY room
+        })->run( $program_id, 1 )->all }
+    ];
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
