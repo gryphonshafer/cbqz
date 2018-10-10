@@ -24,12 +24,17 @@
                     <li>Quiz: <b>{{ quiz.name }}</b></li>
                     <li>Question: <b>{{ ( quiz.status ) ? quiz.status.question_number : 1 }}</b></li>
                     <li>State: <b>{{ quiz.state | ucfirst }}</b></li>
-                    <li>Quizmaster: <b>{{ quiz.quizmaster }}</b></li>
-                    <li>Scheduled: <b>{{ quiz.scheduled }}</b></li>
-                    <li>Last Event: <b>{{ quiz.last_modified }}</b></li>
+                    <li>QM: <b>{{ quiz.quizmaster }}</b></li>
                 </ul>
 
-                <h3>Scoreboard at Question {{ ( quiz.status ) ? quiz.status.question_number : 1 }}</h3>
+                <h3>
+                    <template v-if="quiz.state != 'closed'">
+                        Score at Question {{ ( quiz.status ) ? quiz.status.question_number : 1 }}
+                    </template>
+                    <template v-else>
+                        Final Score
+                    </template>
+                </h3>
 
                 <ul>
                     <li v-for="team_block in quiz.metadata.quiz_teams_quizzers">

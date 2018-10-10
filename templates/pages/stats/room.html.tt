@@ -26,7 +26,8 @@
             <li>Quizmaster: <b>{{ quiz.quizmaster }}</b></li>
         </ul>
 
-        <p id="question_number">Question Number: <b>{{ quiz.status.question_number }}</b></p>
+        <p id="question_number"
+            v-if="quiz.state != 'closed'">Question Number: <b>{{ quiz.status.question_number }}</b></p>
 
         <div id="scoresheet">
             <table class="tabular">
