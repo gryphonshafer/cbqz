@@ -9,7 +9,9 @@
     );
     page.pre_inline_js.push(
         'var meet_status_websocket_url = "' _
-        c.url_for('/stats/meet_status').to_abs.scheme('ws')
+        c.url_for('/stats/meet_status').to_abs.scheme(
+            ( c.req.url.to_abs.scheme.match('s$') ) ? 'wss' : 'ws'
+        )
         _ '";'
     );
 
