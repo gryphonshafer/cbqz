@@ -11,7 +11,9 @@
     );
     page.pre_inline_js.push(
         'var stats_room_websocket_url = "' _
-        c.url_for('/stats/live_scoresheet').query( room => room ).to_abs.scheme('ws')
+        c.url_for('/stats/live_scoresheet').query( room => room ).to_abs.scheme(
+            ( c.req.url.to_abs.scheme.match('s$') ) ? 'wss' : 'ws'
+        )
         _ '";'
     );
 %]
@@ -26,7 +28,8 @@
             <li>Quizmaster: <b>{{ quiz.quizmaster }}</b></li>
         </ul>
 
-        <p id="question_number">Question Number: <b>{{ quiz.status.question_number }}</b></p>
+        <p id="question_number"
+            v-if="quiz.state != 'closed'">Question Number: <b>{{ quiz.status.question_number }}</b></p>
 
         <div id="scoresheet">
             <table class="tabular">

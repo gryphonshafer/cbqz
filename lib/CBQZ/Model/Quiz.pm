@@ -402,6 +402,7 @@ sub meet_status_quizzes ( $self, $program_id ) {
         map {
             my $data = $self->dq->sql(q{
                 SELECT
+                    quiz_id,
                     name,
                     state,
                     quizmaster,

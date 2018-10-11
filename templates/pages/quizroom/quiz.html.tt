@@ -127,7 +127,8 @@
                         title="Open a new tab/window to view/print this quiz's questions">Print</button>
                     <button v-on:click="exit_quiz"
                         title="Exit the quiz without closing it; later resume is possible">Exit</button>
-                    <button v-on:click="close_quiz" title="Close the quiz, marking it as completed">Close</button>
+                    <button v-on:click="close_quiz"
+                        title="Close the quiz, marking it as completed; there is no undo">Close</button>
                 </div>
 
                 <div id="replace">

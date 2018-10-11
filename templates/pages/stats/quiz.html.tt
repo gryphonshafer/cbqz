@@ -1,6 +1,8 @@
 [%
     page.title = 'Quiz Statistics';
     page.menu  = 'stats';
+
+    page.js.push('/js/utilities.js');
 %]
 
 <h2>Quiz: [% quiz.name %]</h2>
@@ -67,4 +69,23 @@
     </table>
 [% ELSE %]
     <p>There doesn't appear to be any play-by-play events for this quiz yet.</p>
+[% END %]
+
+[% IF user.has_role('director') %]
+    <form id="delete_form" method="post" action="[% c.url_for('/stats/delete_official_quiz') %]">
+        <input type="hidden" name="quiz_id" value="[% quiz.quiz_id %]">
+        <input type="submit" value="Delete This Official Quiz">
+    </form>
+
+    [% delete_official_quiz_js = BLOCK %]
+        push_onload( function () {
+            document.getElementById("delete_form").onsubmit = function () {
+                return confirm(
+                    "Are you sure you want to delete this official quiz?\n" +
+                    "Doing so permanently deleted the data. There is no undo."
+                );
+            };
+        } );
+    [% END %]
+    [% page.inline_js.push(delete_official_quiz_js) %]
 [% END %]

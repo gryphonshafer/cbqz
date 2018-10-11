@@ -412,7 +412,10 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             },
 
             close_quiz: function () {
-                if ( confirm("Are you sure you want to close this quiz?") ) {
+                if ( confirm(
+                    "Are you sure you want to close this quiz?\n" +
+                    "This will mark it as completed; there is no undo."
+                ) ) {
                     document.location.href = cntlr + "/close?quiz_id=" + this.metadata.quiz_id;
                 }
             },

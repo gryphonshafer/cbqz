@@ -91,7 +91,7 @@
 %]
 
 [% IF has_checkbox %]
-    <form method="post" action="[% c.url_for('/stats/delete') %]">
+    <form method="post" action="[% c.url_for('/stats/delete_practice_quiz') %]">
         [% closed_quizzes_block %]
         <input id="delete_button" type="submit" value="Delete Selected Closed Practice Quizzes" disabled="true">
     </form>
