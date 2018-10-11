@@ -1,5 +1,17 @@
 Revision history for CBQZ
 
+15.10.2   Thu Oct 11 07:43:26 PDT 2018
+        - Feature additions
+            - Directors can delete closed official quizzes
+            - Quiz room gets remembered on quiz setup page
+            - List from roster tool
+        - Improvements
+            - Link from meet status page to quiz detail page
+            - Remove question number display on closed quizzes
+        - Bug fixes
+            - Fix live scoreboard and meet status real-time
+            - Fix column mis-match on quiz setup page
+
 15.10.1   Tue Oct  9 17:03:52 PDT 2018
         - Feature additions
             - Meet status page
