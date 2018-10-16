@@ -339,6 +339,10 @@ sub replace ( $self, $request, $cbqz_prefs ) {
 }
 
 sub parse_quiz_teams_quizzers ( $self, $quiz_teams_quizzers_string ) {
+    $quiz_teams_quizzers_string =~ s/^\s+|\s+$//g;
+    $quiz_teams_quizzers_string =~ s/^[ \t]+|[ \t]+$//msg;
+    $quiz_teams_quizzers_string =~ s/\n{3,}/\n\n/msg;
+
     return [
         map {
             my @quizzers = split(/\r?\n/);
