@@ -342,9 +342,11 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 } );
             },
 
-            delete_quiz_event: function (question_number) {
-                if ( confirm("Are you sure you want to delete this quiz event?") ) {
+            delete_last_quiz_event: function () {
+                if ( confirm("Are you sure you want to delete the last quiz event?") ) {
                     this.classes.cursor_progress = true;
+
+                    var question_number = this.quiz_questions[0].question_number;
 
                     this.metadata.quiz_teams_quizzers =
                         JSON.parse( JSON.stringify( this.metadata.quiz_teams_quizzers_original ) );
@@ -359,10 +361,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                         this.classes.cursor_progress = false;
 
                         if ( ! response.body.success ) {
-                            alert(
-                                "There was an error deleting this quiz event.\n" +
-                                response.body.error + "."
-                            );
+                            alert("There was an error deleting this quiz event.");
                         }
                     } );
                 }
