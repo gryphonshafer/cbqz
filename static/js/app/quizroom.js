@@ -29,7 +29,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         label : "Start Timer",
     };
     data.classes = {
-        cursor_progress : false
+        cursor_progress    : false,
+        toggle_hide_active : false
     };
     if ( ! data.metadata.quiz_teams_quizzers_original )
         data.metadata.quiz_teams_quizzers_original =
@@ -547,6 +548,24 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     quiz_id         : this.metadata.quiz_id,
                     question_number : this.question.number
                 } );
+            },
+
+            toggle_hide: function () {
+                this.classes.toggle_hide_active = ! this.classes.toggle_hide_active;
+
+                if ( this.classes.toggle_hide_active ) {
+                    var books = Object.keys( this.material );
+                    this.$refs.material_lookup.lookup_reference( books[0], 1, 1 );
+
+                    this.saved_search_text = this.$refs.material_search.search_text;
+                    this.$refs.material_search.search_text = "";
+                }
+                else {
+                    this.lookup_reference();
+
+                    this.$refs.material_search.search_text = this.saved_search_text || "";
+                    this.saved_search_text = "";
+                }
             }
         },
         computed: {
@@ -602,5 +621,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
         // for Alt+N: No Jump
         if ( event.altKey && event.keyCode == 78 ) document.getElementById("button_no_jump").click();
+
+        // for Alt+H: Hide Toggle
+        if ( event.altKey && event.keyCode == 72 ) document.getElementById("toggle_hide").click();
     } );
 });

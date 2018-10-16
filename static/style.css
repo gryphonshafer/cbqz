@@ -483,6 +483,15 @@ span.label {
     margin-bottom: 3px;
 }
 
+.toggle_hide_active .toggle_hide {
+    color: #f0f0f0;
+    background-color: #f0f0f0;
+}
+
+.toggle_hide_active .toggle_hide * {
+    display: none;
+}
+
 /* -------------------------------------------------------------------------- */
 
 div#main form#select_sets fieldset {
