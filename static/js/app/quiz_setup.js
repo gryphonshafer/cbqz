@@ -9,7 +9,7 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
         ? cbqz_prefs.question_types
         : data.program_question_types;
 
-    data.room = cbqz_prefs.room || 1;
+    data.room = cbqz_prefs.room || 9;
 
     var quiz_form_values = get_json_cookie("cbqz_quiz_form_values");
     if ( !! quiz_form_values && !! quiz_form_values.name ) {
