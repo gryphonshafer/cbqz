@@ -347,7 +347,8 @@ sub parse_quiz_teams_quizzers ( $self, $quiz_teams_quizzers_string ) {
         map {
             my @quizzers = split(/\r?\n/);
             ( my $team = shift @quizzers ) =~ s/^\s+|\s+$//g;
-            E->throw('Team name parsing failed') unless ( $team and $team =~ /\w/ and $team !~ /\n/ );
+            E->throw('Team name parsing failed for the teams/quizzers input')
+                unless ( $team and $team =~ /\w/ and $team !~ /\n/ );
             {
                 team => {
                     name      => $team,
@@ -362,13 +363,13 @@ sub parse_quiz_teams_quizzers ( $self, $quiz_teams_quizzers_string ) {
                         $quizzer->{name} =~ s/^\s+|\s+$//g;
                         $quizzer->{name} =~ s/\s+/ /g;
 
-                        E->throw('Quizzer name parsing failed') unless (
+                        E->throw('Quizzer name parsing failed for the teams/quizzers input') unless (
                             $quizzer->{name} and
                             $quizzer->{name} =~ /\w/ and
                             $quizzer->{name} !~ /\n/
                         );
 
-                        E->throw('Quizzer bib parsing failed') unless (
+                        E->throw('Quizzer bib parsing failed for the teams/quizzers input') unless (
                             $quizzer->{bib} and
                             $quizzer->{bib} =~ /^\d+$/
                         );

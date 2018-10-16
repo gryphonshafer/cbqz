@@ -11,6 +11,14 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
 
     data.room = cbqz_prefs.room || 1;
 
+    var quiz_form_values = get_json_cookie("cbqz_quiz_form_values");
+    if ( !! quiz_form_values && !! quiz_form_values.name ) {
+        data.name                = quiz_form_values.name;
+        data.quizmaster          = quiz_form_values.quizmaster;
+        data.scheduled           = quiz_form_values.scheduled;
+        data.quiz_teams_quizzers = quiz_form_values.quiz_teams_quizzers;
+    }
+
     if ( ! data.quiz_teams_quizzers ) {
         var teams_count   = 3;
         var team_size     = 4;
