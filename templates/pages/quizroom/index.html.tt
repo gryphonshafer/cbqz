@@ -29,8 +29,8 @@
                 <tr
                     v-for="quiz in saved_quizzes"
                     v-bind:class="{
-                        selected: quiz.official,
-                        selected_extra: ( quiz.state == 'active' ) ? true : false
+                        selected: ( quiz.state == 'active' ) ? true : false,
+                        selected_extra: ( quiz.state != 'active' && quiz.official ) ? true : false
                     }"
                 >
                     <td><a

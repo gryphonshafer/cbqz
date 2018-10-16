@@ -1408,11 +1408,11 @@ div#meet_status div#meet_status_quiz_wrapper div h2 {
 }
 
 div#meet_status div#meet_status_quiz_wrapper div.pending {
-    background-color: #ccffcc;
+    background-color: white;
 }
 
 div#meet_status div#meet_status_quiz_wrapper div.active {
-    background-color: #ffeeaa;
+    background-color: #ccffcc;
 }
 
 div#meet_status div#meet_status_quiz_wrapper div.closed {
@@ -1422,6 +1422,10 @@ div#meet_status div#meet_status_quiz_wrapper div.closed {
 div#meet_status div#meet_status_quiz_wrapper div ul {
     padding-left: 20px;
     margin: 0px;
+}
+
+div#meet_status div#meet_status_quiz_wrapper div p {
+    margin-bottom: 0px;
 }
 
 /* -------------------------------------------------------------------------- */

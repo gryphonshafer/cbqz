@@ -405,7 +405,7 @@ sub data_deep ($self) {
 sub meet_status_quizzes ( $self, $program_id ) {
     return [
         map {
-            my $data = $self->dq->sql(q{
+            my $row = $self->dq->sql(q{
                 SELECT
                     quiz_id,
                     name,
@@ -414,6 +414,7 @@ sub meet_status_quizzes ( $self, $program_id ) {
                     room,
                     scheduled,
                     last_modified,
+                    TIME_FORMAT( last_modified, "%l:%i:%s %p" ),
                     status,
                     metadata
                 FROM quiz
@@ -424,7 +425,21 @@ sub meet_status_quizzes ( $self, $program_id ) {
                     room = ?
                 ORDER BY last_modified DESC
                 LIMIT 1
-            })->run( $program_id, 1, $_->[0] )->next->data;
+            })->run( $program_id, 1, $_->[0] )->next->row;
+
+            my $data;
+            @$data{ qw(
+                quiz_id
+                name
+                state
+                quizmaster
+                room
+                scheduled
+                last_modified
+                last_modified_time
+                status
+                metadata
+            ) } = @$row;
 
             for ( qw( status metadata ) ) {
                 try {
