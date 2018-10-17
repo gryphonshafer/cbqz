@@ -1,5 +1,20 @@
 Revision history for CBQZ
 
+15.10.3   Wed Oct 17 09:31:05 PDT 2018
+        - Feature additions
+            - Randomize first N questions feature; closes #211
+            - Hide of sensitive question information button; closes #200
+            - Delete last quiz event button; closes #204
+            - Dark mode for live scoresheet
+        - Improvements
+            - Meet status page colors change and add last mod; closes #201
+            - Official room is remembered for session; closes #198
+            - Default quiz room is 9; closes #197
+            - Better quiz gen error messaging and remember form data; closes #210
+        - Bug fixes
+            - 4-1 quiz-outs throw quiz-out dialog; closes #199
+            - Fix bad team input on quiz setup via parse; closes #209
+
 15.10.2   Thu Oct 11 07:43:26 PDT 2018
         - Feature additions
             - Directors can delete closed official quizzes
