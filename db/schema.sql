@@ -39,6 +39,7 @@ CREATE TABLE program (
     name varchar(64) DEFAULT NULL,
     question_types tinytext,
     target_questions tinyint(3) unsigned NOT NULL DEFAULT '40',
+    randomize_first tinyint(3) unsigned NOT NULL DEFAULT '20',
     result_operation text,
     timer_values tinytext,
     timer_default tinyint(4) NOT NULL DEFAULT '30',
@@ -104,7 +105,7 @@ CREATE TABLE quiz (
     questions mediumtext,
     result_operation mediumtext,
     last_modified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created timestamp NOT NULL DEFAULT '1970-01-01 16:00:00',
+    created timestamp NOT NULL DEFAULT '1970-01-01 08:00:00',
     PRIMARY KEY (quiz_id),
     KEY program_id (program_id),
     KEY user_id (user_id),
@@ -113,7 +114,7 @@ CREATE TABLE quiz (
 );
 
 CREATE TRIGGER quiz_before_insert BEFORE INSERT ON quiz FOR EACH ROW SET NEW.created = NOW();
-;
+
 CREATE TABLE quiz_question (
     quiz_question_id int(10) unsigned NOT NULL,
     quiz_id int(10) unsigned DEFAULT NULL,
@@ -157,7 +158,7 @@ CREATE TABLE socket (
     counter int(10) unsigned NOT NULL DEFAULT '0',
     data mediumtext,
     last_modified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created timestamp NOT NULL DEFAULT '1970-01-01 16:00:00',
+    created timestamp NOT NULL DEFAULT '1970-01-01 08:00:00',
     PRIMARY KEY (socket_id),
     UNIQUE KEY name (name)
 );
@@ -196,8 +197,8 @@ CREATE TABLE user_question_set (
     question_set_id int(10) unsigned NOT NULL,
     type enum('publish','share') NOT NULL,
     PRIMARY KEY (user_question_set_id),
-    KEY question_set_id (question_set_id),
     KEY user_id (user_id),
+    KEY user_question_set_ibfk_2 (question_set_id),
     CONSTRAINT user_question_set_ibfk_1 FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT user_question_set_ibfk_2 FOREIGN KEY (question_set_id) REFERENCES question_set (question_set_id) ON DELETE CASCADE ON UPDATE CASCADE
 );

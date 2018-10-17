@@ -776,7 +776,11 @@ div#quiz_setup textarea {
     font-family: normal;
     font-size: 13px;
     width: 200px;
-    height: 138px;
+    height: 128px;
+}
+
+div#quiz_setup fieldset#scoring_and_teams_quizzers textarea {
+    height: 162px;
 }
 
 div#quiz_setup button {

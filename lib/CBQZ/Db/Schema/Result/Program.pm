@@ -51,6 +51,13 @@ __PACKAGE__->table("program");
   extra: {unsigned => 1}
   is_nullable: 0
 
+=head2 randomize_first
+
+  data_type: 'tinyint'
+  default_value: 20
+  extra: {unsigned => 1}
+  is_nullable: 0
+
 =head2 result_operation
 
   data_type: 'text'
@@ -114,6 +121,13 @@ __PACKAGE__->add_columns(
   {
     data_type => "tinyint",
     default_value => 40,
+    extra => { unsigned => 1 },
+    is_nullable => 0,
+  },
+  "randomize_first",
+  {
+    data_type => "tinyint",
+    default_value => 20,
     extra => { unsigned => 1 },
     is_nullable => 0,
   },
@@ -199,8 +213,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07048 @ 2018-05-16 15:29:22
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:v9iiywjpRbcA3GorLDN5IA
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-10-17 07:13:17
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:+WAtQEsIJHS29P1DxfAL8w
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

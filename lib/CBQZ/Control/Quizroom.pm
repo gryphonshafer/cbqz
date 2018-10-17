@@ -71,6 +71,7 @@ sub path ($self) {
             quizmaster          => $self->stash('user')->obj->realname,
             user_is_official    => $self->stash('user')->has_role('official'),
             target_questions    => $program->obj->target_questions,
+            randomize_first     => $program->obj->randomize_first,
             timer_default       => $program->obj->timer_default,
             timeout             => $program->obj->timeout,
             timer_values        => join( ', ', @{ $self->cbqz->json->decode( $program->obj->timer_values ) } ),

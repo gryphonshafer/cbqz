@@ -12,6 +12,7 @@ class_has 'schema_name' => ( isa => 'Str',     is => 'ro', default => 'Program' 
 class_has 'defaults'    => ( isa => 'HashRef', is => 'ro', default => sub {
     +{
         target_questions => 40,
+        randomize_first  => 20,
         timer_default    => 30,
         timeout          => 60,
         timer_values     => [ 5, 30, 60 ],
