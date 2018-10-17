@@ -33,9 +33,13 @@ sub create ( $self, $config ) {
                 score_types => $self->json->decode(
                     CBQZ::Model::Program->new->load( $config->{program_id} )->obj->score_types
                 ),
-                map { $_ => $config->{$_} } qw( target_questions timer_default timeout readiness score_type )
+                map { $_ => $config->{$_} } qw(
+                    target_questions randomize_first timer_default timeout readiness score_type
+                )
             }),
-            map { $_ => $config->{$_} } qw( program_id user_id name quizmaster room scheduled result_operation )
+            map { $_ => $config->{$_} } qw(
+                program_id user_id name quizmaster room scheduled result_operation
+            )
         } )->get_from_storage
     );
 
@@ -85,10 +89,10 @@ sub chapter_set ( $self, $cbqz_prefs ) {
 }
 
 sub generate ( $self, $cbqz_prefs ) {
-    my $chapter_set            = $self->chapter_set($cbqz_prefs);
-    my $program                = CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} );
-    my $target_questions_count = $program->obj->target_questions;
-    my @question_types         = @{ $program->question_types_parse( $cbqz_prefs->{question_types} ) };
+    my $chapter_set    = $self->chapter_set($cbqz_prefs);
+    my @question_types = @{
+        CBQZ::Model::Program->new->question_types_parse( $cbqz_prefs->{question_types} )
+    };
 
     my ( @questions, $error );
     try {
@@ -169,7 +173,7 @@ sub generate ( $self, $cbqz_prefs ) {
             @question_types;
 
         # append additional questions based on question type order up to target count
-        while ( @questions < $target_questions_count and @question_types ) {
+        while ( @questions < $cbqz_prefs->{target_questions} and @question_types ) {
             my $question_type = shift @question_types;
 
             my $types = join( ', ', map { $self->dq->quote($_) } @{ $question_type->[0] } );
@@ -217,7 +221,7 @@ sub generate ( $self, $cbqz_prefs ) {
         }
 
         # append additional questions up to target count
-        while ( @questions < $target_questions_count ) {
+        while ( @questions < $cbqz_prefs->{target_questions} ) {
             my $selection_set = $chapter_set->{
                 ( $cbqz_prefs->{weight_percent} >= rand() * 100 ) ? 'weight' : 'prime'
             };
@@ -244,7 +248,7 @@ sub generate ( $self, $cbqz_prefs ) {
             push( @questions, $question );
         }
 
-        while ( @questions < $target_questions_count ) {
+        while ( @questions < $cbqz_prefs->{target_questions} ) {
             my $selection_set = $chapter_set->{
                 ( $cbqz_prefs->{weight_percent} >= rand() * 100 ) ? 'weight' : 'prime'
             };
@@ -266,11 +270,20 @@ sub generate ( $self, $cbqz_prefs ) {
             push( @questions, $question );
         }
 
-        E->throw('Failed to create a question set to target size') if ( @questions < $target_questions_count );
+        E->throw('Failed to create a question set to target size')
+            if ( @questions < $cbqz_prefs->{target_questions} );
     }
     catch {
         E->throw($_);
     };
+
+    # randomly sort the first 20 questions
+    splice(
+        @questions, 0, 20,
+        map { $_->[0] } sort { $a->[1] <=> $b->[1] } map { [ $_, rand ] } @questions[
+            0 .. $cbqz_prefs->{randomize_first} - 1
+        ],
+    );
 
     return [
         map {
@@ -339,11 +352,16 @@ sub replace ( $self, $request, $cbqz_prefs ) {
 }
 
 sub parse_quiz_teams_quizzers ( $self, $quiz_teams_quizzers_string ) {
+    $quiz_teams_quizzers_string =~ s/^\s+|\s+$//g;
+    $quiz_teams_quizzers_string =~ s/^[ \t]+|[ \t]+$//msg;
+    $quiz_teams_quizzers_string =~ s/\n{3,}/\n\n/msg;
+
     return [
         map {
             my @quizzers = split(/\r?\n/);
             ( my $team = shift @quizzers ) =~ s/^\s+|\s+$//g;
-            E->throw('Team name parsing failed') unless ( $team and $team =~ /\w/ and $team !~ /\n/ );
+            E->throw('Team name parsing failed for the teams/quizzers input')
+                unless ( $team and $team =~ /\w/ and $team !~ /\n/ );
             {
                 team => {
                     name      => $team,
@@ -358,13 +376,13 @@ sub parse_quiz_teams_quizzers ( $self, $quiz_teams_quizzers_string ) {
                         $quizzer->{name} =~ s/^\s+|\s+$//g;
                         $quizzer->{name} =~ s/\s+/ /g;
 
-                        E->throw('Quizzer name parsing failed') unless (
+                        E->throw('Quizzer name parsing failed for the teams/quizzers input') unless (
                             $quizzer->{name} and
                             $quizzer->{name} =~ /\w/ and
                             $quizzer->{name} !~ /\n/
                         );
 
-                        E->throw('Quizzer bib parsing failed') unless (
+                        E->throw('Quizzer bib parsing failed for the teams/quizzers input') unless (
                             $quizzer->{bib} and
                             $quizzer->{bib} =~ /^\d+$/
                         );
@@ -400,7 +418,7 @@ sub data_deep ($self) {
 sub meet_status_quizzes ( $self, $program_id ) {
     return [
         map {
-            my $data = $self->dq->sql(q{
+            my $row = $self->dq->sql(q{
                 SELECT
                     quiz_id,
                     name,
@@ -409,6 +427,7 @@ sub meet_status_quizzes ( $self, $program_id ) {
                     room,
                     scheduled,
                     last_modified,
+                    TIME_FORMAT( last_modified, "%l:%i:%s %p" ),
                     status,
                     metadata
                 FROM quiz
@@ -419,7 +438,21 @@ sub meet_status_quizzes ( $self, $program_id ) {
                     room = ?
                 ORDER BY last_modified DESC
                 LIMIT 1
-            })->run( $program_id, 1, $_->[0] )->next->data;
+            })->run( $program_id, 1, $_->[0] )->next->row;
+
+            my $data;
+            @$data{ qw(
+                quiz_id
+                name
+                state
+                quizmaster
+                room
+                scheduled
+                last_modified
+                last_modified_time
+                status
+                metadata
+            ) } = @$row;
 
             for ( qw( status metadata ) ) {
                 try {

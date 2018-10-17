@@ -483,6 +483,15 @@ span.label {
     margin-bottom: 3px;
 }
 
+.toggle_hide_active .toggle_hide {
+    color: #f0f0f0;
+    background-color: #f0f0f0;
+}
+
+.toggle_hide_active .toggle_hide * {
+    display: none;
+}
+
 /* -------------------------------------------------------------------------- */
 
 div#main form#select_sets fieldset {
@@ -767,7 +776,11 @@ div#quiz_setup textarea {
     font-family: normal;
     font-size: 13px;
     width: 200px;
-    height: 138px;
+    height: 128px;
+}
+
+div#quiz_setup fieldset#scoring_and_teams_quizzers textarea {
+    height: 162px;
 }
 
 div#quiz_setup button {
@@ -1216,6 +1229,64 @@ html.live_scoresheet {
     overflow-y: hidden;
 }
 
+html.live_scoresheet h1 a {
+    color: inherit;
+    text-decoration: none;
+}
+
+html.dark_mode {
+    background-color: #222222;
+    color: white;
+}
+
+html.dark_mode div#live_scoresheet div#scoresheet {
+    background-color: #333333;
+    border-color: #666666;
+}
+
+html.dark_mode div#live_scoresheet div#scoresheet table.tabular td {
+    color: white;
+    border-color: #666666;
+}
+
+html.dark_mode div#live_scoresheet div#scoresheet table td.shaded {
+    background-color: #333333;
+}
+
+html.dark_mode div#live_scoresheet div#scoresheet table td.team_0_bold {
+    background-color: #600505;
+}
+
+html.dark_mode div#live_scoresheet div#scoresheet table td.team_0_mild {
+    background-color: black;
+}
+
+html.dark_mode div#live_scoresheet div#scoresheet table td.team_1_bold {
+    background-color: #474718;
+}
+
+html.dark_mode div#live_scoresheet div#scoresheet table td.team_1_mild {
+    background-color: black;
+}
+
+html.dark_mode div#live_scoresheet div#scoresheet table td.team_2_bold {
+    background-color: #3d3d8a;
+}
+
+html.dark_mode div#live_scoresheet div#scoresheet table td.team_2_mild {
+    background-color: black;
+}
+
+html.dark_mode div#live_scoresheet div#scoresheet table td.team_3_bold,
+html.dark_mode div#live_scoresheet div#scoresheet table td.team_4_bold,
+html.dark_mode div#live_scoresheet div#scoresheet table td.team_5_bold {
+    background-color: #666666;
+}
+
+html.dark_mode div#live_scoresheet div#scoresheet table td.selected {
+    background-color: #007500 !important;
+}
+
 @media ( max-width: 550px ) {
     div#live_scoresheet div#scoresheet {
         font-size: 10px;
@@ -1408,11 +1479,11 @@ div#meet_status div#meet_status_quiz_wrapper div h2 {
 }
 
 div#meet_status div#meet_status_quiz_wrapper div.pending {
-    background-color: #ccffcc;
+    background-color: white;
 }
 
 div#meet_status div#meet_status_quiz_wrapper div.active {
-    background-color: #ffeeaa;
+    background-color: #ccffcc;
 }
 
 div#meet_status div#meet_status_quiz_wrapper div.closed {
@@ -1422,6 +1493,10 @@ div#meet_status div#meet_status_quiz_wrapper div.closed {
 div#meet_status div#meet_status_quiz_wrapper div ul {
     padding-left: 20px;
     margin: 0px;
+}
+
+div#meet_status div#meet_status_quiz_wrapper div p {
+    margin-bottom: 0px;
 }
 
 /* -------------------------------------------------------------------------- */

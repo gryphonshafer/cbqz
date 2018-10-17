@@ -29,8 +29,8 @@
                 <tr
                     v-for="quiz in saved_quizzes"
                     v-bind:class="{
-                        selected: quiz.official,
-                        selected_extra: ( quiz.state == 'active' ) ? true : false
+                        selected: ( quiz.state == 'active' ) ? true : false,
+                        selected_extra: ( quiz.state != 'active' && quiz.official ) ? true : false
                     }"
                 >
                     <td><a
@@ -103,7 +103,7 @@
                 </div>
             </fieldset>
 
-            <fieldset>
+            <fieldset id="scoring_and_teams_quizzers">
                 <legend>Scoring and Teams/Quizzers</legend>
                 <textarea name="quiz_teams_quizzers" v-model="quiz_teams_quizzers"
                     title="Team names followed by a quizzer bib number and name for each quizzer for each team"
@@ -116,6 +116,9 @@
                 <label>Target Questions: <input type="text" name="target_questions" v-model="target_questions"
                     placeholder="Target Questions"
                     title="Total number of questions to select for a quiz's questions pool"></label>
+                <label>Randomize First: <input type="text" name="randomize_first" v-model="randomize_first"
+                    placeholder="Randomize First"
+                    title="First block of questions to additionally randomize after quiz generation"></label>
                 <label>Timer Default: <input type="text" name="timer_default" v-model="timer_default"
                     placeholder="Timer Default" title="Default number of seconds per question on timer"></label>
                 <label>Timeout: <input type="text" name="timeout" v-model="timeout"

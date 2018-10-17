@@ -62,7 +62,7 @@ __PACKAGE__->table("socket");
 
   data_type: 'timestamp'
   datetime_undef_if_invalid: 1
-  default_value: '1970-01-01 08:00:00'
+  default_value: '1970-01-01 00:00:00'
   is_nullable: 0
 
 =cut
@@ -97,7 +97,7 @@ __PACKAGE__->add_columns(
   {
     data_type => "timestamp",
     datetime_undef_if_invalid => 1,
-    default_value => "1970-01-01 08:00:00",
+    default_value => "1970-01-01 00:00:00",
     is_nullable => 0,
   },
 );
@@ -129,8 +129,8 @@ __PACKAGE__->set_primary_key("socket_id");
 __PACKAGE__->add_unique_constraint("name", ["name"]);
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-09-05 19:34:59
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:+I5La/fA4qBU6KVBcPsMng
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-10-17 07:13:17
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:WgOxECK5+85dg31ZQSK0wA
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

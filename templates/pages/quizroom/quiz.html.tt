@@ -16,14 +16,14 @@
     <div v-cloak>
         <div id="question">
             <span class="label">Question #:</span> <span class="field">{{ question.number }}</span>
-            <span class="label">Type:</span> <span class="field">{{ question.type }}</span>
+            <span class="label">Type:</span> <span class="field toggle_hide">{{ question.type }}</span>
             <span class="label">As:</span> <span class="field">{{ question.as }}</span>
-            <span class="label">Score:</span> <span class="field">{{ question.score }}</span>
-            <span class="label">Used:</span> <span class="field">{{ question.used }}</span>
+            <span class="label">Score:</span> <span class="field toggle_hide">{{ question.score }}</span>
+            <span class="label">Used:</span> <span class="field toggle_hide">{{ question.used }}</span>
 
             <br>
 
-            <span class="label">Reference:</span> <span class="field">{{
+            <span class="label">Reference:</span> <span class="field toggle_hide">{{
                 ( question.book && question.chapter && question.verse )
                     ? question.book + ' ' + question.chapter + ':' + question.verse
                     : ''
@@ -37,13 +37,19 @@
             <button v-on:click="mark_for_edit" v-bind:disabled="question.marked"
                 title="Click to enter a comment to mark the question for later edit">Mark for Edit</button>
 
+            <button v-on:click="toggle_hide" id="toggle_hide"
+                title="Click to toggle hiding of sensitive question information"
+                >{{ ( this.classes.toggle_hide_active ) ? 'Show' : 'Hide' }}
+                <span class="key_text">Alt+H</span>
+                </button>
+
             <br>
 
             <span class="label">Question:</span>
-            <div class="htmlarea question_box" v-html="question.question"></div>
+            <div class="htmlarea question_box toggle_hide" v-html="question.question"></div>
 
             <span class="label">Answer:</span>
-            <div class="htmlarea answer_box" v-html="question.answer"></div>
+            <div class="htmlarea answer_box toggle_hide" v-html="question.answer"></div>
         </div>
 
         <material-lookup
@@ -174,12 +180,17 @@
                     <button title="Sub In"
                         v-on:click="quiz_event('sub-in')"
                         v-bind:disabled="! this.active_quizzer.name"
-                    >Sub In</button>
+                    >S-In</button>
 
                     <button title="Sub Out"
                         v-on:click="quiz_event('sub-out')"
                         v-bind:disabled="! this.active_quizzer.name"
-                    >Sub Out</button>
+                    >S-Out</button>
+
+                    <button title="Delete Last Quiz Event"
+                        v-on:click="delete_last_quiz_event"
+                        v-bind:disabled="quiz_questions.length == 0"
+                    >Delete</button>
                 </div>
             </div>
         </div>
@@ -252,7 +263,7 @@
                         <template v-if="index == 0">
                             <a href="#"
                                 title="Delete Quiz Event"
-                                v-on:click="delete_quiz_event( event.question_number )"
+                                v-on:click="delete_last_quiz_event"
                             >
                                 {{
                                     ( event.question_number.toString().indexOf("|") == -1 )

@@ -1,15 +1,31 @@
 Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
     var data = response.body;
 
-    data.official       = false;
     data.save_for_later = false;
 
     var cbqz_prefs = get_json_cookie("cbqz_prefs");
+
     data.question_types = ( !! cbqz_prefs && !! cbqz_prefs.question_types )
         ? cbqz_prefs.question_types
         : data.program_question_types;
 
-    data.room = cbqz_prefs.room || 1;
+    var cbqz_quiz_setup = get_json_cookie("cbqz_quiz_setup");
+    if ( !! cbqz_quiz_setup && !! cbqz_quiz_setup.room ) {
+        data.room     = cbqz_quiz_setup.room;
+        data.official = cbqz_quiz_setup.official;
+    }
+    else {
+        data.room     = 9;
+        data.official = false;
+    }
+
+    var quiz_form_values = get_json_cookie("cbqz_quiz_form_values");
+    if ( !! quiz_form_values && !! quiz_form_values.name ) {
+        data.name                = quiz_form_values.name;
+        data.quizmaster          = quiz_form_values.quizmaster;
+        data.scheduled           = quiz_form_values.scheduled;
+        data.quiz_teams_quizzers = quiz_form_values.quiz_teams_quizzers;
+    }
 
     if ( ! data.quiz_teams_quizzers ) {
         var teams_count   = 3;
@@ -60,16 +76,23 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
                 set_json_cookie(
                     "cbqz_prefs",
                     {
-                        selected_chapters: selected_chapters,
-                        program_id: this.program_id,
-                        question_set_id: this.question_set_id,
-                        material_set_id: this.material_set_id,
-                        weight_chapters: this.weight_chapters,
-                        weight_percent: this.weight_percent,
-                        question_types: this.question_types,
-                        room: this.room
+                        selected_chapters : selected_chapters,
+                        program_id        : this.program_id,
+                        question_set_id   : this.question_set_id,
+                        material_set_id   : this.material_set_id,
+                        weight_chapters   : this.weight_chapters,
+                        weight_percent    : this.weight_percent,
+                        question_types    : this.question_types
                     },
                     65535
+                );
+
+                set_json_cookie(
+                    "cbqz_quiz_setup",
+                    {
+                        room              : this.room,
+                        official          : this.official
+                    }
                 );
             },
             set_weighted_chapters: function () {
@@ -130,7 +153,8 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
             weight_chapters: function () { this.save_settings() },
             weight_percent:  function () { this.save_settings() },
             question_types:  function () { this.save_settings() },
-            room:            function () { this.save_settings() }
+            room:            function () { this.save_settings() },
+            official:        function () { this.save_settings() }
         },
 
         created: function () {

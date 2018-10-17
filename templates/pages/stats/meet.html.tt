@@ -50,6 +50,8 @@
                         <b>{{ team_block.team.name }}</b>: {{ team_block.team.score }}
                     </li>
                 </ul>
+
+                <p>Last Event: <b>{{ quiz.last_modified_time }}</b></p>
             </div>
         </div>
         <div v-else>

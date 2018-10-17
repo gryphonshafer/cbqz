@@ -61,10 +61,12 @@ if ( input.form == "question" ) {
             }
         }
 
-        if ( input.quizzer.correct == 3 && input.quizzer.incorrect == 0 ) {
-            output.team    += 10;
-            output.quizzer += 10;
-            output.label   += "+";
+        if ( input.quizzer.correct == 3 ) {
+            if ( input.quizzer.incorrect == 0 ) {
+                output.team    += 10;
+                output.quizzer += 10;
+                output.label   += "+";
+            }
             output.message = "Quiz Out: " + input.quizzer.name;
         }
     }

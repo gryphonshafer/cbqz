@@ -9,6 +9,7 @@
         '/stats/path.js',
         '/js/app/stats_room.js',
     );
+
     page.pre_inline_js.push(
         'var stats_room_websocket_url = "' _
         c.url_for('/stats/live_scoresheet').query( room => room ).to_abs.scheme(
@@ -19,7 +20,22 @@
 %]
 
 <div id="live_scoresheet">
-    <h1>CBQZ [% page.title %]</h1>
+    <h1><a href="#"
+        title="Click to toggle between light and dark display of the live scoreboard"
+        onclick="scoreboard_page_header()">CBQZ [% page.title %]</a></h1>
+
+    [% scoreboard_page_header = BLOCK %]
+        function scoreboard_page_header() {
+            var classes = document.children[0].classList;
+            if ( classes.contains('dark_mode') ) {
+                classes.remove('dark_mode');
+            }
+            else {
+                classes.add('dark_mode');
+            }
+        }
+    [% END %]
+    [% page.inline_js.push(scoreboard_page_header) %]
 
     <template v-if="quiz">
         <ul id="metadata">

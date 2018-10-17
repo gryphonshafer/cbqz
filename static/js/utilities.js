@@ -20,16 +20,17 @@ function get_cookie(name) {
     return null;
 }
 
-function erase_cookie(name) {
-    return set_cookie( name, "", -1 );
-}
-
 function set_json_cookie( name, value, days ) {
     return set_cookie( name, btoa( JSON.stringify(value) ), days );
 }
 
 function get_json_cookie(name) {
-    return JSON.parse( atob( get_cookie(name) ) );
+    var cookie_value;
+    try {
+        cookie_value = JSON.parse( atob( get_cookie(name) ) );
+    }
+    catch (e) {}
+    return ( !! cookie_value ) ? cookie_value : null;
 }
 
 // -----------------------------------------------------------------------------

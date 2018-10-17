@@ -3,6 +3,7 @@ package CBQZ::Control::Quizroom;
 use Mojo::Base 'Mojolicious::Controller';
 use exact;
 use Try::Tiny;
+use MIME::Base64 'encode_base64';
 use CBQZ::Model::Quiz;
 use CBQZ::Model::Program;
 use CBQZ::Model::MaterialSet;
@@ -70,6 +71,7 @@ sub path ($self) {
             quizmaster          => $self->stash('user')->obj->realname,
             user_is_official    => $self->stash('user')->has_role('official'),
             target_questions    => $program->obj->target_questions,
+            randomize_first     => $program->obj->randomize_first,
             timer_default       => $program->obj->timer_default,
             timeout             => $program->obj->timeout,
             timer_values        => join( ', ', @{ $self->cbqz->json->decode( $program->obj->timer_values ) } ),
@@ -116,12 +118,26 @@ sub generate_quiz ($self) {
         });
     }
     catch {
-        $self->warn($_);
+        $self->warn( $self->cbqz->clean_error($_) );
         $self->flash( message =>
-            'An error occurred while trying to generate quiz data. ' .
-            'This is likely due to invalid quiz configuration settings ' .
-            'or insufficient questions to fulfill the settings.'
+            'An error occurred while trying to generate the quiz: ' .
+            $self->cbqz->clean_error($_) . '.'
         );
+
+        (
+            my $cbqz_quiz_form_values = encode_base64(
+                $self->cbqz->json->encode({
+                    map { $_ => $self->req->param($_) } qw(
+                        name
+                        quizmaster
+                        scheduled
+                        quiz_teams_quizzers
+                    )
+                })
+            )
+        ) =~ s/\r?\n//msg;
+        $self->cookie( cbqz_quiz_form_values => $cbqz_quiz_form_values );
+
         $self->redirect_to('/quizroom');
         return undef;
     };
