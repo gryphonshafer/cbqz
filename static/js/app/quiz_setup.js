@@ -26,6 +26,16 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
         data.scheduled           = quiz_form_values.scheduled;
         data.quiz_teams_quizzers = quiz_form_values.quiz_teams_quizzers;
     }
+    else {
+        var now   = new Date;
+        data.name = data.scheduled =
+            now.getFullYear() + "-" +
+            ( now.getMonth() + 1 ) + "-" +
+            now.getDate() + " " +
+            now.getHours() + ":" +
+            ( "0" + now.getMinutes() ).slice(-2) + ":" +
+            ( "0" + now.getSeconds() ).slice(-2);
+    }
 
     if ( ! data.quiz_teams_quizzers ) {
         var teams_count   = 3;

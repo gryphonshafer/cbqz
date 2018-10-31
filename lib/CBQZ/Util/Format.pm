@@ -1,15 +1,11 @@
 package CBQZ::Util::Format;
 
 use exact;
-use POSIX 'tzset';
 
 require Exporter;
 
 our @ISA       = 'Exporter';
 our @EXPORT_OK = qw( log_date date_time_ansi );
-
-$ENV{TZ} = 'America/Los_Angeles';
-tzset;
 
 {
     my @abbr = qw( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
