@@ -1,5 +1,8 @@
 Revision history for CBQZ
 
+15.10.4   Tue Oct 30 18:48:22 PDT 2018
+        - Fix for invalid date time generation
+
 15.10.3   Wed Oct 17 09:31:05 PDT 2018
         - Feature additions
             - Randomize first N questions feature; closes #211
