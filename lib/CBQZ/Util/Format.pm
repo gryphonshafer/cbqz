@@ -1,11 +1,15 @@
 package CBQZ::Util::Format;
 
 use exact;
+use POSIX 'tzset';
 
 require Exporter;
 
 our @ISA       = 'Exporter';
 our @EXPORT_OK = qw( log_date date_time_ansi );
+
+$ENV{TZ} = 'America/Los_Angeles';
+tzset;
 
 {
     my @abbr = qw( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
@@ -17,7 +21,7 @@ our @EXPORT_OK = qw( log_date date_time_ansi );
 
 sub date_time_ansi ( $this_time = time ) {
     my ( $year, $month, @time_bits ) = reverse( ( localtime($this_time) )[ 0 .. 5 ] );
-    return sprintf( '%4d-%02d-%02d %d:%02d:%02d', ( $year + 1900 ), $month, @time_bits );
+    return sprintf( '%4d-%02d-%02d %d:%02d:%02d', ( $year + 1900 ), ( $month + 1 ), @time_bits );
 }
 
 1;
