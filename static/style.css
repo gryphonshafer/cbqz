@@ -411,7 +411,7 @@ div#header_login input[type="password"]:hover {
 
 div.two_column {
     display: inline-block;
-    width: calc( 50vw - 15px );
+    width: calc( 50vw - 20px );
     vertical-align: top;
 }
 
