@@ -525,6 +525,7 @@ ul#cbqz_account_info a {
 
 ul#cbqz_account_info a:hover {
     text-decoration: underline;
+    color: blue;
 }
 
 form#edit_user {

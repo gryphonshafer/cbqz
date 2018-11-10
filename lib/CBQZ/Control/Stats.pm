@@ -2,6 +2,7 @@ package CBQZ::Control::Stats;
 
 use Mojo::Base 'Mojolicious::Controller';
 use exact;
+use MIME::Base64 'decode_base64';
 use CBQZ::Model::Quiz;
 use CBQZ::Model::QuizQuestion;
 
@@ -147,6 +148,25 @@ sub meet_status ($self) {
 
         $self->on( finish => sub { $self->socket( finish => $socket_name, { tx => $self->tx } ) } );
     }
+}
+
+sub quiz_edit ($self) {
+    my $command = $self->cbqz->json->decode( decode_base64( $self->param('command') ) );
+
+    if ( $self->stash('user')->has_role('director') ) {
+        CBQZ::Model::Quiz->new->load( $command->{quiz_id} )
+            ->obj->update({ $command->{name} => $command->{value} });
+
+        $self->flash( message => {
+            type => 'success',
+            text => 'Quiz ' . $command->{name} . ' successfully edited.',
+        } );
+    }
+    else {
+        $self->flash( message => 'It appears you do not have necessary privilages to edit quizzes.' );
+    }
+
+    return $self->redirect_to( '/stats/quiz?id=' . $command->{quiz_id} );
 }
 
 1;
