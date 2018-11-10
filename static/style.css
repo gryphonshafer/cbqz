@@ -186,6 +186,10 @@ div#pagination a.this_page:after {
     font-weight: normal;
 }
 
+div#pagination select {
+    font-size: 14px;
+}
+
 /* -------------------------------------------------------------------------- */
 
 div#header {

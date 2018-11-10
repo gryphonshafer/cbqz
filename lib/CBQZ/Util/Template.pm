@@ -34,6 +34,20 @@ sub tt_settings ( $type, $tt_conf, $constants ) {
             $context->define_vmethod( 'scalar', 'commify', sub {
                 return scalar( reverse join( ',', unpack( '(A3)*', scalar( reverse $_[0] ) ) ) );
             } );
+
+            $context->define_vmethod( 'list', 'sort_by', sub {
+                my ( $arrayref, $sort_by, $sort_order ) = @_;
+                return $arrayref unless ($sort_by);
+
+                return [ sort {
+                    my ( $c, $d ) = ( $a, $b );
+                    ( $c, $d ) = ( $d, $c ) if ( $sort_order and $sort_order eq 'desc' );
+
+                    ( $c->{$sort_by} =~ /^\d+$/ and $d->{$sort_by} =~ /^\d+$/ )
+                        ? $c->{$sort_by} <=> $d->{$sort_by}
+                        : $c->{$sort_by} cmp $d->{$sort_by}
+                } @$arrayref ];
+            } );
         },
     };
 }

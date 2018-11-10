@@ -30,7 +30,7 @@ sub index ($self) {
                     ],
                 },
                 {
-                    order_by => { -desc => 'last_modified' },
+                    order_by => { -desc => 'scheduled' },
                 },
             )
         ];
