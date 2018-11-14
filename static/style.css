@@ -160,9 +160,7 @@ table.overflow_active td.overflow_toggle {
 /* -------------------------------------------------------------------------- */
 
 div#pagination {
-    font-size: 14px;
-    line-height: 18px;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
 }
 
 div#pagination a {
@@ -184,10 +182,6 @@ div#pagination a.this_page:after {
     content: "]";
     font-family: bold;
     font-weight: normal;
-}
-
-div#pagination select {
-    font-size: 14px;
 }
 
 /* -------------------------------------------------------------------------- */
