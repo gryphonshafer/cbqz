@@ -5,6 +5,7 @@ use MooseX::ClassAttribute;
 use exact;
 use Try::Tiny;
 use CBQZ::Model::Program;
+use CBQZ::Util::Format 'canonical_date_time';
 
 extends 'CBQZ::Model';
 
@@ -20,6 +21,8 @@ sub create ( $self, $config ) {
         $team->{team}{score} = 0 + $config->{readiness};
         $_->{score} = 0 for ( @{ $team->{quizzers} } );
     }
+
+    $config->{scheduled} = canonical_date_time( $config->{scheduled} );
 
     $self->obj(
         $self->rs->create({

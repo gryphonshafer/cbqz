@@ -14,6 +14,8 @@ requires 'MojoX::Log::Dispatch::Simple', '>= 1.05';
 
 requires 'Carp', '>= 1.38';
 requires 'Data::Printer', '>= 0.40';
+requires 'Date::Format', '>= 2.30';
+requires 'Date::Parse', '>= 2.30';
 requires 'DBD::mysql', '>= 4.046';
 requires 'DBIx::Class', '>= 0.082841';
 requires 'DBIx::Query', '>= 1.06';
