@@ -104,7 +104,7 @@ for my $verse (@$data) {
                 (?<=$x)($_)$
             !
                 $mark . ( $1 || $2 || $3 ) . '/' . $mark
-            !iex;
+            !iexg;
         }
     };
 
