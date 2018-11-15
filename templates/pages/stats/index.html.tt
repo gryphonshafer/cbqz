@@ -95,7 +95,7 @@
                 [%
                     has_checkbox = 0;
                     IF type == 'closed';
-                        FOR quiz IN quizzes.$type;
+                        FOR quiz IN page_quizzes;
                             IF NOT quiz.official;
                                 has_checkbox = 1;
                             END;
