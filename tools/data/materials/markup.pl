@@ -77,6 +77,11 @@ Progress::Any::Output->set( { task => 'data' }, 'TermProgressBarColor' );
 say 'Processing ', scalar(@$data), ' verses...';
 
 for my $verse (@$data) {
+    $verse->{text} =~ s!^'!~!g;
+    $verse->{text} =~ s!'$!~!g;
+    $verse->{text} =~ s!'([^A-Za-z])!~$1!g;
+    $verse->{text} =~ s!([^A-Za-z])'!$1~!g;
+
     for (@$unique_phrases) {
         my ( $word_a, $word_b ) = @$_;
 
@@ -88,7 +93,7 @@ for my $verse (@$data) {
             ($1) ?      '^' . $1 . '/^' .  $2 . '^' .  $3 . '/^' :
             ($5) ? $4 . '^' . $5 . '/^' .  $6 . '^' .  $7 . '/^' :
             ($9) ? $8 . '^' . $9 . '/^' . $10 . '^' . $11 . '/^' : ''
-        !iex;
+        !iexg;
     }
 
     $verse->{text} =~ s!\^{2,}!\^!g;
@@ -104,7 +109,7 @@ for my $verse (@$data) {
                 (?<=$x)($_)$
             !
                 $mark . ( $1 || $2 || $3 ) . '/' . $mark
-            !iex;
+            !iexg;
         }
     };
 
@@ -115,6 +120,8 @@ for my $verse (@$data) {
     $verse->{text} =~ s!\*!<span class="unique_word">!g;
     $verse->{text} =~ s!\+!<span class="unique_chapter">!g;
     $verse->{text} =~ s!\^!<span class="unique_phrase">!g;
+
+    $verse->{text} =~ s!~!'!g;
 
     $progress->update;
 }

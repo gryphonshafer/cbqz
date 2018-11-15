@@ -28,8 +28,12 @@ for ( @{ csv( in => $settings->{kvl} ) } ) {
 
 my $dq = CBQZ->new->dq;
 
-$dq->sql('INSERT INTO material_set (name) VALUES (?)')->run( $settings->{name} );
-my $set_id = $dq->sql('SELECT last_insert_id()')->run->value;
+my $set_id;
+$set_id = $dq->sql('SELECT material_set_id FROM material_set WHERE name = ?')->run( $settings->{name} )->value;
+unless ($set_id) {
+    $dq->sql('INSERT INTO material_set (name) VALUES (?)')->run( $settings->{name} );
+    $set_id = $dq->sql('SELECT last_insert_id()')->run->value;
+}
 
 my $ins_material = $dq->sql(q{
     INSERT INTO material (

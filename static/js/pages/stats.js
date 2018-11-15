@@ -27,4 +27,20 @@ push_onload( function () {
             };
         }
     }
+
+    var sort_control = document.getElementsByClassName("sort_control");
+    for ( var i = 0; i < sort_control.length; i++ ) {
+        sort_control[i].onchange = function () {
+            var url = document.createElement("a");
+            url.href = document.location.href;
+            url.search =
+                "?sort_by=" + document.getElementById("sort_by").value +
+                "&sort_order=" + document.getElementById("sort_order").value;
+
+            var page = document.getElementById("page");
+            if (page) url.search = url.search + "&page=" + page.value;
+
+            document.location.href = url.href;
+        }
+    }
 } );

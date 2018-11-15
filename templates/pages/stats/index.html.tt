@@ -1,6 +1,9 @@
 [%
-    page.title = 'Quiz Statistics';
-    page.menu  = 'stats';
+    page.title     = 'Quiz Statistics';
+    page.menu      = 'stats';
+    items_per_page = 40;
+    sort_by        = c.param('sort_by')    || 'scheduled';
+    sort_order     = c.param('sort_order') || 'desc';
 
     page.js.push( '/js/utilities.js', '/js/pages/stats.js' );
 %]
@@ -29,6 +32,62 @@
     [% IF quizzes.$type.size %]
         <p>The following are [% type %] quizzes for which you have access to view.</p>
 
+        [% page_quizzes = quizzes.$type %]
+        [% IF type == 'closed' %]
+            <div id="pagination">
+                <b>Sort by:</b>
+                <select id="sort_by" class="sort_control">
+                    <option [% IF sort_by == 'name' %]selected[% END %]
+                        value="name">Name</option>
+                    <option [% IF sort_by == 'quizmaster' %]selected[% END %]
+                        value="quizmaster">Quizmaster</option>
+                    <option [% IF sort_by == 'room' %]selected[% END %]
+                        value="room">Room</option>
+                    <option [% IF sort_by == 'scheduled' %]selected[% END %]
+                        value="scheduled">Scheduled</option>
+                    <option [% IF sort_by == 'created' %]selected[% END %]
+                        value="created">Created</option>
+                    <option [% IF sort_by == 'last_modified' %]selected[% END %]
+                        value="last_modified">Last Modified</option>
+                </select>
+
+                <b>Sort order:</b>
+                <select id="sort_order" class="sort_control">
+                    <option [% IF sort_order == 'asc' %]selected[% END %]
+                        value="asc">Ascending</option>
+                    <option [% IF sort_order == 'desc' %]selected[% END %]
+                        value="desc">Descending</option>
+                </select>
+
+                [% page_quizzes = page_quizzes.sort_by( sort_by, sort_order ) %]
+
+                [% IF page_quizzes.size > items_per_page %]
+                    [%
+                        current_page  = c.param('page') || 1;
+                        total_pages   = page_quizzes.size / items_per_page + 1;
+                        counter_start = current_page * items_per_page - items_per_page;
+                        counter_end   = counter_start + items_per_page - 1;
+                        page_quizzes  = page_quizzes.slice(
+                            counter_start,
+                            ( counter_end <= page_quizzes.size ) ? counter_end : page_quizzes.size - 1
+                        );
+                    %]
+                    <input type="hidden" id="page" name="page" value="[% current_page %]">
+                    <b>Page:</b>
+                    [% FOREACH this_page = [ 1 .. total_pages ] %]
+                        <a
+                            [% IF this_page == current_page %]class="this_page"[% END %]
+                            href="[% c.url_for.query(
+                                page       => this_page,
+                                sort_by    => sort_by,
+                                sort_order => sort_order,
+                            ) %]"
+                        >[% this_page %]</a>
+                    [% END %]
+                [% END %]
+            </div>
+        [% END %]
+
         <table class="tabular">
             <tbody>
                 [%
@@ -41,7 +100,7 @@
                         END;
                     END;
                 %]
-                [% FOR quiz IN quizzes.$type %]
+                [% FOR quiz IN page_quizzes %]
                     <tr class="quiz_table_row">
                         [% IF has_checkbox %]
                             <td>

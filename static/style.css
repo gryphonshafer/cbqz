@@ -160,9 +160,7 @@ table.overflow_active td.overflow_toggle {
 /* -------------------------------------------------------------------------- */
 
 div#pagination {
-    font-size: 14px;
-    line-height: 18px;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
 }
 
 div#pagination a {
@@ -411,7 +409,7 @@ div#header_login input[type="password"]:hover {
 
 div.two_column {
     display: inline-block;
-    width: calc( 50vw - 15px );
+    width: calc( 50vw - 20px );
     vertical-align: top;
 }
 
@@ -525,6 +523,7 @@ ul#cbqz_account_info a {
 
 ul#cbqz_account_info a:hover {
     text-decoration: underline;
+    color: blue;
 }
 
 form#edit_user {

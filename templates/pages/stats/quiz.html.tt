@@ -5,26 +5,85 @@
     page.js.push('/js/utilities.js');
 %]
 
-<h2>Quiz: [% quiz.name %]</h2>
+<h2>Quiz Name: <span class="quiz_edit _name">[% quiz.name %]</span></h2>
 
 <ul>
-    <li>State: [% quiz.state.ucfirst %]</li>
-    <li>Quizmaster: [% quiz.quizmaster %]</li>
-    <li>Room: [% quiz.room %]</li>
-    <li>Type: [% ( quiz.official ) ? "Official" : "Practice" %]</li>
-    <li>Created: [% quiz.created %]</li>
-    <li>Scheduled: [% quiz.scheduled %]</li>
-    <li>Last Modified: [% quiz.last_modified %]</li>
+    <li>State: <b>[% quiz.state.ucfirst %]</b></li>
+    <li>Quizmaster: <b><span class="quiz_edit _quizmaster">[% quiz.quizmaster %]</span></b></li>
+    <li>Room: <b><span class="quiz_edit _room">[% quiz.room %]</span></b></li>
+    <li>Type: <b>[% ( quiz.official ) ? "Official" : "Practice" %]</b></li>
+    <li>Created: <b>[% quiz.created %]</b></li>
+    <li>Scheduled: <b>[% quiz.scheduled %]</b></li>
+    <li>Last Modified: <b>[% quiz.last_modified %]</b></li>
 </ul>
+
+[% IF user.has_role('director') %]
+    <form id="delete_form" method="post" action="[% c.url_for('/stats/delete_official_quiz') %]">
+        <input type="hidden" name="quiz_id" value="[% quiz.quiz_id %]">
+        <input type="submit" value="Delete This Official Quiz">
+    </form>
+
+    [% delete_official_quiz_js = BLOCK %]
+        push_onload( function () {
+
+            document.getElementById("delete_form").onsubmit = function () {
+                return confirm(
+                    "Are you sure you want to delete this official quiz?\n" +
+                    "Doing so permanently deleted the data. There is no undo."
+                );
+            };
+
+            function quiz_edit_dialog( name, text ) {
+                return function () {
+                    var value = prompt( "Change quiz " + name +" to:", text );
+                    if ( value && value != text ) {
+                        document.location.href = "quiz_edit?command=" + btoa( JSON.stringify({
+                            quiz_id : quiz_id,
+                            name    : name,
+                            value   : value
+                        }) );
+                    }
+                };
+            }
+
+            var quiz_id   = [% quiz.quiz_id %];
+            var quiz_edit = document.getElementsByClassName("quiz_edit");
+
+            for ( var i = 0; i < quiz_edit.length; i++ ) {
+                var token = quiz_edit[i];
+
+                var classesIterator = token.classList.entries();
+                for ( var value of classesIterator ) {
+                    if ( value[1].indexOf("_") == 0 ) {
+                        var name = value[1].substr(1);
+                        var text = token.textContent;
+
+                        var anchor         = document.createElement("a");
+                        anchor.href        = "#";
+                        anchor.textContent = text;
+                        anchor.onclick     = quiz_edit_dialog( name, text );
+
+                        while ( token.firstChild ) {
+                            token.removeChild( token.firstChild );
+                        }
+                        token.appendChild(anchor);
+                    }
+                }
+            }
+
+        } );
+    [% END %]
+    [% page.inline_js.push(delete_official_quiz_js) %]
+[% END %]
 
 <h3>Team and Individual Scores</h3>
 
 <ul>
     [% FOREACH team IN quiz.metadata.quiz_teams_quizzers %]
-        <li>[% team.team.name %]: [% team.team.score %]</li>
+        <li>[% team.team.name %]: <b>[% team.team.score %]</b></li>
         <ul>
             [% FOREACH quizzer IN team.quizzers %]
-                <li>[% quizzer.bib %]. [% quizzer.name %]: [% quizzer.score %]</li>
+                <li>[% quizzer.bib %]. [% quizzer.name %]: <b>[% quizzer.score %]</b></li>
             [% END %]
         </ul>
     [% END %]
@@ -69,23 +128,4 @@
     </table>
 [% ELSE %]
     <p>There doesn't appear to be any play-by-play events for this quiz yet.</p>
-[% END %]
-
-[% IF user.has_role('director') %]
-    <form id="delete_form" method="post" action="[% c.url_for('/stats/delete_official_quiz') %]">
-        <input type="hidden" name="quiz_id" value="[% quiz.quiz_id %]">
-        <input type="submit" value="Delete This Official Quiz">
-    </form>
-
-    [% delete_official_quiz_js = BLOCK %]
-        push_onload( function () {
-            document.getElementById("delete_form").onsubmit = function () {
-                return confirm(
-                    "Are you sure you want to delete this official quiz?\n" +
-                    "Doing so permanently deleted the data. There is no undo."
-                );
-            };
-        } );
-    [% END %]
-    [% page.inline_js.push(delete_official_quiz_js) %]
 [% END %]
