@@ -1,5 +1,10 @@
 Revision history for CBQZ
 
+15.10.6   Thu Nov 15 09:45:28 PST 2018
+        - Closed quizzes pagination hides empty checkbox column
+        - Sort by type on closed quizzes
+        - Officials see "delete official quiz" on practices quizzes resolved
+
 15.10.5   Wed Nov 14 18:41:22 PST 2018
         - Feature additions
             - Rename official, closed quizzes; closes #212
