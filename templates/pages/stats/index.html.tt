@@ -36,9 +36,11 @@
         [% IF type == 'closed' %]
             <div id="pagination">
                 <b>Sort by:</b>
-                <select id="sort_by" class="sort_control">
+                <select id="sort_by" name="sort_by" class="sort_control">
                     <option [% IF sort_by == 'name' %]selected[% END %]
                         value="name">Name</option>
+                    <option [% IF sort_by == 'official' %]selected[% END %]
+                        value="official">Type</option>
                     <option [% IF sort_by == 'quizmaster' %]selected[% END %]
                         value="quizmaster">Quizmaster</option>
                     <option [% IF sort_by == 'room' %]selected[% END %]
@@ -52,7 +54,7 @@
                 </select>
 
                 <b>Sort order:</b>
-                <select id="sort_order" class="sort_control">
+                <select id="sort_order" name="sort_order" class="sort_control">
                     <option [% IF sort_order == 'asc' %]selected[% END %]
                         value="asc">Ascending</option>
                     <option [% IF sort_order == 'desc' %]selected[% END %]
