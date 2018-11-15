@@ -98,6 +98,8 @@ sub delete_official_quiz ($self) {
     CBQZ::Model::Quiz->new->rs->search({
         quiz_id    => $self->param('quiz_id'),
         program_id => $self->decode_cookie('cbqz_prefs')->{program_id},
+        state      => 'closed',
+        official   => 1,
     })->delete if ( $self->stash('user')->has_role('director') );
 
     return $self->redirect_to('/stats');

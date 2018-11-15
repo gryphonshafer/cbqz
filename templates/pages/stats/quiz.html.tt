@@ -17,7 +17,7 @@
     <li>Last Modified: <b>[% quiz.last_modified %]</b></li>
 </ul>
 
-[% IF user.has_role('director') %]
+[% IF user.has_role('director') AND quiz.state == 'closed' AND quiz.official %]
     <form id="delete_form" method="post" action="[% c.url_for('/stats/delete_official_quiz') %]">
         <input type="hidden" name="quiz_id" value="[% quiz.quiz_id %]">
         <input type="submit" value="Delete This Official Quiz">
