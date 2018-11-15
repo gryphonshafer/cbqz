@@ -1,5 +1,18 @@
 Revision history for CBQZ
 
+15.10.5   Wed Nov 14 18:41:22 PST 2018
+        - Feature additions
+            - Rename official, closed quizzes; closes #212
+        - Improvements
+            - Style tightening regarding pagination
+            - Sort and pagination for close quizzes
+            - Two-column width adjustment for edge cases
+            - Improve handling of invalid datetime entry for scheduled quizzes
+            - Improved fix for invalid date time of scheduled quiz
+        - Bug fixes
+            - Unique word multiple instances in single verse marked all instances; closes #214
+            - Material coloring single-quote bug fix; closes #207
+
 15.10.4   Tue Oct 30 18:48:22 PDT 2018
         - Fix for invalid date time generation
 
