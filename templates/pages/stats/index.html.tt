@@ -103,7 +103,19 @@
                     END;
                 %]
                 [% FOR quiz IN page_quizzes %]
-                    <tr class="quiz_table_row">
+                    <tr class="quiz_table_row
+                        [% IF type == 'active' %]
+                            [% UNLESS quiz.official %]
+                                selected
+                            [% ELSE %]
+                                selected_extra
+                            [% END %]
+                        [% ELSE %]
+                            [% UNLESS quiz.official %]
+                                selected
+                            [% END %]
+                        [% END %]
+                    ">
                         [% IF has_checkbox %]
                             <td>
                                 [% UNLESS quiz.official %]

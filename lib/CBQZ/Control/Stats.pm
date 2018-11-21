@@ -26,8 +26,9 @@ sub index ($self) {
                     state      => $_[0],
                     program_id => $self->decode_cookie('cbqz_prefs')->{program_id},
                     -or        => [
-                        user_id  => $self->stash('user')->obj->id,
-                        official => 1,
+                        user_id       => $self->stash('user')->obj->id,
+                        official      => 1,
+                        last_modified => \q{ >= NOW() - INTERVAL 1 DAY },
                     ],
                 },
                 {
@@ -155,10 +156,15 @@ sub meet_status ($self) {
 
 sub quiz_edit ($self) {
     my $command = $self->cbqz->json->decode( decode_base64( $self->param('command') ) );
+    my $quiz    = CBQZ::Model::Quiz->new->load( $command->{quiz_id} );
 
-    if ( $self->stash('user')->has_role('director') ) {
-        CBQZ::Model::Quiz->new->load( $command->{quiz_id} )
-            ->obj->update({ $command->{name} => $command->{value} });
+    if ( $self->stash('user')->has_role('director') or $self->stash('user')->obj->id == $quiz->obj->user_id ) {
+        if ( $command->{name} eq 'type' ) {
+            $quiz->obj->update({ type => not $quiz->obj->type });
+        }
+        else {
+            $quiz->obj->update({ $command->{name} => $command->{value} });
+        }
 
         $self->flash( message => {
             type => 'success',
@@ -166,7 +172,7 @@ sub quiz_edit ($self) {
         } );
     }
     else {
-        $self->flash( message => 'It appears you do not have necessary privilages to edit quizzes.' );
+        $self->flash( message => 'It appears you do not have necessary privilages to edit the quiz.' );
     }
 
     return $self->redirect_to( '/stats/quiz?id=' . $command->{quiz_id} );

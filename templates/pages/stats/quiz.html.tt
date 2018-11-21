@@ -11,27 +11,15 @@
     <li>State: <b>[% quiz.state.ucfirst %]</b></li>
     <li>Quizmaster: <b><span class="quiz_edit _quizmaster">[% quiz.quizmaster %]</span></b></li>
     <li>Room: <b><span class="quiz_edit _room">[% quiz.room %]</span></b></li>
-    <li>Type: <b>[% ( quiz.official ) ? "Official" : "Practice" %]</b></li>
+    <li>Type: <b><span id="official_toggle">[% ( quiz.official ) ? "Official" : "Practice" %]</span></b></li>
     <li>Created: <b>[% quiz.created %]</b></li>
     <li>Scheduled: <b>[% quiz.scheduled %]</b></li>
     <li>Last Modified: <b>[% quiz.last_modified %]</b></li>
 </ul>
 
-[% IF user.has_role('director') AND quiz.state == 'closed' AND quiz.official %]
-    <form id="delete_form" method="post" action="[% c.url_for('/stats/delete_official_quiz') %]">
-        <input type="hidden" name="quiz_id" value="[% quiz.quiz_id %]">
-        <input type="submit" value="Delete This Official Quiz">
-    </form>
-
-    [% delete_official_quiz_js = BLOCK %]
+[% IF user.has_role('director') OR NOT quiz.official %]
+    [% edit_quiz_js = BLOCK %]
         push_onload( function () {
-
-            document.getElementById("delete_form").onsubmit = function () {
-                return confirm(
-                    "Are you sure you want to delete this official quiz?\n" +
-                    "Doing so permanently deleted the data. There is no undo."
-                );
-            };
 
             function quiz_edit_dialog( name, text ) {
                 return function () {
@@ -71,6 +59,45 @@
                 }
             }
 
+            [% IF user.has_role('director') %]
+                var token = document.getElementById("official_toggle");
+
+                var anchor         = document.createElement("a");
+                anchor.href        = "#";
+                anchor.textContent = token.textContent;
+                anchor.onclick     = function () {
+                    if ( confirm("Toggle the quiz type?") ) {
+                        document.location.href = "quiz_edit?command=" + btoa( JSON.stringify({
+                            quiz_id : quiz_id,
+                            name    : "type"
+                        }) );
+                    }
+                };
+
+                while ( token.firstChild ) {
+                    token.removeChild( token.firstChild );
+                }
+                token.appendChild(anchor);
+            [% END %]
+        } );
+    [% END %]
+    [% page.inline_js.push(edit_quiz_js) %]
+[% END %]
+
+[% IF user.has_role('director') AND quiz.state == 'closed' AND quiz.official %]
+    <form id="delete_form" method="post" action="[% c.url_for('/stats/delete_official_quiz') %]">
+        <input type="hidden" name="quiz_id" value="[% quiz.quiz_id %]">
+        <input type="submit" value="Delete This Official Quiz">
+    </form>
+
+    [% delete_official_quiz_js = BLOCK %]
+        push_onload( function () {
+            document.getElementById("delete_form").onsubmit = function () {
+                return confirm(
+                    "Are you sure you want to delete this official quiz?\n" +
+                    "Doing so permanently deleted the data. There is no undo."
+                );
+            };
         } );
     [% END %]
     [% page.inline_js.push(delete_official_quiz_js) %]

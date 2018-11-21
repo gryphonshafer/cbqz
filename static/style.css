@@ -127,6 +127,16 @@ td.selected_extra {
     background-color: #ffeeaa !important;
 }
 
+tr.selected_light td,
+td.selected_light {
+    background-color: #ddffdd !important;
+}
+
+tr.selected_extra_light td,
+td.selected_extra_light {
+    background-color: #ffffdd !important;
+}
+
 table.numeric td {
     text-align: right;
 }
