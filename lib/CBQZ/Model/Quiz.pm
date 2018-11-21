@@ -5,7 +5,7 @@ use MooseX::ClassAttribute;
 use exact;
 use Try::Tiny;
 use CBQZ::Model::Program;
-use CBQZ::Util::Format 'canonical_date_time';
+use CBQZ::Util::Format qw( canonical_date_time zulu_date_time );
 
 extends 'CBQZ::Model';
 
@@ -430,7 +430,6 @@ sub meet_status_quizzes ( $self, $program_id ) {
                     room,
                     scheduled,
                     last_modified,
-                    TIME_FORMAT( last_modified, "%l:%i:%s %p" ),
                     status,
                     metadata
                 FROM quiz
@@ -452,10 +451,11 @@ sub meet_status_quizzes ( $self, $program_id ) {
                 room
                 scheduled
                 last_modified
-                last_modified_time
                 status
                 metadata
             ) } = @$row;
+
+            $data->{last_modified_time} = zulu_date_time( $data->{last_modified} );
 
             for ( qw( status metadata ) ) {
                 try {

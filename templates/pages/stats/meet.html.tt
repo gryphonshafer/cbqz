@@ -31,7 +31,6 @@
                             v-bind:href="'[% cntlr %]/quiz?id=' + quiz.quiz_id"
                         ><b>{{ quiz.name }}</b></a>
                     </li>
-                    <li>Question: <b>{{ ( quiz.status ) ? quiz.status.question_number : 1 }}</b></li>
                     <li>State: <b>{{ quiz.state | ucfirst }}</b></li>
                     <li>QM: <b>{{ quiz.quizmaster }}</b></li>
                 </ul>
@@ -51,8 +50,10 @@
                     </li>
                 </ul>
 
-                <p>Last Event: <b>{{ quiz.last_modified_time }}</b></p>
+                <p>Last Event: <b>{{ quiz.last_modified_time | time }}</b></p>
             </div>
+
+            <p>Current Time: <b>{{ now }}</b></p>
         </div>
         <div v-else>
             <p>

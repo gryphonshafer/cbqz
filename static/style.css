@@ -1480,11 +1480,11 @@ div#meet_status div#meet_status_quiz_wrapper div h2 {
 }
 
 div#meet_status div#meet_status_quiz_wrapper div.pending {
-    background-color: white;
+    background-color: #ffffe0;
 }
 
 div#meet_status div#meet_status_quiz_wrapper div.active {
-    background-color: #ccffcc;
+    background-color: white;
 }
 
 div#meet_status div#meet_status_quiz_wrapper div.closed {

@@ -27,7 +27,7 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
         data.quiz_teams_quizzers = quiz_form_values.quiz_teams_quizzers;
     }
     else {
-        var now   = new Date;
+        var now   = new Date( data.scheduled );
         data.name = data.scheduled =
             now.getFullYear() + "-" +
             ( now.getMonth() + 1 ) + "-" +

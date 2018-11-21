@@ -9,7 +9,7 @@ use CBQZ::Model::Program;
 use CBQZ::Model::MaterialSet;
 use CBQZ::Model::Question;
 use CBQZ::Model::QuizQuestion;
-use CBQZ::Util::Format 'date_time_ansi';
+use CBQZ::Util::Format 'zulu_date_time';
 use CBQZ::Util::File 'slurp';
 
 sub index ($self) {
@@ -66,8 +66,8 @@ sub path ($self) {
             question_set_id     => $cbqz_prefs->{question_set_id} || undef,
             material_set_id     => $cbqz_prefs->{material_set_id} || undef,
             question_set        => $question_set,
-            scheduled           => date_time_ansi(),
-            name                => date_time_ansi(),
+            scheduled           => zulu_date_time(),
+            name                => zulu_date_time(),
             quizmaster          => $self->stash('user')->obj->realname,
             user_is_official    => $self->stash('user')->has_role('official'),
             target_questions    => $program->obj->target_questions,
