@@ -47,10 +47,18 @@ __PACKAGE__->table("quiz");
   is_foreign_key: 1
   is_nullable: 1
 
+=head2 meet
+
+  data_type: 'varchar'
+  default_value: 'Unnamed'
+  is_nullable: 0
+  size: 64
+
 =head2 name
 
   data_type: 'varchar'
-  is_nullable: 1
+  default_value: 'Unnamed'
+  is_nullable: 0
   size: 64
 
 =head2 state
@@ -143,8 +151,20 @@ __PACKAGE__->add_columns(
     is_foreign_key => 1,
     is_nullable => 1,
   },
+  "meet",
+  {
+    data_type => "varchar",
+    default_value => "Unnamed",
+    is_nullable => 0,
+    size => 64,
+  },
   "name",
-  { data_type => "varchar", is_nullable => 1, size => 64 },
+  {
+    data_type => "varchar",
+    default_value => "Unnamed",
+    is_nullable => 0,
+    size => 64,
+  },
   "state",
   {
     data_type => "enum",
@@ -258,8 +278,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-10-17 07:13:17
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:N1pEoFYjDTxT9rReqX+vBA
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-11-21 10:56:02
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:2f3gRCFLpvgYSLWUlJO+zw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

@@ -9,6 +9,7 @@
 
 <ul>
     <li>State: <b>[% quiz.state.ucfirst %]</b></li>
+    <li>Meet: <b><span class="quiz_edit _meet">[% quiz.meet %]</span></b></li>
     <li>Quizmaster: <b><span class="quiz_edit _quizmaster">[% quiz.quizmaster %]</span></b></li>
     <li>Room: <b><span class="quiz_edit _room">[% quiz.room %]</span></b></li>
     <li>Type: <b><span id="official_toggle">[% ( quiz.official ) ? "Official" : "Practice" %]</span></b></li>

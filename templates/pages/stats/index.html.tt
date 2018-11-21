@@ -37,6 +37,8 @@
             <div id="pagination">
                 <b>Sort by:</b>
                 <select id="sort_by" name="sort_by" class="sort_control">
+                    <option [% IF sort_by == 'meet' %]selected[% END %]
+                        value="meet">Meet</option>
                     <option [% IF sort_by == 'name' %]selected[% END %]
                         value="name">Name</option>
                     <option [% IF sort_by == 'room' %]selected[% END %]
@@ -123,6 +125,7 @@
                                 [% END %]
                             </td>
                         [% END %]
+                        <td>[% quiz.meet %]</td>
                         <td><a
                             href="[% c.url_for('/stats/quiz').query( id => quiz.quiz_id ) %]"
                             title="Click to view: [% quiz.name | html_entity %]"
@@ -145,6 +148,7 @@
             <thead>
                 <tr>
                     [% IF has_checkbox %]<th></th>[% END %]
+                    <th>Meet</th>
                     <th>Name</th>
                     <th>R#</th>
                     [% IF type == 'active' %]<th>Q#</th>[% END %]

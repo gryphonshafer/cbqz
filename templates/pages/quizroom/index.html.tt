@@ -65,6 +65,8 @@
             <fieldset>
                 <legend>Quiz Metadata</legend>
 
+                <label>Meet Name: <input type="text" name="meet" v-model="meet"
+                    placeholder="Meet Name" title="Unique name of the quiz meet"></label>
                 <label>Quiz Name: <input type="text" name="name" v-model="name" autocomplete="off"
                     placeholder="Quiz Name" title="Unique name of the quiz"></label>
                 <label>Quizmaster: <input type="text" name="quizmaster" v-model="quizmaster"

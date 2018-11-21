@@ -9,16 +9,6 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
         ? cbqz_prefs.question_types
         : data.program_question_types;
 
-    var cbqz_quiz_setup = get_json_cookie("cbqz_quiz_setup");
-    if ( !! cbqz_quiz_setup && !! cbqz_quiz_setup.room ) {
-        data.room     = cbqz_quiz_setup.room;
-        data.official = cbqz_quiz_setup.official;
-    }
-    else {
-        data.room     = 9;
-        data.official = false;
-    }
-
     var quiz_form_values = get_json_cookie("cbqz_quiz_form_values");
     if ( !! quiz_form_values && !! quiz_form_values.name ) {
         data.name                = quiz_form_values.name;
@@ -27,14 +17,31 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
         data.quiz_teams_quizzers = quiz_form_values.quiz_teams_quizzers;
     }
     else {
-        var now   = new Date( data.scheduled );
-        data.name = data.scheduled =
+        var now = new Date( data.scheduled );
+
+        data.scheduled =
             now.getFullYear() + "-" +
             ( now.getMonth() + 1 ) + "-" +
             now.getDate() + " " +
             now.getHours() + ":" +
             ( "0" + now.getMinutes() ).slice(-2) + ":" +
             ( "0" + now.getSeconds() ).slice(-2);
+
+        var date_parts = data.scheduled.split(" ");
+
+        data.meet = date_parts[0];
+        data.name = date_parts[1];
+    }
+
+    var cbqz_quiz_setup = get_json_cookie("cbqz_quiz_setup");
+    if ( !! cbqz_quiz_setup && !! cbqz_quiz_setup.room ) {
+        data.room     = cbqz_quiz_setup.room;
+        data.official = cbqz_quiz_setup.official;
+        data.meet     = cbqz_quiz_setup.meet;
+    }
+    else {
+        data.room     = 9;
+        data.official = false;
     }
 
     if ( ! data.quiz_teams_quizzers ) {
@@ -100,8 +107,9 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
                 set_json_cookie(
                     "cbqz_quiz_setup",
                     {
-                        room              : this.room,
-                        official          : this.official
+                        room     : this.room,
+                        official : this.official,
+                        meet     : this.meet
                     }
                 );
             },
@@ -164,7 +172,8 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
             weight_percent:  function () { this.save_settings() },
             question_types:  function () { this.save_settings() },
             room:            function () { this.save_settings() },
-            official:        function () { this.save_settings() }
+            official:        function () { this.save_settings() },
+            meet:            function () { this.save_settings() }
         },
 
         created: function () {
