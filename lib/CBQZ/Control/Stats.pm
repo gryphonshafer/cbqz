@@ -18,6 +18,7 @@ sub index ($self) {
                     my $status = $self->cbqz->json->decode( $_->{status} || '{}' );
                     $_->{question_number} = $status->{question_number} || 1;
                 }
+                $_->{metadata} = $self->cbqz->json->decode( $_->{metadata} );
                 $_;
             }
             CBQZ::Model::Quiz->new->every_data(
