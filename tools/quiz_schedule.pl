@@ -4,22 +4,37 @@ use Config::App;
 use Util::CommandLine qw( options pod2usage );
 use CBQZ::Model::Meet;
 
-my $settings = options( qw( rooms|r=i teams|t=i quizzes|q=i ) );
+my $settings = options( qw( rooms|r=i teams|t=i quizzes|q=i norandom|n ) );
 pod2usage unless ( $settings->{rooms} and $settings->{teams} and $settings->{quizzes} );
 
 # build team objects
 my $team_name      = 'A';
 $settings->{teams} = [ map { $team_name++ } 1 .. $settings->{teams} ];
 
-my $meet = CBQZ::Model::Meet->build_draw($settings);
+my ( $meet, $stats ) = CBQZ::Model::Meet->build_draw($settings);
+
+say 'Quiz meet schedule:';
+printf '         ' . ( '%12s' x $settings->{rooms} ) . "\n", map { 'Room ' . $_ } ( 1 .. $settings->{rooms} );
 
 my $set_count;
 for my $set (@$meet) {
-    printf '%3d: ', ++$set_count;
+    printf '  Set %3d: ', ++$set_count;
     printf '%12s', $_ for (
         map {
-            join( ' ', map { sprintf '%-2s', $_->{name} } @$_ )
+            join( ' ', map { sprintf '%-2s', $_ } @$_ )
         } @$set
+    );
+    print "\n";
+}
+
+print "\n";
+for my $team (@$stats) {
+    say 'Team: ', $team->{name};
+    say '  Quizzes by room: ', join( ', ',
+        map { $_ . ' (' . $team->{rooms}{$_} . 'x)' } sort { $a <=> $b } keys %{ $team->{rooms} }
+    );
+    say '  Opponents faced: ', join( ', ',
+        map { $_ . ' (' . $team->{teams}{$_} . 'x)' } sort { $a cmp $b } keys %{ $team->{teams} }
     );
     print "\n";
 }
@@ -34,6 +49,7 @@ quiz_schedule.pl - Generate a quiz meet schedule based on simple inputs
         -r|rooms N
         -t|teams N
         -q|quizzes N
+        -n|norandom
         -h|help
         -m|man
 

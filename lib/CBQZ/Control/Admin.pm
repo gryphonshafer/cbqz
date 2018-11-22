@@ -111,7 +111,8 @@ sub build_draw ($self) {
     if ( $settings->{rooms} and $settings->{quizzes} and $settings->{teams} ) {
         try {
             $settings->{teams} = [ grep { length } split( /\s*\r?\n\s*/, $settings->{teams} ) ];
-            $self->stash( meet => CBQZ::Model::Meet->build_draw($settings) );
+            my ( $meet, $stats ) = CBQZ::Model::Meet->build_draw($settings);
+            $self->stash( meet => $meet, stats => [ sort { $a->{name} cmp $b->{name} } @$stats ] );
         }
         catch {
             $self->notice( 'Build draw error: ' . $self->cbqz->clean_error($_) );
