@@ -28,7 +28,11 @@ sub index ($self) {
                     -or        => [
                         user_id       => $self->stash('user')->obj->id,
                         official      => 1,
-                        last_modified => \q{ >= NOW() - INTERVAL 1 DAY },
+                        (
+                            ( $self->stash('user')->has_role('director') )
+                                ? ( last_modified => \q{ >= NOW() - INTERVAL 1 DAY } )
+                                : ()
+                        ),
                     ],
                 },
                 {
@@ -59,6 +63,11 @@ sub quiz ($self) {
                         map { $_->program->id } $self->stash('user')->obj->user_programs->all
                     ],
                 ],
+                (
+                    ( $self->stash('user')->has_role('director') )
+                        ? ( last_modified => \q{ >= NOW() - INTERVAL 1 DAY } )
+                        : ()
+                ),
             ],
         }
     );
@@ -160,7 +169,7 @@ sub quiz_edit ($self) {
 
     if ( $self->stash('user')->has_role('director') or $self->stash('user')->obj->id == $quiz->obj->user_id ) {
         if ( $command->{name} eq 'type' ) {
-            $quiz->obj->update({ type => not $quiz->obj->type });
+            $quiz->obj->update({ official => not $quiz->obj->official });
         }
         else {
             $quiz->obj->update({ $command->{name} => $command->{value} });
