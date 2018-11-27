@@ -2,16 +2,23 @@
 use exact;
 use Config::App;
 use Util::CommandLine qw( options pod2usage );
+use Try::Tiny;
 use CBQZ::Model::Meet;
 
-my $settings = options( qw( rooms|r=i teams|t=i quizzes|q=i norandom|n ) );
+my $settings = options( qw( rooms|r=i teams|t=i quizzes|q=i norandom|n stats|s ) );
 pod2usage unless ( $settings->{rooms} and $settings->{teams} and $settings->{quizzes} );
 
 # build team objects
 my $team_name      = 'A';
 $settings->{teams} = [ map { $team_name++ } 1 .. $settings->{teams} ];
 
-my ( $meet, $stats ) = CBQZ::Model::Meet->build_draw($settings);
+my ( $meet, $stats );
+try {
+    ( $meet, $stats ) = CBQZ::Model::Meet->build_draw($settings);
+}
+catch {
+    die CBQZ::Model::Meet->clean_error($_) . "\n";
+};
 
 say 'Quiz meet schedule:';
 printf '         ' . ( '%12s' x $settings->{rooms} ) . "\n", map { 'Room ' . $_ } ( 1 .. $settings->{rooms} );
@@ -27,16 +34,18 @@ for my $set (@$meet) {
     print "\n";
 }
 
-print "\n";
-for my $team (@$stats) {
-    say 'Team: ', $team->{name};
-    say '  Quizzes by room: ', join( ', ',
-        map { $_ . ' (' . $team->{rooms}{$_} . 'x)' } sort { $a <=> $b } keys %{ $team->{rooms} }
-    );
-    say '  Opponents faced: ', join( ', ',
-        map { $_ . ' (' . $team->{teams}{$_} . 'x)' } sort { $a cmp $b } keys %{ $team->{teams} }
-    );
+if ( $settings->{stats} ) {
     print "\n";
+    for my $team (@$stats) {
+        say 'Team: ', $team->{name}, ' (', $team->{quizzes}, ' quizzes)';
+        say '  Quizzes by room: ', join( ', ',
+            map { $_ . ' (' . $team->{rooms}{$_} . 'x)' } sort { $a <=> $b } keys %{ $team->{rooms} }
+        );
+        say '  Opponents faced: ', join( ', ',
+            map { $_ . ' (' . $team->{teams}{$_} . 'x)' } sort { $a cmp $b } keys %{ $team->{teams} }
+        );
+        print "\n";
+    }
 }
 
 =head1 NAME
@@ -50,6 +59,7 @@ quiz_schedule.pl - Generate a quiz meet schedule based on simple inputs
         -t|teams N
         -q|quizzes N
         -n|norandom
+        -s|stats
         -h|help
         -m|man
 

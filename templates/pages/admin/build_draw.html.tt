@@ -62,7 +62,7 @@
 
     <dl>
         [% FOR team IN stats %]
-            <dt>Team: <b>[% team.name %]</b></dt>
+            <dt>Team: [% team.name %] ([% team.quizzes %] quizzes)</dt>
             <dd>
                 Quizzes by room:
                 [% FOR room IN team.rooms.list('keys').nsort %]
