@@ -129,8 +129,8 @@ __PACKAGE__->set_primary_key("socket_id");
 __PACKAGE__->add_unique_constraint("name", ["name"]);
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-11-29 19:42:37
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Wkwm2xQ7oBsz+gWIt4liQw
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-11-30 11:32:35
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:DNy8mW5TmMu5+bOlYLJVVA
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

@@ -1,3 +1,5 @@
+# dest.postreq: db/changes/1528823624_lc_enums
+
 DELETE FROM user_question_set WHERE user_id IS NULL;
 
 ALTER TABLE user_question_set DROP FOREIGN KEY IF EXISTS user_question_set_ibfk_2;

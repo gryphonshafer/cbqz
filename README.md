@@ -250,6 +250,7 @@ To backup the database running from within a Docker container:
 
 To restore the database from Docker container backup to local database:
 
+    echo 'DROP DATABASE cbqz; CREATE DATABASE cbqz' | mysql
     zcat cbqz.sql.gz | egrep -v '^mysqldump:' | sed -e 's/172.17.0.1/127.0.0.1/' | mysql cbqz
 
 To backup the database from a local database:
