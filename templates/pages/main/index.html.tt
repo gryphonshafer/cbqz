@@ -37,12 +37,12 @@
         %]
 
         <form id="create_form" method="post"
-            action="[% c.url_for('/create_user') %]" autocomplete="new-password"
+            action="[% c.url_for('/create_user') %]"
         >
             <fieldset>
                 <legend>Create User Account</legend>
-                <label>Username: <input type="text" name="username" size="20" placeholder="Username"></label>
-                <label>Password: <input type="password" name="passwd" size="20" placeholder="Password"></label>
+                <label>Username: <input type="text" name="username" placeholder="Username" size="20"></label>
+                <label>Password: <input type="password" name="passwd" placeholder="Password" size="20"></label>
                 <label>
                     Real Name:
                     <input type="text" name="realname" size="20" placeholder="Real Full Name (First and Last)">
@@ -92,7 +92,7 @@
         <form method="post" action="[% c.url_for('/reset_password_start') %]">
             <fieldset>
                 <legend>Start Reset Password Process</legend>
-                <label>Username: <input type="text" name="username" size="20" placeholder="Username"></label>
+                <label>Username: <input type="text" name="username" placeholder="Username" size="20"></label>
                 <input type="submit" value="Start Reset Password Process">
             </fieldset>
         </form>
@@ -132,7 +132,7 @@
     </ul>
 
     <form id="edit_user" method="post"
-        action="[% c.url_for('/main/edit_user') %]" autocomplete="new-password"
+        action="[% c.url_for('/main/edit_user') %]"
     >
         <fieldset id="edit_user_password">
             <legend>Edit Account Password</legend>

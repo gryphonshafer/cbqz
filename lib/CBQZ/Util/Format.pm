@@ -3,11 +3,13 @@ package CBQZ::Util::Format;
 use exact;
 use Date::Parse 'str2time';
 use Date::Format 'time2str';
+use DateTime;
+use DateTime::TimeZone;
 
 require Exporter;
 
 our @ISA       = 'Exporter';
-our @EXPORT_OK = qw( log_date date_time_ansi canonical_date_time );
+our @EXPORT_OK = qw( log_date date_time_ansi canonical_date_time zulu_date_time );
 
 {
     my @abbr = qw( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
@@ -24,6 +26,23 @@ sub date_time_ansi ( $this_time = time ) {
 
 sub canonical_date_time ( $this_time = scalar( localtime() ) ) {
     return time2str( '%Y-%m-%d %X', str2time($this_time) || time );
+}
+
+sub zulu_date_time ( $this_time = scalar( localtime() ) ) {
+    my %time;
+    @time{ qw(
+        year month day hour minute second
+    ) } = reverse( ( localtime( str2time($this_time) ) )[ 0 .. 5 ] );
+    $time{year} += 1900;
+    $time{month}++;
+
+    my $dt = DateTime->new(
+        %time,
+        time_zone => DateTime::TimeZone->new( name => 'local' )->name,
+    );
+    $dt->set_time_zone('Etc/UTC');
+
+    return $dt->stringify() . 'Z';
 }
 
 1;

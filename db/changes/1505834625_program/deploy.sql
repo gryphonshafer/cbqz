@@ -19,6 +19,8 @@ CREATE TABLE user_program (
     program_id INTEGER UNSIGNED NOT NULL,
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY( user_id, program_id ),
+INDEX user_id (user_id),
+INDEX program_id (program_id),
 FOREIGN KEY (user_id)
     REFERENCES user(user_id)
     ON DELETE CASCADE

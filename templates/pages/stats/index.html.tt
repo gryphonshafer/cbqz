@@ -37,14 +37,16 @@
             <div id="pagination">
                 <b>Sort by:</b>
                 <select id="sort_by" name="sort_by" class="sort_control">
+                    <option [% IF sort_by == 'meet' %]selected[% END %]
+                        value="meet">Meet</option>
                     <option [% IF sort_by == 'name' %]selected[% END %]
                         value="name">Name</option>
+                    <option [% IF sort_by == 'room' %]selected[% END %]
+                        value="room">Room</option>
                     <option [% IF sort_by == 'official' %]selected[% END %]
                         value="official">Type</option>
                     <option [% IF sort_by == 'quizmaster' %]selected[% END %]
                         value="quizmaster">Quizmaster</option>
-                    <option [% IF sort_by == 'room' %]selected[% END %]
-                        value="room">Room</option>
                     <option [% IF sort_by == 'scheduled' %]selected[% END %]
                         value="scheduled">Scheduled</option>
                     <option [% IF sort_by == 'created' %]selected[% END %]
@@ -103,7 +105,19 @@
                     END;
                 %]
                 [% FOR quiz IN page_quizzes %]
-                    <tr class="quiz_table_row">
+                    <tr class="quiz_table_row
+                        [% IF type == 'active' %]
+                            [% UNLESS quiz.official %]
+                                selected
+                            [% ELSE %]
+                                selected_extra
+                            [% END %]
+                        [% ELSE %]
+                            [% UNLESS quiz.official %]
+                                selected
+                            [% END %]
+                        [% END %]
+                    ">
                         [% IF has_checkbox %]
                             <td>
                                 [% UNLESS quiz.official %]
@@ -111,14 +125,20 @@
                                 [% END %]
                             </td>
                         [% END %]
+                        <td>[% quiz.meet %]</td>
                         <td><a
                             href="[% c.url_for('/stats/quiz').query( id => quiz.quiz_id ) %]"
                             title="Click to view: [% quiz.name | html_entity %]"
                             >[% quiz.name %]</a></td>
-                        <td>[% ( quiz.official ) ? "Official" : "Practice" %]</td>
-                        <td>[% quiz.quizmaster %]</td>
                         <td class="right">[% quiz.room %]</td>
                         [% IF type == 'active' %]<td class="right">[% quiz.question_number %]</td>[% END %]
+                        <td>
+                            [% FOR team IN quiz.metadata.quiz_teams_quizzers %]
+                                [% team.team.name %][% UNLESS loop.last %],[% END %]
+                            [% END %]
+                        </td>
+                        <td>[% ( quiz.official ) ? "Official" : "Practice" %]</td>
+                        <td>[% quiz.quizmaster %]</td>
                         <td class="right">[% quiz.scheduled %]</td>
                         <td class="right">[% quiz.created %]</td>
                         <td class="right">[% quiz.last_modified %]</td>
@@ -128,11 +148,13 @@
             <thead>
                 <tr>
                     [% IF has_checkbox %]<th></th>[% END %]
+                    <th>Meet</th>
                     <th>Name</th>
+                    <th>R#</th>
+                    [% IF type == 'active' %]<th>Q#</th>[% END %]
+                    <th>Teams</th>
                     <th>Type</th>
                     <th>Quizmaster</th>
-                    <th>Room</th>
-                    [% IF type == 'active' %]<th>Q#</th>[% END %]
                     <th>Scheduled</th>
                     <th>Created</th>
                     <th>Last Modified</th>

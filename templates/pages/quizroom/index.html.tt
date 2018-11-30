@@ -65,11 +65,13 @@
             <fieldset>
                 <legend>Quiz Metadata</legend>
 
-                <label>Quiz Name: <input type="text" name="name" v-model="name"
+                <label>Meet Name: <input type="text" name="meet" v-model="meet"
+                    placeholder="Meet Name" title="Unique name of the quiz meet"></label>
+                <label>Quiz Name: <input type="text" name="name" v-model="name" autocomplete="off"
                     placeholder="Quiz Name" title="Unique name of the quiz"></label>
                 <label>Quizmaster: <input type="text" name="quizmaster" v-model="quizmaster"
                     placeholder="Quizmaster" title="Name of initial quizmaster"></label>
-                <label>Scheduled: <input type="text" name="scheduled" v-model="scheduled"
+                <label>Scheduled: <input type="text" name="scheduled" v-model="scheduled" autocomplete="off"
                     placeholder="Scheduled Start" title="Date and time of the scheduled start of the quiz"></label>
 
                 <label id="room">

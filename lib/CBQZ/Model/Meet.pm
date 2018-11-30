@@ -6,16 +6,19 @@ use exact;
 extends 'CBQZ::Model';
 
 sub build_draw ( $self, $settings ) {
-    my $team_id        = 0;
-    $settings->{teams} = [
+    my $team_id      = 0;
+    my $teams_matrix = [
         map { { name => $_, id => $team_id++ } }
-        map { $_->[0] } sort { $a->[1] <=> $b->[1] } map { [ $_, rand ] }
         @{ $settings->{teams} }
     ];
 
+    $teams_matrix = [
+        map { $_->[0] } sort { $a->[1] <=> $b->[1] } map { [ $_, rand ] } @$teams_matrix
+    ] unless ( $settings->{norandom} );
+
     # calculate quiz counts
-    my $remainder = @{ $settings->{teams} } * $settings->{quizzes} % 3;
-    my $three_team_quizzes = int( @{ $settings->{teams} } * $settings->{quizzes} / 3 );
+    my $remainder = @$teams_matrix * $settings->{quizzes} % 3;
+    my $three_team_quizzes = int( @$teams_matrix * $settings->{quizzes} / 3 );
     $three_team_quizzes-- if ( $remainder == 1 );
     my $two_team_quizzes = ( $remainder == 1 ) ? 2 : ( $remainder == 2 ) ? 1 : 0;
 
@@ -33,7 +36,9 @@ sub build_draw ( $self, $settings ) {
         last if ( @quizzes >= $three_team_quizzes + $two_team_quizzes );
     }
     if ($two_team_quizzes) {
-        @quizzes = map { $_->[0] } sort { $a->[1] <=> $b->[1] } map { [ $_, rand ] } @quizzes;
+        @quizzes = map { $_->[0] } sort { $a->[1] <=> $b->[1] } map { [ $_, rand ] } @quizzes
+            unless ( $settings->{norandom} );
+
         pop @{ $quizzes[$_] } for ( 0 .. $two_team_quizzes - 1 );
     }
 
@@ -47,7 +52,7 @@ sub build_draw ( $self, $settings ) {
                 my @available_teams = grep {
                     my $team = $_;
                     not grep { $team->{id} == $_->{id} } @already_scheduled_teams;
-                } @{ $settings->{teams} };
+                } @$teams_matrix;
 
                 E->throw('Insufficient teams to fill quiz set; reduce rooms or rerun') unless @available_teams;
 
@@ -60,6 +65,7 @@ sub build_draw ( $self, $settings ) {
                 }
 
                 my ($selected_team) = sort {
+                    ( $a->{quizzes}              || 0 ) <=> ( $b->{quizzes}              || 0 ) ||
                     ( $a->{seen_team_weight}     || 0 ) <=> ( $b->{seen_team_weight}     || 0 ) ||
                     ( $a->{rooms}{$room}         || 0 ) <=> ( $b->{rooms}{$room}         || 0 ) ||
                     ( $a->{positions}{$position} || 0 ) <=> ( $b->{positions}{$position} || 0 ) ||
@@ -73,6 +79,7 @@ sub build_draw ( $self, $settings ) {
 
                 $selected_team->{rooms}{$room}++;
                 $selected_team->{positions}{$position}++;
+                $selected_team->{quizzes}++;
             }
 
             my @quiz_team_names = map { $_->{name} } @$quiz;
@@ -82,19 +89,44 @@ sub build_draw ( $self, $settings ) {
         }
     }
 
-    # randomize sets
-    my $last_set = pop @$meet;
-    $meet = [ ( map { $_->[0] } sort { $a->[1] <=> $b->[1] } map { [ $_, rand ] } @$meet ), $last_set ];
+    unless ( $settings->{norandom} ) {
+        # randomize sets
+        my $last_set = pop @$meet;
+        $meet = [ ( map { $_->[0] } sort { $a->[1] <=> $b->[1] } map { [ $_, rand ] } @$meet ), $last_set ];
 
-    # randomize the rooms
-    my $room_map;
-    for my $set (@$meet) {
-        $room_map //= [ map { $_->[0] } sort { $a->[1] <=> $b->[1] } map { [ $_ - 1, rand ] } 1 .. @$set ];
-        next unless ( @$set == @$room_map );
-        $set = [ map { $set->[ $room_map->[$_] ] } ( 0 .. @$room_map - 1 ) ];
+        # randomize the rooms
+        my $room_map;
+        for my $set (@$meet) {
+            $room_map //= [ map { $_->[0] } sort { $a->[1] <=> $b->[1] } map { [ $_ - 1, rand ] } 1 .. @$set ];
+            next unless ( @$set == @$room_map );
+            $set = [ map { $set->[ $room_map->[$_] ] } ( 0 .. @$room_map - 1 ) ];
+        }
     }
 
-    return $meet;
+    # clean meet data set
+    for my $set (@$meet) {
+        for my $quiz (@$set) {
+            $quiz = [ map { $_->{name} } @$quiz ];
+        }
+    }
+
+    my $stats = [ map {
+        my $team    = $_;
+        my $quizzes = 0;
+        my $rooms   = { map {
+            $quizzes += $team->{rooms}{$_};
+            $_ + 1 => $team->{rooms}{$_};
+        } keys %{ $team->{rooms} } };
+
+        +{
+            name    => $team->{name},
+            rooms   => $rooms,
+            teams   => \%{ $team->{teams} },
+            quizzes => $quizzes,
+        };
+    } @$teams_matrix ];
+
+    return $meet, $stats;
 }
 
 __PACKAGE__->meta->make_immutable;

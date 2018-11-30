@@ -1,3 +1,5 @@
+# dest.postreq: db/changes/1505834625_program
+
 ALTER TABLE program DROP COLUMN timeout;
 ALTER TABLE program DROP COLUMN readiness;
 ALTER TABLE program DROP COLUMN score_types;
