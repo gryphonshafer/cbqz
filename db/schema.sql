@@ -158,7 +158,7 @@ CREATE TABLE socket (
     counter int(10) unsigned NOT NULL DEFAULT '0',
     data mediumtext,
     last_modified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created timestamp NOT NULL DEFAULT '1970-01-01 08:00:00',
+    created timestamp NOT NULL DEFAULT '1970-01-01 16:00:00',
     PRIMARY KEY (socket_id),
     UNIQUE KEY name (name)
 );
@@ -197,8 +197,8 @@ CREATE TABLE user_question_set (
     question_set_id int(10) unsigned NOT NULL,
     type enum('publish','share') NOT NULL,
     PRIMARY KEY (user_question_set_id),
+    KEY question_set_id (question_set_id),
     KEY user_id (user_id),
-    KEY user_question_set_ibfk_2 (question_set_id),
     CONSTRAINT user_question_set_ibfk_1 FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT user_question_set_ibfk_2 FOREIGN KEY (question_set_id) REFERENCES question_set (question_set_id) ON DELETE CASCADE ON UPDATE CASCADE
 );

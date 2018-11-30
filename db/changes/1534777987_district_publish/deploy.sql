@@ -1,9 +1,8 @@
 # dest.prereq: db/changes/1528823624_lc_enums
 
-ALTER TABLE user_question_set
-    DROP PRIMARY KEY,
-    DROP FOREIGN KEY user_question_set_ibfk_2,
-    DROP FOREIGN KEY user_question_set_ibfk_1;
+ALTER TABLE user_question_set DROP FOREIGN KEY IF EXISTS user_question_set_ibfk_2;
+ALTER TABLE user_question_set DROP FOREIGN KEY IF EXISTS user_question_set_ibfk_1;
+ALTER TABLE user_question_set DROP PRIMARY KEY;
 
 ALTER TABLE user_question_set ADD COLUMN
     user_question_set_id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST;
