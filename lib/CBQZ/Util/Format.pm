@@ -5,6 +5,7 @@ use Date::Parse 'str2time';
 use Date::Format 'time2str';
 use DateTime;
 use DateTime::TimeZone;
+use Try::Tiny;
 
 require Exporter;
 
@@ -36,9 +37,14 @@ sub zulu_date_time ( $this_time = scalar( localtime() ) ) {
     $time{year} += 1900;
     $time{month}++;
 
+    my $time_zone = 'Etc/UTC';
+    try {
+        $time_zone = DateTime::TimeZone->new( name => 'local' )->name;
+    };
+
     my $dt = DateTime->new(
         %time,
-        time_zone => DateTime::TimeZone->new( name => 'local' )->name,
+        time_zone => $time_zone,
     );
     $dt->set_time_zone('Etc/UTC');
 
