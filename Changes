@@ -1,5 +1,20 @@
 Revision history for CBQZ
 
+15.11.1   Fri Nov 30 12:14:27 PST 2018
+        - Improvements
+            - Add statistics about draw to draw generation page; closes #181
+            - Database schema management OCD and verification
+            - Cleanup invalid past schema alteration for user_question_set
+            - Officials can officilify a closed practice quiz; closes #223
+            - Display team names in stats summary lists; closes #218
+            - Prevent browser suggestion on quiz name in setup; closes #220
+            - Make material highlight more prominent; closes #222
+            - Official quizzes have "meet" label; closes #221
+        - Bug fixes
+            - Stats page click on practice quiz works now
+            - Build meet draw does not skip quizzes; closes #179
+            - Meet status fixes and UX; closes #217
+
 15.10.6   Thu Nov 15 09:45:28 PST 2018
         - Closed quizzes pagination hides empty checkbox column
         - Sort by type on closed quizzes
