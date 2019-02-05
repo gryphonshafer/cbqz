@@ -97,7 +97,7 @@ sub generate ( $self, $cbqz_prefs ) {
         CBQZ::Model::Program->new->question_types_parse( $cbqz_prefs->{question_types} )
     };
 
-    my ( @questions, $error );
+    my @questions;
     try {
         E->throw('No chapters selected from which to build a quiz; select chapters and retry')
             unless ( length $chapter_set->{prime} or length $chapter_set->{weight} );
@@ -158,7 +158,10 @@ sub generate ( $self, $cbqz_prefs ) {
                 push( @pending_questions, @$results );
             }
 
-            E->throw('Unable to meet quiz set minimum requirements') if ( @pending_questions < $min );
+            E->throw(
+                'Unable to meet quiz set minimum requirements for question type set: ' .
+                join( ', ', @{ $question_type->[0] } )
+            ) if ( @pending_questions < $min );
             push( @questions, @pending_questions );
         }
 
@@ -277,7 +280,7 @@ sub generate ( $self, $cbqz_prefs ) {
             if ( @questions < $cbqz_prefs->{target_questions} );
     }
     catch {
-        E->throw($_);
+        E->throw( $self->clean_error($_) );
     };
 
     # randomly sort the first 20 questions
