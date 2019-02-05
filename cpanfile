@@ -10,7 +10,7 @@ requires 'Mojolicious', '>= 7.92';
 requires 'Mojolicious::Plugin::AccessLog', '>= 0.010';
 requires 'Mojolicious::Plugin::ToolkitRenderer', '>= 1.08';
 requires 'Mojolicious::Plugin::RequestBase', '>= 0.3';
-requires 'MojoX::Log::Dispatch::Simple', '>= 1.05';
+requires 'MojoX::Log::Dispatch::Simple', '>= 1.06';
 
 requires 'Carp', '>= 1.38';
 requires 'Data::Printer', '>= 0.40';

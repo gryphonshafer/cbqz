@@ -172,13 +172,17 @@ sub setup_logging ( $self, $cbqz ) {
         MojoX::Log::Dispatch::Simple->new(
             dispatch  => $cbqz->log,
             level     => $cbqz->config->get( 'logging', 'log_level', $self->mode ),
-            format_cb => sub { log_date(shift) . ' [' . uc(shift) . '] ' . join( "\n", $cbqz->dp( @_, '' ) ) },
+            format_cb => sub { join( '',
+                log_date(shift),
+                ' [' . uc(shift) . '] ',
+                join( "\n", $cbqz->dp( [ @_, '' ], colored => 0 ) ),
+            ) },
         )
     );
     for my $level ( qw( debug info warn error fatal notice warning critical alert emergency emerg err crit ) ) {
         $self->helper( $level => sub {
             shift;
-            $self->log->$level($_) for ( $cbqz->dp(@_) );
+            $self->log->$level($_) for ( $cbqz->dp(\@_) );
             return;
         } );
     }

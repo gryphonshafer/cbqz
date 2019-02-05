@@ -94,22 +94,22 @@ sub clean_error ( $self, $error ) {
     return $error_message;
 }
 
-sub dp ( $self, @params ) {
-    return map { ( ref $_ ) ? "\n" . np($_) . "\n" : $_ } @params;
+sub dp ( $self, $params, @np_settings ) {
+    return map { ( ref $_ ) ? "\n" . np( $_, @np_settings ) . "\n" : $_ } @$params;
 }
 
-sub debug     ( $self, @params ) { return $self->log->debug    ( $self->dp(@params) ) }
-sub info      ( $self, @params ) { return $self->log->info     ( $self->dp(@params) ) }
-sub notice    ( $self, @params ) { return $self->log->notice   ( $self->dp(@params) ) }
-sub warning   ( $self, @params ) { return $self->log->warning  ( $self->dp(@params) ) }
-sub warn      ( $self, @params ) { return $self->log->warn     ( $self->dp(@params) ) }
-sub error     ( $self, @params ) { return $self->log->error    ( $self->dp(@params) ) }
-sub err       ( $self, @params ) { return $self->log->err      ( $self->dp(@params) ) }
-sub critical  ( $self, @params ) { return $self->log->critical ( $self->dp(@params) ) }
-sub crit      ( $self, @params ) { return $self->log->crit     ( $self->dp(@params) ) }
-sub alert     ( $self, @params ) { return $self->log->alert    ( $self->dp(@params) ) }
-sub emergency ( $self, @params ) { return $self->log->emergency( $self->dp(@params) ) }
-sub emerg     ( $self, @params ) { return $self->log->emerg    ( $self->dp(@params) ) }
+sub debug     ( $self, @params ) { return $self->log->debug    ( $self->dp( \@params ) ) }
+sub info      ( $self, @params ) { return $self->log->info     ( $self->dp( \@params ) ) }
+sub notice    ( $self, @params ) { return $self->log->notice   ( $self->dp( \@params ) ) }
+sub warning   ( $self, @params ) { return $self->log->warning  ( $self->dp( \@params ) ) }
+sub warn      ( $self, @params ) { return $self->log->warn     ( $self->dp( \@params ) ) }
+sub error     ( $self, @params ) { return $self->log->error    ( $self->dp( \@params ) ) }
+sub err       ( $self, @params ) { return $self->log->err      ( $self->dp( \@params ) ) }
+sub critical  ( $self, @params ) { return $self->log->critical ( $self->dp( \@params ) ) }
+sub crit      ( $self, @params ) { return $self->log->crit     ( $self->dp( \@params ) ) }
+sub alert     ( $self, @params ) { return $self->log->alert    ( $self->dp( \@params ) ) }
+sub emergency ( $self, @params ) { return $self->log->emergency( $self->dp( \@params ) ) }
+sub emerg     ( $self, @params ) { return $self->log->emerg    ( $self->dp( \@params ) ) }
 
 __PACKAGE__->meta->make_immutable;
 

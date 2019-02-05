@@ -28,7 +28,6 @@ sub main {
     able($obj);
     yaml($obj);
     clean_error($obj);
-    dp($obj);
     log_helpers( $obj, @loggers );
 
     done_testing();
@@ -81,14 +80,6 @@ sub clean_error ($obj) {
 
     is( $obj->clean_error($e), 'Error message in an E object', '$obj->clean_error( E->throw )' );
 
-    return;
-}
-
-sub dp ($obj) {
-    my @rv;
-    lives_ok( sub { @rv = $obj->dp({ answer => 42 }) }, '$obj->dp call' );
-    $rv[0] =~ s/\e\[\d+(?>(;\d+)*)m//g;
-    is( $rv[0], "\n\\ {\n    answer   42\n}\n", '$obj->dp value' );
     return;
 }
 
