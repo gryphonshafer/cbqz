@@ -61,7 +61,7 @@ if ( input.form == "question" ) {
             }
         }
 
-        if ( input.quizzer.correct == 3 ) {
+        if ( input.quizzer.correct == 3 && input.as != "Bonus" ) {
             if ( input.quizzer.incorrect == 0 ) {
                 output.team    += 10;
                 output.quizzer += 10;
