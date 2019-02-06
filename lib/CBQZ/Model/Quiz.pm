@@ -41,7 +41,7 @@ sub create ( $self, $config ) {
                 )
             }),
             map { $_ => $config->{$_} } qw(
-                program_id user_id name quizmaster room scheduled result_operation
+                program_id user_id meet name quizmaster room scheduled result_operation
             )
         } )->get_from_storage
     );
