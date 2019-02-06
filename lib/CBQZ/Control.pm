@@ -230,6 +230,8 @@ sub setup_csv ($self) {
                 })->run($name)->value;
 
                 $sockets->{$name}{transactions}{ sprintf( '%s', $params->{tx} ) } = $params->{tx};
+
+                $cbqz->info("Socket $name setup");
             }
             elsif ( $command eq 'message' ) {
                 $cbqz->dq->sql(q{
@@ -250,6 +252,7 @@ sub setup_csv ($self) {
             }
             elsif ( $command eq 'finish' ) {
                 delete $sockets->{$name}{transactions}{ sprintf( '%s', $params->{tx} ) };
+                $cbqz->info("Socket $name finished");
             }
             else {
                 E->throw(qq{Command $command not understood});
