@@ -3,6 +3,7 @@ package CBQZ::Control::Editor;
 use Mojo::Base 'Mojolicious::Controller';
 use exact;
 use MIME::Base64 'decode_base64';
+use Text::Unidecode 'unidecode';
 use Try::Tiny;
 use CBQZ::Model::MaterialSet;
 use CBQZ::Model::QuestionSet;
@@ -60,6 +61,9 @@ sub data ($self) {
 sub save ($self) {
     my $question   = $self->req_body_json;
     my $cbqz_prefs = $self->decode_cookie('cbqz_prefs');
+
+    ( $question->{$_} = unidecode( $question->{$_} || '' ) ) =~ s/&nbsp;/ /g
+        for ( qw( question answer marked ) );
 
     $question->{marked} = 'Incomplete question' unless (
         $question->{type} and

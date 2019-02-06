@@ -4,6 +4,7 @@ use Moose;
 use MooseX::ClassAttribute;
 use exact;
 use Try::Tiny;
+use Text::Unidecode 'unidecode';
 use CBQZ::Model::Question;
 
 extends 'CBQZ::Model';
@@ -201,6 +202,9 @@ sub import_questions ( $self, $questions, $material_set ) {
 
         $question_data->{question} =~ s/^\s+|\s+$//g;
         $question_data->{answer}   =~ s/^\s+|\s+$//g;
+
+        ( $question_data->{$_} = unidecode( $question_data->{$_} || '' ) ) =~ s/&nbsp;/ /g
+            for ( qw( question answer marked ) );
 
         $question_data->{question} =~ s/^Q:\s+//i;
         $question_data->{answer}   =~ s/^A:\s+//i;
