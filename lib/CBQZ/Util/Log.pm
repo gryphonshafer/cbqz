@@ -10,13 +10,17 @@ use CBQZ::Util::Format 'log_date';
 sub new {
     my $config = Config::App->new;
 
-    my $log_level_set = $config->get( 'logging', 'log_level' );
-    my $log_level     = _lowest_level( map { $log_level_set->{$_} } keys %$log_level_set );
+    my $log_level = $config->get(
+        'logging',
+        'log_level',
+        ( $ENV{CONFIGAPPENV} and $ENV{CONFIGAPPENV} eq 'production' ) ? 'production' : 'development'
+    );
 
     my $log_dir = join( '/',
         $config->get( qw( config_app root_dir ) ),
         $config->get( qw( logging log_dir ) ),
     );
+
     make_path($log_dir) unless ( -d $log_dir );
 
     my $log_obj = Log::Dispatch->new(
@@ -88,15 +92,6 @@ sub new {
         err  => 4,
         crit => 4,
     };
-
-    sub _lowest_level (@input) {
-        return (
-            map { $_->[1] }
-            sort { $a->[0] <=> $b->[0] }
-            map { [ $log_levels->{$_}, $_ ] }
-            @input
-        )[0];
-    }
 
     sub _highest_level (@input) {
         return (
