@@ -97,12 +97,15 @@ if ( input.form == "question" ) {
             output.number = int_number + "A";
         }
         else if (
-            input.number == int_number + "A" ||
+            input.number == int_number + "A" && input.as != "Bonus" ||
             ( input.number == int_number && input.sk_type == "2-Team 15-Question Tie-Breaker" )
         ) {
             output.number = int_number + "B";
         }
-        else if ( input.number == int_number + "B" ) {
+        else if (
+            input.number == int_number + "B" ||
+            input.number == int_number + "A" && input.as == "Bonus"
+        ) {
             output.number = int_number + 1;
         }
 
