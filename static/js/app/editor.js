@@ -422,6 +422,11 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 document.getElementById("book").focus();
             },
 
+            clean_html: function () {
+                this.$refs.question.innerHTML = cbqz_html_markup_only( this.$refs.question.innerHTML );
+                this.$refs.answer.innerHTML = cbqz_html_markup_only( this.$refs.answer.innerHTML );
+            },
+
             grep_marked_questions: function () {
                 var marked_questions = [];
 
@@ -464,7 +469,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.$nextTick( function () {
                     document.getElementById("verse").select();
                 } );
-                },
+            },
 
             search_reference_click: function (verse) {
                 this.$refs.material_lookup.lookup_reference(

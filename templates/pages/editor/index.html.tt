@@ -110,7 +110,11 @@
                 </button>
 
                 <button v-on:click="toggle_questions_view"
-                    title="View all questions in this question set in a table">View All Questions List</button>
+                    title="View all questions in this question set in a table">View All Questions</button>
+
+                <button tabindex="12" v-on:click="clean_html"
+                    title="Clean any mis-copied markup after a paste"
+                >Clean</button>
             </div>
 
             <div>
