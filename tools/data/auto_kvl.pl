@@ -6,12 +6,12 @@ use Util::CommandLine qw( options pod2usage );
 use CBQZ::Model::MaterialSet;
 use CBQZ::Model::QuestionSet;
 
-my $settings = options( qw( questions|q=s materials|m=s ) );
-pod2usage unless ( $settings->{questions} and $settings->{materials} );
+my $settings = options( qw( questions|q=s set|s=s ) );
+pod2usage unless ( $settings->{questions} and $settings->{set} );
 
 my $material_set;
 try {
-    $material_set = CBQZ::Model::MaterialSet->new->load( { 'name' => $settings->{materials} } );
+    $material_set = CBQZ::Model::MaterialSet->new->load( { 'name' => $settings->{set} } );
 }
 catch {
     die "Unable to load material set\n";
@@ -35,7 +35,7 @@ auto_kvl.pl - Run the Auto-KVL functionality against a question set
 
     auto_kvl.pl OPTIONS
         -q|questions  QUESTION_SET_NAME
-        -m|materials  MATERIAL_SET_NAME
+        -s|set        MATERIAL_SET_NAME
         -h|help
         -m|man
 

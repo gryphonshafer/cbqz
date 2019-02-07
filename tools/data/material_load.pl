@@ -6,8 +6,8 @@ use Config::App;
 use Text::CSV_XS 'csv';
 use CBQZ;
 
-my $settings = options( qw( name|n=s kvl|k=s material|m=s ) );
-pod2usage unless ( $settings->{name} and $settings->{kvl} and $settings->{material} );
+my $settings = options( qw( name|n=s kvl|k=s set|s=s ) );
+pod2usage unless ( $settings->{name} and $settings->{kvl} and $settings->{set} );
 
 my $kvl;
 for ( @{ csv( in => $settings->{kvl} ) } ) {
@@ -41,7 +41,7 @@ my $ins_material = $dq->sql(q{
     ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
 });
 
-for ( @{ csv( in => $settings->{material} ) } ) {
+for ( @{ csv( in => $settings->{set} ) } ) {
     my $verse;
     @$verse{ qw( para book chapter verse text ) } = @$_;
 
@@ -63,7 +63,7 @@ material_load.pl - Load materials data into the database as a new materials set
     material_load.pl OPTIONS
         -n|name     MATERIAL_SET_NAME
         -k|kvl      KEY_VERSE_LIST_DATA_FILE
-        -m|material MATERIAL_DATA_FILE
+        -s|set      MATERIAL_DATA_FILE
         -h|help
         -m|man
 
@@ -76,7 +76,7 @@ with the name of the material set.
     material_load.pl \
         -n '2017 Corinthians' \
         -k 2017_Corinthians_KVL.csv \
-        -m 2017_Corinthians_material.csv
+        -s 2017_Corinthians_material.csv
 
 =head2 Key Verses List Data File
 

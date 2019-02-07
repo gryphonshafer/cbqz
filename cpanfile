@@ -53,6 +53,8 @@ feature 'tools', 'Tools and Etc.' => sub {
     requires 'Parse::RecDescent', '>= 1.967015';
     requires 'Term::ReadKey', '>= 2.37';
     requires 'Util::CommandLine', '>= 1.03';
+    requires 'IO::Socket::SSL';
+    requires 'Progress::Any::Output::TermProgressBarColor';
 };
 
 feature 'deploy', 'Deployment' => sub {

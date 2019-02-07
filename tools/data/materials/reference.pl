@@ -56,7 +56,7 @@ reference.pl - Create a reference materials HTML file from marked-up CSV data
 
 =head1 SYNOPSIS
 
-    fetch.pl OPTIONS
+    reference.pl OPTIONS
         -i|input  INPUT_FILE
         -o|output OUTPUT_FILE
         -k|kvl    KEY_VERSE_LIST_FILE

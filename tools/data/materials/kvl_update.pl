@@ -7,8 +7,8 @@ use Try::Tiny;
 use Config::App;
 use CBQZ::Model::MaterialSet;
 
-my $settings = options( qw( kvl|k=s materials|m=s ) );
-pod2usage unless ( $settings->{kvl} and $settings->{materials} );
+my $settings = options( qw( kvl|k=s set|s=s ) );
+pod2usage unless ( $settings->{kvl} and $settings->{set} );
 
 my $kvl;
 for ( @{ csv( in => $settings->{kvl} ) } ) {
@@ -29,7 +29,7 @@ for ( @{ csv( in => $settings->{kvl} ) } ) {
 
 my $material_set_id;
 try {
-    $material_set_id = CBQZ::Model::MaterialSet->new->load({ name => $settings->{materials} })->obj->id;
+    $material_set_id = CBQZ::Model::MaterialSet->new->load({ name => $settings->{set} })->obj->id;
 };
 die "Unable to find material set with specified name\n" unless ($material_set_id);
 
@@ -61,7 +61,7 @@ kvl_update.pl - Update key verse list data for a given materials set database
 =head1 SYNOPSIS
 
     kvl_update.pl OPTIONS
-        -k|kvl        KEY_VERSE_LIST_DATA_FILE
-        -m|materials  MATERIALS_SET_NAME
+        -k|kvl   KEY_VERSE_LIST_DATA_FILE
+        -s|set   MATERIALS_SET_NAME
         -h|help
         -m|man

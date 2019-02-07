@@ -10,8 +10,8 @@ use CBQZ::Model::Question;
 use CBQZ::Model::QuestionSet;
 use CBQZ::Model::MaterialSet;
 
-my $settings = options( qw( user|u=s questions|q=s materials|m=s reset|r ) );
-pod2usage unless ( $settings->{user} and $settings->{questions} and $settings->{materials} );
+my $settings = options( qw( user|u=s questions|q=s set|s=s reset|r ) );
+pod2usage unless ( $settings->{user} and $settings->{questions} and $settings->{set} );
 
 my ( $question_set, $material_set );
 
@@ -29,7 +29,7 @@ catch {
 };
 
 try {
-    $material_set = CBQZ::Model::MaterialSet->new->load({ name => $settings->{materials} });
+    $material_set = CBQZ::Model::MaterialSet->new->load({ name => $settings->{set} });
 }
 catch {
     die "Failed to load material set\n";
@@ -71,7 +71,7 @@ markup_questions.pl - Add color markup to a plain-text questions set
     markup_questions.pl OPTIONS
         -u|user       USERNAME
         -q|questions  QUESTIONS_SET_NAME
-        -m|materials  MATERIAL_SET_NAME
+        -s|set        MATERIAL_SET_NAME
         -r|reset      # reset any marked questions before processing
         -h|help
         -m|man
