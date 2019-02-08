@@ -1,5 +1,27 @@
 Revision history for CBQZ
 
+15.12.1   Fri Feb  8 08:09:11 PST 2019
+        - Feature additions
+            - Internationals-style questions export; closes #226
+            - Sort by question text as third-tier sort in editor; closes #227
+            - Provide button to "clean" pasted HTML question/answer content
+        - Improvements
+            - Material generation clean-up; closes #225
+            - Decode non-ASCII saved content; closes #231
+            - Socket setup and finish is INFO logged
+            - DEBUG log level made offline in production
+            - Improve tabindex on editor page
+            - Improve error reporting for question types in quiz generation
+            - Log messaging simple cleanup
+            - Use UTC if local timezone cannot be determined
+        - Bug fixes
+            - No quizout message on 3-0 with correct bonus; closes #230
+            - Fouls points deductions conforms to rules; closes #234
+            - BE on 16A results in 17; closes #229
+            - Spacing does not break auto-text; closes #232
+            - Meet name now saved to quiz record
+            - Bizzard font fix for FF on Mac to display good UI
+
 15.11.1   Fri Nov 30 12:14:27 PST 2018
         - Improvements
             - Add statistics about draw to draw generation page; closes #181
