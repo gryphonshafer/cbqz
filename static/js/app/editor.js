@@ -39,7 +39,9 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         if ( a.type < b.type ) return -1;
         if ( a.type > b.type ) return 1;
 
-        var icmp = b.question.toLowerCase().localeCompare( a.question.toLowerCase() );
+        var icmp = a.question.toLowerCase().replace( /<[^>]+>/g, '' ).localeCompare(
+            b.question.toLowerCase().replace( /<[^>]+>/g, '' )
+        );
         if ( icmp != 0 ) return icmp;
 
         if ( a.used > b.used ) return -1;
