@@ -406,15 +406,83 @@ sub export_question_set ($self) {
     if ( $set and $set->is_usable_by( $self->stash('user') ) ) {
         $self->stash('user')->event('export_question_set');
 
+        my $questions = [
+            sort {
+                $a->{book} cmp $b->{book} or
+                $a->{chapter} <=> $b->{chapter} or
+                $a->{verse} <=> $b->{verse} or
+                $a->{type} cmp $b->{type}
+            } @{ $set->get_questions([]) }
+        ];
+
+        if ( $self->req->param('style') and $self->req->param('style') eq 'intl' ) {
+            my $de_text = sub {
+                my $text = lc( $_[0] );
+                $text =~ s/<[^>]+?>//g;
+                $text =~ s/\W+/ /g;
+                $text =~ s/\s{2,}/ /g;
+                return $text;
+            };
+
+            my $material = [];
+            if ( my $material_set_id = $self->decode_cookie('cbqz_prefs')->{material_set_id} ) {
+                try {
+                    $material = [
+                        map { $de_text->( $_->{text} ) } @{
+                            CBQZ::Model::MaterialSet->new->load(
+                                $self->decode_cookie('cbqz_prefs')->{material_set_id}
+                            )->get_material([])
+                        }
+                    ];
+                };
+            }
+
+            my $search = sub {
+                my @text = split( /\s+/, $de_text->( $_[0] ) );
+
+                for my $i ( 0 .. @text - 1 ) {
+                    for my $j ( 0, 1 ) {
+                        my $search_for = join( ' ', @text[ $j .. $i ] );
+                        my @finds = grep { CORE::index( $_, $search_for ) > -1 } @$material;
+
+                        return $i + 1 if ( @finds == 1 );
+                    }
+                }
+                return 0;
+            };
+
+            for my $question ( grep { $_->{type} eq 'INT' or $_->{type} eq 'MA' } @$questions ) {
+                if ( my $words = $search->( $question->{question} ) ) {
+                    my $text = $question->{question};
+                    $text =~ s|<span class="unique_word">|*|g;
+                    $text =~ s|<span class="unique_chapter">|^|g;
+                    $text =~ s|<span class="unique_phrase">|+|g;
+                    $text =~ s|</span>|#|g;
+
+                    my @text = split(/(?<=\s)|(?=\s)/, $text );
+
+                    if ( $words * 2 > @text ) {
+                        push( @text, ' ', '%' );
+                    }
+                    else {
+                        splice( @text, $words * 2, 0, '%', ' ' );
+                    }
+
+                    $text = join( '', @text );
+                    $text =~ s|\*|<span class="unique_word">|g;
+                    $text =~ s|\^|<span class="unique_chapter">|g;
+                    $text =~ s|\+|<span class="unique_phrase">|g;
+                    $text =~ s|\#|</span>|g;
+
+                    $text =~ s|\%|&#187;|g;
+                    $question->{question} = $text;
+                }
+            }
+        }
+
         $self->stash(
-            questions => [
-                sort {
-                    $a->{book} cmp $b->{book} or
-                    $a->{chapter} <=> $b->{chapter} or
-                    $a->{verse} <=> $b->{verse} or
-                    $a->{type} cmp $b->{type}
-                } @{ $set->get_questions([]) }
-            ],
+            style     => $self->req->param('style'),
+            questions => $questions,
         );
 
         ( my $filename = $set->obj->name . '.xls' ) =~ s/[\\\/:?"<>|]+/_/g;

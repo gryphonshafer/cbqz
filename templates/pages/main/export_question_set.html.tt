@@ -5,18 +5,24 @@
 %]
 
 <style type="text/css">
-    .unique_word {
-        font-weight: bold;
-        color: blue;
-    }
-    .unique_phrase {
-        font-weight: bold;
-        color: green;
-    }
-    .unique_chapter {
-        font-weight: bold;
-        color: red;
-    }
+    [% IF style %]
+        .unique_word {
+            font-weight: bold;
+        }
+    [% ELSE %]
+        .unique_word {
+            font-weight: bold;
+            color: blue;
+        }
+        .unique_phrase {
+            font-weight: bold;
+            color: green;
+        }
+        .unique_chapter {
+            font-weight: bold;
+            color: red;
+        }
+    [% END %]
 </style>
 
 <table class="tabular">

@@ -43,6 +43,7 @@
         <button type="button" disabled="true" id="share">Set Share To</button>
         <button type="button" disabled="true" id="delete">Delete</button>
         <button type="button" disabled="true" id="export">Export</button>
+        <button type="button" disabled="true" id="export_intl">Export Intl.</button>
         <button type="button" disabled="true" id="merge">Merge</button>
         <button type="button" disabled="true" id="auto-kvl">Auto-KVL</button>
     </div>
@@ -78,7 +79,9 @@
         </dd>
         <dt>Export</dt>
         <dd>
-            Exports the question set to a .csv file.
+            Exports the question set to a .csv file. The default option exports
+            in a way CBQZ would expect for later importing. The "Intl." option
+            exports in a way CMA Internationals expects data to look.
         </dd>
         <dt>Merge</dt>
         <dd>
