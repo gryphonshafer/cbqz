@@ -266,6 +266,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 var confirmation = false;
 
                 if ( type == "timeout" ) {
+                    if ( this.official ) this.toggle_hide();
                     this.set_timer( this.metadata.timeout );
                     this.timer_click();
                 }
