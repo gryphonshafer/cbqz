@@ -39,8 +39,8 @@ sub login ($self) {
 
     $self->info( 'Login success for: ' . $user->obj->username );
     $self->session(
-        'user_id' => $user->obj->id,
-        'time'    => time,
+        'user_id'           => $user->obj->id,
+        'last_request_time' => time,
     );
 
     return $self->redirect_to('/');
@@ -52,8 +52,8 @@ sub logout ($self) {
         ( ( $self->stash('user') ) ? $self->stash('user')->obj->username : '(Unlogged-in user)' )
     );
     $self->session(
-        'user_id' => undef,
-        'time'    => undef,
+        'user_id'           => undef,
+        'last_request_time' => undef,
     );
 
     return $self->redirect_to('/');
