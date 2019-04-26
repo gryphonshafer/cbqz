@@ -1,5 +1,16 @@
 Revision history for CBQZ
 
+15.13.1   Fri Apr 26 11:06:30 PDT 2019
+        - Timeout triggers hide of screen/data; closes #235
+        - Auto-hide question on official quiz generate; closes #239
+        - Throw error on duplicate quizzer names; closes #237
+        - 3rd and 4th quizzer bonus alerts
+        - Fix question 16 (as a bonus) next question number; closes #238
+        - Unify last_request_time session name
+        - Add 2018-2019 GWI KVL for John
+        - Fix for canonical HebPet KVL
+        - Updated 2019 KVL to canonical
+
 15.12.2   Fri Feb  8 13:53:35 PST 2019
         - Handle by-question-text sorting of marked-up content in questions list view
 
