@@ -362,6 +362,8 @@ sub parse_quiz_teams_quizzers ( $self, $quiz_teams_quizzers_string ) {
     $quiz_teams_quizzers_string =~ s/^[ \t]+|[ \t]+$//msg;
     $quiz_teams_quizzers_string =~ s/\n{3,}/\n\n/msg;
 
+    my %quizzer_names;
+
     return [
         map {
             my @quizzers = split(/\r?\n/);
@@ -392,6 +394,9 @@ sub parse_quiz_teams_quizzers ( $self, $quiz_teams_quizzers_string ) {
                             $quizzer->{bib} and
                             $quizzer->{bib} =~ /^\d+$/
                         );
+
+                        E->throw( 'Duplicate quizzer name: ' . $quizzer->{name} )
+                            if ( $quizzer_names{ $quizzer->{name} }++ );
 
                         +{
                             %$quizzer,
