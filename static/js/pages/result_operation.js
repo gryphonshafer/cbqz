@@ -58,6 +58,8 @@ if ( input.form == "question" ) {
             if ( quizzers_with_corrects.length >= 2 && input.quizzer.correct == 0 ) {
                 output.team  += 10;
                 output.label += "+";
+                output.message =
+                    ( quizzers_with_corrects.length + 1 ) + "-Quizzer Bonus: " + input.quizzer.name;
             }
         }
 
