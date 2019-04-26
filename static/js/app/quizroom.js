@@ -587,6 +587,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         },
         mounted: function () {
             if ( ! this.error ) {
+                if ( this.official ) this.toggle_hide();
                 this.quiz_build_up(true);
             }
             else {

@@ -217,7 +217,7 @@ sub data ($self) {
                 $question;
             } $quiz->obj->quiz_questions->search( {}, { order_by => { -desc => 'created' } } )->all
         ];
-
+        $data->{official} = $quiz->obj->official;
         $data->{material} = CBQZ::Model::MaterialSet->new->load(
             $cbqz_prefs->{material_set_id}
         )->get_material;
