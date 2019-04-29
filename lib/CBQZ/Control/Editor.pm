@@ -70,6 +70,7 @@ sub save ($self) {
         length( $question->{question} ) > 0 and
         length( $question->{answer} ) > 0
     );
+    $question->{marked} = undef unless ( $question->{marked} );
 
     my $success = 0;
     unless ( $question->{question_id} ) {
