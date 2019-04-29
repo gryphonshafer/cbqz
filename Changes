@@ -1,5 +1,8 @@
 Revision history for CBQZ
 
+15.13.2   Mon Apr 29 15:03:30 PDT 2019
+        - Correcting marked questions actually de-marks the question
+
 15.13.1   Fri Apr 26 11:06:30 PDT 2019
         - Timeout triggers hide of screen/data; closes #235
         - Auto-hide question on official quiz generate; closes #239

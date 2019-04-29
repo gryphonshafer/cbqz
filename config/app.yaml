@@ -1,6 +1,6 @@
 ---
 default:
-    version: 15.13.1
+    version: 15.13.2
     logging:
         log_dir: runtime
         log_file: app.log
