@@ -88,6 +88,7 @@ sub path ($self) {
                 @{ CBQZ::Model::Quiz->new->quizzes_for_user( $self->stash('user'), $program ) },
             ],
             program_question_types => $program->question_types_as_text,
+            book_order => CBQZ::Model::MaterialSet->new->load( $cbqz_prefs->{material_set_id} )->get_books,
         } );
     }
 }
@@ -217,10 +218,10 @@ sub data ($self) {
                 $question;
             } $quiz->obj->quiz_questions->search( {}, { order_by => { -desc => 'created' } } )->all
         ];
-        $data->{official} = $quiz->obj->official;
-        $data->{material} = CBQZ::Model::MaterialSet->new->load(
-            $cbqz_prefs->{material_set_id}
-        )->get_material;
+        $data->{official}   = $quiz->obj->official;
+        my $material_set    = CBQZ::Model::MaterialSet->new->load( $cbqz_prefs->{material_set_id} );
+        $data->{material}   = $material_set->get_material;
+        $data->{book_order} = $material_set->get_books;
 
         $quiz->obj->update({ state => 'active' });
         $quiz->obj->update({ quizmaster => $self->stash('user')->obj->realname })

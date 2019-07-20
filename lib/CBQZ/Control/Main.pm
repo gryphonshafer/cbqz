@@ -219,6 +219,7 @@ sub clone_question_set ($self) {
 }
 
 sub material_data ($self) {
+    my $book_order;
     my $material = { Error => { 1 => { 1 => {
         book    => 'Error',
         chapter => 1,
@@ -230,15 +231,17 @@ sub material_data ($self) {
     } } } };
 
     try {
-        $material = CBQZ::Model::MaterialSet->new->load(
+        my $material_set = CBQZ::Model::MaterialSet->new->load(
             $self->decode_cookie('cbqz_prefs')->{material_set_id}
-        )->get_material;
+        );
+        $material   = $material_set->get_material;
+        $book_order = $material_set->get_books;
     }
     catch {
         $self->warn($_);
     };
 
-    return $self->render( json => { material => $material } );
+    return $self->render( json => { material => $material, book_order => $book_order } );
 }
 
 sub edit_user ($self) {

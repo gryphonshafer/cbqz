@@ -62,6 +62,21 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
         }
     }
 
+    if ( data.book_order ) {
+        var book_order_map = {};
+        for ( var i = 0; i < data.book_order.length; i++ ) {
+            book_order_map[ data.book_order[i] ] = i;
+        }
+
+        data.question_set.statistics = data.question_set.statistics.sort( function ( a, b ) {
+            if ( book_order_map[ a.book ] < book_order_map[ b.book ] ) return -1;
+            if ( book_order_map[ a.book ] > book_order_map[ b.book ] ) return 1;
+            if ( a.chapter < b.chapter ) return -1;
+            if ( a.chapter > b.chapter ) return 1;
+            return 0;
+        } );
+    }
+
     new Vue({
         el: "#quiz_setup",
         data: data,

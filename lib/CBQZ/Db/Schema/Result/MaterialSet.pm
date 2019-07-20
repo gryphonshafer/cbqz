@@ -39,6 +39,12 @@ __PACKAGE__->table("material_set");
   is_nullable: 1
   size: 64
 
+=head2 book_order
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 128
+
 =head2 last_modified
 
   data_type: 'timestamp'
@@ -50,7 +56,7 @@ __PACKAGE__->table("material_set");
 
   data_type: 'timestamp'
   datetime_undef_if_invalid: 1
-  default_value: '1970-01-01 08:00:00'
+  default_value: '1970-01-01 00:00:00'
   is_nullable: 0
 
 =cut
@@ -65,6 +71,8 @@ __PACKAGE__->add_columns(
   },
   "name",
   { data_type => "varchar", is_nullable => 1, size => 64 },
+  "book_order",
+  { data_type => "varchar", is_nullable => 1, size => 128 },
   "last_modified",
   {
     data_type => "timestamp",
@@ -76,7 +84,7 @@ __PACKAGE__->add_columns(
   {
     data_type => "timestamp",
     datetime_undef_if_invalid => 1,
-    default_value => "1970-01-01 08:00:00",
+    default_value => "1970-01-01 00:00:00",
     is_nullable => 0,
   },
 );
@@ -125,8 +133,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-11-30 11:32:35
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:eHZAABVuUeGH1Ogngyjm3Q
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2019-07-19 12:29:12
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:fHYpAw6itRwPQiq9mMaC3A
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

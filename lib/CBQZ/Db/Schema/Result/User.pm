@@ -74,7 +74,7 @@ __PACKAGE__->table("user");
 
   data_type: 'timestamp'
   datetime_undef_if_invalid: 1
-  default_value: '1970-01-01 08:00:00'
+  default_value: '1970-01-01 00:00:00'
   is_nullable: 0
 
 =head2 active
@@ -118,7 +118,7 @@ __PACKAGE__->add_columns(
   {
     data_type => "timestamp",
     datetime_undef_if_invalid => 1,
-    default_value => "1970-01-01 08:00:00",
+    default_value => "1970-01-01 00:00:00",
     is_nullable => 0,
   },
   "active",
@@ -257,8 +257,8 @@ __PACKAGE__->has_many(
 with 'CBQZ::Db::Base::Result::User';
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2018-11-30 11:32:35
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:BABwiEvy0bJI/37CGHQQ4Q
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2019-07-19 12:29:12
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:huJxJdC2ztarXpwR0Sak9w
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

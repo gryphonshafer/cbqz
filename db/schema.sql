@@ -26,14 +26,15 @@ CREATE TABLE material (
 CREATE TABLE material_set (
     material_set_id int(10) unsigned NOT NULL,
     name varchar(64) DEFAULT NULL,
+    book_order varchar(128) DEFAULT NULL,
     last_modified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created timestamp NOT NULL DEFAULT '1970-01-01 16:00:00',
+    created timestamp NOT NULL DEFAULT '1970-01-01 08:00:00',
     PRIMARY KEY (material_set_id),
     UNIQUE KEY name (name)
 );
 
 CREATE TRIGGER material_set_before_insert BEFORE INSERT ON material_set FOR EACH ROW SET NEW.created = NOW();
-;
+
 CREATE TABLE program (
     program_id int(10) unsigned NOT NULL,
     name varchar(64) DEFAULT NULL,
@@ -70,32 +71,26 @@ CREATE TABLE question (
     CONSTRAINT question_ibfk_1 FOREIGN KEY (question_set_id) REFERENCES question_set (question_set_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TRIGGER question_after_insert AFTER INSERT ON question
-FOR EACH ROW
-UPDATE question_set SET last_modified = NOW() WHERE question_set_id = NEW.question_set_id;
-;
-CREATE TRIGGER question_after_update AFTER UPDATE ON question
-FOR EACH ROW
-UPDATE question_set SET last_modified = NOW() WHERE question_set_id IN ( NEW.question_set_id, OLD.question_set_id );
-;
-CREATE TRIGGER question_after_delete AFTER DELETE ON question
-FOR EACH ROW
-UPDATE question_set SET last_modified = NOW() WHERE question_set_id = OLD.question_set_id;
+CREATE TRIGGER question_after_insert AFTER INSERT ON question FOR EACH ROW UPDATE question_set SET last_modified = NOW() WHERE question_set_id = NEW.question_set_id;
+
+CREATE TRIGGER question_after_update AFTER UPDATE ON question FOR EACH ROW UPDATE question_set SET last_modified = NOW() WHERE question_set_id IN ( NEW.question_set_id, OLD.question_set_id );
+
+CREATE TRIGGER question_after_delete AFTER DELETE ON question FOR EACH ROW UPDATE question_set SET last_modified = NOW() WHERE question_set_id = OLD.question_set_id;
 
 CREATE TABLE question_set (
     question_set_id int(10) unsigned NOT NULL,
     user_id int(10) unsigned NOT NULL,
     name varchar(64) DEFAULT NULL,
     last_modified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created timestamp NOT NULL DEFAULT '1970-01-01 16:00:00',
+    created timestamp NOT NULL DEFAULT '1970-01-01 08:00:00',
     PRIMARY KEY (question_set_id),
-    KEY name (name),
     KEY user_id (user_id),
+    KEY name (name),
     CONSTRAINT question_set_ibfk_1 FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TRIGGER question_set_before_insert BEFORE INSERT ON question_set FOR EACH ROW SET NEW.created = NOW();
-;
+
 CREATE TABLE quiz (
     quiz_id int(10) unsigned NOT NULL,
     program_id int(10) unsigned NOT NULL,
@@ -112,7 +107,7 @@ CREATE TABLE quiz (
     questions mediumtext,
     result_operation mediumtext,
     last_modified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created timestamp NOT NULL DEFAULT '1970-01-01 16:00:00',
+    created timestamp NOT NULL DEFAULT '1970-01-01 08:00:00',
     PRIMARY KEY (quiz_id),
     KEY program_id (program_id),
     KEY user_id (user_id),
@@ -121,7 +116,7 @@ CREATE TABLE quiz (
 );
 
 CREATE TRIGGER quiz_before_insert BEFORE INSERT ON quiz FOR EACH ROW SET NEW.created = NOW();
-;
+
 CREATE TABLE quiz_question (
     quiz_question_id int(10) unsigned NOT NULL,
     quiz_id int(10) unsigned DEFAULT NULL,
@@ -165,7 +160,7 @@ CREATE TABLE socket (
     counter int(10) unsigned NOT NULL DEFAULT '0',
     data mediumtext,
     last_modified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created timestamp NOT NULL DEFAULT '1970-01-01 16:00:00',
+    created timestamp NOT NULL DEFAULT '1970-01-01 08:00:00',
     PRIMARY KEY (socket_id),
     UNIQUE KEY name (name)
 );
@@ -180,14 +175,14 @@ CREATE TABLE user (
     email varchar(64) DEFAULT NULL,
     last_login timestamp NULL DEFAULT NULL,
     last_modified timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created timestamp NOT NULL DEFAULT '1970-01-01 16:00:00',
+    created timestamp NOT NULL DEFAULT '1970-01-01 08:00:00',
     active tinyint(1) NOT NULL DEFAULT '1',
     PRIMARY KEY (user_id),
     UNIQUE KEY name (username)
 );
 
 CREATE TRIGGER user_before_insert BEFORE INSERT ON user FOR EACH ROW SET NEW.created = NOW();
-;
+
 CREATE TABLE user_program (
     user_id int(10) unsigned NOT NULL,
     program_id int(10) unsigned NOT NULL,
@@ -206,7 +201,7 @@ CREATE TABLE user_question_set (
     type enum('publish','share') NOT NULL,
     PRIMARY KEY (user_question_set_id),
     KEY user_id (user_id),
-    KEY user_question_set_ibfk_2 (question_set_id),
+    KEY question_set_id (question_set_id),
     CONSTRAINT user_question_set_ibfk_1 FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT user_question_set_ibfk_2 FOREIGN KEY (question_set_id) REFERENCES question_set (question_set_id) ON DELETE CASCADE ON UPDATE CASCADE
 );

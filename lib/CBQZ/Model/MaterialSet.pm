@@ -31,6 +31,12 @@ sub load_material ($self) {
     return $self;
 }
 
+sub get_books ($self) {
+    return unless ( $self->obj );
+    my $book_order = $self->obj->book_order;
+    return ($book_order) ? $self->json->decode($book_order) : undef;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;

@@ -34,6 +34,13 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
     data.questions_view_page   = 1;
     data.questions_view_size   = 40;
 
+    if ( data.book_order ) {
+        var book_order_map = {};
+        for ( var i = 0; i < data.book_order.length; i++ ) {
+            book_order_map[ data.book_order[i] ] = i;
+        }
+    }
+
     var sort_by = {};
     sort_by._base = function ( a, b ) {
         if ( a.type < b.type ) return -1;
@@ -49,9 +56,20 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
         return 0;
     };
+    sort_by.book = function ( a, b ) {
+        if (book_order_map) {
+            if ( book_order_map[a] < book_order_map[b] ) return -1;
+            if ( book_order_map[a] > book_order_map[b] ) return 1;
+            return 0;
+        }
+        else {
+            var icmp = a.toLowerCase().localeCompare( b.toLowerCase() );
+            if ( icmp != 0 ) return icmp;
+        }
+    };
     sort_by.ref = function ( a, b ) {
-        var icmp = a.book.toLowerCase().localeCompare( b.book.toLowerCase() );
-        if ( icmp != 0 ) return icmp;
+        var book_sort = sort_by.book( a.book, b.book );
+        if ( book_sort != 0 ) return book_sort;
 
         if ( a.chapter < b.chapter ) return -1;
         if ( a.chapter > b.chapter ) return 1;
@@ -61,8 +79,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         return sort_by._base( a, b );
     };
     sort_by.ref_desc = function ( a, b ) {
-        var icmp = b.book.toLowerCase().localeCompare( a.book.toLowerCase() );
-        if ( icmp != 0 ) return icmp;
+        var book_sort = sort_by.book( b.book, a.book );
+        if ( book_sort != 0 ) return book_sort;
 
         if ( a.chapter > b.chapter ) return -1;
         if ( a.chapter < b.chapter ) return 1;
@@ -640,7 +658,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 this.questions.book = null;
 
                 this.$nextTick( function () {
-                    this.questions.books = Object.keys( this.questions.data ).sort();
+                    this.questions.books = Object.keys( this.questions.data ).sort( sort_by.book );
+
                     if ( this.questions.books[0] ) {
                         this.questions.book = book || this.questions.books[0];
 
@@ -659,7 +678,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         },
 
         mounted: function () {
-            this.questions.books = Object.keys( this.questions.data ).sort();
+            this.questions.books = Object.keys( this.questions.data ).sort( sort_by.book );
             if ( this.questions.books[0] ) this.questions.book = this.questions.books[0];
 
             this.questions.marked_questions = this.grep_marked_questions();

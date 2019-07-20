@@ -2,7 +2,8 @@ Vue.http.get( cntlr + "/material_data" ).then( function (response) {
     var vue_app = new Vue({
         el: '#material',
         data: {
-            material: response.body.material
+            material   : response.body.material,
+            book_order : response.body.book_order
         },
         methods: {
             lookup_reference_change: function ( book, chapter, verse ) {

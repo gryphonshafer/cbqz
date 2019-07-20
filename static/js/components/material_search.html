@@ -96,6 +96,10 @@
                         }
                     };
                 }
+            },
+            book_order: {
+                type: Array,
+                default: null
             }
         },
         methods: {
@@ -133,7 +137,7 @@
 
                 search_regex += '(?![^<]*>)';
 
-                var books = Object.keys( this.material ).sort();
+                var books = this.book_order || Object.keys( this.material ).sort();
                 for ( var i = 0; i < books.length; i++ ) {
                     var chapters = Object.keys( this.material[ books[i] ] ).sort(
                         function ( a, b ) {

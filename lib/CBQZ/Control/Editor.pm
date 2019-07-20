@@ -32,19 +32,20 @@ sub data ($self) {
     };
 
     try {
-        my $set = CBQZ::Model::QuestionSet->new->load( $cbqz_prefs->{question_set_id} );
+        my $q_set = CBQZ::Model::QuestionSet->new->load( $cbqz_prefs->{question_set_id} );
         $data->{questions} = { data => (
-            ( $set and $set->is_usable_by( $self->stash('user') ) ) ? $set->get_questions : {},
+            ( $q_set and $q_set->is_usable_by( $self->stash('user') ) ) ? $q_set->get_questions : {},
         ) };
 
-        $data->{material} = CBQZ::Model::MaterialSet->new->load(
-            $cbqz_prefs->{material_set_id},
-        )->get_material;
+        my $material_set    = CBQZ::Model::MaterialSet->new->load( $cbqz_prefs->{material_set_id} );
+        $data->{material}   = $material_set->get_material;
+        $data->{book_order} = $material_set->get_books;
 
         my %books = map { $_ => 1 } keys %{ $data->{material} }, keys %{ $data->{questions}{data} };
+
         $data->{metadata} = {
             types => CBQZ::Model::Program->new->load( $cbqz_prefs->{program_id} )->types_list,
-            books => [ sort { $a cmp $b } keys %books ],
+            books => ( $data->{book_order} || [ sort { $a cmp $b } keys %books ] ),
         };
     }
     catch {
@@ -128,19 +129,29 @@ sub questions ($self) {
             ] );
         }
         else {
-            my $set = CBQZ::Model::QuestionSet->new->load(
+            my $q_set = CBQZ::Model::QuestionSet->new->load(
                 $self->decode_cookie('cbqz_prefs')->{question_set_id}
             );
+
+            my $m_set = CBQZ::Model::MaterialSet->new->load(
+                $self->decode_cookie('cbqz_prefs')->{material_set_id}
+            );
+            my $i = 1;
+            my $book_order_map = { map { $_ => $i++ } @{ ($m_set) ? $m_set->get_books : [] } };
+
             $self->stash(
                 questions => [
                     sort {
+                        $book_order_map->{ $a->{book} } and $book_order_map->{ $b->{book} } and
+                        $book_order_map->{ $a->{book} } <=> $book_order_map->{ $b->{book} } or
+
                         $a->{book} cmp $b->{book} or
                         $a->{chapter} <=> $b->{chapter} or
                         $a->{verse} <=> $b->{verse} or
                         $a->{type} cmp $b->{type}
-                    } @{ $set->get_questions([]) }
+                    } @{ $q_set->get_questions([]) }
                 ],
-            ) if ( $set and $set->is_usable_by( $self->stash('user') ) );
+            ) if ( $q_set and $q_set->is_usable_by( $self->stash('user') ) );
         }
     }
     catch {

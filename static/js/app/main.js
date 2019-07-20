@@ -37,6 +37,29 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 } );
 
                 this.question_set = question_set;
+            },
+            sort_question_set: function () {
+                var material_set_id = this.material_set_id;
+                var material_set    = this.material_sets.find( function(set) {
+                    return material_set_id == set.material_set_id;
+                } );
+
+                if ( material_set.book_order ) {
+                    var book_order = JSON.parse( material_set.book_order );
+
+                    var book_order_map = {};
+                    for ( var i = 0; i < book_order.length; i++ ) {
+                        book_order_map[ book_order[i] ] = i;
+                    }
+
+                    this.question_set.statistics = this.question_set.statistics.sort( function ( a, b ) {
+                        if ( book_order_map[ a.book ] < book_order_map[ b.book ] ) return -1;
+                        if ( book_order_map[ a.book ] > book_order_map[ b.book ] ) return 1;
+                        if ( a.chapter < b.chapter ) return -1;
+                        if ( a.chapter > b.chapter ) return 1;
+                        return 0;
+                    } );
+                }
             }
         },
 
@@ -44,9 +67,13 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             question_set_id: function () {
                 this.set_question_set();
                 this.save_settings();
+                this.sort_question_set();
             },
             program_id:      function () { this.save_settings() },
-            material_set_id: function () { this.save_settings() },
+            material_set_id: function () {
+                this.save_settings();
+                this.sort_question_set();
+            },
         },
 
         mounted: function () {
@@ -61,6 +88,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             else {
                 this.set_question_set();
             }
+            this.sort_question_set();
         }
     });
 });

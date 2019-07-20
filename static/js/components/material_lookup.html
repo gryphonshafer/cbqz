@@ -88,10 +88,14 @@
                         }
                     };
                 }
+            },
+            book_order: {
+                type: Array,
+                default: null
             }
         },
         mounted: function () {
-            this.books = Object.keys( this.material );
+            this.books = this.book_order || Object.keys( this.material ).sort();
             this.book  = this.books[0];
         },
         watch: {
