@@ -4,6 +4,7 @@ use Mojo::Base 'Mojolicious::Controller';
 use exact;
 use Try::Tiny;
 use MIME::Base64 'encode_base64';
+use Text::Unidecode 'unidecode';
 use CBQZ::Model::Quiz;
 use CBQZ::Model::Program;
 use CBQZ::Model::MaterialSet;
@@ -203,7 +204,7 @@ sub data ($self) {
         my $quiz     = CBQZ::Model::Quiz->new->load($quiz_id);
         my $metadata = $quiz->json->decode( $quiz->obj->metadata );
 
-        $data->{questions} = $quiz->json->decode( $quiz->obj->questions );
+        $data->{questions} = $quiz->json->decode( unidecode( $quiz->obj->questions ) );
         $data->{metadata}  = {
             quiz_id     => $quiz_id,
             types       => $program->types_list,
