@@ -36,6 +36,7 @@ sub create ( $self, $config ) {
                 score_types => $self->json->decode(
                     CBQZ::Model::Program->new->load( $config->{program_id} )->obj->score_types
                 ),
+                self_practice => ( ( $config->{self_practice} ) ? 1 : 0 ),
                 map { $_ => $config->{$_} } qw(
                     target_questions randomize_first timer_default timeout readiness score_type
                 )

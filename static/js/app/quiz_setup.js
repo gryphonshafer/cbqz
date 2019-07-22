@@ -35,13 +35,15 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
 
     var cbqz_quiz_setup = get_json_cookie("cbqz_quiz_setup");
     if ( !! cbqz_quiz_setup && !! cbqz_quiz_setup.room ) {
-        data.room     = cbqz_quiz_setup.room;
-        data.official = cbqz_quiz_setup.official;
-        data.meet     = cbqz_quiz_setup.meet;
+        data.room          = cbqz_quiz_setup.room;
+        data.official      = cbqz_quiz_setup.official;
+        data.self_practice = cbqz_quiz_setup.self_practice;
+        data.meet          = cbqz_quiz_setup.meet;
     }
     else {
-        data.room     = 9;
-        data.official = false;
+        data.room          = 9;
+        data.official      = false;
+        data.self_practice = false;
     }
 
     if ( ! data.quiz_teams_quizzers ) {
@@ -122,9 +124,10 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
                 set_json_cookie(
                     "cbqz_quiz_setup",
                     {
-                        room     : this.room,
-                        official : this.official,
-                        meet     : this.meet
+                        room          : this.room,
+                        official      : this.official,
+                        self_practice : this.self_practice,
+                        meet          : this.meet
                     }
                 );
             },
@@ -187,8 +190,15 @@ Vue.http.get( cntlr + "/quiz_setup" ).then( function (response) {
             weight_percent:  function () { this.save_settings() },
             question_types:  function () { this.save_settings() },
             room:            function () { this.save_settings() },
-            official:        function () { this.save_settings() },
-            meet:            function () { this.save_settings() }
+            meet:            function () { this.save_settings() },
+            official:        function () {
+                if ( this.official ) this.self_practice = false;
+                this.save_settings();
+            },
+            self_practice: function () {
+                if ( this.self_practice ) this.official = false;
+                this.save_settings();
+            }
         },
 
         created: function () {

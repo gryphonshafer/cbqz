@@ -16,10 +16,10 @@
     <div v-cloak>
         <div id="question">
             <span class="label">Question #:</span> <span class="field">{{ question.number }}</span>
-            <span class="label">Type:</span> <span class="field toggle_hide">{{ question.type }}</span>
+            <span class="label">Type:</span> <span class="field toggle_hide_official">{{ question.type }}</span>
             <span class="label">As:</span> <span class="field">{{ question.as }}</span>
-            <span class="label">Score:</span> <span class="field toggle_hide">{{ question.score }}</span>
-            <span class="label">Used:</span> <span class="field toggle_hide">{{ question.used }}</span>
+            <span class="label">Score:</span> <span class="field toggle_hide_official">{{ question.score }}</span>
+            <span class="label">Used:</span> <span class="field toggle_hide_official">{{ question.used }}</span>
 
             <br>
 
@@ -46,7 +46,7 @@
             <br>
 
             <span class="label">Question:</span>
-            <div class="htmlarea question_box toggle_hide" v-html="question.question"></div>
+            <div class="htmlarea question_box toggle_hide_official" v-html="question.question"></div>
 
             <span class="label">Answer:</span>
             <div class="htmlarea answer_box toggle_hide" v-html="question.answer"></div>

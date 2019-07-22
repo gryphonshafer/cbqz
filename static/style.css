@@ -491,12 +491,14 @@ span.label {
     margin-bottom: 3px;
 }
 
-.toggle_hide_active .toggle_hide {
+.toggle_hide_active .toggle_hide,
+.toggle_hide_official_active .toggle_hide_official {
     color: #f0f0f0;
     background-color: #f0f0f0;
 }
 
-.toggle_hide_active .toggle_hide * {
+.toggle_hide_active .toggle_hide *,
+.toggle_hide_official_active .toggle_hide_official * {
     display: none;
 }
 

@@ -29,8 +29,9 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         label : "Start Timer",
     };
     data.classes = {
-        cursor_progress    : false,
-        toggle_hide_active : false
+        cursor_progress             : false,
+        toggle_hide_active          : false,
+        toggle_hide_official_active : false
     };
     if ( ! data.metadata.quiz_teams_quizzers_original )
         data.metadata.quiz_teams_quizzers_original =
@@ -138,6 +139,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
             },
 
             move_question: function (target) {
+                if ( this.metadata.self_practice ) this.hide();
                 if ( target == parseInt(target) ) {
                     target--;
                     if ( target >= 0 && target < this.questions.length ) {
@@ -266,7 +268,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 var confirmation = false;
 
                 if ( type == "timeout" ) {
-                    if ( this.official ) this.toggle_hide();
+                    if ( this.official || this.metadata.self_practice ) this.toggle_hide();
                     this.set_timer( this.metadata.timeout );
                     this.timer_click();
                 }
@@ -447,6 +449,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
                         this.question = this.questions[ this.position ] = question;
                         this.set_type_counts();
+
+                        if ( this.metadata.self_practice ) this.hide();
                     }
                 } );
             },
@@ -553,6 +557,8 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
             toggle_hide: function () {
                 this.classes.toggle_hide_active = ! this.classes.toggle_hide_active;
+                if ( this.official )
+                    this.classes.toggle_hide_official_active = ! this.classes.toggle_hide_official_active;
 
                 if ( this.classes.toggle_hide_active ) {
                     var books = Object.keys( this.material );
@@ -567,6 +573,10 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                     this.$refs.material_search.search_text = this.saved_search_text || "";
                     this.saved_search_text = "";
                 }
+            },
+
+            hide: function () {
+                if ( ! this.classes.toggle_hide_active ) this.toggle_hide();
             }
         },
         computed: {
@@ -588,7 +598,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         },
         mounted: function () {
             if ( ! this.error ) {
-                if ( this.official ) this.toggle_hide();
+                if ( this.official || this.metadata.self_practice ) this.toggle_hide();
                 this.quiz_build_up(true);
             }
             else {
