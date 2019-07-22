@@ -481,7 +481,7 @@ span.key_text {
     color: gray;
 }
 
-span.label {
+.label {
     font-size: 90%;
     color: #333;
 }
@@ -630,7 +630,7 @@ div#material_search_display span.outdent {
 }
 
 div#material_search input#material_search_input {
-    width: 230px;
+    width: 180px;
 }
 
 /* -------------------------------------------------------------------------- */

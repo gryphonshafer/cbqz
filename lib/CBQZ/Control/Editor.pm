@@ -137,7 +137,7 @@ sub questions ($self) {
                 $self->decode_cookie('cbqz_prefs')->{material_set_id}
             );
             my $i = 1;
-            my $book_order_map = { map { $_ => $i++ } @{ ($m_set) ? $m_set->get_books : [] } };
+            my $book_order_map = { map { $_ => $i++ } @{ ($m_set) ? ( $m_set->get_books || [] ) : [] } };
 
             $self->stash(
                 questions => [

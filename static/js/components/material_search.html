@@ -4,6 +4,7 @@
             <input type="text" ref="search_text_input" v-model="search_text" placeholder="Search Text"
                 id="material_search_input"
                 v-bind:title="search_input_title">
+            <label class="label"><input type="checkbox" v-model="exact">Exact</label>
             <button v-on:click="go"
                 title="Run search now manually">Go</button>
             <button v-on:click="find"
@@ -57,8 +58,9 @@
         template: '#material-search-template',
         data: function () {
             return {
-                search_text    : null,
+                search_text    : "",
                 matched_verses : null,
+                exact          : false,
                 selected_ref   : {
                     book    : null,
                     chapter : null,
@@ -104,7 +106,7 @@
         },
         methods: {
             go: function () {
-                this.search();
+                if ( this.search_text.length > 0 ) this.search();
             },
             find: function (moveFocus) {
                 var selection = document.getSelection();
@@ -120,21 +122,35 @@
             },
             search: function () {
                 this.matched_verses = [];
+                var search_regex    = "";
 
-                var search_regex = this.search_text
-                    .toLowerCase()
-                    .replace( /\s+/g, " " )
-                    .replace( /['-<>]/g, "" )
-                    .replace( /\W/g, function (match) {
-                        return "\\" + match;
-                    } )
-                    .replace( /\w/g, function (match) {
-                        return match + "(<[^>]+>)*['-]*(<[^>]+>)*";
-                    } )
-                    .replace( /\\ /g, " " )
-                    .replace( /(^\s+|\s+$)/g, "\\b" )
-                    .replace( /\s/g, "(<[^>]+>|\\W)+" );
-
+                if ( ! this.exact ) {
+                    search_regex = this.search_text
+                        .toLowerCase()
+                        .replace( /\s+/g, " " )
+                        .replace( /['-<>]/g, "" )
+                        .replace( /\W/g, function (match) {
+                            return "\\" + match;
+                        } )
+                        .replace( /\w/g, function (match) {
+                            return match + "(<[^>]+>)*['-]*(<[^>]+>)*";
+                        } )
+                        .replace( /\\ /g, " " )
+                        .replace( /(^\s+|\s+$)/g, "\\b" )
+                        .replace( /\s/g, "(<[^>]+>|\\W)+" );
+                }
+                else {
+                    search_regex = this.search_text
+                        .replace( /\s+/g, " " )
+                        .replace( /\W/g, function (match) {
+                            return "\\" + match;
+                        } )
+                        .replace( /\w/g, function (match) {
+                            return match + "(<[^>]+>)*['-]*(<[^>]+>)*";
+                        } )
+                        .replace( /\\ /g, " " )
+                        .replace( /\s/g, "(<[^>]+>|\\W)+" );
+                }
                 search_regex += '(?![^<]*>)';
 
                 var books = this.book_order || Object.keys( this.material ).sort();
@@ -156,13 +172,21 @@
                         for ( var k = 0; k < verse_numbers.length; k++ ) {
                             var verse_number = verse_numbers[k];
 
-                            if ( verses[verse_number].text.search( RegExp( search_regex, 'i' ) ) != -1 ) {
+                            if (
+                                verses[verse_number].text.search(
+                                    RegExp( search_regex, ( ! this.exact ) ? 'i' : '' )
+                                ) != -1
+                            ) {
                                 var skip = false;
                                 var text = verses[verse_number].text.replace(
-                                    RegExp( search_regex, 'ig' ),
+                                    RegExp( search_regex, ( ! this.exact ) ? 'ig' : '' ),
                                     function (match) {
                                         if ( match.search(/^[^<]+>/) != -1 ) skip = true;
-                                        return '<span class="match">[</span>' + match + '<span class="match">]</span>';
+                                        return (
+                                            '<span class="match">[</span>' +
+                                            match +
+                                            '<span class="match">]</span>'
+                                        );
                                     }
                                 );
 
@@ -191,6 +215,10 @@
         },
         watch: {
             search_text: function () {
+                this.matched_verses = [];
+                if ( this.search_text.length > 3 ) this.search();
+            },
+            exact: function () {
                 this.matched_verses = [];
                 if ( this.search_text.length > 3 ) this.search();
             }
