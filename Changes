@@ -1,5 +1,11 @@
 Revision history for CBQZ
 
+15.13.3   Mon Jul 22 16:35:42 PDT 2019
+        - Material search optionally respects punctuation; closes #224
+        - Self-quiz practice flashcards; closes #123
+        - Sort books in quizzing order; closes #243
+        - Fix for UTF8 characters throwing JSON decode in quiz room display
+
 15.13.2   Mon Apr 29 15:03:30 PDT 2019
         - Correcting marked questions actually de-marks the question
 
