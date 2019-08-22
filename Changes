@@ -1,5 +1,8 @@
 Revision history for CBQZ
 
+15.13.4   Thu Aug 22 10:47:47 PDT 2019
+        - Manual data cleaning tools improvements
+
 15.13.3   Mon Jul 22 16:35:42 PDT 2019
         - Material search optionally respects punctuation; closes #224
         - Self-quiz practice flashcards; closes #123
