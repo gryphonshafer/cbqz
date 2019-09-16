@@ -97,7 +97,7 @@ sub quiz ($self) {
 
 sub delete_practice_quiz ($self) {
     CBQZ::Model::Quiz->new->rs->search({
-        quiz_id  => [ keys %{ $self->params } ],
+        quiz_id  => [ grep { /^\d+$/ } keys %{ $self->params } ],
         official => 0,
         user_id  => $self->stash('user')->obj->id,
     })->delete;
