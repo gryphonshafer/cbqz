@@ -1,5 +1,8 @@
 Revision history for CBQZ
 
+15.13.5   Mon Sep 16 11:57:33 PDT 2019
+        - Remove non quiz ID form values from Quiz query
+
 15.13.4   Thu Aug 22 10:47:47 PDT 2019
         - Manual data cleaning tools improvements
 
