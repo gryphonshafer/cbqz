@@ -517,32 +517,43 @@ sub import_question_set ($self) {
         my $csv = csv( in => \$csv_data, headers => 'auto' ) ||
             E->throw('Input not a valid CSV file as defined by the instructions on the page');
 
-        my $questions = [
-            grep {
-                my $type = $_->{type};
+        my $questions = [];
+        for ( my $i = 0; $i < @$csv; $i++ ) {
+            my $question = $csv->[$i];
+            $question = { map { lc( unidecode($_) ) => unidecode( $question->{$_} ) } keys %$question };
 
-                $_->{book} and
-                $_->{chapter} and
-                $_->{verse} and
-                $_->{type} and
-                $_->{question} and
-                $_->{answer} and
-                scalar( grep { $type eq $_ } @$types_list );
+            $question->{$_} =~ s/[<>]+//g for ( qw( question answer ) );
+            $question->{$_} =~ s/\s{2,}/ /g for ( qw( book chapter verse type question answer ) );
+            $question->{$_} =~ s/(^\s+|\s+$)//g for ( qw( book chapter verse type question answer ) );
+            $question->{$_} =~ s/\D+//g for ( qw( chapter verse ) );
+
+            $question = { map { $_ => $question->{$_} } qw( book chapter verse type question answer ) };
+
+            if ( not $question->{book} ) {
+                $self->notice("Import error on record $i due to no book");
             }
-            map {
-                my $question = $_;
-                $question = { map { lc( unidecode($_) ) => unidecode( $question->{$_} ) } keys %$question };
-
-                $question->{$_} =~ s/[<>]+//g for ( qw( question answer ) );
-                $question->{$_} =~ s/\s{2,}/ /g for ( qw( book chapter verse type question answer ) );
-                $question->{$_} =~ s/(^\s+|\s+$)//g for ( qw( book chapter verse type question answer ) );
-                $question->{$_} =~ s/[^A-z]+//g for ( qw( book type ) );
-                $question->{$_} =~ s/\D+//g for ( qw( chapter verse ) );
-
-                +{ map { $_ => $question->{$_} } qw( book chapter verse type question answer ) };
+            elsif ( not $question->{chapter} ) {
+                $self->notice("Import error on record $i due to no chapter");
             }
-            @$csv
-        ];
+            elsif ( not $question->{verse} ) {
+                $self->notice("Import error on record $i due to no verse");
+            }
+            elsif ( not $question->{type} ) {
+                $self->notice("Import error on record $i due to no type");
+            }
+            elsif ( not $question->{question} ) {
+                $self->notice("Import error on record $i due to no question");
+            }
+            elsif ( not $question->{answer} ) {
+                $self->notice("Import error on record $i due to no answer");
+            }
+            elsif ( not scalar( grep { $question->{type} eq $_ } @$types_list ) ) {
+                $self->notice("Import error on record $i due to type not valid");
+            }
+            else {
+                push( @$questions, $question );
+            }
+        }
 
         E->throw(
             'Failed to parse uploaded data; Check that you have a CSV text file ' .
