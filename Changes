@@ -1,5 +1,8 @@
 Revision history for CBQZ
 
+15.13.6   Mon Sep 16 18:32:40 PDT 2019
+        - Fix for importing data bug that nukes valid books and types
+
 15.13.5   Mon Sep 16 11:57:33 PDT 2019
         - Remove non quiz ID form values from Quiz query
 
