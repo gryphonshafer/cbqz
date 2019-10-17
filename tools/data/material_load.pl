@@ -7,21 +7,23 @@ use Text::CSV_XS 'csv';
 use CBQZ;
 
 my $settings = options( qw( name|n=s kvl|k=s set|s=s ) );
-pod2usage unless ( $settings->{name} and $settings->{kvl} and $settings->{set} );
+pod2usage unless ( $settings->{name} and $settings->{set} );
 
 my $kvl;
-for ( @{ csv( in => $settings->{kvl} ) } ) {
-    my ( $book, $chapter, @verses ) = @$_;
+if ( $settings->{kvl} ) {
+    for ( @{ csv( in => $settings->{kvl} ) } ) {
+        my ( $book, $chapter, @verses ) = @$_;
 
-    for my $verse (@verses) {
-        my $key_type = ( $verse =~ /\(([^)]+)\)/ ) ? $1 : undef;
-        if ( $verse =~ /^(\d+)-(\d+)/ ) {
-            for ( $1 .. $2 ) {
-                $kvl->{$book}{$chapter}{$_} = { key_type => $key_type, key_class => 'range' };
+        for my $verse (@verses) {
+            my $key_type = ( $verse =~ /\(([^)]+)\)/ ) ? $1 : undef;
+            if ( $verse =~ /^(\d+)-(\d+)/ ) {
+                for ( $1 .. $2 ) {
+                    $kvl->{$book}{$chapter}{$_} = { key_type => $key_type, key_class => 'range' };
+                }
             }
-        }
-        elsif ( $verse =~ /^(\d+)/ ) {
-            $kvl->{$book}{$chapter}{$1} = { key_type => $key_type, key_class => 'solo' };
+            elsif ( $verse =~ /^(\d+)/ ) {
+                $kvl->{$book}{$chapter}{$1} = { key_type => $key_type, key_class => 'solo' };
+            }
         }
     }
 }
