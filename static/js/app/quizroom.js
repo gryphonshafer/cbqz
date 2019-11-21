@@ -590,7 +590,7 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
         },
         watch: {
             "question.question_id": function () {
-                this.lookup_reference();
+                if ( ! this.classes.toggle_hide_active ) this.lookup_reference();
             }
         },
         created: function () {
