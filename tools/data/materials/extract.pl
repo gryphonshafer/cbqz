@@ -67,7 +67,7 @@ for my $pattern ( @{ $settings->{files} } ) {
                             $chapter,
                             $verse,
                             $text,
-                        ] );
+                        ] ) if ($text);
                     }
                     else {
                         $data->[-1][4] .= ' ' . $text;
