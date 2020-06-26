@@ -22,6 +22,11 @@
             placeholder="# of Quizzes"
             title="Number of quizzes per team"></label>
 
+        <label>
+            <input type="checkbox" [% IF c.params.norandom %]checked[% END %] name="norandom">
+            No Randomization
+        </label>
+
         <input type="submit" value="Build Meet Draw">
     </fieldset>
     <fieldset>
@@ -41,27 +46,44 @@
         <tr>
             <th>Set</th>
             [% FOR room IN [ 1 .. meet.0.size ] %]
-                <th colspan="3">Room [% room %]</th>
+                <th>Room [% room %]</th>
             [% END %]
         </tr>
         [% FOR set IN meet %]
             <tr>
                 <th class="right">[% set_count = set_count + 1; set_count %]</th>
                 [% FOR quiz IN set %]
-                    [% FOR team IN quiz %]
-                        <td>[% team %]</td>
-                    [% END %]
+                    <td>
+                        [% FOR team IN quiz %]
+                            [% team %]<br>
+                        [% END %]
+                    </td>
                 [% END %]
             </tr>
         [% END %]
     </table>
 [% END %]
 
-[% IF stats %]
+[% IF quiz_stats OR team_stats %]
     <h3>Draw Statistics</h3>
+[% END %]
 
+[% IF quiz_stats %]
+    [% FOR qcount IN quiz_stats.keys.nsort.reverse %]
+        <dl>
+            <dt>Quiz Count: [% qcount %]</dt>
+            <dd>
+                [% FOR quiz IN quiz_stats.$qcount %]
+                    [ [% quiz.sort.join(', ' ) %] ]
+                [% END %]
+            </dd>
+        </dl>
+    [% END %]
+[% END %]
+
+[% IF team_stats %]
     <dl>
-        [% FOR team IN stats %]
+        [% FOR team IN team_stats %]
             <dt>Team: [% team.name %] ([% team.quizzes %] quizzes)</dt>
             <dd>
                 Quizzes by room:

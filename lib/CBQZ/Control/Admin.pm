@@ -106,13 +106,17 @@ sub save_program_config ($self) {
 }
 
 sub build_draw ($self) {
-    my $settings = { map { $_ => $self->param($_) } ( qw( rooms quizzes teams ) ) };
+    my $settings = { map { $_ => $self->param($_) } ( qw( rooms quizzes teams norandom ) ) };
 
     if ( $settings->{rooms} and $settings->{quizzes} and $settings->{teams} ) {
         try {
             $settings->{teams} = [ grep { length } split( /\s*\r?\n\s*/, $settings->{teams} ) ];
-            my ( $meet, $stats ) = CBQZ::Model::Meet->build_draw($settings);
-            $self->stash( meet => $meet, stats => [ sort { $a->{name} cmp $b->{name} } @$stats ] );
+            my ( $meet, $team_stats, $quiz_stats ) = CBQZ::Model::Meet->build_draw($settings);
+            $self->stash(
+                meet       => $meet,
+                team_stats => $team_stats,
+                quiz_stats => $quiz_stats,
+            );
         }
         catch {
             $self->notice( 'Build draw error: ' . $self->cbqz->clean_error($_) );
