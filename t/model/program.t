@@ -1,7 +1,7 @@
-use exact;
 use Config::App;
 use Test::Most;
 use Test::Moose;
+use exact;
 
 use constant PACKAGE => 'CBQZ::Model::Program';
 

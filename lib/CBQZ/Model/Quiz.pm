@@ -179,6 +179,8 @@ sub generate ( $self, $cbqz_prefs ) {
             grep { $_->[1][1] - $_->[1][0] > 0 }
             @question_types;
 
+        $cbqz_prefs->{target_questions} //= 0;
+
         # append additional questions based on question type order up to target count
         while ( @questions < $cbqz_prefs->{target_questions} and @question_types ) {
             my $question_type = shift @question_types;
@@ -285,6 +287,7 @@ sub generate ( $self, $cbqz_prefs ) {
     };
 
     # randomly sort the first 20 questions
+    $cbqz_prefs->{randomize_first} //= 0;
     splice(
         @questions, 0, 20,
         map { $_->[0] } sort { $a->[1] <=> $b->[1] } map { [ $_, rand ] } @questions[

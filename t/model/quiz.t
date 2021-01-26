@@ -1,8 +1,8 @@
-use exact;
 use Config::App;
 use Test::Most;
 use Test::Moose;
 use CBQZ::Model;
+use exact;
 
 use constant PACKAGE => 'CBQZ::Model::Quiz';
 
