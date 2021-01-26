@@ -332,11 +332,11 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                         if ( form == "question" ) {
                             this.question.used++;
 
-                            if ( response.body.swap_questions ) {
+                            if ( response.body.swap_question ) {
                                 this.questions.splice(
                                     this.position + 1,
                                     0,
-                                    this.questions.splice( 20, 1 ).shift()
+                                    this.questions.splice( response.body.swap_question, 1 ).shift()
                                 );
                             }
 

@@ -308,24 +308,25 @@ sub quiz_event ($self) {
         $quiz_question_data = CBQZ::Model::QuizQuestion->new->create($quiz_question_data)->data;
         delete $quiz_question_data->{question};
 
-        my $swap_questions = 0;
-        my $questions      = $self->cbqz->json->decode( $quiz->obj->questions );
+        ( my $number = $event->{result_data}{number} ) =~ s/\D+//g;
+        my $swap_question = 0;
+        my $questions = $self->cbqz->json->decode( $quiz->obj->questions );
         if (
             $event->{event_data}{form} eq 'question' and
             $event->{result_data}{number} =~ /[AB]/ and
-            $event->{position} < 20
+            $number < 21
         ) {
-            splice( @$questions, $event->{position} + 1, 0, splice( @$questions, 20, 1 ) );
-            $swap_questions = 1;
+            $swap_question = 21 - ( $number - $event->{position} );
+            splice( @$questions, $event->{position} + 1, 0, splice( @$questions, $swap_question, 1 ) );
             $quiz->obj->update({ questions => $self->cbqz->json->encode($questions) });
         }
 
         $quiz_data_ws->( $self, $quiz, $cbqz_prefs );
 
         $self->render( json => {
-            success        => 1,
-            quiz_question  => $quiz_question_data,
-            swap_questions => $swap_questions,
+            success       => 1,
+            quiz_question => $quiz_question_data,
+            swap_question => $swap_question,
         } );
     }
     catch {
