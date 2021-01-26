@@ -311,26 +311,12 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                 var result_data = result_operation_process( this, event_data );
 
                 this.$http.post( cntlr + "/quiz_event", {
-                    metadata   : this.metadata,
-                    question   : this.question,
-                    event_data : event_data
+                    metadata    : this.metadata,
+                    question    : this.question,
+                    event_data  : event_data,
+                    result_data : result_data,
+                    position    : this.position
                 } ).then( function (response) {
-                    this.active_team    = {};
-                    this.active_quizzer = {};
-
-                    if ( form == "question" ) {
-                        this.question.used++;
-                        this.move_question("forward");
-
-                        this.question.as     = result_data.as;
-                        this.question.number = result_data.number;
-
-                        this.$http.post( cntlr + "/status", {
-                            quiz_id         : this.metadata.quiz_id,
-                            question_number : this.question.number
-                        } );
-                    }
-
                     this.classes.cursor_progress = false;
 
                     if ( ! response.body.success ) {
@@ -340,6 +326,31 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
                         );
                     }
                     else {
+                        this.active_team    = {};
+                        this.active_quizzer = {};
+
+                        if ( form == "question" ) {
+                            this.question.used++;
+
+                            if ( response.body.swap_questions ) {
+                                this.questions.splice(
+                                    this.position + 1,
+                                    0,
+                                    this.questions.splice( 20, 1 ).shift()
+                                );
+                            }
+
+                            this.move_question("forward");
+
+                            this.question.as     = result_data.as;
+                            this.question.number = result_data.number;
+
+                            this.$http.post( cntlr + "/status", {
+                                quiz_id         : this.metadata.quiz_id,
+                                question_number : this.question.number
+                            } );
+                        }
+
                         this.quiz_questions.unshift( response.body.quiz_question );
                         if ( !! result_data.message ) alert( result_data.message );
                     }
