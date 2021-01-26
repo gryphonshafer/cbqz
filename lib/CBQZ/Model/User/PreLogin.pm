@@ -34,32 +34,34 @@ sub create ( $self, $params ) {
 
     $self->event('create_user');
 
-    if (
-        my @emails = map { $_->[0] } @{ $self->dq->sql(q{
-            (
-                SELECT DISTINCT email
-                FROM user
-                JOIN role USING (user_id)
-                WHERE role.type = 'administrator'
-            )
-            UNION
-            (
-                SELECT DISTINCT email
-                FROM user
-                JOIN role USING (user_id)
-                WHERE role.type = 'director' AND role.program_id = ?
-            )
-        })->run( $program_id || 0 )->all }
-    ) {
-        CBQZ::Model::Email->new( type => 'new_user_registration' )->send({
-            to   => \@emails,
-            data => {
-                username => $self->obj->username,
-                realname => $self->obj->realname,
-                email    => $self->obj->email,
-            },
-        });
-    }
+    # if (
+    #     my @emails = map { $_->[0] } @{ $self->dq->sql(q{
+    #         (
+    #             SELECT DISTINCT email
+    #             FROM user
+    #             JOIN role USING (user_id)
+    #             WHERE role.type = 'administrator'
+    #         )
+    #         UNION
+    #         (
+    #             SELECT DISTINCT email
+    #             FROM user
+    #             JOIN role USING (user_id)
+    #             WHERE role.type = 'director' AND role.program_id = ?
+    #         )
+    #     })->run( $program_id || 0 )->all }
+    # ) {
+    #     CBQZ::Model::Email->new( type => 'new_user_registration' )->send({
+    #         to   => \@emails,
+    #         data => {
+    #             username => $self->obj->username,
+    #             realname => $self->obj->realname,
+    #             email    => $self->obj->email,
+    #         },
+    #     });
+    # }
+
+    $self->add_role( 'user', $program_id );
 
     # if there are no user with the "administrator" role, add the "administrator" roll to this new user
     $self->add_role( 'administrator', $program_id ) unless (
