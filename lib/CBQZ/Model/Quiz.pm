@@ -3,7 +3,6 @@ package CBQZ::Model::Quiz;
 use Moose;
 use MooseX::ClassAttribute;
 use exact;
-use Try::Tiny;
 use CBQZ::Model::Program;
 use CBQZ::Util::Format qw( canonical_date_time zulu_date_time );
 
@@ -283,7 +282,7 @@ sub generate ( $self, $cbqz_prefs ) {
             if ( @questions < $cbqz_prefs->{target_questions} );
     }
     catch {
-        E->throw( $self->clean_error($_) );
+        E->throw( $self->clean_error( $_ || $@ ) );
     };
 
     # randomly sort the first 20 questions

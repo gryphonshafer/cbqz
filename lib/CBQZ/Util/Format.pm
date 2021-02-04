@@ -5,7 +5,6 @@ use Date::Parse 'str2time';
 use Date::Format 'time2str';
 use DateTime;
 use DateTime::TimeZone;
-use Try::Tiny;
 
 require Exporter;
 

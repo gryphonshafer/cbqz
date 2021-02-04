@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
 use exact;
 use Config::App;
-use Try::Tiny;
 use CBQZ;
 use CBQZ::Util::File 'slurp';
 

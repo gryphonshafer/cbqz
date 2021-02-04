@@ -1,6 +1,5 @@
 use Config::App;
 use Test::Most;
-use Try::Tiny;
 use exact;
 
 use constant PACKAGE => 'CBQZ::Error';
@@ -18,7 +17,7 @@ sub main {
                 E->throw('Error message');
             }
             catch {
-                $e = $_;
+                $e = $_ || $@;
             };
         },
         q{E->throw('Error message')},
@@ -35,7 +34,7 @@ sub main {
                 );
             }
             catch {
-                $e = $_;
+                $e = $_ || $@;
             };
         },
         q{E::Db->throw(...)},

@@ -4,7 +4,6 @@ use Moose;
 use MooseX::ClassAttribute;
 use exact;
 use Digest::SHA 'sha256_hex';
-use Try::Tiny;
 use CBQZ::Model::QuestionSet;
 
 extends 'CBQZ::Model';
@@ -41,8 +40,8 @@ sub change_name ( $self, $username, $underscore_ok = 0 ) {
     }
     catch {
         E->throw('Failed to rename user; username already in use' )
-            if ( index( $_, 'Duplicate entry' ) > -1 );
-        E->throw($_);
+            if ( index( ( $_ || $@ ), 'Duplicate entry' ) > -1 );
+        E->throw( $_ || $@ );
     };
 
     return $self->obj;

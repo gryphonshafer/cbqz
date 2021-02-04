@@ -2,7 +2,6 @@
 use exact;
 use Config::App;
 use Util::CommandLine qw( options pod2usage );
-use Try::Tiny;
 use Progress::Any;
 use Progress::Any::Output;
 use CBQZ::Model::Question;

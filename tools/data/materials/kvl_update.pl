@@ -3,7 +3,6 @@ use exact;
 use open qw( :std :utf8 );
 use Util::CommandLine qw( options pod2usage );
 use Text::CSV_XS 'csv';
-use Try::Tiny;
 use Config::App;
 use CBQZ::Model::MaterialSet;
 

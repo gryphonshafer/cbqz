@@ -2,7 +2,6 @@ package CBQZ::Model::User::PreLogin;
 
 use Moose::Role;
 use exact;
-use Try::Tiny;
 use Digest::SHA 'sha256_hex';
 use CBQZ::Model::Email;
 
@@ -28,8 +27,8 @@ sub create ( $self, $params ) {
     }
     catch {
         E->throw('Failed to create user that already exists')
-            if ( index( $_, 'Duplicate entry' ) > -1 );
-        E->throw($_);
+            if ( index( ( $_ || $@ ), 'Duplicate entry' ) > -1 );
+        E->throw( $_ || $@ );
     };
 
     $self->event('create_user');

@@ -3,7 +3,6 @@ package CBQZ::Model;
 use Moose;
 use MooseX::ClassAttribute;
 use exact;
-use Try::Tiny;
 
 use CBQZ::Db::Schema;
 
@@ -25,7 +24,7 @@ sub load ( $self, @params ) {
         $self->obj( $self->db->resultset( $self->schema_name )->find(@params) );
     }
     catch {
-        E->throw( 'Failed to load object from database given PK: ' . $_ );
+        E->throw( 'Failed to load object from database given PK: ' . ( $_ || $@ ) );
     };
 
     return $self;

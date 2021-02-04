@@ -7,7 +7,6 @@ use Config::App;
 use DBIx::Query;
 use JSON::XS;
 use Mojo::UserAgent;
-use Try::Tiny;
 use CBQZ::Error;
 use CBQZ::Util::Log;
 use Data::Printer return_value => 'dump', colored => 1;

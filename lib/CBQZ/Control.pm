@@ -5,7 +5,6 @@ use exact;
 use Mojo::Loader 'load_class';
 use Mojo::Util 'b64_decode';
 use MojoX::Log::Dispatch::Simple;
-use Try::Tiny;
 use Text::CSV_XS 'csv';
 use CBQZ;
 use CBQZ::Model::User;

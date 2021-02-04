@@ -2,7 +2,6 @@ package CBQZ::Control::Admin;
 
 use Mojo::Base 'Mojolicious::Controller';
 use exact;
-use Try::Tiny;
 use CBQZ::Model::Program;
 use CBQZ::Model::User;
 use CBQZ::Model::Meet;
@@ -119,8 +118,8 @@ sub build_draw ($self) {
             );
         }
         catch {
-            $self->notice( 'Build draw error: ' . $self->cbqz->clean_error($_) );
-            $self->stash( message => $self->cbqz->clean_error($_) );
+            $self->notice( 'Build draw error: ' . $self->cbqz->clean_error( $_ || $@ ) );
+            $self->stash( message => $self->cbqz->clean_error( $_ || $@ ) );
         };
     }
 }

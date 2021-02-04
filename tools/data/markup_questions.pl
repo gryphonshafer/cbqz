@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
 use exact;
 use Config::App;
-use Try::Tiny;
 use Util::CommandLine qw( options pod2usage );
 use Progress::Any;
 use Progress::Any::Output;

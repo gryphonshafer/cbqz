@@ -2,7 +2,6 @@ package CBQZ::Control::Quizroom;
 
 use Mojo::Base 'Mojolicious::Controller';
 use exact;
-use Try::Tiny;
 use MIME::Base64 'encode_base64';
 use Text::Unidecode 'unidecode';
 use CBQZ::Model::Quiz;
@@ -120,7 +119,7 @@ sub generate_quiz ($self) {
         });
     }
     catch {
-        $self->warn( $self->cbqz->clean_error($_) );
+        $self->warn( $self->cbqz->clean_error( $_ || $@ ) );
         $self->flash( message =>
             'An error occurred while trying to generate the quiz: ' .
             $self->cbqz->clean_error($_) . '.'
@@ -229,7 +228,7 @@ sub data ($self) {
             if ( $quiz->obj->quizmaster ne $self->stash('user')->obj->realname );
     }
     catch {
-        $self->warn($_);
+        $self->warn( $_ || $@ );
         $data->{error} =
             'An error occurred while trying to load data. ' .
             'This is likely due to invalid quiz configuration settings.';
@@ -270,7 +269,7 @@ sub quiz_event ($self) {
                 if ( $question and $question->is_usable_by( $self->stash('user') ) );
         }
         catch {
-            $self->warn($_);
+            $self->warn( $_ || $@ );
         };
     }
 
@@ -330,8 +329,8 @@ sub quiz_event ($self) {
         } );
     }
     catch {
-        $self->warn($_);
-        $self->render( json => { error => $self->clean_error($_) } );
+        $self->warn( $_ || $@ );
+        $self->render( json => { error => $self->clean_error( $_ || $@ ) } );
     };
 
     return;
@@ -362,8 +361,8 @@ sub delete_quiz_event ($self) {
         $self->render( json => { success => 1 } );
     }
     catch {
-        $self->warn($_);
-        $self->render( json => { error => $self->clean_error($_) } );
+        $self->warn( $_ || $@ );
+        $self->render( json => { error => $self->clean_error( $_ || $@ ) } );
     };
 
     return;
@@ -394,7 +393,7 @@ sub mark ($self) {
         $return_json = { success => 1 };
     }
     catch {
-        $return_json = { error => $self->clean_error($_) };
+        $return_json = { error => $self->clean_error( $_ || $@ ) };
     };
 
     return $self->render( json => $return_json );
@@ -423,7 +422,7 @@ sub replace ($self) {
     }
     catch {
         $self->render( json => {
-            error => $self->clean_error($_),
+            error => $self->clean_error( $_ || $@ ),
         } );
     };
 
@@ -449,7 +448,7 @@ sub close ($self) {
         $self->stash('user')->event('close_quiz');
     }
     catch {
-        $self->flash( message => $self->clean_error($_) );
+        $self->flash( message => $self->clean_error( $_ || $@ ) );
     };
 
     return $self->redirect_to('/quizroom');
@@ -516,7 +515,7 @@ sub rearrange_quizzers ($self) {
     }
     catch {
         $self->render( json => {
-            error => $self->clean_error($_),
+            error => $self->clean_error( $_ || $@ ),
         } );
     };
 

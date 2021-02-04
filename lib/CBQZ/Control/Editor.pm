@@ -4,7 +4,6 @@ use Mojo::Base 'Mojolicious::Controller';
 use exact;
 use MIME::Base64 'decode_base64';
 use Text::Unidecode 'unidecode';
-use Try::Tiny;
 use CBQZ::Model::MaterialSet;
 use CBQZ::Model::QuestionSet;
 use CBQZ::Model::Question;
@@ -49,7 +48,7 @@ sub data ($self) {
         };
     }
     catch {
-        $self->warn($_);
+        $self->warn( $_ || $@ );
         $data->{error} =
             "An error occurred while trying to load data.\n" .
             "This is likely due to invalid settings on the main page.\n" .
@@ -155,7 +154,7 @@ sub questions ($self) {
         }
     }
     catch {
-        $self->warn($_);
+        $self->warn( $_ || $@ );
     };
 }
 

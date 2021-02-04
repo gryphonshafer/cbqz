@@ -3,7 +3,6 @@ package CBQZ::Control::Main;
 use Mojo::Base 'Mojolicious::Controller';
 use exact;
 use Mojo::IOLoop;
-use Try::Tiny;
 use Text::Unidecode 'unidecode';
 use Text::CSV_XS 'csv';
 use CBQZ::Model::User;
@@ -31,7 +30,7 @@ sub login ($self) {
         $user = $user->login( { map { $_ => $self->param($_) } qw( username passwd ) } );
     }
     catch {
-        $e = $self->clean_error($_);
+        $e = $self->clean_error( $_ || $@ );
         $self->info( 'Login failure (in controller): ' . $e );
         $self->flash( message => "Login failed. ($e) Please try again." );
     };
@@ -70,7 +69,7 @@ sub create_user ($self) {
         $self->login;
     }
     catch {
-        $e = $self->clean_error($_);
+        $e = $self->clean_error( $_ || $@ );
         $self->info( 'Create user failure (in controller): ' . $e );
         $self->flash( message => "Create user failed. ($e) Please try again." );
     };
@@ -211,7 +210,7 @@ sub clone_question_set ($self) {
         } );
     }
     catch {
-        $self->error($_);
+        $self->error( $_ || $@ );
         $self->flash( message => 'An error occurred; unable to clone set.' );
     };
 
@@ -238,7 +237,7 @@ sub material_data ($self) {
         $book_order = $material_set->get_books;
     }
     catch {
-        $self->warn($_);
+        $self->warn( $_ || $@ );
     };
 
     return $self->render( json => { material => $material, book_order => $book_order } );
@@ -261,7 +260,7 @@ sub edit_user ($self) {
                 $self->stash('user')->change_passwd( $self->req->param('new1'), $self->req->param('old') );
             }
             catch {
-                $self->flash( message => $self->clean_error($_) );
+                $self->flash( message => $self->clean_error( $_ || $@ ) );
             }
             finally {
                 unless (@_) {
@@ -278,7 +277,7 @@ sub edit_user ($self) {
             $self->stash('user')->change_name( $self->req->param('value') );
         }
         catch {
-            $self->flash( message => $self->clean_error($_) );
+            $self->flash( message => $self->clean_error( $_ || $@ ) );
         }
         finally {
             unless (@_) {
@@ -594,7 +593,7 @@ sub import_question_set ($self) {
         } );
     }
     catch {
-        $self->flash( message => 'Import failed; ' . $self->clean_error($_) );
+        $self->flash( message => 'Import failed; ' . $self->clean_error( $_ || $@ ) );
     };
 
     return $self->redirect_to('/main/question_sets');

@@ -2,7 +2,6 @@
 use exact;
 use Config::App;
 use Util::CommandLine qw( options pod2usage );
-use Try::Tiny;
 use CBQZ::Model::Meet;
 
 my $settings = options( qw( rooms|r=i teams|t=i quizzes|q=i norandom|n stats|s ) );
@@ -17,7 +16,8 @@ try {
     ( $meet, $stats ) = CBQZ::Model::Meet->build_draw($settings);
 }
 catch {
-    die CBQZ::Model::Meet->clean_error($_) . "\n";
+    my $e = $_ || $@;
+    die CBQZ::Model::Meet->clean_error($e) . "\n";
 };
 
 say 'Quiz meet schedule:';

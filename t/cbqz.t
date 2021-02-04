@@ -2,7 +2,6 @@ use Config::App;
 use Test::Most;
 use Test::Moose;
 use Test::MockModule;
-use Try::Tiny;
 use CBQZ::Error;
 use CBQZ::Util::Log;
 use exact;
@@ -75,7 +74,7 @@ sub clean_error ($obj) {
         E->throw('Error message in an E object');
     }
     catch {
-        $e = $_;
+        $e = $_ || $@;
     };
 
     is( $obj->clean_error($e), 'Error message in an E object', '$obj->clean_error( E->throw )' );

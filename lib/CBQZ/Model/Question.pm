@@ -5,7 +5,6 @@ use MooseX::ClassAttribute;
 use exact;
 use Mojo::DOM;
 use Time::Out 'timeout';
-use Try::Tiny;
 use CBQZ::Model::QuestionSet;
 
 extends 'CBQZ::Model';
@@ -298,7 +297,7 @@ sub is_shared_set ($self) {
             $question = $type_fork->($question);
         }
         catch {
-            $question->{error} = 'Auto-text error: ' . ( split(/\n/) )[0];
+            $question->{error} = 'Auto-text error: ' . ( split( /\n/, ( $_ || $@ ) ) )[0];
         };
 
         return $question;
