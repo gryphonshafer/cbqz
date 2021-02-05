@@ -436,7 +436,8 @@ sub export_question_set ($self) {
                             )->get_material([])
                         }
                     ];
-                };
+                }
+                catch {};
             }
 
             my $search = sub {

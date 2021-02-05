@@ -1,7 +1,8 @@
 package E {
     use Moose;
     use MooseX::ClassAttribute;
-    use exact;
+    use exact -notry;
+    use Try::Tiny;
     use Carp 'croak';
     use CBQZ;
 
@@ -13,17 +14,15 @@ package E {
             $self->$orig(@params);
         }
         catch {
-            my $e = $_ || $@;
-
             $self->cbqz->log->log_to(
                 name    => 'log_file',
                 level   => 'error',
-                message => ( $self->cbqz->able( $e, 'as_string' ) ) ? $e->as_string : $e,
+                message => ( $self->cbqz->able( $_, 'as_string' ) ) ? $_->as_string : $_,
             );
 
             {
                 local $Carp::CarpLevel = 2;
-                croak($e);
+                croak($_);
             }
         };
     };

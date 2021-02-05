@@ -143,7 +143,8 @@ sub setup_general_helpers ( $self, $cbqz ) {
         my $data;
         try {
             $data = $cbqz->json->decode( $self->req->body );
-        };
+        }
+        catch {};
         return $data;
     } );
     $self->helper( 'cbqz' => sub { $cbqz } );
@@ -151,7 +152,8 @@ sub setup_general_helpers ( $self, $cbqz ) {
         my $data = {};
         try {
             $data = $cbqz->json->decode( b64_decode( $self->cookie($name) // '' ) );
-        };
+        }
+        catch {};
         return $data;
     } );
 }

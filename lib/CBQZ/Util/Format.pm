@@ -39,7 +39,8 @@ sub zulu_date_time ( $this_time = scalar( localtime() ) ) {
     my $time_zone = 'Etc/UTC';
     try {
         $time_zone = DateTime::TimeZone->new( name => 'local' )->name;
-    };
+    }
+    catch {};
 
     my $dt = DateTime->new(
         %time,
