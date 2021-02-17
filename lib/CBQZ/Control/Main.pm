@@ -1,7 +1,7 @@
 package CBQZ::Control::Main;
 
 use Mojo::Base 'Mojolicious::Controller';
-use exact;
+use exact -trytiny;
 use Mojo::IOLoop;
 use Text::Unidecode 'unidecode';
 use Text::CSV_XS 'csv';

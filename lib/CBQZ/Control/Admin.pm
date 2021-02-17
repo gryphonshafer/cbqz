@@ -1,7 +1,7 @@
 package CBQZ::Control::Admin;
 
 use Mojo::Base 'Mojolicious::Controller';
-use exact;
+use exact -trytiny;
 use CBQZ::Model::Program;
 use CBQZ::Model::User;
 use CBQZ::Model::Meet;

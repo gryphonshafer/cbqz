@@ -1,7 +1,7 @@
 package CBQZ::Control;
 
 use Mojo::Base 'Mojolicious';
-use exact;
+use exact -trytiny;
 use Mojo::Loader 'load_class';
 use Mojo::Util 'b64_decode';
 use MojoX::Log::Dispatch::Simple;
@@ -74,8 +74,13 @@ sub startup ($self) {
 
     $anyone->any('/')->to('main#index');
     $anyone->any( '/' . $_ )->to( controller => 'main', action => $_ ) for ( qw(
-        login logout create_user
-        reset_password_start reset_password reset_password_save
+        index
+        login
+        logout
+        create_user
+        reset_password_start
+        reset_password
+        reset_password_save
     ) );
 
     my $authorized_user = $anyone->under( sub ($self) {
@@ -104,13 +109,81 @@ sub startup ($self) {
     } );
 
     $admin_user->any('/admin')->to( controller => 'admin', action => 'index' );
-    $admin_user->any('/admin/:action')->to( controller => 'admin' );
+    $admin_user->any( '/admin/' . $_ )->to( controller => 'admin', action => $_ ) for ( qw (
+        index
+        save_roles_changes
+        config
+        save_program_config
+        build_draw
+    ) );
 
     $authorized_user->any('/stats/room/:room')->to( controller => 'stats', action => 'room' );
     $authorized_user->any('/stats/room')->to( cb => sub ($self) { $self->redirect_to('/stats') } );
 
-    $authorized_user->any('/:controller')->to( action => 'index' );
-    $authorized_user->any('/:controller/:action');
+    $authorized_user->any( '/' . $_ )->to( controller => $_, action => 'index' ) for ( qw(
+        editor
+        quizroom
+        stats
+    ) );
+
+    $authorized_user->any( '/main/' . $_ )->to( controller => 'main', action => $_ ) for ( qw(
+        path
+        data
+        question_set_create
+        question_set_rename
+        question_set_delete
+        question_sets_reset
+        clone_question_set
+        material
+        material_data
+        edit_user
+        question_sets
+        set_select_users
+        save_set_select_users
+        export_question_set
+        import_question_set
+        merge_question_sets
+        auto_kvl
+        reset_password_start
+        reset_password_save
+    ) );
+
+    $authorized_user->any( '/editor/' . $_ )->to( controller => 'editor', action => $_ ) for ( qw(
+        path
+        data
+        save
+        delete
+        questions
+        auto_text
+    ) );
+
+    $authorized_user->any( '/quizroom/' . $_ )->to( controller => 'quizroom', action => $_ ) for ( qw(
+        index
+        path
+        quiz_setup
+        generate_quiz
+        quiz
+        data
+        quiz_event
+        delete_quiz_event
+        mark
+        replace
+        close
+        rearrange_quizzers
+        status
+    ) );
+
+    $authorized_user->any( '/stats/' . $_ )->to( controller => 'stats', action => $_ ) for ( qw(
+        index
+        path
+        quiz
+        delete_practice_quiz
+        delete_official_quiz
+        live_scoresheet
+        meet
+        meet_status
+        quiz_edit
+    ) );
 
     return;
 }

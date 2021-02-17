@@ -1,7 +1,7 @@
 package CBQZ::Control::Quizroom;
 
 use Mojo::Base 'Mojolicious::Controller';
-use exact;
+use exact -trytiny;
 use MIME::Base64 'encode_base64';
 use Text::Unidecode 'unidecode';
 use CBQZ::Model::Quiz;

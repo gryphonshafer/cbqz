@@ -2,7 +2,7 @@ package CBQZ::Model;
 
 use Moose;
 use MooseX::ClassAttribute;
-use exact;
+use exact -trytiny;
 
 use CBQZ::Db::Schema;
 

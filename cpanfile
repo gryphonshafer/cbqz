@@ -1,4 +1,4 @@
-requires 'exact', '>= 1.05';
+requires 'exact', '>= 1.16';
 requires 'Config::App', '>= 1.08';
 
 requires 'Moose', '>= 2.2011';
@@ -6,7 +6,7 @@ requires 'MooseX::ClassAttribute', '>= 0.29';
 requires 'MooseX::MarkAsMethods', '>= 0.15';
 requires 'MooseX::NonMoose', '>= 0.26';
 
-requires 'Mojolicious', '>= 7.92';
+requires 'Mojolicious', '>= 9.01';
 requires 'Mojolicious::Plugin::AccessLog', '>= 0.010';
 requires 'Mojolicious::Plugin::ToolkitRenderer', '>= 1.08';
 requires 'Mojolicious::Plugin::RequestBase', '>= 0.3';
@@ -35,7 +35,6 @@ requires 'Term::ANSIColor', '>= 4.06';
 requires 'Text::CSV_XS', '>= 1.36';
 requires 'Text::Unidecode', '>= 1.30';
 requires 'Time::Out', '>= 0.11';
-requires 'Try::Tiny', '>= 0.30';
 
 feature 'db', 'Deployment' => sub {
     requires 'DBIx::Class::Schema::Loader', '>= 0.07049';

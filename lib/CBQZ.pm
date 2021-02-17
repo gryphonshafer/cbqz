@@ -2,7 +2,7 @@ package CBQZ;
 
 use Moose;
 use MooseX::ClassAttribute;
-use exact;
+use exact -trytiny;
 use Config::App;
 use DBIx::Query;
 use JSON::XS;

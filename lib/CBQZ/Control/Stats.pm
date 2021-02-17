@@ -1,7 +1,7 @@
 package CBQZ::Control::Stats;
 
 use Mojo::Base 'Mojolicious::Controller';
-use exact;
+use exact -trytiny;
 use MIME::Base64 'decode_base64';
 use CBQZ::Model::Quiz;
 use CBQZ::Model::QuizQuestion;

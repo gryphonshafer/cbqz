@@ -1,6 +1,6 @@
 package CBQZ::Util::Format;
 
-use exact;
+use exact -trytiny;
 use Date::Parse 'str2time';
 use Date::Format 'time2str';
 use DateTime;

@@ -1,7 +1,7 @@
 package CBQZ::Control::Editor;
 
 use Mojo::Base 'Mojolicious::Controller';
-use exact;
+use exact -trytiny;
 use MIME::Base64 'decode_base64';
 use Text::Unidecode 'unidecode';
 use CBQZ::Model::MaterialSet;
