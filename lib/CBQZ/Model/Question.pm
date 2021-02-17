@@ -2,7 +2,8 @@ package CBQZ::Model::Question;
 
 use Moose;
 use MooseX::ClassAttribute;
-use exact -trytiny;
+use exact -notry;
+use Try::Tiny;
 use Mojo::DOM;
 use Time::Out 'timeout';
 use CBQZ::Model::QuestionSet;

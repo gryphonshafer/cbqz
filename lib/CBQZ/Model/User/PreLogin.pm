@@ -1,7 +1,8 @@
 package CBQZ::Model::User::PreLogin;
 
 use Moose::Role;
-use exact -trytiny;
+use exact -notry;
+use Try::Tiny;
 use Digest::SHA 'sha256_hex';
 use CBQZ::Model::Email;
 

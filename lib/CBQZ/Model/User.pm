@@ -2,7 +2,8 @@ package CBQZ::Model::User;
 
 use Moose;
 use MooseX::ClassAttribute;
-use exact -trytiny;
+use exact -notry;
+use Try::Tiny;
 use Digest::SHA 'sha256_hex';
 use CBQZ::Model::QuestionSet;
 

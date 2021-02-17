@@ -2,7 +2,8 @@ package CBQZ::Model::Quiz;
 
 use Moose;
 use MooseX::ClassAttribute;
-use exact -trytiny;
+use exact -notry;
+use Try::Tiny;
 use CBQZ::Model::Program;
 use CBQZ::Util::Format qw( canonical_date_time zulu_date_time );
 

@@ -1,7 +1,8 @@
 package E {
     use Moose;
     use MooseX::ClassAttribute;
-    use exact -trytiny;
+    use exact -notry;
+    use Try::Tiny;
     use Carp 'croak';
     use CBQZ;
 

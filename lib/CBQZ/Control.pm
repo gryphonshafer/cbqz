@@ -1,7 +1,8 @@
 package CBQZ::Control;
 
 use Mojo::Base 'Mojolicious';
-use exact -trytiny;
+use exact -notry;
+use Try::Tiny;
 use Mojo::Loader 'load_class';
 use Mojo::Util 'b64_decode';
 use MojoX::Log::Dispatch::Simple;
