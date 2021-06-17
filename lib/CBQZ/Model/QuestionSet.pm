@@ -193,6 +193,8 @@ sub save_set_select_users ( $self, $user, $type, $selected_user_ids ) {
 }
 
 sub import_questions ( $self, $questions, $material_set ) {
+    my $material = $material_set->load_material->material;
+
     for my $question_data (@$questions) {
         $question_data->{type} = 'MACR'  if ( $question_data->{type} eq 'CRMA'  );
         $question_data->{type} = 'MACVR' if ( $question_data->{type} eq 'CVRMA' );
@@ -206,18 +208,22 @@ sub import_questions ( $self, $questions, $material_set ) {
         ( $question_data->{$_} = unidecode( $question_data->{$_} || '' ) ) =~ s/&nbsp;/ /g
             for ( qw( question answer marked ) );
 
+        delete $question_data->{marked} unless ( $question_data->{marked} );
+
         $question_data->{question} =~ s/^Q:\s+//i;
         $question_data->{answer}   =~ s/^A:\s+//i;
 
         $question_data->{question_set_id} = $self->obj->id;
 
         my $question_obj = CBQZ::Model::Question->new->create($question_data);
+        my $data = $question_obj->auto_text( undef, undef, $material );
 
-        my $data = $question_obj->auto_text($material_set);
         $data->{marked} = delete $data->{error} if ( $data->{error} );
+        delete $data->{marked}
+            if ( index( $data->{marked}, 'Auto-text not supported for question type' ) > -1 );
 
         $question_obj->obj->update($data);
-        $question_obj->calculate_score($material_set);
+        $question_obj->calculate_score( undef, undef, $material );
     }
 
     return $self;

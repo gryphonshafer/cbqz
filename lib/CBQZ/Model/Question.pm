@@ -277,15 +277,20 @@ sub is_shared_set ($self) {
         return $data;
     };
 
-    sub auto_text ( $self, $material_set, $question = undef ) {
+    sub auto_text ( $self, $material_set = undef, $question = undef, $pre_loaded_material = undef ) {
         $question = $self->data if ( not $question and $self->obj );
 
-        try {
-            $material = $material_set->load_material->material;
+        unless ($pre_loaded_material) {
+            try {
+                $material = $material_set->load_material->material;
+            }
+            catch {
+                E->throw('Unable to load material from provided material set');
+            };
         }
-        catch {
-            E->throw('Unable to load material from provided material set');
-        };
+        else {
+            $material = $pre_loaded_material;
+        }
 
         my %lower_case_words =
             map { $_ => 1 }
@@ -305,11 +310,12 @@ sub is_shared_set ($self) {
     }
 }
 
-sub calculate_score ( $self, $material_set, $question = undef ) {
+sub calculate_score ( $self, $material_set = undef, $question = undef, $pre_loaded_material = undef ) {
     $question = $self->data if ( not $question and $self->obj );
 
     my $clean = sub {
         my ($text) = @_;
+        $text //= '';
         $text =~ s/<[^>]*>//g;
         $text =~ s/\[[^\]]*\]//g;
         $text =~ s/[^a-z0-9 ]+//gi;
@@ -332,7 +338,7 @@ sub calculate_score ( $self, $material_set, $question = undef ) {
     };
 
     my %verses;
-    for ( @{ $material_set->load_material->material } ) {
+    for ( @{ $pre_loaded_material || $material_set->load_material->material } ) {
         my $clean = $clean->( $_->{text} );
         push( @{ $verses{all} }, $clean );
         push( @{ $verses{key} }, $clean ) if ( $_->{key_class} );
