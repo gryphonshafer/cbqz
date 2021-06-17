@@ -127,8 +127,16 @@ sub startup ($self) {
         stats
     ) );
 
+    $authorized_user->any(
+        '/' . $_ . '/path' => [ format => ['js'] ]
+    )->to( controller => $_, action => 'path' ) for ( qw(
+        main
+        editor
+        quizroom
+        stats
+    ) );
+
     $authorized_user->any( '/main/' . $_ )->to( controller => 'main', action => $_ ) for ( qw(
-        path
         data
         question_set_create
         question_set_rename
@@ -150,7 +158,6 @@ sub startup ($self) {
     ) );
 
     $authorized_user->any( '/editor/' . $_ )->to( controller => 'editor', action => $_ ) for ( qw(
-        path
         data
         save
         delete
@@ -160,7 +167,6 @@ sub startup ($self) {
 
     $authorized_user->any( '/quizroom/' . $_ )->to( controller => 'quizroom', action => $_ ) for ( qw(
         index
-        path
         quiz_setup
         generate_quiz
         quiz
@@ -176,7 +182,6 @@ sub startup ($self) {
 
     $authorized_user->any( '/stats/' . $_ )->to( controller => 'stats', action => $_ ) for ( qw(
         index
-        path
         quiz
         delete_practice_quiz
         delete_official_quiz
