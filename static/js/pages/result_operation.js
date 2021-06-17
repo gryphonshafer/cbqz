@@ -43,12 +43,12 @@ if ( input.form == "question" ) {
                 ( int_number >= 13 && input.sk_type == "2-Team 15-Question Tie-Breaker" )
             )
         ) {
-            output.quizzer = 10;
-            output.team    = 10;
-            output.label   = 10;
+            output.team  = 10;
+            output.label = 10;
         }
 
         if ( input.as == "Bonus" ) {
+            output.quizzer = 0;
             output.label += "B";
         }
         else {
