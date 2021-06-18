@@ -219,8 +219,10 @@ sub import_questions ( $self, $questions, $material_set ) {
         my $data = $question_obj->auto_text( undef, undef, $material );
 
         $data->{marked} = delete $data->{error} if ( $data->{error} );
-        delete $data->{marked}
-            if ( index( $data->{marked}, 'Auto-text not supported for question type' ) > -1 );
+        delete $data->{marked} if (
+            $data->{marked} and
+            index( $data->{marked}, 'Auto-text not supported for question type' ) > -1
+        );
 
         $question_obj->obj->update($data);
         $question_obj->calculate_score( undef, undef, $material );
