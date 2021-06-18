@@ -309,24 +309,70 @@ sub quiz_event ($self) {
         delete $quiz_question_data->{question};
 
         ( my $number = $event->{result_data}{number} ) =~ s/\D+//g;
-        my $swap_question = 0;
+        my ( $swap_question, $swap_question_failure ) = ( 0, 0 );
+
         my $questions = $self->cbqz->json->decode( $quiz->obj->questions );
-        if (
-            $event->{event_data}{form} eq 'question' and
-            $event->{result_data}{number} =~ /[AB]/ and
-            $number < 21
-        ) {
-            $swap_question = 21 - ( $number - $event->{position} );
-            splice( @$questions, $event->{position} + 1, 0, splice( @$questions, $swap_question, 1 ) );
-            $quiz->obj->update({ questions => $self->cbqz->json->encode($questions) });
+        if ( $event->{event_data}{form} eq 'question' ) {
+            if ( $event->{result_data}{number} =~ /[AB]/ and $number < 21 ) {
+                $swap_question = 21 - ( $number - $event->{position} );
+            }
+            elsif ( $event->{result_data}{number} !~ /[AB]/ and $number >= 21 ) {
+                my $last_question = { %{ $event->{question} } };
+                $last_question->{question_number} = delete $last_question->{number};
+
+                my @natural_questions =
+                    grep { $_->{question_number} =~ /^\d+$/ }
+                    $last_question, @{ $event->{event_data}{history} };
+
+                if ( my $check_count = ( $natural_questions[0]{question_number} - 20 ) % 3 ) {
+                    my @types_in_3_set =
+                        map { $_->{type} } (
+                            grep { $_->{question_number} =~ /^\d+$/ } @natural_questions
+                        )[ 0 .. $check_count - 1 ];
+
+                    my @type_sets     = map { $_->[0] } @{ $event->{metadata}{type_ranges} };
+                    my %matched_types =
+                        map {
+                            my $this_type = $_;
+                            map { map { $_ => 1 } @$_ } grep {
+                                grep { $_ eq $this_type } @$_
+                            } @type_sets;
+                        }
+                        @types_in_3_set;
+
+                    my @types_in_3_set_full = sort keys %matched_types;
+
+                    if ( grep { $_ eq $questions->[ $event->{position} + 1 ]{type} } @types_in_3_set_full ) {
+                        my @replacement_options =
+                            grep {
+                                my $this_type = $_->[1]{type};
+                                not grep { $this_type eq $_ } @types_in_3_set_full;
+                            }
+                            map { [ $_, $questions->[$_] ] } $event->{position} + 1 .. @$questions - 1;
+
+                        if (@replacement_options) {
+                            $swap_question = $replacement_options[0][0];
+                        }
+                        else {
+                            $swap_question_failure = 1;
+                        }
+                    }
+                }
+            }
+
+            if ($swap_question) {
+                splice( @$questions, $event->{position} + 1, 0, splice( @$questions, $swap_question, 1 ) );
+                $quiz->obj->update({ questions => $self->cbqz->json->encode($questions) });
+            }
         }
 
         $quiz_data_ws->( $self, $quiz, $cbqz_prefs );
 
         $self->render( json => {
-            success       => 1,
-            quiz_question => $quiz_question_data,
-            swap_question => $swap_question,
+            success               => 1,
+            quiz_question         => $quiz_question_data,
+            swap_question         => $swap_question,
+            swap_question_failure => $swap_question_failure,
         } );
     }
     catch {

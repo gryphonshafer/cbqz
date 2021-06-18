@@ -353,6 +353,11 @@ Vue.http.get( cntlr + "/data" ).then( function (response) {
 
                         this.quiz_questions.unshift( response.body.quiz_question );
                         if ( !! result_data.message ) alert( result_data.message );
+                        if ( response.body.swap_question_failure ) alert(
+                            'Failed to auto-swap questions in queue to' + "\n" +
+                            'adhere to type rules. Recommend manually' + "\n" +
+                            'replacing current new question.'
+                        );
                     }
                 } );
             },
