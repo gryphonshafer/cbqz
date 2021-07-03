@@ -97,13 +97,8 @@ sub is_shared_set ($self) {
         return $text;
     };
 
-    my $search = sub ( $text, $book, $chapter, $verse, $range ) {
-        $text = $prep_text_re->($text);
-
-        my @matches =
-            map { $_->[0] }
-            sort { $a->[1] <=> $b->[1] }
-            map { [ $_, abs( $verse - $_->{verse} ) ] }
+    my $fetch = sub ( $book, $chapter, $verse, $range, $use_simple_sort = undef ) {
+        my @verses =
             grep {
                 $_->{book} eq $book and
                 $_->{chapter} eq $chapter and
@@ -111,6 +106,20 @@ sub is_shared_set ($self) {
                 $_->{verse} <= $verse + $range
             }
             @$material;
+
+        @verses =
+            map { $_->[0] }
+            sort { $a->[1] <=> $b->[1] }
+            map { [ $_, abs( $verse - $_->{verse} ) ] }
+            @verses
+            unless ($use_simple_sort);
+
+        return @verses;
+    };
+
+    my $search = sub ( $text, $book, $chapter, $verse, $range ) {
+        $text = $prep_text_re->($text);
+        my @matches = $fetch->( $book, $chapter, $verse, $range );
 
         my @filtered_matches;
         timeout 2 => sub {
@@ -266,6 +275,27 @@ sub is_shared_set ($self) {
             $quote_off->( $data->{answer} );
             $data->{answer} =~ s/".*//;
             $quote_back->( $data->{answer} );
+        }
+        elsif ( $data->{type} eq 'SIT' ) {
+            my ( $need, $quote ) = $data->{question} =~ /\s*\[([^\]]+)\]\s*"?(.+?)"?$/;
+            E->throw('SIT not written in required ATM format') unless ($quote);
+
+            my @context = $fetch->( @$data{ qw( book chapter verse ) }, 5, 'simple_sort' );
+
+            my $forward = join( ' ', map { $_->{text} } grep { $_->{verse} >= $data->{verse} } @context );
+            ( my $quote_simple = lc $quote ) =~ s/[^a-z0-9']+/ /g;
+            my $quote_re = join( '.*?', map { $prep_text_re->($_) } split( ' ', $quote_simple ) );
+            my $match_quote = ( $forward =~ /($quote_re)/i ) ? $fix->($1) : undef;
+            E->throw('Failed to match quote text') unless ($match_quote);
+
+            my $complete = join( ' ', map { $_->{text} } @context );
+            ( my $answer_simple = lc $data->{answer} ) =~ s/[^a-z0-9']+/ /g;
+            my $answer_re = join( '.*?', map { $prep_text_re->($_) } split( ' ', $answer_simple ) );
+            my $match_answer = ( $complete =~ /($answer_re)/i ) ? $fix->($1) : undef;
+            E->throw('Failed to match answer text') unless ($match_answer);
+
+            $data->{question} = '[' . $need . '] ' . $match_quote . '."';
+            $data->{answer} = $match_answer;
         }
         else {
             E->throw('Auto-text not supported for question type');
