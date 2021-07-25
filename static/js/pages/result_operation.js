@@ -39,6 +39,7 @@ if ( input.form == "question" ) {
 
         if (
             input.as == "Bonus" && (
+                input.sk_type == "2-Team 20-Question" ||
                 ( int_number >= 17 && input.sk_type != "2-Team 15-Question Tie-Breaker" ) ||
                 ( int_number >= 13 && input.sk_type == "2-Team 15-Question Tie-Breaker" )
             )
