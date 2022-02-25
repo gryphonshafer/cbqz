@@ -64,7 +64,16 @@ if ( input.form == "question" ) {
             }
         }
 
-        if ( input.quizzer.correct == 3 && input.as != "Bonus" ) {
+        if (
+            (
+                input.quizzer.correct == 3 ||
+                (
+                    input.sk_type == "3-Team 15-Question" &&
+                    input.quizzer.correct == 2
+                )
+            ) &&
+            input.as != "Bonus"
+        ) {
             if ( input.quizzer.incorrect == 0 ) {
                 output.team    += 10;
                 output.quizzer += 10;
@@ -92,7 +101,8 @@ if ( input.form == "question" ) {
 
         if (
             ( int_number < 16 && input.sk_type != "2-Team 15-Question Tie-Breaker" ) ||
-            ( int_number < 12 && input.sk_type == "2-Team 15-Question Tie-Breaker" )
+            ( int_number < 12 && input.sk_type == "2-Team 15-Question Tie-Breaker" ) ||
+            ( int_number < 12 && input.sk_type == "3-Team 15-Question" )
         ) {
             output.number = int_number + 1;
         }
@@ -135,8 +145,14 @@ if ( input.form == "question" ) {
     }
 
     if (
-        output.as == "Standard" && output.number == 21 &&
-        ( input.sk_type == "3-Team 20-Question" || input.sk_type == "2-Team 20-Question" )
+        output.as == "Standard" && (
+            (
+                output.number == 21 && (
+                    input.sk_type == "3-Team 20-Question" || input.sk_type == "2-Team 20-Question"
+                )
+            ) ||
+            ( output.number == 16 && input.sk_type == "3-Team 15-Question" )
+        )
     ) output.sk_type = "2-Team Overtime";
 }
 
