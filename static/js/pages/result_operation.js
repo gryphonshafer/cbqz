@@ -41,7 +41,8 @@ if ( input.form == "question" ) {
             input.as == "Bonus" && (
                 input.sk_type == "2-Team 20-Question" ||
                 ( int_number >= 17 && input.sk_type != "2-Team 15-Question Tie-Breaker" ) ||
-                ( int_number >= 13 && input.sk_type == "2-Team 15-Question Tie-Breaker" )
+                ( int_number >= 13 && input.sk_type == "2-Team 15-Question Tie-Breaker" ) ||
+                ( int_number >= 13 && input.sk_type == "3-Team 15-Question" )
             )
         ) {
             output.team  = 10;
@@ -100,9 +101,13 @@ if ( input.form == "question" ) {
         }
 
         if (
-            ( int_number < 16 && input.sk_type != "2-Team 15-Question Tie-Breaker" ) ||
+            ( int_number < 12 && input.sk_type == "3-Team 15-Question" ) ||
             ( int_number < 12 && input.sk_type == "2-Team 15-Question Tie-Breaker" ) ||
-            ( int_number < 12 && input.sk_type == "3-Team 15-Question" )
+            (
+                int_number < 16 &&
+                input.sk_type != "2-Team 15-Question Tie-Breaker" &&
+                input.sk_type != "3-Team 15-Question"
+            )
         ) {
             output.number = int_number + 1;
         }
@@ -130,7 +135,10 @@ if ( input.form == "question" ) {
                 output.team    = -10;
                 output.label   += "--";
             }
-            else if ( int_number >= 17 ) {
+            else if (
+                int_number >= 17 ||
+                ( int_number >= 13 && input.sk_type == "3-Team 15-Question" )
+            ) {
                 output.team  = -10;
                 output.label += "-";
             }
