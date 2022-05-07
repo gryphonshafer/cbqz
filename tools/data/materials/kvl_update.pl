@@ -29,7 +29,8 @@ for ( @{ csv( in => $settings->{kvl} ) } ) {
 my $material_set_id;
 try {
     $material_set_id = CBQZ::Model::MaterialSet->new->load({ name => $settings->{set} })->obj->id;
-};
+}
+catch {};
 die "Unable to find material set with specified name\n" unless ($material_set_id);
 
 my $dq = CBQZ::Model::MaterialSet->new->dq;
