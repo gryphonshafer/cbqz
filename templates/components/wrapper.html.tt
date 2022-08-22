@@ -26,6 +26,8 @@
 <!DOCTYPE html>
 <html lang="en" class="[% page.html_class %]">
     <head>
+        <title>[% page.title %]</title>
+
         <meta charset="utf-8">
         <meta name="robots" content="noindex">
         <meta name="viewport" content="width=device-width, initial-scale=0.9">
@@ -38,7 +40,13 @@
                 href="[% c.url_for('/style.css').query( version => version ) %]" />
         [% END %]
 
-        <title>[% page.title %]</title>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-4EESVF7WE2"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            gtag( 'js', new Date() );
+            gtag( 'config', 'G-4EESVF7WE2' );
+        </script>
     </head>
     <body>
         [% UNLESS page.skip_layout %]
