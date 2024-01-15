@@ -39,14 +39,6 @@
             <link rel="stylesheet" type="text/css"
                 href="[% c.url_for('/style.css').query( version => version ) %]" />
         [% END %]
-
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-7TD4R6CP9K"></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag() { dataLayer.push(arguments); }
-            gtag( 'js', new Date() );
-            gtag( 'config', 'G-7TD4R6CP9K' );
-        </script>
     </head>
     <body>
         [% UNLESS page.skip_layout %]
