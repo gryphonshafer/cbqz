@@ -2,9 +2,10 @@ use Config::App;
 use Test::Most;
 use Test::Moose;
 use Test::MockModule;
+use Try::Tiny;
 use CBQZ::Error;
 use CBQZ::Util::Log;
-use exact;
+use exact -notry;
 
 use constant PACKAGE => 'CBQZ';
 

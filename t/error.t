@@ -1,6 +1,7 @@
 use Config::App;
 use Test::Most;
-use exact;
+use Try::Tiny;
+use exact -notry;
 
 use constant PACKAGE => 'CBQZ::Error';
 

@@ -54,8 +54,6 @@ default:
             AutoCommit: 1
             RaiseError: 1
             PrintError: 0
-            mysql_enable_utf8: 1
-            mysql_auto_reconnect: 1
         logging:
             debug: 1
             file: runtime/dbic_sql.sql

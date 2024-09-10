@@ -62,7 +62,7 @@ class_has dq => ( isa => 'DBIx::Query::db', is => 'ro', lazy => 1, default => su
 class_has dsn => ( isa => 'Str', is => 'ro', lazy => 1, default => sub ($self) {
     my $config = $self->config->get('database');
 
-    return 'dbi:mysql:' . join( ';',
+    return 'DBI:MariaDB:' . join( ';',
         map { join( '=', @$_ ) }
         grep { defined $_->[1] }
         map { [ $_, $config->{$_} ] }
