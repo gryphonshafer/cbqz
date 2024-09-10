@@ -1,10 +1,9 @@
-FROM alpine:3.13
-MAINTAINER Gryphon Shafer <g@cbqz.org>
+FROM alpine:3.20
 
 WORKDIR /cbqz
 COPY cpanfile .
 
-RUN apk --no-cache add perl perl-dbd-mysql && \
+RUN apk --no-cache add perl && \
     apk --no-cache add --virtual .build-dependencies build-base curl wget perl-dev mariadb-dev && \
     curl -sL http://xrl.us/cpanm > cpanm && \
     chmod +x cpanm && \
@@ -15,5 +14,4 @@ RUN apk --no-cache add perl perl-dbd-mysql && \
 VOLUME /cbqz
 EXPOSE 3000
 
-CMD rm runtime/hypnotoad.pid
-CMD hypnotoad -f app.pl
+CMD [ "sh", "-c", "rm runtime/hypnotoad.pid && hypnotoad -f app.pl" ]
