@@ -142,19 +142,14 @@ sub users_to_select ( $self, $user, $type ) {
                 SELECT
                     u.user_id AS id, u.username, u.realname,
                     SUM( IF( uqs.question_set_id = ? AND uqs.type = ?, 1, 0 ) ) AS checked
-                FROM user_program AS up
-                JOIN user AS u USING (user_id)
+                FROM user AS u
                 LEFT OUTER JOIN user_question_set AS uqs USING (user_id)
-                WHERE
-                    up.program_id IN (
-                       SELECT program_id FROM user_program WHERE user_id = ?
-                    )
-                    AND u.user_id != ?
+                WHERE u.user_id != ?
                 GROUP BY 1
             })->run(
                 $self->obj->id,
                 $type,
-                ( $user->obj->id ) x 2,
+                $user->obj->id,
             )->all({})
         }
     ];
