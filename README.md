@@ -144,10 +144,9 @@ container based on the CBQZ Docker image.
 
     docker run \
         --detach \
-        --hostname cbqz-app \
+        --hostname cbqz \
         --net host \
-        --publish 3000:3000 \
-        --name cbqz-app \
+        --name cbqz \
         --restart unless-stopped \
         --volume `pwd`:/cbqz \
         cbqz
@@ -157,7 +156,7 @@ container based on the CBQZ Docker image.
 The following as an exampe of how to get shell access of a running CBQZ
 container.
 
-    docker exec --interactive --tty cbqz-app sh
+    docker exec --interactive --tty cbqz sh
 
 Note that this gives you `sh` access, not `bash` or anything more advanced
 since these other shells are not installed in the image/container for space
@@ -168,7 +167,7 @@ considerations.
 If you need to run command-line tools from within a CBQZ Docker container, you
 can run such a container as follows:
 
-    docker run --interactive --tty --rm --net host --volume `pwd`:/cbqz cbqz-app sh
+    docker run --interactive --tty --rm --net host --volume `pwd`:/cbqz cbqz sh
 
 This will spin up a new container and put you in to the `sh` shell of that
 container. When you exit the container, the container will delete itself. To get
@@ -195,7 +194,7 @@ be stored in `/opt/docker/mysql/data`.
     docker run \
         --detach \
         --publish 3306:3306 \
-        --name cbqz-mysql \
+        --name mysql \
         --restart unless-stopped \
         --env MYSQL_ROOT_PASSWORD=root_password \
         --volume /opt/docker/mysql/data:/var/lib/mysql \
@@ -225,9 +224,8 @@ CBQZ service.
 
     docker run \
         --detach \
-        --net host \
         --publish 80:80 \
-        --name cbqz-nginx \
+        --name nginx \
         --restart unless-stopped \
         --volume `pwd`/etc/nginx.conf:/etc/nginx/nginx.conf:ro \
         --volume `pwd`:/cbqz:ro \
@@ -247,7 +245,8 @@ To obtain a command-line interface to the database:
 To backup the database running from within a Docker container:
 
     set +o history
-    sudo docker run -it --rm --net host mysql sh -c 'exec mysqldump -h127.0.0.1 -uroot -pPASSWORD cbqz' | gzip > cbqz.sql.gz
+    sudo docker run -it --rm --net host \
+        mysql sh -c 'exec mysqldump -h127.0.0.1 -uroot -pPASSWORD cbqz' | gzip > cbqz.sql.gz
     set -o history
 
 To restore the database from Docker container backup to local database:
