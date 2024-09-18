@@ -54,6 +54,7 @@ default:
             AutoCommit: 1
             RaiseError: 1
             PrintError: 0
+            mariadb_auto_reconnect: 1
         logging:
             debug: 1
             file: runtime/dbic_sql.sql
